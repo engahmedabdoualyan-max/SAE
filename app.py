@@ -47,7 +47,7 @@ def app():
 
     st.set_page_config(
         page_title="SAE Calibration Hub",
-        page_icon=":car:",
+        page_icon="⚙️",
         layout="wide",
         initial_sidebar_state="expanded",
     )
