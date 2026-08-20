@@ -6,6 +6,19 @@
     <title>SAE AutoSim Hub</title>
     <meta name="description" content="Pre-calibrated vehicle fleets for chaotic, aggressive traffic environments. Supporting researchers worldwide, with a focus on Arab Countries.">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                colors: {
+                    primary: { DEFAULT: '#0EA5E9', dark: '#028AC4' },
+                    secondary: '#6366F1',
+                    accent: '#F59E0B'
+                }
+            }
+        }
+    }
+    </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -32,8 +45,8 @@
         .card-hover:hover { transform: translateY(-4px); box-shadow: 0 10px 30px rgba(0,0,0,0.12); }
         .flag { font-size: 1.3em; margin-right: 6px; }
         .rtl .flag { margin-right: 0; margin-left: 6px; }
-        .download-btn { transition: all 0.3s ease; border: 2px dashed var(--primary); background: white; }
-        .download-btn:hover { background: var(--primary); transform: scale(1.02); }
+        .download-btn { transition: all 0.3s ease; border: 2px dashed var(--primary); background: white; color: #374151; }
+        .download-btn:hover { background: var(--primary); color: white; transform: scale(1.02); border-color: var(--primary); }
         .level-badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 0.7em; font-weight: 600; }
         .lvl0 { background: #FEE2E2; color: #991B2B; }
         .lvl2 { background: #DBEAFE; color: #1E40AF; }
@@ -41,7 +54,7 @@
         .mpr-knob { -webkit-appearance: none; width: 100%; height: 8px; border-radius: 4px; background: linear-gradient(to right, var(--primary), var(--secondary)); outline: none; }
         .mpr-knob::-webkit-slider-thumb { -webkit-appearance: none; width: 24px; height: 24px; border-radius: 50%; background: white; border: 2px solid var(--primary); cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.2); }
         .platform-btn { transition: all 0.2s ease; }
-        .platform-btn.active { background: var(--primary); color: white; }
+        .platform-btn.active { background: rgba(255,255,255,0.95) !important; color: #0EA5E9 !important; border-color: white !important; }
         .nav-link { transition: color 0.2s ease; }
         .nav-link:hover { color: var(--primary); }
         @media (max-width: 768px) { .hero-bg { min-height: 500px; } .flag { font-size: 1.1em; } }
@@ -99,11 +112,11 @@
                 </div>
                 <div class="flex flex-wrap gap-3 mt-8 fade-in" style="animation-delay: 0.8s;">
                     <span class="text-sm text-slate-300" data-key="sel">Select Platform</span>
-                    <button onclick="switchPlatform('vissim')" data-platform-btn data-platform="vissim" class="platform-btn px-6 py-3 rounded-lg font-semibold flex items-center gap-2">
+                    <button onclick="switchPlatform('vissim')" data-platform-btn data-platform="vissim" class="platform-btn px-6 py-3 rounded-lg font-semibold flex items-center gap-2 bg-white/20 text-white backdrop-blur-sm border border-white/30 hover:bg-white/30">
                         <i class="fas fa-cog"></i><span data-key="vis">PTV VISSIM</span></button>
-                    <button onclick="switchPlatform('sumo')" data-platform-btn data-platform="sumo" class="platform-btn px-6 py-3 rounded-lg font-semibold flex items-center gap-2 bg-slate-800/30">
+                    <button onclick="switchPlatform('sumo')" data-platform-btn data-platform="sumo" class="platform-btn px-6 py-3 rounded-lg font-semibold flex items-center gap-2 bg-white/10 text-white/80 backdrop-blur-sm border border-white/20 hover:bg-white/20">
                         <i class="fas fa-network-wired"></i><span data-key="sum">SUMO</span></button>
-                    <button onclick="switchPlatform('aimsun')" data-platform-btn data-platform="aimsun" class="platform-btn px-6 py-3 rounded-lg font-semibold flex items-center gap-2 bg-slate-800/30">
+                    <button onclick="switchPlatform('aimsun')" data-platform-btn data-platform="aimsun" class="platform-btn px-6 py-3 rounded-lg font-semibold flex items-center gap-2 bg-white/10 text-white/80 backdrop-blur-sm border border-white/20 hover:bg-white/20">
                         <i class="fas fa-car"></i><span data-key="aim">Aimsun Next</span></button>
                 </div>
                 <div class="mt-8 max-w-md fade-in" style="animation-delay: 1s;">
@@ -1107,23 +1120,22 @@
     }
 
     function handleDownload(type) {
-        var platformNames = {
-            vissim: 'VISSIM',
-            sumo: 'SUMO',
-            aimsun: 'Aimsun'
+        var urls = {
+            vissim: '/fleets/custom_egypt_fleet.inpx',
+            sumo: '/fleets/egypt_sumo_fleet.rou.xml',
+            script: '/scripts/vissim_sae_override.py'
         };
-        var msgs = {
-            en: 'Download ' + platformNames[currentPlatform] + ' config (MPR: ' + mprValue + '%)',
-            ar: 'تحميل إعدادات ' + platformNames[currentPlatform] + ' (MPR: ' + mprValue + '%)',
-            ru: 'Скачать ' + platformNames[currentPlatform] + ' (MPR: ' + mprValue + '%)',
-            hi: 'डाउनलोड ' + platformNames[currentPlatform] + ' (MPR: ' + mprValue + '%)',
-            de: 'Laden Sie ' + platformNames[currentPlatform] + ' Konfiguration herunter (MPR: ' + mprValue + '%)',
-            zh: '下载 ' + platformNames[currentPlatform] + ' 配置 (MPR: ' + mprValue + '%)',
-            ja: currentPlatform + ' をダウンロード (MPR: ' + mprValue + '%)',
-            ko: currentPlatform + ' 다운로드 (MPR: ' + mprValue + '%)',
-            fr: 'Télécharger ' + platformNames[currentPlatform] + ' (MPR: ' + mprValue + '%)'
+        var names = {
+            vissim: 'custom_egypt_fleet.inpx',
+            sumo: 'egypt_sumo_fleet.rou.xml',
+            script: 'vissim_sae_override.py'
         };
-        alert(msgs[currentLang] || msgs.en);
+        var a = document.createElement('a');
+        a.href = urls[type];
+        a.download = names[type];
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
     }
 
     window.addEventListener('load', function() {
