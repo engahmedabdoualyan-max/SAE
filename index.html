@@ -266,55 +266,190 @@
         </div>
     </section>
 
-    <!-- Fleet Documentation -->
+    <!-- Fleet Documentation — Expanded Granular Matrix -->
     <section id="fleets" class="py-16 bg-white">
         <div class="container mx-auto px-4">
-            <div class="text-center mb-12">
-                <h2 class="text-3xl font-bold text-slate-800 mb-4" data-key="f0">SAE Level 0 - Conventional Fleet (Egyptian)</h2>
-                <p class="text-slate-600 max-w-2xl mx-auto" data-key="f0d">The Egyptian conventional fleet dominates todays roads. Microbuses, passenger cars (Mlaiky), and heavy trucks (Naql) exhibit aggressive, non-lane-based driving patterns.</p>
+            <!-- SAE Level 0: Standard -->
+            <div class="text-center mb-10">
+                <h2 class="text-3xl font-bold text-slate-800 mb-3" data-key="f0">SAE Level 0 — Standard Conventional Fleet</h2>
+                <p class="text-slate-600 max-w-3xl mx-auto" data-key="f0d">The heterogeneous baseline fleet dominating Egyptian roads. Each vehicle type exhibits unique kinematic signatures critical for valid micro-simulation calibration.</p>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-                <div class="bg-white rounded-xl p-6 border border-slate-200 card-hover">
-                    <div class="flex items-center gap-3 mb-4">
-                        <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center"><i class="fas fa-bus text-2xl text-orange-500"></i></div>
-                        <h3 class="font-bold text-lg" data-key="mb">Egyptian Microbus</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 mb-12">
+                <!-- Mlaiky -->
+                <div class="bg-white rounded-xl p-5 border border-slate-200 card-hover">
+                    <div class="flex items-center gap-2 mb-3">
+                        <div class="w-9 h-9 bg-blue-100 rounded-lg flex items-center justify-center"><i class="fas fa-car-side text-lg text-blue-500"></i></div>
+                        <div><h3 class="font-bold text-sm" data-key="ml">Mlaiky (Passenger Car)</h3><span class="text-xs text-slate-400">25%</span></div>
                     </div>
-                    <p class="text-sm text-slate-600 mb-3" data-key="mbd">High acceleration/deceleration, zero lateral headway, aggressive lane changes, frequent roadside stops (mean dwell ~25s, ~0.4 stops/km).</p>
-                    <div class="bg-slate-50 rounded-lg p-3 text-xs font-mono"><span data-key="mbp">Accel: 3.0 | Decel: 6.0 | tau: 0.7s | Safety: 0.35 | sigma: 0.95</span></div>
+                    <p class="text-xs text-slate-600 mb-2" data-key="mld">Local small/mid-size sedans. Reduced safety distances, high cooperative lane-changing thresholds.</p>
+                    <div class="bg-slate-50 rounded-lg p-2 text-xs font-mono text-slate-600"><span data-key="mlp">a:2.4 d:5.0 t:0.85 s:0.45</span></div>
                 </div>
-                <div class="bg-white rounded-xl p-6 border border-slate-200 card-hover">
-                    <div class="flex items-center gap-3 mb-4">
-                        <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center"><i class="fas fa-car-side text-2xl text-blue-500"></i></div>
-                        <h3 class="font-bold text-lg" data-key="ml">Mlaiky (Passenger Cars)</h3>
+                <!-- Microbus -->
+                <div class="bg-white rounded-xl p-5 border border-slate-200 card-hover">
+                    <div class="flex items-center gap-2 mb-3">
+                        <div class="w-9 h-9 bg-orange-100 rounded-lg flex items-center justify-center"><i class="fas fa-bus text-lg text-orange-500"></i></div>
+                        <div><h3 class="font-bold text-sm" data-key="mb">Egyptian Microbus</h3><span class="text-xs text-slate-400">20%</span></div>
                     </div>
-                    <p class="text-sm text-slate-600 mb-3" data-key="mld">Reduced safety distances, high cooperative lane-changing thresholds, unpredictable cut-ins.</p>
-                    <div class="bg-slate-50 rounded-lg p-3 text-xs font-mono"><span data-key="mlp">Accel: 2.4 | Decel: 5.0 | tau: 0.85s | Safety: 0.45 | sigma: 0.85</span></div>
+                    <p class="text-xs text-slate-600 mb-2" data-key="mbd">High accel/decel, zero lateral headway, aggressive lane changes, frequent roadside stops (~25s dwell).</p>
+                    <div class="bg-slate-50 rounded-lg p-2 text-xs font-mono text-slate-600"><span data-key="mbp">a:3.0 d:6.0 t:0.7 s:0.35</span></div>
                 </div>
-                <div class="bg-white rounded-xl p-6 border border-slate-200 card-hover">
-                    <div class="flex items-center gap-3 mb-4">
-                        <div class="w-12 h-12 bg-amber-100 rounded-lg flex items-center justify-center"><i class="fas fa-truck-loading text-2xl text-amber-600"></i></div>
-                        <h3 class="font-bold text-lg" data-key="nt">Naql (Heavy Trucks)</h3>
+                <!-- Noss-Naql -->
+                <div class="bg-white rounded-xl p-5 border border-slate-200 card-hover">
+                    <div class="flex items-center gap-2 mb-3">
+                        <div class="w-9 h-9 bg-amber-100 rounded-lg flex items-center justify-center"><i class="fas fa-truck text-lg text-amber-600"></i></div>
+                        <div><h3 class="font-bold text-sm" data-key="nn">Noss-Naql (Half-Truck)</h3><span class="text-xs text-slate-400">8%</span></div>
                     </div>
-                    <p class="text-sm text-slate-600 mb-3" data-key="ntd">Low power-to-weight, extended braking distances, night-dominant lane usage.</p>
-                    <div class="bg-slate-50 rounded-lg p-3 text-xs font-mono"><span data-key="ntp">Accel: 0.9 | Decel: 4.5 | tau: 1.3s | Safety: 0.55 | sigma: 0.75 | Night</span></div>
+                    <p class="text-xs text-slate-600 mb-2" data-key="nnd">Medium commercial distribution vans, moderate braking distances, moderate lane discipline.</p>
+                    <div class="bg-slate-50 rounded-lg p-2 text-xs font-mono text-slate-600"><span data-key="nnp">a:1.8 d:5.2 t:0.9 s:0.40</span></div>
+                </div>
+                <!-- Rob-Naql -->
+                <div class="bg-white rounded-xl p-5 border border-slate-200 card-hover">
+                    <div class="flex items-center gap-2 mb-3">
+                        <div class="w-9 h-9 bg-yellow-100 rounded-lg flex items-center justify-center"><i class="fas fa-shuttle-van text-lg text-yellow-600"></i></div>
+                        <div><h3 class="font-bold text-sm" data-key="rn">Rob-Naql (Dababa)</h3><span class="text-xs text-slate-400">7%</span></div>
+                    </div>
+                    <p class="text-xs text-slate-600 mb-2" data-key="rnd">Quarter-truck pickups (Chevrolet T-Series). High-frequency local logistics, frequent stops.</p>
+                    <div class="bg-slate-50 rounded-lg p-2 text-xs font-mono text-slate-600"><span data-key="rnp">a:2.0 d:5.5 t:0.8 s:0.38</span></div>
+                </div>
+                <!-- Naql-Taqeel -->
+                <div class="bg-white rounded-xl p-5 border border-slate-200 card-hover">
+                    <div class="flex items-center gap-2 mb-3">
+                        <div class="w-9 h-9 bg-red-100 rounded-lg flex items-center justify-center"><i class="fas fa-truck-monster text-lg text-red-700"></i></div>
+                        <div><h3 class="font-bold text-sm" data-key="ntt">Naql-Taqeel (Semitrailer)</h3><span class="text-xs text-slate-400">5%</span></div>
+                    </div>
+                    <p class="text-xs text-slate-600 mb-2" data-key="nttd">Heavy freight trucks, massive braking distances, very low power-to-weight, night-dominant.</p>
+                    <div class="bg-slate-50 rounded-lg p-2 text-xs font-mono text-slate-600"><span data-key="nttp">a:0.7 d:4.0 t:1.4 s:0.60</span></div>
+                </div>
+                <!-- Motorcycle -->
+                <div class="bg-white rounded-xl p-5 border border-slate-200 card-hover">
+                    <div class="flex items-center gap-2 mb-3">
+                        <div class="w-9 h-9 bg-red-100 rounded-lg flex items-center justify-center"><i class="fas fa-motorcycle text-lg text-red-500"></i></div>
+                        <div><h3 class="font-bold text-sm" data-key="moto">Motorcycle (Darrah)</h3><span class="text-xs text-slate-400">5%</span></div>
+                    </div>
+                    <p class="text-xs text-slate-600 mb-2" data-key="motod">Ultra-narrow lateral footprint, high filtering through queues, aggressive gap acceptance.</p>
+                    <div class="bg-slate-50 rounded-lg p-2 text-xs font-mono text-slate-600"><span data-key="motop">a:3.5 d:6.5 t:0.6 s:0.25</span></div>
+                </div>
+                <!-- Bicycle -->
+                <div class="bg-white rounded-xl p-5 border border-slate-200 card-hover">
+                    <div class="flex items-center gap-2 mb-3">
+                        <div class="w-9 h-9 bg-green-100 rounded-lg flex items-center justify-center"><i class="fas fa-bicycle text-lg text-green-600"></i></div>
+                        <div><h3 class="font-bold text-sm" data-key="bicy">Bicycle (Ajala)</h3><span class="text-xs text-slate-400">2%</span></div>
+                    </div>
+                    <p class="text-xs text-slate-600 mb-2" data-key="bicyd">Low speed, operates on extreme right boundaries, minimal lateral footprint.</p>
+                    <div class="bg-slate-50 rounded-lg p-2 text-xs font-mono text-slate-600"><span data-key="bicyp">a:0.8 d:1.5 t:0.5 s:0.20</span></div>
                 </div>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-                <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-6 card-hover">
-                    <div class="flex items-center gap-3 mb-4">
-                        <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center"><i class="fas fa-cruise-control text-2xl text-blue-600"></i></div>
-                        <h3 class="font-bold text-lg" data-key="f2">SAE Level 2 - Partial Automation</h3>
+
+            <!-- SAE Level 0: Chaotic / Informal -->
+            <div class="text-center mb-10 mt-16">
+                <h2 class="text-2xl font-bold text-slate-800 mb-3" data-key="f0c">SAE Level 0 — Chaotic / Informal Vehicles</h2>
+                <p class="text-slate-600 max-w-3xl mx-auto" data-key="f0cd">Critical for local calibration. These informal vehicles exhibit zero lane discipline, erratic overtaking, and sudden cross-lane maneuvers that standard simulation defaults fail to capture.</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto mb-16">
+                <div class="bg-gradient-to-br from-red-50 to-orange-50 rounded-xl p-6 border border-red-200 card-hover">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-11 h-11 bg-red-100 rounded-lg flex items-center justify-center"><i class="fas fa-couch text-xl text-red-500"></i></div>
+                        <div><h3 class="font-bold text-lg" data-key="trc">Trooscoor (Tricycle)</h3><span class="text-xs text-slate-400">1.5%</span></div>
                     </div>
-                    <p class="text-sm text-slate-600" data-key="f2d">ACC with rigid lane-keeping. Reaction ~1.1s, safety 0.75, sigma 0.15.</p>
-                    <div class="bg-white rounded-lg p-3 text-xs font-mono mt-2"><span data-key="f2p">Accel: 1.8 | Decel: 3.2 | tau: 1.1s | Safety: 0.75 | sigma: 0.15</span></div>
+                    <p class="text-sm text-slate-600 mb-3" data-key="trcd">Three-wheeled open freight, highly erratic overtaking, unpredictable stop patterns, non-lane-based weaving.</p>
+                    <div class="bg-white rounded-lg p-2 text-xs font-mono"><span data-key="trcp">a:1.5 d:4.5 t:0.65 s:0.22 sigma:0.95</span></div>
                 </div>
-                <div class="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-6 card-hover">
-                    <div class="flex items-center gap-3 mb-4">
-                        <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center"><i class="fas fa-bolt text-2xl text-green-600"></i></div>
-                        <h3 class="font-bold text-lg" data-key="f4">SAE Level 4 & 5 - Full Automation</h3>
+                <div class="bg-gradient-to-br from-yellow-50 to-amber-50 rounded-xl p-6 border border-yellow-300 card-hover">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-11 h-11 bg-yellow-100 rounded-lg flex items-center justify-center"><i class="fas fa-car text-xl text-yellow-600"></i></div>
+                        <div><h3 class="font-bold text-lg" data-key="ttk">Tuk-Tuk (Auto-Rickshaw)</h3><span class="text-xs text-slate-400">1.5%</span></div>
                     </div>
-                    <p class="text-sm text-slate-600" data-key="f4d">V2X-enabled CACC platoons with near-zero safety headways. Defensive mode activates when cut off by Level 0 vehicles.</p>
-                    <div class="bg-white rounded-lg p-3 text-xs font-mono mt-2"><span data-key="f4p">Accel: 2.2 | Decel: 3.5 | tau: 0.35s | Safety: 0.95 | sigma: 0.01 | CACC: 0.3s</span></div>
+                    <p class="text-sm text-slate-600 mb-3" data-key="ttkd">Small footprint, sudden cross-lane maneuvers, zero lane discipline, high agility in gaps.</p>
+                    <div class="bg-white rounded-lg p-2 text-xs font-mono"><span data-key="ttkp">a:1.8 d:5.0 t:0.55 s:0.18 sigma:0.98</span></div>
+                </div>
+            </div>
+
+            <!-- SAE Levels 1-5 -->
+            <div class="text-center mb-10 mt-16">
+                <h2 class="text-3xl font-bold text-slate-800 mb-3" data-key="av_sec">SAE Levels 1–5 — Autonomous Vehicles</h2>
+                <p class="text-slate-600 max-w-3xl mx-auto" data-key="av_secd">Each isolated SAE automation level with kinematic profiles, core capabilities, and real-world production fleet catalogs.</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- L1 -->
+                <div class="bg-gradient-to-br from-purple-50 to-violet-50 rounded-xl p-6 border border-purple-200 card-hover">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center text-lg font-bold text-purple-700">L1</div>
+                        <h3 class="font-bold" data-key="f1">Driver Assistance</h3>
+                    </div>
+                    <p class="text-sm text-slate-600 mb-3" data-key="f1d">Single automated system (steering OR acceleration/braking). Human driver remains fully responsible.</p>
+                    <div class="bg-white rounded-lg p-2 text-xs font-mono mb-3"><span data-key="f1p">t:1.0 s:0.70 sigma:0.25 headway:2.2m</span></div>
+                    <div class="border-t pt-3 mt-3">
+                        <p class="text-xs font-semibold text-slate-700 mb-1" data-key="real_models">Real-World Models:</p>
+                        <ul class="text-xs text-slate-600 space-y-1">
+                            <li><a href="https://www.toyota.com/safety-sense" target="_blank" class="text-purple-600 hover:underline" data-key="l1_m1">Toyota Corolla (TSS 2.0) <i class="fas fa-external-link-alt text-[10px]"></i></a></li>
+                            <li><a href="https://www.ford.com/support/how-tos/safety/copilot360/" target="_blank" class="text-purple-600 hover:underline" data-key="l1_m2">Ford F-150 (Co-Pilot360) <i class="fas fa-external-link-alt text-[10px]"></i></a></li>
+                        </ul>
+                    </div>
+                </div>
+                <!-- L2 -->
+                <div class="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl p-6 border border-blue-200 card-hover">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center text-lg font-bold text-blue-700">L2</div>
+                        <h3 class="font-bold" data-key="f2">Partial Automation</h3>
+                    </div>
+                    <p class="text-sm text-slate-600 mb-3" data-key="f2d">Simultaneous lane centering + Adaptive Cruise Control. Human monitors environment.</p>
+                    <div class="bg-white rounded-lg p-2 text-xs font-mono mb-3"><span data-key="f2p">t:0.9 s:0.80 sigma:0.12 headway:2.5m</span></div>
+                    <div class="border-t pt-3 mt-3">
+                        <p class="text-xs font-semibold text-slate-700 mb-1" data-key="real_models">Real-World Models:</p>
+                        <ul class="text-xs text-slate-600 space-y-1">
+                            <li><a href="https://www.tesla.com/autopilot" target="_blank" class="text-blue-600 hover:underline" data-key="l2_m1">Tesla Model 3 / Model Y (Autopilot) <i class="fas fa-external-link-alt text-[10px]"></i></a></li>
+                            <li><a href="https://www.cadillac.com/super-cruise" target="_blank" class="text-blue-600 hover:underline" data-key="l2_m2">Cadillac Lyriq (Super Cruise) <i class="fas fa-external-link-alt text-[10px]"></i></a></li>
+                        </ul>
+                    </div>
+                </div>
+                <!-- L3 -->
+                <div class="bg-gradient-to-br from-teal-50 to-green-50 rounded-xl p-6 border border-teal-200 card-hover">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-10 h-10 bg-teal-100 rounded-lg flex items-center justify-center text-lg font-bold text-teal-700">L3</div>
+                        <h3 class="font-bold" data-key="f3">Conditional Automation</h3>
+                    </div>
+                    <p class="text-sm text-slate-600 mb-3" data-key="f3d">Vehicle drives itself in geofenced ODD (e.g., highway jams up to 130 km/h). Human must intervene upon request.</p>
+                    <div class="bg-white rounded-lg p-2 text-xs font-mono mb-3"><span data-key="f3p">t:0.5 s:0.88 sigma:0.06 headway:2.0m</span></div>
+                    <div class="border-t pt-3 mt-3">
+                        <p class="text-xs font-semibold text-slate-700 mb-1" data-key="real_models">Real-World Models:</p>
+                        <ul class="text-xs text-slate-600 space-y-1">
+                            <li><a href="https://www.mercedes-benz.com/en/innovation/automated-driving/" target="_blank" class="text-teal-600 hover:underline" data-key="l3_m1">Mercedes S-Class / EQS (DRIVE PILOT) <i class="fas fa-external-link-alt text-[10px]"></i></a></li>
+                            <li><a href="https://www.bmw.com/en/innovation/automated-driving.html" target="_blank" class="text-teal-600 hover:underline" data-key="l3_m2">BMW 7 Series (Personal Pilot L3) <i class="fas fa-external-link-alt text-[10px]"></i></a></li>
+                        </ul>
+                    </div>
+                </div>
+                <!-- L4 -->
+                <div class="bg-gradient-to-br from-emerald-50 to-green-50 rounded-xl p-6 border border-emerald-200 card-hover">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center text-lg font-bold text-emerald-700">L4</div>
+                        <h3 class="font-bold" data-key="f4">High Automation</h3>
+                    </div>
+                    <p class="text-sm text-slate-600 mb-3" data-key="f4d">Fully driverless within predefined areas. No steering wheel option required for purpose-built deployments.</p>
+                    <div class="bg-white rounded-lg p-2 text-xs font-mono mb-3"><span data-key="f4p">t:0.3 s:0.92 sigma:0.03 CACC:0.4s</span></div>
+                    <div class="border-t pt-3 mt-3">
+                        <p class="text-xs font-semibold text-slate-700 mb-1" data-key="real_models">Real-World Models:</p>
+                        <ul class="text-xs text-slate-600 space-y-1">
+                            <li><a href="https://waymo.com/waymo-one/" target="_blank" class="text-emerald-600 hover:underline" data-key="l4_m1">Waymo One (Jaguar I-PACE Fleet) <i class="fas fa-external-link-alt text-[10px]"></i></a></li>
+                            <li><a href="https://zoox.com/" target="_blank" class="text-emerald-600 hover:underline" data-key="l4_m2">Amazon Zoox Robotaxi <i class="fas fa-external-link-alt text-[10px]"></i></a></li>
+                            <li><a href="https://www.apollo.auto/" target="_blank" class="text-emerald-600 hover:underline" data-key="l4_m3">Baidu Apollo Go (RT6) <i class="fas fa-external-link-alt text-[10px]"></i></a></li>
+                        </ul>
+                    </div>
+                </div>
+                <!-- L5 -->
+                <div class="bg-gradient-to-br from-green-600 to-emerald-700 rounded-xl p-6 border border-green-500 text-white card-hover">
+                    <div class="flex items-center gap-3 mb-3">
+                        <div class="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center text-lg font-bold">L5</div>
+                        <h3 class="font-bold" data-key="f5">Full Automation</h3>
+                    </div>
+                    <p class="text-sm opacity-90 mb-3" data-key="f5d">Complete autonomous driving under any environment worldwide. Zero operational domain boundaries.</p>
+                    <div class="bg-white/10 rounded-lg p-2 text-xs font-mono mb-3"><span data-key="f5p">t:0.2 s:0.98 sigma:0.01 CACC:0.3s</span></div>
+                    <div class="border-t border-white/20 pt-3 mt-3">
+                        <p class="text-xs font-semibold opacity-80 mb-1" data-key="real_models">Real-World / Target:</p>
+                        <ul class="text-xs opacity-90 space-y-1">
+                            <li><a href="https://www.tesla.com/AI" target="_blank" class="text-white hover:underline" data-key="l5_m1">Tesla Cybercab (Target) <i class="fas fa-external-link-alt text-[10px]"></i></a></li>
+                            <li><span class="opacity-70" data-key="l5_m2">Global theoretical research platforms</span></li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>
@@ -348,47 +483,64 @@
         </div>
     </section>
 
-    <!-- Parameter Table -->
-    <section class="py-12 bg-white">
+    <!-- Parameter Table — Granular Matrix -->
+    <section class="py-12 bg-slate-50">
         <div class="container mx-auto px-4">
-            <div class="text-center mb-12">
-                <h2 class="text-3xl font-bold text-slate-800 mb-4" data-key="param_table">Parameter Comparison</h2>
+            <div class="text-center mb-8">
+                <h2 class="text-3xl font-bold text-slate-800 mb-4" data-key="param_table">Parameter Comparison Matrix</h2>
+                <p class="text-slate-500 text-sm" data-key="param_sub">All 14 vehicle profiles with kinematic coefficients for micro-simulation calibration</p>
             </div>
             <div class="overflow-x-auto">
-                <table class="w-full max-w-4xl mx-auto border-collapse">
+                <table class="w-full max-w-6xl mx-auto border-collapse text-sm">
                     <thead>
-                        <tr class="bg-slate-100">
-                            <th class="p-3 text-left" data-key="vehicle">Vehicle</th>
-                            <th class="p-3" data-key="level">Level</th>
-                            <th class="p-3" data-key="reaction">Reaction tau (s)</th>
-                            <th class="p-3" data-key="safety_factor">Safety</th>
-                            <th class="p-3" data-key="accel">Accel</th>
-                            <th class="p-3" data-key="decel">Decel</th>
-                            <th class="p-3" data-key="sigma">Sigma</th>
+                        <tr class="bg-slate-200">
+                            <th class="p-2.5 text-left text-xs" data-key="vehicle">Vehicle</th>
+                            <th class="p-2.5 text-xs" data-key="level">SAE</th>
+                            <th class="p-2.5 text-xs" data-key="reaction">tau (s)</th>
+                            <th class="p-2.5 text-xs" data-key="safety_factor">Safety</th>
+                            <th class="p-2.5 text-xs" data-key="accel">Accel</th>
+                            <th class="p-2.5 text-xs" data-key="decel">Decel</th>
+                            <th class="p-2.5 text-xs" data-key="sigma">Sigma</th>
+                            <th class="p-2.5 text-xs" data-key="min_gap">Gap (m)</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-200">
-                        <tr class="hover:bg-slate-50"><td class="p-3 font-medium">Egyptian Microbus</td><td class="p-3"><span class="level-badge lvl0">L0</span></td><td class="p-3">0.70</td><td class="p-3">0.35</td><td class="p-3">3.0</td><td class="p-3">6.0</td><td class="p-3">0.95</td></tr>
-                        <tr class="hover:bg-slate-50"><td class="p-3 font-medium">Mlaiky (Car)</td><td class="p-3"><span class="level-badge lvl0">L0</span></td><td class="p-3">0.85</td><td class="p-3">0.45</td><td class="p-3">2.4</td><td class="p-3">5.0</td><td class="p-3">0.85</td></tr>
-                        <tr class="hover:bg-slate-50"><td class="p-3 font-medium">Naql (Truck)</td><td class="p-3"><span class="level-badge lvl0">L0</span></td><td class="p-3">1.30</td><td class="p-3">0.55</td><td class="p-3">0.9</td><td class="p-3">4.5</td><td class="p-3">0.75</td></tr>
-                        <tr class="hover:bg-blue-50"><td class="p-3 font-medium">AV SAE L2</td><td class="p-3"><span class="level-badge lvl2">L2</span></td><td class="p-3">1.10</td><td class="p-3">0.75</td><td class="p-3">1.8</td><td class="p-3">3.2</td><td class="p-3">0.15</td></tr>
-                        <tr class="hover:bg-green-50"><td class="p-3 font-medium">AV SAE L4-5</td><td class="p-3"><span class="level-badge lvl45">L4-5</span></td><td class="p-3">0.35</td><td class="p-3">0.95</td><td class="p-3">2.2</td><td class="p-3">3.5</td><td class="p-3">0.01</td></tr>
+                        <tr class="hover:bg-blue-50"><td class="p-2 font-medium">Mlaiky (Car)</td><td class="p-2"><span class="level-badge lvl0">L0</span></td><td class="p-2 font-mono">0.85</td><td class="p-2 font-mono">0.45</td><td class="p-2 font-mono">2.4</td><td class="p-2 font-mono">5.0</td><td class="p-2 font-mono">0.85</td><td class="p-2 font-mono">1.8</td></tr>
+                        <tr class="hover:bg-orange-50"><td class="p-2 font-medium">Microbus</td><td class="p-2"><span class="level-badge lvl0">L0</span></td><td class="p-2 font-mono">0.70</td><td class="p-2 font-mono">0.35</td><td class="p-2 font-mono">3.0</td><td class="p-2 font-mono">6.0</td><td class="p-2 font-mono">0.95</td><td class="p-2 font-mono">1.2</td></tr>
+                        <tr class="hover:bg-amber-50"><td class="p-2 font-medium">Noss-Naql</td><td class="p-2"><span class="level-badge lvl0">L0</span></td><td class="p-2 font-mono">0.90</td><td class="p-2 font-mono">0.40</td><td class="p-2 font-mono">1.8</td><td class="p-2 font-mono">5.2</td><td class="p-2 font-mono">0.80</td><td class="p-2 font-mono">2.2</td></tr>
+                        <tr class="hover:bg-yellow-50"><td class="p-2 font-medium">Rob-Naql (Dababa)</td><td class="p-2"><span class="level-badge lvl0">L0</span></td><td class="p-2 font-mono">0.80</td><td class="p-2 font-mono">0.38</td><td class="p-2 font-mono">2.0</td><td class="p-2 font-mono">5.5</td><td class="p-2 font-mono">0.88</td><td class="p-2 font-mono">1.8</td></tr>
+                        <tr class="hover:bg-red-50"><td class="p-2 font-medium">Naql-Taqeel</td><td class="p-2"><span class="level-badge lvl0">L0</span></td><td class="p-2 font-mono">1.40</td><td class="p-2 font-mono">0.60</td><td class="p-2 font-mono">0.7</td><td class="p-2 font-mono">4.0</td><td class="p-2 font-mono">0.70</td><td class="p-2 font-mono">3.5</td></tr>
+                        <tr class="hover:bg-red-50"><td class="p-2 font-medium">Motorcycle</td><td class="p-2"><span class="level-badge lvl0">L0</span></td><td class="p-2 font-mono">0.60</td><td class="p-2 font-mono">0.25</td><td class="p-2 font-mono">3.5</td><td class="p-2 font-mono">6.5</td><td class="p-2 font-mono">0.95</td><td class="p-2 font-mono">0.5</td></tr>
+                        <tr class="hover:bg-green-50"><td class="p-2 font-medium">Bicycle</td><td class="p-2"><span class="level-badge lvl0">L0</span></td><td class="p-2 font-mono">0.50</td><td class="p-2 font-mono">0.20</td><td class="p-2 font-mono">0.8</td><td class="p-2 font-mono">1.5</td><td class="p-2 font-mono">0.90</td><td class="p-2 font-mono">0.3</td></tr>
+                        <tr class="hover:bg-orange-50 bg-red-50/50"><td class="p-2 font-medium text-red-700">Trooscoor</td><td class="p-2"><span class="level-badge lvl0">L0</span></td><td class="p-2 font-mono">0.65</td><td class="p-2 font-mono">0.22</td><td class="p-2 font-mono">1.5</td><td class="p-2 font-mono">4.5</td><td class="p-2 font-mono">0.95</td><td class="p-2 font-mono">0.8</td></tr>
+                        <tr class="hover:bg-yellow-50 bg-red-50/50"><td class="p-2 font-medium text-red-700">Tuk-Tuk</td><td class="p-2"><span class="level-badge lvl0">L0</span></td><td class="p-2 font-mono">0.55</td><td class="p-2 font-mono">0.18</td><td class="p-2 font-mono">1.8</td><td class="p-2 font-mono">5.0</td><td class="p-2 font-mono">0.98</td><td class="p-2 font-mono">0.6</td></tr>
+                        <tr class="hover:bg-purple-50 border-t-2 border-purple-200"><td class="p-2 font-medium text-purple-700">SAE L1</td><td class="p-2"><span class="level-badge" style="background:#EDE9FE;color:#5B21B6">L1</span></td><td class="p-2 font-mono">1.00</td><td class="p-2 font-mono">0.70</td><td class="p-2 font-mono">2.0</td><td class="p-2 font-mono">3.5</td><td class="p-2 font-mono">0.25</td><td class="p-2 font-mono">2.2</td></tr>
+                        <tr class="hover:bg-blue-50"><td class="p-2 font-medium text-blue-700">SAE L2</td><td class="p-2"><span class="level-badge lvl2">L2</span></td><td class="p-2 font-mono">0.90</td><td class="p-2 font-mono">0.80</td><td class="p-2 font-mono">1.8</td><td class="p-2 font-mono">3.2</td><td class="p-2 font-mono">0.12</td><td class="p-2 font-mono">2.5</td></tr>
+                        <tr class="hover:bg-teal-50"><td class="p-2 font-medium text-teal-700">SAE L3</td><td class="p-2"><span class="level-badge" style="background:#CCFBF1;color:#0F766E">L3</span></td><td class="p-2 font-mono">0.50</td><td class="p-2 font-mono">0.88</td><td class="p-2 font-mono">2.0</td><td class="p-2 font-mono">3.5</td><td class="p-2 font-mono">0.06</td><td class="p-2 font-mono">2.0</td></tr>
+                        <tr class="hover:bg-emerald-50"><td class="p-2 font-medium text-emerald-700">SAE L4</td><td class="p-2"><span class="level-badge" style="background:#D1FAE5;color:#065F46">L4</span></td><td class="p-2 font-mono">0.30</td><td class="p-2 font-mono">0.92</td><td class="p-2 font-mono">2.2</td><td class="p-2 font-mono">3.5</td><td class="p-2 font-mono">0.03</td><td class="p-2 font-mono">1.2</td></tr>
+                        <tr class="hover:bg-green-50"><td class="p-2 font-medium text-green-700">SAE L5</td><td class="p-2"><span class="level-badge lvl45">L5</span></td><td class="p-2 font-mono">0.20</td><td class="p-2 font-mono">0.98</td><td class="p-2 font-mono">2.5</td><td class="p-2 font-mono">4.0</td><td class="p-2 font-mono">0.01</td><td class="p-2 font-mono">0.8</td></tr>
                         <tr class="weight-row" id="fleet-weight-row">
-                            <td class="p-3 font-bold text-emerald-700" data-key="w_row">Current Fleet Weighted</td>
-                            <td class="p-3">--</td>
-                            <td class="p-3 font-mono" id="wt-tau">0.86</td>
-                            <td class="p-3 font-mono" id="wt-safety">0.43</td>
-                            <td class="p-3 font-mono" id="wt-accel">2.22</td>
-                            <td class="p-3 font-mono" id="wt-decel">4.88</td>
-                            <td class="p-3 font-mono" id="wt-sigma">0.85</td>
+                            <td class="p-2 font-bold text-emerald-700" data-key="w_row">Current Fleet Weighted</td>
+                            <td class="p-2">--</td>
+                            <td class="p-2 font-mono" id="wt-tau">0.86</td>
+                            <td class="p-2 font-mono" id="wt-safety">0.43</td>
+                            <td class="p-2 font-mono" id="wt-accel">2.22</td>
+                            <td class="p-2 font-mono" id="wt-decel">4.88</td>
+                            <td class="p-2 font-mono" id="wt-sigma">0.85</td>
+                            <td class="p-2 font-mono" id="wt-gap">1.72</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
-            <div class="mt-8 text-center">
-                <div class="inline-flex items-center gap-4 text-sm text-slate-600">
-                    <span class="flex items-center gap-2"><span class="w-3 h-3 bg-red-400 rounded"></span> <span data-key="egyptian_aggressive">Aggressive (Short tau, Low Safety)</span></span>
-                    <span class="flex items-center gap-2"><span class="w-3 h-3 bg-green-400 rounded"></span> <span data-key="av_conservative">Conservative (CACC, High Safety)</span></span>
+            <div class="mt-6 text-center">
+                <div class="inline-flex flex-wrap items-center gap-4 text-xs text-slate-500">
+                    <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 bg-slate-300 rounded"></span> L0 Standard</span>
+                    <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 bg-red-300 rounded"></span> L0 Chaotic</span>
+                    <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 bg-purple-300 rounded"></span> L1</span>
+                    <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 bg-blue-300 rounded"></span> L2</span>
+                    <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 bg-teal-300 rounded"></span> L3</span>
+                    <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 bg-emerald-300 rounded"></span> L4</span>
+                    <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 bg-green-600 rounded"></span> L5</span>
                 </div>
             </div>
         </div>
@@ -664,43 +816,119 @@
     <!-- Translation Data + Generators -->
     <script>
     // ══════════════════════════════════════════════════════════
-    // FLEET PROFILES (ported from Python models)
+    // FLEET PROFILES — Expanded Granular Matrix
     // ══════════════════════════════════════════════════════════
     const FLEET = {
+        // ── SAE Level 0: Standard Conventional ──
+        mlaijy: {
+            name: "Mlaiky (Passenger Car)", sae: 0, len: 4.4, width: 1.8, category: "standard",
+            cf: { accel: 2.4, decel: 5.0, decisiveDecel: 8.0, reaction: 0.85, minGap: 1.8, standstillAccel: 2.0, safety: 0.45, sigma: 0.85, desiredSpeed: 25.0 },
+            lc: { prob: 75, rightThresh: 10, gapDetect: 0.7, slowProb: 0.35, brakeProb: 0.6, brakeStandstill: 0.7, dwell: 5, minDist: 2.0 },
+            dwell: null, color: "#00AAFF", weight: 0.30
+        },
         microbus: {
-            name: "Egyptian Microbus", sae: 0, len: 6.2, width: 2.0,
+            name: "Egyptian Microbus", sae: 0, len: 6.2, width: 2.0, category: "standard",
             cf: { accel: 3.0, decel: 6.0, decisiveDecel: 10.8, reaction: 0.7, minGap: 1.2, standstillAccel: 2.8, safety: 0.35, sigma: 0.95, desiredSpeed: 22.2222 },
             lc: { prob: 95, rightThresh: 12, gapDetect: 0.5, slowProb: 0.6, brakeProb: 0.8, brakeStandstill: 0.95, dwell: 25, minDist: 1.5 },
             dwell: { mean: 25, std: 12, freq: 0.4, dist: "exponential" },
-            color: "#FF6B21", weight: 0.25
+            color: "#FF6B21", weight: 0.20
         },
-        mlaijy: {
-            name: "Mlaiky (Passenger Car)", sae: 0, len: 4.4, width: 1.8,
-            cf: { accel: 2.4, decel: 5.0, decisiveDecel: 8.0, reaction: 0.85, minGap: 1.8, standstillAccel: 2.0, safety: 0.45, sigma: 0.85, desiredSpeed: 25.0 },
-            lc: { prob: 75, rightThresh: 10, gapDetect: 0.7, slowProb: 0.35, brakeProb: 0.6, brakeStandstill: 0.7, dwell: 5, minDist: 2.0 },
-            dwell: null, color: "#00AAFF", weight: 0.60
+        noss_naql: {
+            name: "Noss-Naql (Light Goods / Half-Truck)", sae: 0, len: 5.8, width: 2.1, category: "standard",
+            cf: { accel: 1.8, decel: 5.2, decisiveDecel: 8.5, reaction: 0.9, minGap: 2.2, standstillAccel: 1.5, safety: 0.40, sigma: 0.80, desiredSpeed: 20.8333 },
+            lc: { prob: 55, rightThresh: 9, gapDetect: 0.8, slowProb: 0.25, brakeProb: 0.55, brakeStandstill: 0.65, dwell: 10, minDist: 2.5 },
+            dwell: null, color: "#D97706", weight: 0.08
         },
-        naql: {
-            name: "Naql (Heavy Truck)", sae: 0, len: 10.5, width: 2.5,
-            cf: { accel: 0.9, decel: 4.5, decisiveDecel: 6.3, reaction: 1.3, minGap: 3.0, standstillAccel: 0.8, safety: 0.55, sigma: 0.75, desiredSpeed: 19.4444 },
-            lc: { prob: 40, rightThresh: 8, gapDetect: 1.5, slowProb: 0.2, brakeProb: 0.85, brakeStandstill: 0.8, dwell: 8, minDist: 4.0 },
-            dwell: null, color: "#8B4513", weight: 0.15
+        rob_naql: {
+            name: "Rob-Naql (Quarter-Truck / Dababa)", sae: 0, len: 5.2, width: 2.0, category: "standard",
+            cf: { accel: 2.0, decel: 5.5, decisiveDecel: 9.0, reaction: 0.8, minGap: 1.8, standstillAccel: 1.8, safety: 0.38, sigma: 0.88, desiredSpeed: 19.4444 },
+            lc: { prob: 80, rightThresh: 11, gapDetect: 0.6, slowProb: 0.45, brakeProb: 0.7, brakeStandstill: 0.8, dwell: 15, minDist: 1.8 },
+            dwell: { mean: 15, std: 8, freq: 0.3, dist: "exponential" },
+            color: "#B45309", weight: 0.07
         },
+        naql_taqeel: {
+            name: "Naql-Taqeel (Heavy Truck / Semitrailer)", sae: 0, len: 12.5, width: 2.5, category: "standard",
+            cf: { accel: 0.7, decel: 4.0, decisiveDecel: 5.6, reaction: 1.4, minGap: 3.5, standstillAccel: 0.6, safety: 0.60, sigma: 0.70, desiredSpeed: 16.6667 },
+            lc: { prob: 30, rightThresh: 7, gapDetect: 2.0, slowProb: 0.15, brakeProb: 0.9, brakeStandstill: 0.95, dwell: 5, minDist: 5.0 },
+            dwell: null, color: "#78350F", weight: 0.05
+        },
+        motorcycle: {
+            name: "Motorcycle (Darrah)", sae: 0, len: 2.2, width: 0.8, category: "standard",
+            cf: { accel: 3.5, decel: 6.5, decisiveDecel: 11.0, reaction: 0.6, minGap: 0.5, standstillAccel: 3.2, safety: 0.25, sigma: 0.95, desiredSpeed: 27.7778 },
+            lc: { prob: 98, rightThresh: 14, gapDetect: 0.3, slowProb: 0.7, brakeProb: 0.9, brakeStandstill: 0.98, dwell: 2, minDist: 0.5 },
+            dwell: null, color: "#DC2626", weight: 0.05
+        },
+        bicycle: {
+            name: "Bicycle (Ajala)", sae: 0, len: 1.8, width: 0.6, category: "standard",
+            cf: { accel: 0.8, decel: 1.5, decisiveDecel: 3.0, reaction: 0.5, minGap: 0.3, standstillAccel: 0.7, safety: 0.20, sigma: 0.90, desiredSpeed: 4.1667 },
+            lc: { prob: 30, rightThresh: 5, gapDetect: 1.0, slowProb: 0.1, brakeProb: 0.3, brakeStandstill: 0.4, dwell: 0, minDist: 0.5 },
+            dwell: null, color: "#059669", weight: 0.02
+        },
+        // ── SAE Level 0: Chaotic / Informal ──
+        trooscoor: {
+            name: "Trooscoor (Tricycle / Open Freight)", sae: 0, len: 3.5, width: 1.4, category: "chaotic",
+            cf: { accel: 1.5, decel: 4.5, decisiveDecel: 7.5, reaction: 0.65, minGap: 0.8, standstillAccel: 1.3, safety: 0.22, sigma: 0.95, desiredSpeed: 15.2778 },
+            lc: { prob: 90, rightThresh: 13, gapDetect: 0.4, slowProb: 0.55, brakeProb: 0.75, brakeStandstill: 0.9, dwell: 20, minDist: 0.8 },
+            dwell: { mean: 20, std: 10, freq: 0.35, dist: "exponential" },
+            color: "#F97316", weight: 0.015
+        },
+        tuktuk: {
+            name: "Tuk-Tuk (Auto-Rickshaw)", sae: 0, len: 2.8, width: 1.2, category: "chaotic",
+            cf: { accel: 1.8, decel: 5.0, decisiveDecel: 8.0, reaction: 0.55, minGap: 0.6, standstillAccel: 1.6, safety: 0.18, sigma: 0.98, desiredSpeed: 18.0556 },
+            lc: { prob: 95, rightThresh: 14, gapDetect: 0.3, slowProb: 0.65, brakeProb: 0.85, brakeStandstill: 0.95, dwell: 12, minDist: 0.6 },
+            dwell: { mean: 12, std: 6, freq: 0.25, dist: "exponential" },
+            color: "#FBBF24", weight: 0.015
+        },
+        // ── SAE Level 1: Driver Assistance ──
+        av_l1: {
+            name: "SAE L1 - Driver Assistance", sae: 1, len: 4.7, width: 1.9, category: "av",
+            cf: { accel: 2.0, decel: 3.5, decisiveDecel: 5.0, reaction: 1.0, minGap: 2.2, standstillAccel: 1.8, safety: 0.70, sigma: 0.25, desiredSpeed: 25.0 },
+            lc: { prob: 55, rightThresh: 7, gapDetect: 1.5, slowProb: 0.08, brakeProb: 0.2, brakeStandstill: 0.3, dwell: 3, minDist: 2.5 },
+            dwell: null, color: "#A78BFA", realModels: ["Toyota Corolla (TSS 2.0)", "Ford F-150 (Co-Pilot360)"],
+            manufacturerLinks: { toyota: "https://www.toyota.com/safety-sense", ford: "https://www.ford.com/support/how-tos/safety/copilot360/" }
+        },
+        // ── SAE Level 2: Partial Automation ──
         av_l2: {
-            name: "AV SAE Level 1-2 (ACC)", sae: 2, len: 4.8, width: 1.9,
-            cf: { accel: 1.8, decel: 3.2, decisiveDecel: 4.48, reaction: 1.1, minGap: 2.5, standstillAccel: 1.6, safety: 0.75, sigma: 0.15, desiredSpeed: 23.6111 },
-            lc: { prob: 50, rightThresh: 6, gapDetect: 2.0, slowProb: 0.1, brakeProb: 0.3, brakeStandstill: 0.4, dwell: 5, minDist: 3.0 },
-            dwell: null, color: "#FFD700"
+            name: "SAE L2 - Partial Automation", sae: 2, len: 4.8, width: 1.9, category: "av",
+            cf: { accel: 1.8, decel: 3.2, decisiveDecel: 4.48, reaction: 0.9, minGap: 2.5, standstillAccel: 1.6, safety: 0.80, sigma: 0.12, desiredSpeed: 25.0 },
+            lc: { prob: 70, rightThresh: 5, gapDetect: 2.0, slowProb: 0.05, brakeProb: 0.15, brakeStandstill: 0.2, dwell: 3, minDist: 2.5 },
+            dwell: null, color: "#60A5FA", realModels: ["Tesla Model 3 (Autopilot)", "Cadillac Lyriq (Super Cruise)"],
+            manufacturerLinks: { tesla: "https://www.tesla.com/autopilot", gm: "https://www.cadillac.com/super-cruise" }
         },
-        av_l45: {
-            name: "AV SAE Level 4-5 (CACC/V2X)", sae: 5, len: 4.9, width: 1.9,
-            cf: { accel: 2.2, decel: 3.5, decisiveDecel: 4.55, reaction: 0.35, minGap: 1.0, standstillAccel: 2.0, safety: 0.95, sigma: 0.01, desiredSpeed: 26.3889 },
-            lc: { prob: 90, rightThresh: 3, gapDetect: 0.5, slowProb: 0.0, brakeProb: 0.05, brakeStandstill: 0.1, dwell: 2, minDist: 1.0 },
-            dwell: null, caccHeadway: 0.3, defensiveFactor: 3.0, color: "#00FF7F"
+        // ── SAE Level 3: Conditional Automation ──
+        av_l3: {
+            name: "SAE L3 - Conditional Automation", sae: 3, len: 5.1, width: 1.95, category: "av",
+            cf: { accel: 2.0, decel: 3.5, decisiveDecel: 4.5, reaction: 0.5, minGap: 2.0, standstillAccel: 1.8, safety: 0.88, sigma: 0.06, desiredSpeed: 27.7778 },
+            lc: { prob: 80, rightThresh: 4, gapDetect: 1.5, slowProb: 0.02, brakeProb: 0.08, brakeStandstill: 0.1, dwell: 2, minDist: 2.0 },
+            dwell: null, color: "#34D399",
+            realModels: ["Mercedes S-Class (DRIVE PILOT)", "BMW 7 Series (Personal Pilot L3)"],
+            manufacturerLinks: { mb: "https://www.mercedes-benz.com/en/innovation/automated-driving/", bmw: "https://www.bmw.com/en/innovation/automated-driving.html" }
+        },
+        // ── SAE Level 4: High Automation ──
+        av_l4: {
+            name: "SAE L4 - High Automation", sae: 4, len: 4.9, width: 1.9, category: "av",
+            cf: { accel: 2.2, decel: 3.5, decisiveDecel: 4.55, reaction: 0.3, minGap: 1.2, standstillAccel: 2.0, safety: 0.92, sigma: 0.03, desiredSpeed: 26.3889 },
+            lc: { prob: 88, rightThresh: 3, gapDetect: 0.6, slowProb: 0.0, brakeProb: 0.03, brakeStandstill: 0.05, dwell: 2, minDist: 1.2 },
+            dwell: null, caccHeadway: 0.4, defensiveFactor: 2.5, color: "#10B981",
+            realModels: ["Waymo One (Jaguar I-PACE)", "Amazon Zoox Robotaxi", "Baidu Apollo Go (RT6)"],
+            manufacturerLinks: { waymo: "https://waymo.com/waymo-one/", zoox: "https://zoox.com/", baidu: "https://www.apollo.auto/" }
+        },
+        // ── SAE Level 5: Full Automation ──
+        av_l5: {
+            name: "SAE L5 - Full Automation", sae: 5, len: 4.9, width: 1.9, category: "av",
+            cf: { accel: 2.5, decel: 4.0, decisiveDecel: 5.0, reaction: 0.2, minGap: 0.8, standstillAccel: 2.2, safety: 0.98, sigma: 0.01, desiredSpeed: 27.7778 },
+            lc: { prob: 95, rightThresh: 2, gapDetect: 0.4, slowProb: 0.0, brakeProb: 0.01, brakeStandstill: 0.02, dwell: 1, minDist: 0.8 },
+            dwell: null, caccHeadway: 0.3, defensiveFactor: 3.0, color: "#059669",
+            realModels: ["Tesla Cybercab (Target)", "Global Research Platforms"],
+            manufacturerLinks: { tesla: "https://www.tesla.com/AI" }
         }
     };
-    const EGYPTIAN_PROFILES = [FLEET.microbus, FLEET.mlaijy, FLEET.naql];
-    const AV_PROFILES = [FLEET.av_l2, FLEET.av_l45];
+    const L0_STANDARD = [FLEET.mlaijy, FLEET.microbus, FLEET.noss_naql, FLEET.rob_naql, FLEET.naql_taqeel, FLEET.motorcycle, FLEET.bicycle];
+    const L0_CHAOTIC = [FLEET.trooscoor, FLEET.tuktuk];
+    const L0_ALL = L0_STANDARD.concat(L0_CHAOTIC);
+    const AV_PROFILES = [FLEET.av_l1, FLEET.av_l2, FLEET.av_l3, FLEET.av_l4, FLEET.av_l5];
+    const EGYPTIAN_PROFILES = L0_ALL;
+    const ALL_PROFILES = L0_ALL.concat(AV_PROFILES);
 
     // ══════════════════════════════════════════════════════════
     // MAPPING FUNCTIONS
@@ -772,13 +1000,15 @@
         xml += '  <VehicleFlows>\n';
 
         var flowId = 1;
+        var totalHumanVol = 1000;
         EGYPTIAN_PROFILES.forEach(function(p) {
-            xml += '    <VehicleFlow ID="' + flowId + '" VehicleType="' + p.name + '" Volume="1000"/>\n';
+            var vol = Math.max(1, Math.round(totalHumanVol * (p.weight / 0.87)));
+            xml += '    <VehicleFlow ID="' + flowId + '" VehicleType="' + p.name + '" Volume="' + vol + '"/>\n';
             flowId++;
         });
         if (mpr > 0) {
             AV_PROFILES.forEach(function(p) {
-                xml += '    <VehicleFlow ID="' + flowId + '" VehicleType="' + p.name + '" Volume="' + Math.round(1000 * 0.5 * mpr) + '"/>\n';
+                xml += '    <VehicleFlow ID="' + flowId + '" VehicleType="' + p.name + '" Volume="' + Math.round(totalHumanVol * (1 / AV_PROFILES.length) * mpr) + '"/>\n';
                 flowId++;
             });
         }
@@ -996,25 +1226,25 @@
     function computeWeightedFleet(mpr) {
         var m = mpr / 100;
         var humanShare = 1 - m;
-        var egyptianWeight = [0.25, 0.60, 0.15];
-        var weighted = { tau: 0, safety: 0, accel: 0, decel: 0, sigma: 0 };
-        EGYPTIAN_PROFILES.forEach(function(p, i) {
-            var w = humanShare * egyptianWeight[i];
+        var weighted = { tau: 0, safety: 0, accel: 0, decel: 0, sigma: 0, gap: 0 };
+        L0_ALL.forEach(function(p) {
+            var w = humanShare * p.weight;
             weighted.tau   += w * p.cf.reaction;
             weighted.safety += w * p.cf.safety;
             weighted.accel  += w * p.cf.accel;
             weighted.decel  += w * p.cf.decel;
             weighted.sigma  += w * p.cf.sigma;
+            weighted.gap    += w * p.cf.minGap;
         });
         if (m > 0) {
-            var avWeight = [0.5, 0.5];
-            AV_PROFILES.forEach(function(p, i) {
-                var w = m * avWeight[i];
+            AV_PROFILES.forEach(function(p) {
+                var w = m * (1 / AV_PROFILES.length);
                 weighted.tau   += w * p.cf.reaction;
                 weighted.safety += w * p.cf.safety;
                 weighted.accel  += w * p.cf.accel;
                 weighted.decel  += w * p.cf.decel;
                 weighted.sigma  += w * p.cf.sigma;
+                weighted.gap    += w * p.cf.minGap;
             });
         }
         var C_baseline = 1800, C_max = 3200;
@@ -1031,6 +1261,7 @@
         el = document.getElementById('wt-accel');   if (el) el.textContent = w.accel.toFixed(2);
         el = document.getElementById('wt-decel');   if (el) el.textContent = w.decel.toFixed(2);
         el = document.getElementById('wt-sigma');   if (el) el.textContent = w.sigma.toFixed(2);
+        el = document.getElementById('wt-gap');     if (el) el.textContent = w.gap.toFixed(2);
 
         el = document.getElementById('metric-tau');  if (el) el.textContent = w.tau.toFixed(2);
         el = document.getElementById('metric-cap');  if (el) el.textContent = result.capacity.toLocaleString();
@@ -1068,10 +1299,19 @@
         var isAv = Math.random() * 100 < mprValue;
         var type;
         if (isAv) {
-            type = Math.random() < 0.5 ? FLEET.av_l2 : FLEET.av_l45;
+            var avPool = [FLEET.av_l1, FLEET.av_l2, FLEET.av_l3, FLEET.av_l4, FLEET.av_l5];
+            type = avPool[Math.floor(Math.random() * avPool.length)];
         } else {
             var r = Math.random();
-            type = r < 0.25 ? FLEET.microbus : r < 0.85 ? FLEET.mlaijy : FLEET.naql;
+            if (r < 0.30) type = FLEET.mlaijy;
+            else if (r < 0.50) type = FLEET.microbus;
+            else if (r < 0.58) type = FLEET.noss_naql;
+            else if (r < 0.65) type = FLEET.rob_naql;
+            else if (r < 0.70) type = FLEET.naql_taqeel;
+            else if (r < 0.75) type = FLEET.motorcycle;
+            else if (r < 0.77) type = FLEET.bicycle;
+            else if (r < 0.785) type = FLEET.trooscoor;
+            else type = FLEET.tuktuk;
         }
         var lane = Math.floor(Math.random() * LANE_COUNT);
         var baseSpeed = type.cf.desiredSpeed * 0.6;
@@ -1079,16 +1319,16 @@
             x: Math.random() * CANVAS_W,
             y: ROAD_TOP + lane * LANE_W + LANE_W * 0.5,
             lane: lane,
-            w: Math.max(18, type.len * 1.8),
-            h: Math.max(10, type.width * 5),
+            w: Math.max(10, type.len * 1.5),
+            h: Math.max(6, type.width * 4),
             speed: baseSpeed + (Math.random() - 0.5) * 4,
             baseSpeed: baseSpeed,
-            color: isAv ? (type.sae >= 4 ? '#00FF7F' : '#FFD700') : type.color,
+            color: isAv ? type.color : type.color,
             isAv: isAv,
-            isErratic: !isAv && type === FLEET.microbus,
+            isErratic: !isAv && type.category === 'chaotic',
             erraticTimer: 0,
             targetLane: lane,
-            label: isAv ? '' : (type === FLEET.microbus ? 'M' : type === FLEET.naql ? 'T' : '')
+            label: isAv ? type.name.charAt(0) + type.sae : (type === FLEET.microbus ? 'M' : type === FLEET.naql_taqeel ? 'T' : type === FLEET.tuktuk ? 'TK' : type === FLEET.trooscoor ? 'TR' : type === FLEET.noss_naql ? 'NN' : type === FLEET.rob_naql ? 'RN' : type === FLEET.motorcycle ? 'MC' : type === FLEET.bicycle ? 'B' : '')
         };
     }
 
@@ -1169,7 +1409,7 @@
             if (v.isAv && v.isAv) {
                 simCtx.fillStyle = 'rgba(0,255,127,0.15)';
                 simCtx.beginPath();
-                simCtx.arc(v.x + v.w / 2, v.y, 18, 0, Math.PI * 2);
+                simCtx.arc(v.x + v.w / 2, v.y, 12, 0, Math.PI * 2);
                 simCtx.fill();
             }
         });
@@ -1386,7 +1626,58 @@
     "aimsun_s3_title": "Configure Vehicle Types",
     "aimsun_s3_desc": "Open the Vehicle Types editor. Create or import types matching the profiles in our script: Egyptian Microbus, Mlaiky, Naql, AV L2, AV L4-5. Link each to the IDM parameters in the override script.",
     "aimsun_s4_title": "Run & Inspect",
-    "aimsun_s4_desc": "Start the micro-simulation. The Python script will dynamically apply TTC-based conflict resolution and override vehicle kinematics during cut-in events. Check the output console for confirmations."
+    "aimsun_s4_desc": "Start the micro-simulation. The Python script will dynamically apply TTC-based conflict resolution and override vehicle kinematics during cut-in events. Check the output console for confirmations.",
+    "f0c": "SAE Level 0 — Chaotic / Informal Vehicles",
+    "f0cd": "Critical for local calibration. These informal vehicles exhibit zero lane discipline, erratic overtaking, and sudden cross-lane maneuvers that standard simulation defaults fail to capture.",
+    "nn": "Noss-Naql (Half-Truck)",
+    "nnd": "Medium commercial distribution vans, moderate braking distances, moderate lane discipline.",
+    "nnp": "a:1.8 d:5.2 t:0.9 s:0.40",
+    "rn": "Rob-Naql (Dababa)",
+    "rnd": "Quarter-truck pickups (Chevrolet T-Series). High-frequency local logistics, frequent stops.",
+    "rnp": "a:2.0 d:5.5 t:0.8 s:0.38",
+    "ntt": "Naql-Taqeel (Semitrailer)",
+    "nttd": "Heavy freight trucks, massive braking distances, very low power-to-weight, night-dominant.",
+    "nttp": "a:0.7 d:4.0 t:1.4 s:0.60",
+    "moto": "Motorcycle (Darrah)",
+    "motod": "Ultra-narrow lateral footprint, high filtering through queues, aggressive gap acceptance.",
+    "motop": "a:3.5 d:6.5 t:0.6 s:0.25",
+    "bicy": "Bicycle (Ajala)",
+    "bicyd": "Low speed, operates on extreme right boundaries, minimal lateral footprint.",
+    "bicyp": "a:0.8 d:1.5 t:0.5 s:0.20",
+    "trc": "Trooscoor (Tricycle)",
+    "trcd": "Three-wheeled open freight, highly erratic overtaking, unpredictable stop patterns.",
+    "trcp": "a:1.5 d:4.5 t:0.65 s:0.22",
+    "ttk": "Tuk-Tuk (Auto-Rickshaw)",
+    "ttkd": "Small footprint, sudden cross-lane maneuvers, zero lane discipline.",
+    "ttkp": "a:1.8 d:5.0 t:0.55 s:0.18",
+    "av_sec": "SAE Levels 1–5 — Autonomous Vehicles",
+    "av_secd": "Each isolated SAE automation level with kinematic profiles, core capabilities, and real-world production fleet catalogs.",
+    "f1": "SAE L1 — Driver Assistance",
+    "f1d": "Single automated system (steering OR acceleration/braking). Human driver remains fully responsible.",
+    "f1p": "t:1.0 s:0.70 sigma:0.25 headway:2.2m",
+    "f3": "SAE L3 — Conditional Automation",
+    "f3d": "Vehicle drives itself in geofenced ODD (e.g., highway jams up to 130 km/h). Human must intervene upon request.",
+    "f3p": "t:0.5 s:0.88 sigma:0.06 headway:2.0m",
+    "f4": "SAE L4 — High Automation",
+    "f4d": "Fully driverless within predefined areas. No steering wheel option required for purpose-built deployments.",
+    "f4p": "t:0.3 s:0.92 sigma:0.03 CACC:0.4s",
+    "f5": "SAE L5 — Full Automation",
+    "f5d": "Complete autonomous driving under any environment worldwide. Zero operational domain boundaries.",
+    "f5p": "t:0.2 s:0.98 sigma:0.01 CACC:0.3s",
+    "real_models": "Real-World Models:",
+    "l1_m1": "Toyota Corolla (TSS 2.0)",
+    "l1_m2": "Ford F-150 (Co-Pilot360)",
+    "l2_m1": "Tesla Model 3 / Model Y (Autopilot)",
+    "l2_m2": "Cadillac Lyriq (Super Cruise)",
+    "l3_m1": "Mercedes S-Class / EQS (DRIVE PILOT)",
+    "l3_m2": "BMW 7 Series (Personal Pilot L3)",
+    "l4_m1": "Waymo One (Jaguar I-PACE Fleet)",
+    "l4_m2": "Amazon Zoox Robotaxi",
+    "l4_m3": "Baidu Apollo Go (RT6)",
+    "l5_m1": "Tesla Cybercab (Target)",
+    "l5_m2": "Global theoretical research platforms",
+    "min_gap": "Gap (m)",
+    "param_sub": "All vehicle profiles with kinematic coefficients for micro-simulation calibration"
   },
   "ar": {
     "t": "SAE AutoSim Hub",
@@ -1510,7 +1801,58 @@
     "aimsun_s3_title": "heets عناصر أنواع المركبات",
     "aimsun_s3_desc": "افتح محرر أنواع المركبات. أنشئ أو استورد أنواعاً تطابق الملفات في نصنا: الميكروباص والملاكي والناقل و L2 و L4-5.",
     "aimsun_s4_title": "شغّل وافحص",
-    "aimsun_s4_desc": "ابدأ المحاكاة الميكروسكوبية. سينفّذ النص Python حل النزاعات_based على TTC وتتجاوز حركية المركبات أثناء أحداث القطع."
+    "aimsun_s4_desc": "ابدأ المحاكاة الميكروسكوبية. سينفّذ النص Python حل النزاعات_based على TTC وتتجاوز حركية المركبات أثناء أحداث القطع.",
+    "f0c": "مستوى SAE 0 — مركبات فوضوية / غير رسمية",
+    "f0cd": "حرجة للمعايرة المحلية. هذه المركبات تظهر انضباط مسار صفري وتخطي عشوائي ومناورات مفاجئة.",
+    "nn": "نوس نق (شاحنة نصف)",
+    "nnd": "شاحنات توزيع تجارية متوسطة، مسافات تبطئ معتدلة.",
+    "nnp": "تسارع:1.8 تبطئ:5.2 tau:0.9 أمان:0.40",
+    "rn": "روب نق (دبابا)",
+    "rnd": "شاحنات صغيرة (شفروليت تي سيريز). لوجستيات محلية عالية التكرار.",
+    "rnp": "تسارع:2.0 تبطئ:5.5 tau:0.8 أمان:0.38",
+    "ntt": "ناقل ثقيل (سيميتريلا)",
+    "nttd": "شاحنات بضائع ثقيلة، مسافات تبطئ ضخمة،_ratio منخفضة جداً.",
+    "nttp": "تسارع:0.7 تبطئ:4.0 tau:1.4 أمان:0.60",
+    "moto": "دراجة نارية (درة)",
+    "motod": "عرض جانبي ضيق للغاية، تصفية عالية عبر الطوابير.",
+    "motop": "تسارع:3.5 تبطئ:6.5 tau:0.6 أمان:0.25",
+    "bicy": "دراجة هوائية (عجلة)",
+    "bicyd": "سرعة منخفضة، تعمل على الحدود اليمنى القصوى.",
+    "bicyp": "تسارع:0.8 تبطئ:1.5 tau:0.5 أمان:0.20",
+    "trc": "تروسكور (درج THREE)",
+    "trcd": "بضائع مفتوحة ثلاثية العجلات، تخطي عشوائي للغاية.",
+    "trcp": "تسارع:1.5 تبطئ:4.5 tau:0.65 أمان:0.22",
+    "ttk": "توكتوك (أوتو ريكشا)",
+    "ttkd": "حجم صغير، مناورات مفاجئة عبر المسار، انضباط صفري.",
+    "ttkp": "تسارع:1.8 تبطئ:5.0 tau:0.55 أمان:0.18",
+    "av_sec": "مستويات SAE 1-5 — مركبات ذاتية القيادة",
+    "av_secd": "كل مستوى أتمتة SAE مع ملفات حركية وقدرات أساسية وكتالوجات إنتاج حقيقية.",
+    "f1": "SAE L1 — مساعدة السائق",
+    "f1d": "نظام مؤتمت واحد فقط (توجيه أو تسارع/تبطئ). السائق يظل مسؤولاً بالكامل.",
+    "f1p": "tau:1.0 أمان:0.70 sigma:0.25",
+    "f3": "SAE L3 — أتمتة مشروطة",
+    "f3d": "المركبة تقود نفسها في منطقة محددة (مثل الازدحام freeway حتى 130 كم/ساعة).",
+    "f3p": "tau:0.5 أمان:0.88 sigma:0.06",
+    "f4": "SAE L4 — أتمتة عالية",
+    "f4d": "قيادة ذاتية كاملة داخل مناطق محددة. لا تحتاج عجلة قيادة للنشر المخصص.",
+    "f4p": "tau:0.3 أمان:0.92 sigma:0.03 CACC:0.4ث",
+    "f5": "SAE L5 — أتمتة كاملة",
+    "f5d": "قيادة ذاتية كاملة تحت أي بيئة في العالم. صفر حدود نطاق تشغيل.",
+    "f5p": "tau:0.2 أمان:0.98 sigma:0.01 CACC:0.3ث",
+    "real_models": "نماذج واقعية:",
+    "l1_m1": "تويوتا كورولا (TSS 2.0)",
+    "l1_m2": "فورد F-150 (Co-Pilot360)",
+    "l2_m1": "تسلا موديل 3 / موديل Y (أوتوبيلوت)",
+    "l2_m2": "كاديلاك ليريك (Super Cruise)",
+    "l3_m1": "مرسيدس S-Class / EQS (DRIVE PILOT)",
+    "l3_m2": "بي إم دبليو سيريز 7 (Personal Pilot L3)",
+    "l4_m1": "وايمو وان ( Jaguar I-PACE)",
+    "l4_m2": "أمازون زوكس روبوتاكسي",
+    "l4_m3": "بaidu أبولو Go (RT6)",
+    "l5_m1": "تسلا Cybercab (هدف)",
+    "l5_m2": "منصات بحث نظرية عالمية",
+    "min_gap": "فجوة (م)",
+    "param_sub": "جميع ملفات المركبات مع معاملات حركية لمحاكاة دقيقة"
   },
   "ru": {
     "t": "SAE AutoSim Hub",
@@ -1634,7 +1976,25 @@
     "aimsun_s3_title": "Настройте типы ТС",
     "aimsun_s3_desc": "Откройте редактор типов ТС. Создайте или импортируйте типы из нашего скрипта: египетский микроавтобус, млаики, нақл, L2, L4-5.",
     "aimsun_s4_title": "Запуск и проверка",
-    "aimsun_s4_desc": "Запустите микросимуляцию. Скрипт будет применять разрешение конфликтов на основе TTC и переопределять кинематику ТС."
+    "aimsun_s4_desc": "Запустите микросимуляцию. Скрипт будет применять разрешение конфликтов на основе TTC и переопределять кинематику ТС.",
+    "f0c": "Уровень SAE 0 — Хаотичные / неформальные ТС",
+    "f0cd": "Критически важно для калибровки. Эти неформальные ТС демонстрируют нулевую дисциплину полосы и хаотичные маневры.",
+    "nn": "Нос-Накл (Полугрузовик)",
+    "rn": "Роб-Накл (Дабаба)",
+    "ntt": "Накл-Такеэль (Полуприцеп)",
+    "moto": "Мотоцикл (Даррах)",
+    "bicy": "Велосипед (Аджала)",
+    "trc": "Трооскур (Трицикл)",
+    "ttk": "Тук-Тук (Авто-рикша)",
+    "av_sec": "Уровни SAE 1–5 — Автономные ТС",
+    "av_secd": "Каждый уровень автоматизации с кинематическими профилями и каталогами реальных моделей.",
+    "f1": "SAE L1 — Помощь водителю",
+    "f3": "SAE L3 — Условная автоматизация",
+    "f4": "SAE L4 — Высокая автоматизация",
+    "f5": "SAE L5 — Полная автоматизация",
+    "real_models": "Реальные модели:",
+    "min_gap": "Зазор (м)",
+    "param_sub": "Все профили ТС с кинематическими коэффициентами"
   },
   "hi": {
     "t": "SAE AutoSim Hub",
@@ -1758,7 +2118,25 @@
     "aimsun_s3_title": "वाहन प्रकार कॉन्फ़िगर करें",
     "aimsun_s3_desc": "वाहन प्रकार संपादक खोलें। हमारे स्क्रिप्ट से मेल खाते प्रकार बनाएं या आयात करें।",
     "aimsun_s4_title": "चलाएं और निरीक्षण करें",
-    "aimsun_s4_desc": "माइक्रो-सिमुलेशन शुरू करें। Python स्क्रिप्ट TTC-आधारित टकराव समाधान लागू करेगा।"
+    "aimsun_s4_desc": "माइक्रो-सिमुलेशन शुरू करें। Python स्क्रिप्ट TTC-आधारित टकराव समाधान लागू करेगा।",
+    "f0c": "SAE स्तर 0 — अराजक / अनौपचारिक वाहन",
+    "f0cd": "स्थानीय कैलिब्रेशन के लिए महत्वपूर्ण।",
+    "nn": "नॉस-नाकल (हाफ-ट्रक)",
+    "rn": "रॉब-नाकल (डबाबा)",
+    "ntt": "नाकल-तकील (सेमीट्रेलर)",
+    "moto": "मोटरसाइकिल (दर्रा)",
+    "bicy": "साइकिल (अजला)",
+    "trc": "ट्रूस्कूर (त्रिचक्र)",
+    "ttk": "टुक-टुक (ऑटो-रिक्शा)",
+    "av_sec": "SAE स्तर 1–5 — स्वचालित वाहन",
+    "av_secd": "प्रत्येक स्वचालन स्तर वास्तविक मॉडलों के साथ।",
+    "f1": "SAE L1 — ड्राइवर सहायता",
+    "f3": "SAE L3 — शर्तबद्ध स्वचालन",
+    "f4": "SAE L4 — उच्च स्वचालन",
+    "f5": "SAE L5 — पूर्ण स्वचालन",
+    "real_models": "वास्तविक मॉडल:",
+    "min_gap": "दूरी (m)",
+    "param_sub": "सभी वाहन प्रोफाइल गतिशील गुणांकों के साथ"
   },
   "de": {
     "t": "SAE AutoSim Hub",
@@ -1882,7 +2260,25 @@
     "aimsun_s3_title": "Fahrzeugtypen konfigurieren",
     "aimsun_s3_desc": "Öffnen Sie den Fahrzeugtyp-Editor. Erstellen oder importieren Sie Typen aus unserem Skript: ägyptischer Mikrobus, Mlaiky, Naql, L2, L4-5.",
     "aimsun_s4_title": "Ausführen und prüfen",
-    "aimsun_s4_desc": "Starten Sie die Mikrosimulation. Das Python-Skript wendet TTC-basierte Konfliktlösung an und überschreibt Fahrzeugkinematik."
+    "aimsun_s4_desc": "Starten Sie die Mikrosimulation. Das Python-Skript wendet TTC-basierte Konfliktlösung an und überschreibt Fahrzeugkinematik.",
+    "f0c": "SAE Level 0 — Chaotische / inoffizielle Fahrzeuge",
+    "f0cd": "Kritisch für die lokale Kalibrierung. Diese inoffiziellen Fahrzeuge zeigen Null-Spurdisziplin.",
+    "nn": "Noss-Naql (Halblaster)",
+    "rn": "Rob-Naql (Dababa)",
+    "ntt": "Naql-Taqeel (Sattelzug)",
+    "moto": "Motorrad (Darrah)",
+    "bicy": "Fahrrad (Ajala)",
+    "trc": "Trooscoor (Dreirad)",
+    "ttk": "Tuk-Tuk (Autorikscha)",
+    "av_sec": "SAE Level 1–5 — Autonome Fahrzeuge",
+    "av_secd": "Jeder Automatisierungslevel mit Echtzeit-Produktionskatalogen.",
+    "f1": "SAE L1 — Fahrerunterstützung",
+    "f3": "SAE L3 — Bedingte Automatisierung",
+    "f4": "SAE L4 — Hochautomatisierung",
+    "f5": "SAE L5 — Vollautomatisierung",
+    "real_models": "Echtzeit-Modelle:",
+    "min_gap": "Abstand (m)",
+    "param_sub": "Alle Fahrzeugprofile mit kinematischen Koeffizienten"
   },
   "zh": {
     "t": "SAE AutoSim Hub",
@@ -2006,7 +2402,25 @@
     "aimsun_s3_title": "配置车辆类型",
     "aimsun_s3_desc": "打开车辆类型编辑器。创建或导入与脚本中配置匹配的类型: 埃及微型巴士、Mlaiky、Naql、L2、L4-5。",
     "aimsun_s4_title": "运行并检查",
-    "aimsun_s4_desc": "启动微观模拟。Python 脚本将应用基于 TTC 的冲突解决并覆盖车辆运动学。"
+    "aimsun_s4_desc": "启动微观模拟。Python 脚本将应用基于 TTC 的冲突解决并覆盖车辆运动学。",
+    "f0c": "SAE 0 级 — 混乱/非正规车辆",
+    "f0cd": "本地校准关键。这些非正规车辆表现出零车道纪律和混乱超车。",
+    "nn": "Noss-Naql (半卡车)",
+    "rn": "Rob-Naql (Dababa)",
+    "ntt": "Naql-Taqeel (半挂车)",
+    "moto": "摩托车 (Darrah)",
+    "bicy": "自行车 (Ajala)",
+    "trc": "三轮车 (Trooscoor)",
+    "ttk": "嘟嘟车 (Tuk-Tuk)",
+    "av_sec": "SAE 1-5 级 — 自动驾驶车辆",
+    "av_secd": "每个独立的SAE自动化级别，含真实产品目录。",
+    "f1": "SAE L1 — 驾驶辅助",
+    "f3": "SAE L3 — 有条件自动化",
+    "f4": "SAE L4 — 高度自动化",
+    "f5": "SAE L5 — 完全自动化",
+    "real_models": "真实车型:",
+    "min_gap": "间距 (m)",
+    "param_sub": "所有车辆配置文件含运动学系数"
   },
   "ja": {
     "t": "SAE AutoSim Hub",
@@ -2130,7 +2544,25 @@
     "aimsun_s3_title": "車両タイプを設定",
     "aimsun_s3_desc": "車両タイプエディタを開きます。スクリプトのプロファイルに一致するタイプを作成またはインポートします。",
     "aimsun_s4_title": "実行して検査",
-    "aimsun_s4_desc": "マイクロシミュレーションを開始します。Python スクリプトが TTC ベースの競合解決を適用します。"
+    "aimsun_s4_desc": "マイクロシミュレーションを開始します。Python スクリプトが TTC ベースの競合解決を適用します。",
+    "f0c": "SAE レベル 0 — 混沌/非公式車両",
+    "f0cd": "ローカルキャリブレーションに不可欠。零レーン規律と混沌とした操作。",
+    "nn": "Noss-Naql (ハーフトラック)",
+    "rn": "Rob-Naql (ダババ)",
+    "ntt": "Naql-Taqeel (セミトレーラー)",
+    "moto": "バイク (ダッラ)",
+    "bicy": "自転車 (アジャラ)",
+    "trc": "トゥルースクール (三輪)",
+    "ttk": "トゥクトゥク (オートリキシャ)",
+    "av_sec": "SAE レベル 1–5 — 自動運転車両",
+    "av_secd": "各レベルのキネマティックプロファイルと実在モデル。",
+    "f1": "SAE L1 — ドライバーアシスト",
+    "f3": "SAE L3 — 条件付き自動化",
+    "f4": "SAE L4 — 高度自動化",
+    "f5": "SAE L5 — 完全自动 化",
+    "real_models": "実在モデル:",
+    "min_gap": "ギャップ (m)",
+    "param_sub": "すべての車両プロファイルと運動学係数"
   },
   "ko": {
     "t": "SAE AutoSim Hub",
@@ -2254,7 +2686,25 @@
     "aimsun_s3_title": "차량 유형 구성",
     "aimsun_s3_desc": "차량 유형 편집기를 엽니다. 스크립트의 프로필과 일치하는 유형을 만들거나 가져옵니다.",
     "aimsun_s4_title": "실행 및 검사",
-    "aimsun_s4_desc": "마이크로시뮬레이션을 시작합니다. Python 스크립트가 TTC 기반 충돌 해결을 적용합니다."
+    "aimsun_s4_desc": "마이크로시뮬레이션을 시작합니다. Python 스크립트가 TTC 기반 충돌 해결을 적용합니다.",
+    "f0c": "SAE 레벨 0 — 혼돈/비공식 차량",
+    "f0cd": "지역 캘리브레이션에 중요. 제로 차선 규율과 혼돈스러운 기동.",
+    "nn": "Noss-Naql (하프트럭)",
+    "rn": "Rob-Naql (다바바)",
+    "ntt": "Naql-Taqeel (세미트레일러)",
+    "moto": "오토바이 (다라)",
+    "bicy": "자전거 (아자라)",
+    "trc": "트루스쿠르 (삼륜차)",
+    "ttk": "툭툭 (오토릭샤)",
+    "av_sec": "SAE 레벨 1–5 — 자율주행 차량",
+    "av_secd": "각 자동화 레벨의 운동학 프로필과 실존 모델.",
+    "f1": "SAE L1 — 운전자 지원",
+    "f3": "SAE L3 — 조건부 자동화",
+    "f4": "SAE L4 — 고도 자동화",
+    "f5": "SAE L5 — 완전 자동화",
+    "real_models": "실존 모델:",
+    "min_gap": "간격 (m)",
+    "param_sub": "모든 차량 프로필과 운동학 계수"
   },
   "fr": {
     "t": "SAE AutoSim Hub",
@@ -2378,7 +2828,25 @@
     "aimsun_s3_title": "Configurez les types de vehicules",
     "aimsun_s3_desc": "Ouvrez l editeur de types de vehicules. Creez ou importez les types correspondant aux profils de notre script.",
     "aimsun_s4_title": "Executez et inspectez",
-    "aimsun_s4_desc": "Lancez la microsimulation. Le script Python appliquera la resolution de conflits basee sur le TTC et remplacera la cinematique."
+    "aimsun_s4_desc": "Lancez la microsimulation. Le script Python appliquera la resolution de conflits basee sur le TTC et remplacera la cinematique.",
+    "f0c": "Niveau SAE 0 — Vehicules chaotiques / informels",
+    "f0cd": "Critique pour la calibration locale. Zero discipline de voie et depassements erratiques.",
+    "nn": "Noss-Naql (Semi-camion)",
+    "rn": "Rob-Naql (Dababa)",
+    "ntt": "Naql-Taqeel (Semi-remorque)",
+    "moto": "Moto (Darrah)",
+    "bicy": "Velo (Ajala)",
+    "trc": "Trooscoor (Tricycle)",
+    "ttk": "Tuk-Tuk (Auto-rickshaw)",
+    "av_sec": "Niveaux SAE 1–5 — Vehicules autonomes",
+    "av_secd": "Chaque niveau avec profils cinematiques et catalogues de production reels.",
+    "f1": "SAE L1 — Assistance conducteur",
+    "f3": "SAE L3 — Automatisation conditionnelle",
+    "f4": "SAE L4 — Haute automatisation",
+    "f5": "SAE L5 — Automatisation complete",
+    "real_models": "Modeles reels:",
+    "min_gap": "Ecart (m)",
+    "param_sub": "Tous les profils avec coefficients cinematiques"
   }
 };
     const LANG_OPTIONS = [];
