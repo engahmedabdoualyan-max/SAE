@@ -559,3 +559,6 @@ def _generate_config(platform, egyptian_profiles, av_profiles, mpr):
 
 if __name__ == "__main__":
     main()
+
+# Entry point for Streamlit Community Cloud / serverless deployments
+app = main
