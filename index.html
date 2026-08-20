@@ -352,8 +352,334 @@
         </div>
     </footer>
 
-    <!-- Translation Data -->
+    <!-- Translation Data + Generators -->
     <script>
+    // ══════════════════════════════════════════════════════════
+    // FLEET PROFILES (ported from Python models)
+    // ══════════════════════════════════════════════════════════
+    const FLEET = {
+        microbus: {
+            name: "Egyptian Microbus", sae: 0, len: 6.2, width: 2.0,
+            cf: { accel: 3.0, decel: 6.0, decisiveDecel: 10.8, reaction: 0.7, minGap: 1.2, standstillAccel: 2.8, safety: 0.35, sigma: 0.95, desiredSpeed: 22.2222 },
+            lc: { prob: 95, rightThresh: 12, gapDetect: 0.5, slowProb: 0.6, brakeProb: 0.8, brakeStandstill: 0.95, dwell: 25, minDist: 1.5 },
+            dwell: { mean: 25, std: 12, freq: 0.4, dist: "exponential" },
+            color: "#FF6B21", weight: 0.25
+        },
+        mlaijy: {
+            name: "Mlaiky (Passenger Car)", sae: 0, len: 4.4, width: 1.8,
+            cf: { accel: 2.4, decel: 5.0, decisiveDecel: 8.0, reaction: 0.85, minGap: 1.8, standstillAccel: 2.0, safety: 0.45, sigma: 0.85, desiredSpeed: 25.0 },
+            lc: { prob: 75, rightThresh: 10, gapDetect: 0.7, slowProb: 0.35, brakeProb: 0.6, brakeStandstill: 0.7, dwell: 5, minDist: 2.0 },
+            dwell: null, color: "#00AAFF", weight: 0.60
+        },
+        naql: {
+            name: "Naql (Heavy Truck)", sae: 0, len: 10.5, width: 2.5,
+            cf: { accel: 0.9, decel: 4.5, decisiveDecel: 6.3, reaction: 1.3, minGap: 3.0, standstillAccel: 0.8, safety: 0.55, sigma: 0.75, desiredSpeed: 19.4444 },
+            lc: { prob: 40, rightThresh: 8, gapDetect: 1.5, slowProb: 0.2, brakeProb: 0.85, brakeStandstill: 0.8, dwell: 8, minDist: 4.0 },
+            dwell: null, color: "#8B4513", weight: 0.15
+        },
+        av_l2: {
+            name: "AV SAE Level 1-2 (ACC)", sae: 2, len: 4.8, width: 1.9,
+            cf: { accel: 1.8, decel: 3.2, decisiveDecel: 4.48, reaction: 1.1, minGap: 2.5, standstillAccel: 1.6, safety: 0.75, sigma: 0.15, desiredSpeed: 23.6111 },
+            lc: { prob: 50, rightThresh: 6, gapDetect: 2.0, slowProb: 0.1, brakeProb: 0.3, brakeStandstill: 0.4, dwell: 5, minDist: 3.0 },
+            dwell: null, color: "#FFD700"
+        },
+        av_l45: {
+            name: "AV SAE Level 4-5 (CACC/V2X)", sae: 5, len: 4.9, width: 1.9,
+            cf: { accel: 2.2, decel: 3.5, decisiveDecel: 4.55, reaction: 0.35, minGap: 1.0, standstillAccel: 2.0, safety: 0.95, sigma: 0.01, desiredSpeed: 26.3889 },
+            lc: { prob: 90, rightThresh: 3, gapDetect: 0.5, slowProb: 0.0, brakeProb: 0.05, brakeStandstill: 0.1, dwell: 2, minDist: 1.0 },
+            dwell: null, caccHeadway: 0.3, defensiveFactor: 3.0, color: "#00FF7F"
+        }
+    };
+    const EGYPTIAN_PROFILES = [FLEET.microbus, FLEET.mlaijy, FLEET.naql];
+    const AV_PROFILES = [FLEET.av_l2, FLEET.av_l45];
+
+    // ══════════════════════════════════════════════════════════
+    // MAPPING FUNCTIONS
+    // ══════════════════════════════════════════════════════════
+    function safeDistance(vRef, cf) {
+        var sqrt_ab = Math.sqrt(Math.max(cf.accel, 0.1) * Math.max(cf.decel, 0.1));
+        return cf.minGap + vRef * cf.reaction * cf.safety + (vRef * vRef) / (2 * sqrt_ab) * cf.safety;
+    }
+
+    function mapToWiedemann99(p) {
+        var cf = p.cf, lc = p.lc;
+        var vRef = cf.desiredSpeed;
+        var safeStart = cf.minGap;
+        var safeEnd = safeDistance(vRef, cf);
+        return {
+            CC0: safeStart, CC1: safeEnd, CC2: 0.5 * cf.minGap,
+            CC3: 2 * cf.minGap + vRef * cf.reaction, CC4: 0,
+            CC5: cf.accel, CC6: cf.decel, CC7: cf.decisiveDecel,
+            CC8: cf.minGap, CC9: cf.standstillAccel,
+            OP0: cf.reaction, OP1: cf.safety, OP2: cf.reaction / 2,
+            OP3: cf.reaction, OP4: lc.rightThresh, OP5: lc.gapDetect,
+            OP6: cf.reaction * 0.5, OP7: cf.reaction * 0.3,
+            OP8: lc.gapDetect, OP9: lc.brakeStandstill, OP10: lc.dwell,
+            OP11: 0, OP12: 0, OP13: lc.slowProb, OP14: lc.brakeProb,
+            OP15: lc.prob, OP16: cf.minGap
+        };
+    }
+
+    function mapToSumo(p) {
+        var cf = p.cf, lc = p.lc;
+        var sigma = cf.safety < 0.2 ? cf.sigma : Math.max(0, Math.min(1, 1 - cf.safety));
+        if (cf.sigma < 0.2) sigma = cf.sigma;
+        return {
+            accel: cf.accel, decel: cf.decel, tau: cf.reaction,
+            minGap: cf.minGap, sigma: +sigma.toFixed(4),
+            k: +cf.accel.toFixed(4), phi: 0, delta: 4,
+            speedFactor: 1, speedDev: 0.05,
+            lcCooperative: lc.prob, lcAssertive: lc.rightThresh * 0.25,
+            lcSpeedAdd: 5, lcLookahead: lc.gapDetect, lcTimeToIndent: lc.gapDetect,
+            length: p.len, width: p.width, color: p.color
+        };
+    }
+
+    function ff(v) { return parseFloat(v.toFixed(6)).toString(); }
+
+    // ══════════════════════════════════════════════════════════
+    // VISSIM .inpx GENERATOR
+    // ══════════════════════════════════════════════════════════
+    function generateVISSIM(mpr) {
+        var xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
+        xml += '<VISSIMConfig xmlns="http://www.ptv.de/vissim" version="2024">\n';
+        xml += '  <VehicleTypes>\n';
+
+        var profiles = EGYPTIAN_PROFILES;
+        var id = 1;
+        profiles.forEach(function(p) {
+            xml += buildVT(p, id, "0");
+            id++;
+        });
+
+        if (mpr > 0) {
+            AV_PROFILES.forEach(function(p) {
+                xml += buildVT(p, id, "100");
+                id++;
+            });
+        }
+
+        xml += '  </VehicleTypes>\n';
+        xml += '  <VehicleFlows>\n';
+
+        var flowId = 1;
+        EGYPTIAN_PROFILES.forEach(function(p) {
+            xml += '    <VehicleFlow ID="' + flowId + '" VehicleType="' + p.name + '" Volume="1000"/>\n';
+            flowId++;
+        });
+        if (mpr > 0) {
+            AV_PROFILES.forEach(function(p) {
+                xml += '    <VehicleFlow ID="' + flowId + '" VehicleType="' + p.name + '" Volume="' + Math.round(1000 * 0.5 * mpr) + '"/>\n';
+                flowId++;
+            });
+        }
+
+        xml += '  </VehicleFlows>\n</VISSIMConfig>';
+        return xml;
+    }
+
+    function buildVT(p, id, cat) {
+        var w = mapToWiedemann99(p);
+        var s = '    <VehicleType Name="' + p.name + '" MapID="' + id + '" Length="' + ff(p.len) + '" Width="' + ff(p.width) + '" TypeCategory="' + cat + '">\n';
+        s += '      <CarFollowing Model="Wiedemann99">\n';
+        ["CC0","CC1","CC2","CC3","CC4","CC5","CC6","CC7","CC8","CC9"].forEach(function(k) {
+            s += '        <' + k + '>' + ff(w[k]) + '</' + k + '>\n';
+        });
+        s += '      </CarFollowing>\n';
+        s += '      <LaneChanging>\n';
+        for (var i = 0; i <= 16; i++) {
+            s += '        <OP' + i + '>' + ff(w['OP' + i]) + '</OP' + i + '>\n';
+        }
+        s += '      </LaneChanging>\n';
+        s += '      <DesiredSpeed Distribution="Normal" Mean="' + ff(p.cf.desiredSpeed * 3.6) + '" StdDev="5.0"/>\n';
+        s += '    </VehicleType>\n';
+        return s;
+    }
+
+    // ══════════════════════════════════════════════════════════
+    // SUMO .rou.xml GENERATOR
+    // ══════════════════════════════════════════════════════════
+    function generateSUMO(mpr) {
+        var numVeh = 500, simTime = 3600;
+        var xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
+        xml += '<routes xmlns="http://sumo.dlr.de/xsd/routes_file.xsd"\n';
+        xml += '        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"\n';
+        xml += '        xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/routes_file.xsd">\n';
+        xml += '  <!-- SAE Calibration Hub — Egyptian + AV Fleet MPR=' + Math.round(mpr*100) + '% -->\n\n';
+
+        // vType definitions
+        var allProfiles = EGYPTIAN_PROFILES.slice();
+        if (mpr > 0) AV_PROFILES.forEach(function(p) { allProfiles.push(p); });
+
+        allProfiles.forEach(function(p, i) {
+            var sp = mapToSumo(p);
+            var vClass = p.len < 8 ? 'passenger' : 'truck';
+            xml += '  <vType id="veh_' + String(i+1).padStart(2,'0') + '" vClass="' + vClass + '"';
+            xml += ' name="' + p.name + ' (SAE L' + p.sae + ')"';
+            xml += ' color="' + sp.color + '"';
+            xml += ' accel="' + ff(sp.accel) + '" decel="' + ff(sp.decel) + '"';
+            xml += ' tau="' + ff(sp.tau) + '" minGap="' + ff(sp.minGap) + '"';
+            xml += ' sigma="' + ff(sp.sigma) + '" length="' + ff(sp.length) + '" width="' + ff(sp.width) + '"';
+            xml += ' lcCooperative="' + ff(sp.lcCooperative) + '" lcAssertive="' + ff(sp.lcAssertive) + '"';
+            xml += ' lcSpeedAdd="' + ff(sp.lcSpeedAdd) + '" lcLookahead="' + ff(sp.lcLookahead) + '"';
+            if (p.sae >= 4 && p.caccHeadway !== undefined) {
+                xml += ' param-cacc-headway="' + ff(p.caccHeadway) + '" param-defensive-factor="' + ff(p.defensiveFactor) + '"';
+            }
+            if (p.dwell) {
+                xml += ' param-dwell-mean="' + ff(p.dwell.mean) + '" param-dwell-std="' + ff(p.dwell.std) + '"';
+                xml += ' param-dwell-freq="' + ff(p.dwell.freq) + '" param-dwell-dist="' + p.dwell.dist + '"';
+            }
+            xml += '/>\n';
+        });
+
+        // Bus stops for microbus
+        if (mpr < 1) {
+            xml += '\n  <additional>\n';
+            for (var j = 0; j < 3; j++) {
+                xml += '    <busStop id="microbus_stop_' + j + '" lane="lane_' + j + '" friendlyPos="true" duration="25.00"/>\n';
+            }
+            xml += '  </additional>\n';
+        }
+
+        // Routes
+        xml += '\n  <route id="ring_cw" edges="ring_road_1 ring_road_2 ring_road_3 ring_road_4"/>\n';
+        xml += '  <route id="ring_ccw" edges="ring_road_4 ring_road_3 ring_road_2 ring_road_1"/>\n\n';
+
+        // Vehicles
+        var egyptTotal = Math.max(0, 1 - mpr);
+        var vehIdx = 0;
+        EGYPTIAN_PROFILES.forEach(function(p, i) {
+            var count = Math.floor(numVeh * egyptTotal * p.weight);
+            var vtid = 'veh_' + String(i+1).padStart(2,'0');
+            var period = simTime / Math.max(count, 1);
+            for (var k = 0; k < count; k++) {
+                var route = k % 2 === 0 ? 'ring_cw' : 'ring_ccw';
+                xml += '  <vehicle id="' + vtid + '_' + vehIdx + '" type="' + vtid + '" route="' + route + '"';
+                xml += ' depart="' + (k * period).toFixed(2) + '" departLane="best" departSpeed="max"/>\n';
+                vehIdx++;
+            }
+        });
+
+        if (mpr > 0) {
+            AV_PROFILES.forEach(function(p, j) {
+                var idx = EGYPTIAN_PROFILES.length + j + 1;
+                var count = Math.floor(numVeh * mpr * 0.5);
+                var vtid = 'veh_' + String(idx).padStart(2,'0');
+                var period = simTime / Math.max(count, 1);
+                for (var k = 0; k < count; k++) {
+                    var route = k % 2 === 0 ? 'ring_cw' : 'ring_ccw';
+                    xml += '  <vehicle id="' + vtid + '_' + vehIdx + '" type="' + vtid + '" route="' + route + '"';
+                    xml += ' depart="' + (k * period).toFixed(2) + '" departLane="best" departSpeed="max"/>\n';
+                    vehIdx++;
+                }
+            });
+        }
+
+        xml += '\n</routes>';
+        return xml;
+    }
+
+    // ══════════════════════════════════════════════════════════
+    // PYTHON OVERRIDE SCRIPT GENERATOR
+    // ══════════════════════════════════════════════════════════
+    function generateScript(mpr, platform) {
+        var lines = [];
+        var hr = "# " + "=".repeat(68);
+        lines.push(hr);
+        lines.push("# SAE Calibration Hub — " + platform + " Override Script");
+        lines.push("# MPR (AV penetration): " + Math.round(mpr * 100) + "%");
+        lines.push("# Auto-generated by SAE AutoSim Hub (sae-tau.vercel.app)");
+        lines.push(hr);
+        lines.push("");
+
+        if (platform === "VISSIM") {
+            lines.push("import win32com.client");
+            lines.push("import pythoncom, time, csv");
+            lines.push("");
+            lines.push('vissim = win32com.client.GetActiveObject("Vissim.Vissim-64")');
+            lines.push("");
+            var vehTypes = vissim;
+        }
+
+        lines.push("# Vehicle profiles");
+        lines.push("PROFILES = {");
+
+        EGYPTIAN_PROFILES.forEach(function(p) {
+            lines.push('  "' + p.name + '": {');
+            var w = mapToWiedemann99(p);
+            Object.keys(w).forEach(function(k) {
+                lines.push('    "' + k + '": ' + ff(w[k]) + ',');
+            });
+            lines.push('  },');
+        });
+
+        if (mpr > 0) {
+            AV_PROFILES.forEach(function(p) {
+                lines.push('  "' + p.name + '": {');
+                var w = mapToWiedemann99(p);
+                Object.keys(w).forEach(function(k) {
+                    lines.push('    "' + k + '": ' + ff(w[k]) + ',');
+                });
+                if (p.caccHeadway !== undefined) {
+                    lines.push('    "CACC_HEADWAY": ' + ff(p.caccHeadway) + ',');
+                    lines.push('    "DEFENSIVE_FACTOR": ' + ff(p.defensiveFactor) + ',');
+                }
+                lines.push('  },');
+            });
+        }
+
+        lines.push("}");
+        lines.push("");
+        lines.push("# ── Apply parameters to vehicle types ──");
+        lines.push("net = vissim.Net");
+        lines.push("for vt in net.VehicleTypes:");
+        lines.push("    name = vt.get_attribute_value('NAME')");
+        lines.push("    if name in PROFILES:");
+        lines.push("        p = PROFILES[name]");
+        lines.push("        for key, val in p.items():");
+        lines.push("            if key.startswith('CC') or key.startswith('OP'):");
+        lines.push("                vt.set_attribute_value(key, val)");
+        lines.push('        print(f"Applied {name}: {len(p)} parameters")');
+        lines.push("");
+        lines.push("# ── Run simulation ──");
+        lines.push("sim = vissim.Simulation");
+        lines.push("sim.set_attribute_value('MAXTIME', 3600)");
+        lines.push("sim.set_attribute_value('SIMRESOLUTION', 10)");
+        lines.push("sim.Start()");
+        lines.push('print("Simulation started...")');
+        lines.push("while sim.get_attribute_value('RUNNING') == 1:");
+        lines.push("    time.sleep(1)");
+        lines.push('print("Simulation complete.")');
+
+        return lines.join("\n");
+    }
+
+    // ══════════════════════════════════════════════════════════
+    // DOWNLOAD HELPER
+    // ══════════════════════════════════════════════════════════
+    function downloadFile(content, filename, mime) {
+        var blob = new Blob([content], { type: mime });
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
+
+    function handleDownload(type) {
+        var mpr = mprValue / 100;
+        if (type === 'vissim') {
+            downloadFile(generateVISSIM(mpr), 'sae_vissim_fleet_mpr' + Math.round(mpr*100) + '.inpx', 'application/xml');
+        } else if (type === 'sumo') {
+            downloadFile(generateSUMO(mpr), 'sae_sumo_fleet_mpr' + Math.round(mpr*100) + '.rou.xml', 'application/xml');
+        } else if (type === 'script') {
+            var plat = currentPlatform === 'sumo' ? 'SUMO' : currentPlatform === 'aimsun' ? 'AIMSUN' : 'VISSIM';
+            downloadFile(generateScript(mpr, plat), 'sae_' + currentPlatform + '_override.py', 'text/x-python');
+        }
+    }
     const TRANSLATIONS = {
   "en": {
     "t": "SAE AutoSim Hub",
@@ -1117,25 +1443,6 @@
         var gd = document.getElementById('gen-display');
         if (pd) pd.textContent = currentPlatform.toUpperCase();
         if (gd) gd.textContent = TRANSLATIONS[currentLang].gen + ' ' + currentPlatform.toUpperCase() + ' - ' + mprValue + '%';
-    }
-
-    function handleDownload(type) {
-        var urls = {
-            vissim: '/fleets/custom_egypt_fleet.inpx',
-            sumo: '/fleets/egypt_sumo_fleet.rou.xml',
-            script: '/scripts/vissim_sae_override.py'
-        };
-        var names = {
-            vissim: 'custom_egypt_fleet.inpx',
-            sumo: 'egypt_sumo_fleet.rou.xml',
-            script: 'vissim_sae_override.py'
-        };
-        var a = document.createElement('a');
-        a.href = urls[type];
-        a.download = names[type];
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
     }
 
     window.addEventListener('load', function() {
