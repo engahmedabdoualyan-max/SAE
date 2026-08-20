@@ -57,6 +57,20 @@
         .platform-btn.active { background: rgba(255,255,255,0.95) !important; color: #0EA5E9 !important; border-color: white !important; }
         .nav-link { transition: color 0.2s ease; }
         .nav-link:hover { color: var(--primary); }
+        .weight-row { background: linear-gradient(90deg, #ECFDF5 0%, #F0FDF4 100%) !important; font-weight: 600; }
+        .weight-row td { border-top: 2px solid #22C55E !important; }
+        #sim-canvas { border-radius: 12px; display: block; width: 100%; }
+        .capacity-bar { transition: width 0.6s cubic-bezier(0.4,0,0.2,1); }
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 200; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+        .modal-overlay.hidden { display: none; }
+        .code-block { background: #1E293B; color: #E2E8F0; border-radius: 10px; padding: 20px; font-family: 'JetBrains Mono', 'Fira Code', monospace; font-size: 13px; line-height: 1.6; overflow-x: auto; white-space: pre; max-height: 60vh; overflow-y: auto; }
+        .code-block .kw { color: #C084FC; }
+        .code-block .fn { color: #67E8F9; }
+        .code-block .st { color: #86EFAC; }
+        .code-block .cm { color: #94A3B8; font-style: italic; }
+        .code-block .num { color: #FCA5A5; }
+        .toast-msg { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px); background: #059669; color: white; padding: 12px 28px; border-radius: 12px; font-weight: 600; z-index: 300; opacity: 0; transition: all 0.4s cubic-bezier(0.4,0,0.2,1); pointer-events: none; box-shadow: 0 8px 30px rgba(0,0,0,0.2); }
+        .toast-msg.show { opacity: 1; transform: translateX(-50%) translateY(0); }
         @media (max-width: 768px) { .hero-bg { min-height: 500px; } .flag { font-size: 1.1em; } }
     </style>
 </head>
@@ -138,6 +152,44 @@
                         <i class="fas fa-calculator"></i><span data-key="cta2">View Documentation</span>
                     </button>
                     <div class="mt-4 text-center" data-key="gen" id="gen-display"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Live Traffic Simulation -->
+    <section id="sim" class="py-16 bg-slate-900">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-10">
+                <h2 class="text-3xl font-bold text-white mb-3" data-key="sim_title">Live Traffic Flow Simulation</h2>
+                <p class="text-slate-400 max-w-2xl mx-auto" data-key="sim_desc">Visualize how increasing AV penetration smooths chaotic Egyptian Ring Road traffic in real-time.</p>
+            </div>
+            <div class="max-w-4xl mx-auto">
+                <div class="relative bg-slate-800 rounded-2xl p-2 border border-slate-700">
+                    <canvas id="sim-canvas" width="800" height="320"></canvas>
+                    <div class="absolute top-4 right-4 bg-black/60 text-white text-xs px-3 py-1.5 rounded-lg font-mono">
+                        <span id="sim-mpr-label">MPR: 30%</span>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
+                    <div class="bg-slate-800 rounded-xl p-4 text-center border border-slate-700">
+                        <div class="text-2xl font-bold text-white" id="metric-tau">0.86</div>
+                        <div class="text-xs text-slate-400 mt-1" data-key="w_tau">Weighted Avg tau (s)</div>
+                    </div>
+                    <div class="bg-slate-800 rounded-xl p-4 text-center border border-slate-700">
+                        <div class="text-2xl font-bold text-white" id="metric-cap">2,132</div>
+                        <div class="text-xs text-slate-400 mt-1" data-key="w_cap">Est. Capacity (veh/hr/lane)</div>
+                    </div>
+                    <div class="bg-slate-800 rounded-xl p-4 text-center border border-slate-700">
+                        <div class="text-2xl font-bold text-white" id="metric-ego">69%</div>
+                        <div class="text-xs text-slate-400 mt-1" data-key="w_h">Human %</div>
+                    </div>
+                    <div class="bg-slate-800 rounded-xl p-4 text-center border border-slate-700">
+                        <div class="w-full bg-slate-700 rounded-full h-3 overflow-hidden">
+                            <div id="cap-bar" class="capacity-bar h-full bg-gradient-to-r from-red-500 via-yellow-400 to-emerald-400 rounded-full" style="width:17%"></div>
+                        </div>
+                        <div class="text-xs text-slate-400 mt-2" data-key="w_cap_bar">Capacity vs. Baseline</div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -250,6 +302,15 @@
                         <tr class="hover:bg-slate-50"><td class="p-3 font-medium">Naql (Truck)</td><td class="p-3"><span class="level-badge lvl0">L0</span></td><td class="p-3">1.30</td><td class="p-3">0.55</td><td class="p-3">0.9</td><td class="p-3">4.5</td><td class="p-3">0.75</td></tr>
                         <tr class="hover:bg-blue-50"><td class="p-3 font-medium">AV SAE L2</td><td class="p-3"><span class="level-badge lvl2">L2</span></td><td class="p-3">1.10</td><td class="p-3">0.75</td><td class="p-3">1.8</td><td class="p-3">3.2</td><td class="p-3">0.15</td></tr>
                         <tr class="hover:bg-green-50"><td class="p-3 font-medium">AV SAE L4-5</td><td class="p-3"><span class="level-badge lvl45">L4-5</span></td><td class="p-3">0.35</td><td class="p-3">0.95</td><td class="p-3">2.2</td><td class="p-3">3.5</td><td class="p-3">0.01</td></tr>
+                        <tr class="weight-row" id="fleet-weight-row">
+                            <td class="p-3 font-bold text-emerald-700" data-key="w_row">Current Fleet Weighted</td>
+                            <td class="p-3">--</td>
+                            <td class="p-3 font-mono" id="wt-tau">0.86</td>
+                            <td class="p-3 font-mono" id="wt-safety">0.43</td>
+                            <td class="p-3 font-mono" id="wt-accel">2.22</td>
+                            <td class="p-3 font-mono" id="wt-decel">4.88</td>
+                            <td class="p-3 font-mono" id="wt-sigma">0.85</td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -289,7 +350,7 @@
                     <h3 class="font-bold text-lg mb-2" data-key="dc">Download Override Script</h3>
                     <p class="text-xs text-slate-500 font-mono mb-3" data-key="dc_file">/scripts/vissim_sae_override.py</p>
                     <p class="text-sm text-slate-600 mb-4" data-key="dcd">Python script using TraCI/COM/Aimsun API for real-time TTC-based conflict resolution.</p>
-                    <button onclick="handleDownload('script')" class="w-full download-btn text-orange-600 font-semibold py-3 rounded-lg flex items-center justify-center gap-2"><i class="fas fa-download"></i><span data-key="dc">Download</span></button>
+                    <button onclick="openSandbox()" class="w-full download-btn text-orange-600 font-semibold py-3 rounded-lg flex items-center justify-center gap-2"><i class="fas fa-terminal"></i><span data-key="dc">View &amp; Download Script</span></button>
                 </div>
             </div>
         </div>
@@ -336,8 +397,41 @@
                     <p class="text-slate-700" data-key="r6">Aimsun. (2024). "Aimsun Next 24 User Guide - Microscopic Traffic Simulation."</p>
                 </div>
             </div>
+            <div class="mt-10 text-center">
+                <button onclick="copyBibtex()" class="inline-flex items-center gap-3 bg-indigo-600 text-white font-semibold px-8 py-4 rounded-xl hover:bg-indigo-700 transition-all shadow-lg">
+                    <i class="fas fa-quote-left"></i>
+                    <span data-key="cite_btn">Cite this Platform / Copy BibTeX</span>
+                </button>
+            </div>
         </div>
     </section>
+
+    <!-- Code Sandbox Modal -->
+    <div id="sandbox-modal" class="modal-overlay hidden" onclick="if(event.target===this)closeSandbox()">
+        <div class="bg-white rounded-2xl w-full max-w-3xl mx-4 shadow-2xl max-h-[85vh] flex flex-col">
+            <div class="flex items-center justify-between p-5 border-b">
+                <h3 class="text-lg font-bold text-slate-800" data-key="sandbox_title">Code Sandbox — Override Script</h3>
+                <button onclick="closeSandbox()" class="text-slate-400 hover:text-red-500 transition-colors"><i class="fas fa-times text-xl"></i></button>
+            </div>
+            <div class="flex-1 overflow-hidden p-4">
+                <div class="code-block" id="sandbox-code"></div>
+            </div>
+            <div class="flex items-center justify-between p-4 border-t bg-slate-50 rounded-b-2xl">
+                <span class="text-sm text-slate-500" data-key="sandbox_hint">Review the conflict-resolution logic before downloading.</span>
+                <div class="flex gap-3">
+                    <button onclick="copySandboxCode()" class="px-5 py-2 bg-emerald-600 text-white rounded-lg font-semibold hover:bg-emerald-700 transition-colors flex items-center gap-2">
+                        <i class="fas fa-copy"></i><span data-key="copy_code">Copy Code</span>
+                    </button>
+                    <button onclick="downloadSandboxFile()" class="px-5 py-2 bg-primary text-white rounded-lg font-semibold hover:bg-primary-dark transition-colors flex items-center gap-2">
+                        <i class="fas fa-download"></i><span data-key="dl_file">Download .py</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div id="toast" class="toast-msg"><i class="fas fa-check-circle mr-2"></i><span id="toast-text"></span></div>
 
     <!-- Footer -->
     <footer class="bg-slate-900 text-slate-300 py-8">
@@ -680,6 +774,280 @@
             downloadFile(generateScript(mpr, plat), 'sae_' + currentPlatform + '_override.py', 'text/x-python');
         }
     }
+
+    // ══════════════════════════════════════════════════════════
+    // FLEET CALCULATOR — Weighted τ, capacity, metrics
+    // ══════════════════════════════════════════════════════════
+    function computeWeightedFleet(mpr) {
+        var m = mpr / 100;
+        var humanShare = 1 - m;
+        var egyptianWeight = [0.25, 0.60, 0.15];
+        var weighted = { tau: 0, safety: 0, accel: 0, decel: 0, sigma: 0 };
+        EGYPTIAN_PROFILES.forEach(function(p, i) {
+            var w = humanShare * egyptianWeight[i];
+            weighted.tau   += w * p.cf.reaction;
+            weighted.safety += w * p.cf.safety;
+            weighted.accel  += w * p.cf.accel;
+            weighted.decel  += w * p.cf.decel;
+            weighted.sigma  += w * p.cf.sigma;
+        });
+        if (m > 0) {
+            var avWeight = [0.5, 0.5];
+            AV_PROFILES.forEach(function(p, i) {
+                var w = m * avWeight[i];
+                weighted.tau   += w * p.cf.reaction;
+                weighted.safety += w * p.cf.safety;
+                weighted.accel  += w * p.cf.accel;
+                weighted.decel  += w * p.cf.decel;
+                weighted.sigma  += w * p.cf.sigma;
+            });
+        }
+        var C_baseline = 1800, C_max = 3200;
+        var capacity = Math.round(C_baseline + (C_max - C_baseline) * m);
+        return { weighted: weighted, capacity: capacity, humanPct: Math.round(humanShare * 100) };
+    }
+
+    function updateFleetTable(mpr) {
+        var result = computeWeightedFleet(mpr);
+        var w = result.weighted;
+        var el;
+        el = document.getElementById('wt-tau');    if (el) el.textContent = w.tau.toFixed(2);
+        el = document.getElementById('wt-safety');  if (el) el.textContent = w.safety.toFixed(2);
+        el = document.getElementById('wt-accel');   if (el) el.textContent = w.accel.toFixed(2);
+        el = document.getElementById('wt-decel');   if (el) el.textContent = w.decel.toFixed(2);
+        el = document.getElementById('wt-sigma');   if (el) el.textContent = w.sigma.toFixed(2);
+
+        el = document.getElementById('metric-tau');  if (el) el.textContent = w.tau.toFixed(2);
+        el = document.getElementById('metric-cap');  if (el) el.textContent = result.capacity.toLocaleString();
+        el = document.getElementById('metric-ego');  if (el) el.textContent = result.humanPct + '%';
+
+        var capPct = ((result.capacity - 1800) / (3200 - 1800) * 100);
+        el = document.getElementById('cap-bar');     if (el) el.style.width = Math.max(2, capPct) + '%';
+
+        el = document.getElementById('sim-mpr-label'); if (el) el.textContent = 'MPR: ' + mpr + '%';
+    }
+
+    // ══════════════════════════════════════════════════════════
+    // 2D CANVAS TRAFFIC SIMULATION
+    // ══════════════════════════════════════════════════════════
+    var simCanvas, simCtx, simAnimId;
+    var simVehicles = [];
+    var LANE_COUNT = 4, LANE_W = 70, CANVAS_W = 800, CANVAS_H = 320;
+    var ROAD_TOP = 30;
+
+    function initSim() {
+        simCanvas = document.getElementById('sim-canvas');
+        if (!simCanvas) return;
+        simCtx = simCanvas.getContext('2d');
+        CANVAS_W = simCanvas.parentElement.clientWidth - 16;
+        simCanvas.width = CANVAS_W;
+        simCanvas.height = CANVAS_H;
+        ROAD_TOP = 20;
+        LANE_W = Math.floor((CANVAS_H - 40) / LANE_COUNT);
+        simVehicles = [];
+        for (var i = 0; i < 40; i++) simVehicles.push(createVehicle());
+        if (!simAnimId) animateSim();
+    }
+
+    function createVehicle() {
+        var isAv = Math.random() * 100 < mprValue;
+        var type;
+        if (isAv) {
+            type = Math.random() < 0.5 ? FLEET.av_l2 : FLEET.av_l45;
+        } else {
+            var r = Math.random();
+            type = r < 0.25 ? FLEET.microbus : r < 0.85 ? FLEET.mlaijy : FLEET.naql;
+        }
+        var lane = Math.floor(Math.random() * LANE_COUNT);
+        var baseSpeed = type.cf.desiredSpeed * 0.6;
+        return {
+            x: Math.random() * CANVAS_W,
+            y: ROAD_TOP + lane * LANE_W + LANE_W * 0.5,
+            lane: lane,
+            w: Math.max(18, type.len * 1.8),
+            h: Math.max(10, type.width * 5),
+            speed: baseSpeed + (Math.random() - 0.5) * 4,
+            baseSpeed: baseSpeed,
+            color: isAv ? (type.sae >= 4 ? '#00FF7F' : '#FFD700') : type.color,
+            isAv: isAv,
+            isErratic: !isAv && type === FLEET.microbus,
+            erraticTimer: 0,
+            targetLane: lane,
+            label: isAv ? '' : (type === FLEET.microbus ? 'M' : type === FLEET.naql ? 'T' : '')
+        };
+    }
+
+    function animateSim() {
+        if (!simCtx) { simAnimId = null; return; }
+        var m = mprValue / 100;
+        simCtx.fillStyle = '#334155';
+        simCtx.fillRect(0, 0, CANVAS_W, CANVAS_H);
+
+        for (var l = 0; l < LANE_COUNT; l++) {
+            var ly = ROAD_TOP + l * LANE_W;
+            simCtx.fillStyle = l % 2 === 0 ? '#475569' : '#3E4C5E';
+            simCtx.fillRect(0, ly, CANVAS_W, LANE_W);
+            simCtx.strokeStyle = '#FCD34D';
+            simCtx.lineWidth = 1;
+            simCtx.setLineDash([12, 8]);
+            simCtx.beginPath();
+            simCtx.moveTo(0, ly + LANE_W);
+            simCtx.lineTo(CANVAS_W, ly + LANE_W);
+            simCtx.stroke();
+            simCtx.setLineDash([]);
+        }
+        simCtx.strokeStyle = '#FCD34D';
+        simCtx.lineWidth = 3;
+        simCtx.strokeRect(0, ROAD_TOP, CANVAS_W, LANE_COUNT * LANE_W);
+
+        simVehicles.forEach(function(v) {
+            var chaos = 1 - m;
+            v.x += v.speed * 0.3;
+
+            if (v.isErratic && Math.random() < 0.008 * chaos) {
+                var dir = Math.random() < 0.5 ? -1 : 1;
+                v.targetLane = Math.max(0, Math.min(LANE_COUNT - 1, v.lane + dir));
+            }
+            if (v.lane !== v.targetLane) {
+                var diff = v.targetLane - v.lane;
+                v.lane += Math.sign(diff) * 0.04;
+                if (Math.abs(v.targetLane - v.lane) < 0.02) v.lane = v.targetLane;
+                v.y = ROAD_TOP + v.lane * LANE_W + LANE_W * 0.5;
+            }
+
+            if (v.isErratic && Math.random() < 0.003 * chaos) {
+                v.speed = v.baseSpeed * (0.3 + Math.random() * 0.4);
+                v.erraticTimer = 60;
+            }
+            if (v.erraticTimer > 0) {
+                v.erraticTimer--;
+                if (v.erraticTimer === 0) v.speed = v.baseSpeed + (Math.random() - 0.5) * 4;
+            }
+
+            if (v.isAv && !v.isErratic) {
+                v.speed += (v.baseSpeed - v.speed) * 0.02;
+            }
+
+            if (v.x > CANVAS_W + 40) {
+                var nv = createVehicle();
+                nv.x = -nv.w - Math.random() * 60;
+                nv.lane = v.lane;
+                nv.targetLane = v.lane;
+                nv.y = ROAD_TOP + v.lane * LANE_W + LANE_W * 0.5;
+                Object.assign(v, nv);
+            }
+
+            simCtx.fillStyle = v.color;
+            simCtx.globalAlpha = 0.9;
+            simCtx.beginPath();
+            simCtx.roundRect(v.x, v.y - v.h / 2, v.w, v.h, 3);
+            simCtx.fill();
+            simCtx.globalAlpha = 1;
+
+            if (v.label) {
+                simCtx.fillStyle = '#FFF';
+                simCtx.font = 'bold 8px sans-serif';
+                simCtx.textAlign = 'center';
+                simCtx.fillText(v.label, v.x + v.w / 2, v.y + 3);
+            }
+
+            if (v.isAv && v.isAv) {
+                simCtx.fillStyle = 'rgba(0,255,127,0.15)';
+                simCtx.beginPath();
+                simCtx.arc(v.x + v.w / 2, v.y, 18, 0, Math.PI * 2);
+                simCtx.fill();
+            }
+        });
+
+        simAnimId = requestAnimationFrame(animateSim);
+    }
+
+    // ══════════════════════════════════════════════════════════
+    // CITATION / BibTeX
+    // ══════════════════════════════════════════════════════════
+    var BIBTEX = '@misc{sae_autosim_hub_2024,\n  title        = {SAE AutoSim Hub: Pre-calibrated Vehicle Fleets for Chaotic Traffic Environments},\n  author       = {{SAE AutoSim Hub}},\n  year         = {2024},\n  url          = {https://sae-tau.vercel.app},\n  note         = {Accessed: ' + new Date().toISOString().slice(0,10) + '}\n}';
+
+    function copyBibtex() {
+        navigator.clipboard.writeText(BIBTEX).then(function() {
+            showToast(t('copied'));
+        }).catch(function() {
+            var ta = document.createElement('textarea');
+            ta.value = BIBTEX;
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            document.body.removeChild(ta);
+            showToast(t('copied'));
+        });
+    }
+
+    // ══════════════════════════════════════════════════════════
+    // TOAST
+    // ══════════════════════════════════════════════════════════
+    var toastTimer;
+    function showToast(msg) {
+        var el = document.getElementById('toast');
+        var txt = document.getElementById('toast-text');
+        if (!el || !txt) return;
+        txt.textContent = msg;
+        el.classList.add('show');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(function() { el.classList.remove('show'); }, 2500);
+    }
+
+    // ══════════════════════════════════════════════════════════
+    // CODE SANDBOX MODAL
+    // ══════════════════════════════════════════════════════════
+    var sandboxCode = '';
+
+    function openSandbox() {
+        var mpr = mprValue / 100;
+        var plat = currentPlatform === 'sumo' ? 'SUMO' : currentPlatform === 'aimsun' ? 'AIMSUN' : 'VISSIM';
+        sandboxCode = generateScript(mpr, plat);
+        var highlighted = highlightPython(sandboxCode);
+        document.getElementById('sandbox-code').innerHTML = highlighted;
+        document.getElementById('sandbox-modal').classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeSandbox() {
+        document.getElementById('sandbox-modal').classList.add('hidden');
+        document.body.style.overflow = '';
+    }
+
+    function copySandboxCode() {
+        navigator.clipboard.writeText(sandboxCode).then(function() {
+            showToast(t('copied'));
+        }).catch(function() {
+            var ta = document.createElement('textarea');
+            ta.value = sandboxCode;
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            document.body.removeChild(ta);
+            showToast(t('copied'));
+        });
+    }
+
+    function downloadSandboxFile() {
+        var plat = currentPlatform === 'sumo' ? 'sumo' : currentPlatform === 'aimsun' ? 'aimsun' : 'vissim';
+        downloadFile(sandboxCode, 'sae_' + plat + '_override.py', 'text/x-python');
+    }
+
+    function highlightPython(code) {
+        return code
+            .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+            .replace(/(#.*$)/gm, '<span class="cm">$1</span>')
+            .replace(/\b(import|from|def|for|in|if|elif|else|while|return|print|as|class|True|False|None)\b/g, '<span class="kw">$1</span>')
+            .replace(/\b(win32com|client|pythoncom|time|csv)\b/g, '<span class="fn">$1</span>')
+            .replace(/("[^"]*")/g, '<span class="st">$1</span>')
+            .replace(/\b(\d+\.?\d*)\b/g, '<span class="num">$1</span>');
+    }
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') closeSandbox();
+    });
+
     const TRANSLATIONS = {
   "en": {
     "t": "SAE AutoSim Hub",
@@ -758,7 +1126,20 @@
     "nav_home": "Home",
     "nav_math": "Math",
     "nav_refs": "References",
-    "nav_github": "GitHub"
+    "nav_github": "GitHub",
+    "sim_title": "Live Traffic Flow Simulation",
+    "sim_desc": "Visualize how increasing AV penetration smooths chaotic Egyptian Ring Road traffic in real-time.",
+    "w_tau": "Weighted Avg tau (s)",
+    "w_cap": "Est. Capacity (veh/hr/lane)",
+    "w_h": "Human %",
+    "w_cap_bar": "Capacity vs. Baseline",
+    "w_row": "Current Fleet Weighted",
+    "cite_btn": "Cite this Platform / Copy BibTeX",
+    "sandbox_title": "Code Sandbox - Override Script",
+    "sandbox_hint": "Review the conflict-resolution logic before downloading.",
+    "copy_code": "Copy Code",
+    "dl_file": "Download .py",
+    "copied": "Copied to clipboard!"
   },
   "ar": {
     "t": "SAE AutoSim Hub",
@@ -837,7 +1218,20 @@
     "nav_home": "الرئيسية",
     "nav_math": "الرياضيات",
     "nav_refs": "المراجع",
-    "nav_github": "GitHub"
+    "nav_github": "GitHub",
+    "sim_title": "محاكاة حركة المرور المباشرة",
+    "sim_desc": "تصور كيف يُシーン اختراق المركبات الذكية حركة المرور الفوضوية على الطريق الدائري.",
+    "w_tau": "متوسط tau المرجح (ث)",
+    "w_cap": "السعة المقدرة (مركبة/ساعة/مسار)",
+    "w_h": "نسبة البشر",
+    "w_cap_bar": "السعة مقارنة بالخط الأساسي",
+    "w_row": "الأسطول المرجح الحالي",
+    "cite_btn": "استشهاد بهذه المنصة / نسخ BibTeX",
+    "sandbox_title": "بيئة البرمجة - نص التعديل",
+    "sandbox_hint": "راجع منطق حل النزاعات قبل التنزيل.",
+    "copy_code": "نسخ الكود",
+    "dl_file": "تنزيل .py",
+    "copied": "تم النسخ!"
   },
   "ru": {
     "t": "SAE AutoSim Hub",
@@ -916,7 +1310,20 @@
     "nav_home": "Главная",
     "nav_math": "Математика",
     "nav_refs": "Ссылки",
-    "nav_github": "GitHub"
+    "nav_github": "GitHub",
+    "sim_title": "Живая симуляция трафика",
+    "sim_desc": "Наглядно покажите, как проникновение AV сглаживает хаотичное движение Каирского кольцевого шоссе.",
+    "w_tau": "Средняя tau (с)",
+    "w_cap": "Емкость (авт/час/полоса)",
+    "w_h": "Доля людей",
+    "w_cap_bar": "Пропускная способность vs. базовая",
+    "w_row": "Взвешенный автопарк",
+    "cite_btn": "Цитировать / Скопировать BibTeX",
+    "sandbox_title": "Песочница — Скрипт переопределения",
+    "sandbox_hint": "Просмотрите логику решения конфликтов перед скачиванием.",
+    "copy_code": "Скопировать код",
+    "dl_file": "Скачать .py",
+    "copied": "Скопировано!"
   },
   "hi": {
     "t": "SAE AutoSim Hub",
@@ -995,7 +1402,20 @@
     "nav_home": "होम",
     "nav_math": "गणित",
     "nav_refs": "संदर्भ",
-    "nav_github": "GitHub"
+    "nav_github": "GitHub",
+    "sim_title": "लाइव ट्रैफ़िक फ़्लो सिमुलेशन",
+    "sim_desc": "देखें कि AV प्रवेश कैसे कैरो रिंग रोड के अराजक ट्रैफ़िक को सुगम बनाता है।",
+    "w_tau": "भारित औसत tau (s)",
+    "w_cap": "अनुमानित क्षमता (वाहन/घंटा/लेन)",
+    "w_h": "मानव %",
+    "w_cap_bar": "क्षमता बनाम आधारभूत",
+    "w_row": "वर्तमान भारित फ़्लीट",
+    "cite_btn": "इस मंच को उद्धृत करें / BibTeX कॉपी करें",
+    "sandbox_title": "कोड सैंडबॉक्स - ओवरराइड स्क्रिप्ट",
+    "sandbox_hint": "डाउनलोड करने से पहले टकराव समाधान तर्क की समीक्षा करें।",
+    "copy_code": "कोड कॉपी करें",
+    "dl_file": "डाउनलोड .py",
+    "copied": "कॉपी किया गया!"
   },
   "de": {
     "t": "SAE AutoSim Hub",
@@ -1074,7 +1494,20 @@
     "nav_home": "Startseite",
     "nav_math": "Mathematik",
     "nav_refs": "Referenzen",
-    "nav_github": "GitHub"
+    "nav_github": "GitHub",
+    "sim_title": "Live-Verkehrssimulation",
+    "sim_desc": "Visualisieren Sie, wie AV-Durchdringung den chaotischen Verkehr auf der Kairoer Ringstraße glättet.",
+    "w_tau": "Gewichtete tau (s)",
+    "w_cap": "Kapazität (Fz/h/Spur)",
+    "w_h": "Mensch-Anteil",
+    "w_cap_bar": "Kapazität vs. Basis",
+    "w_row": "Gewichtete Flotte",
+    "cite_btn": "Zitieren / BibTeX kopieren",
+    "sandbox_title": "Code-Sandbox - Überschreibungsskript",
+    "sandbox_hint": "Überprüfen Sie die Konfliktlösungslogik vor dem Download.",
+    "copy_code": "Code kopieren",
+    "dl_file": "Herunterladen .py",
+    "copied": "Kopiert!"
   },
   "zh": {
     "t": "SAE AutoSim Hub",
@@ -1153,7 +1586,20 @@
     "nav_home": "首页",
     "nav_math": "数学",
     "nav_refs": "参考",
-    "nav_github": "GitHub"
+    "nav_github": "GitHub",
+    "sim_title": "实时交通流模拟",
+    "sim_desc": "可视化 AV 渗透如何平滑开罗环路的混乱交通。",
+    "w_tau": "加权平均 tau (s)",
+    "w_cap": "估计容量 (辆/小时/车道)",
+    "w_h": "人类比例",
+    "w_cap_bar": "容量 vs 基线",
+    "w_row": "当前加权车队",
+    "cite_btn": "引用此平台 / 复制 BibTeX",
+    "sandbox_title": "代码沙箱 - 覆盖脚本",
+    "sandbox_hint": "下载前查看冲突解决逻辑。",
+    "copy_code": "复制代码",
+    "dl_file": "下载 .py",
+    "copied": "已复制到剪贴板!"
   },
   "ja": {
     "t": "SAE AutoSim Hub",
@@ -1232,7 +1678,20 @@
     "nav_home": "ホーム",
     "nav_math": "数学",
     "nav_refs": "参考文献",
-    "nav_github": "GitHub"
+    "nav_github": "GitHub",
+    "sim_title": "リアルタイム交通流シミュレーション",
+    "sim_desc": "AV 渗透がカイロ環状道の混沌とした交通をどのように滑らかにするかを視覚化。",
+    "w_tau": "加重平均 tau (s)",
+    "w_cap": "推定容量 (両/時/レーン)",
+    "w_h": "人間 %",
+    "w_cap_bar": "容量 vs ベースライン",
+    "w_row": "現在の加重車両群",
+    "cite_btn": "このプラットフォームを引用 / BibTeX コピー",
+    "sandbox_title": "コードサンドボックス - オーバーライドスクリプト",
+    "sandbox_hint": "ダウンロード前に競合解決ロジックを確認。",
+    "copy_code": "コードをコピー",
+    "dl_file": "ダウンロード .py",
+    "copied": "コピーしました!"
   },
   "ko": {
     "t": "SAE AutoSim Hub",
@@ -1311,7 +1770,20 @@
     "nav_home": "홈",
     "nav_math": "수학",
     "nav_refs": "참고문헌",
-    "nav_github": "GitHub"
+    "nav_github": "GitHub",
+    "sim_title": "실시간 교통 흐름 시뮬레이션",
+    "sim_desc": "AV 침투가 카이로 링 로드의 혼란스러운 교통을 어떻게 원활하게 하는지 시각화합니다.",
+    "w_tau": "가중평균 tau (s)",
+    "w_cap": "추정 용량 (대/시간/차로)",
+    "w_h": "인간 비율",
+    "w_cap_bar": "용량 vs 기준선",
+    "w_row": "현재 가중 편성",
+    "cite_btn": "이 플랫폼 인용 / BibTeX 복사",
+    "sandbox_title": "코드 샌드박스 - 오버라이드 스크립트",
+    "sandbox_hint": "다운로드 전에 충돌 해결 로직을 검토하세요.",
+    "copy_code": "코드 복사",
+    "dl_file": "다운로드 .py",
+    "copied": "복사되었습니다!"
   },
   "fr": {
     "t": "SAE AutoSim Hub",
@@ -1390,7 +1862,20 @@
     "nav_home": "Accueil",
     "nav_math": "Mathematiques",
     "nav_refs": "References",
-    "nav_github": "GitHub"
+    "nav_github": "GitHub",
+    "sim_title": "Simulation de trafic en temps reel",
+    "sim_desc": "Visualisez comment la penetration AV lisse le trafic chaotique de la Ceinture du Caire.",
+    "w_tau": "tau moyen pondere (s)",
+    "w_cap": "Capacite estimee (veh/h/v)",
+    "w_h": "Humains %",
+    "w_cap_bar": "Capacite vs. Base",
+    "w_row": "Flotte ponderee actuelle",
+    "cite_btn": "Citer cette plateforme / Copier BibTeX",
+    "sandbox_title": "Bac a sable - Script de remplacement",
+    "sandbox_hint": "Examinez la logique de resolution avant de telecharger.",
+    "copy_code": "Copier le code",
+    "dl_file": "Telecharger .py",
+    "copied": "Copie!"
   }
 };
     const LANG_OPTIONS = [];
@@ -1435,6 +1920,7 @@
         mprValue = parseInt(value);
         document.getElementById('mpr-bar').style.width = mprValue + '%';
         document.getElementById('mpr-val').textContent = mprValue + '%';
+        updateFleetTable(mprValue);
         updateDisplay();
     }
 
@@ -1452,6 +1938,8 @@
         document.querySelectorAll('[data-platform-btn]').forEach(function(btn) {
             btn.classList.toggle('active', btn.getAttribute('data-platform') === 'vissim');
         });
+        updateFleetTable(mprValue);
+        setTimeout(initSim, 300);
     });
     </script>
 </body>
