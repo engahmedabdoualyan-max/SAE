@@ -3,8 +3,77 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SAE AutoSim Hub</title>
-    <meta name="description" content="Pre-calibrated vehicle fleets for chaotic, aggressive traffic environments. Supporting researchers worldwide, with a focus on Arab Countries.">
+    <title>SAE AutoSim Hub | Pre-Calibrated Traffic Simulation Fleets for Egypt &amp; Arab World</title>
+    <meta name="description" content="Pre-calibrated vehicle fleets for chaotic, aggressive, non-lane-based traffic environments. Wiedemann 99, SUMO Krauss, and Aimsun IDM parameters for Egyptian Microbus, Mlaiky, and Naql fleets. Supporting researchers worldwide.">
+    <meta name="keywords" content="traffic micro-simulation, SAE autonomous vehicle calibration, Egypt Ring Road traffic simulation, Wiedemann 99 microbuses calibration, SUMO vehicle definition profiles, VISSIM Egyptian fleet, Aimsun mixed traffic, non-lane-based traffic modeling, AV market penetration rate, car-following model calibration, Cairo traffic, Arab world transportation research, cooperative adaptive cruise control, CACC platooning">
+    <meta name="author" content="SAE AutoSim Hub">
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+    <link rel="canonical" href="https://sae.fimtosoft.com/">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="SAE AutoSim Hub">
+    <meta property="og:title" content="SAE AutoSim Hub | Pre-Calibrated Traffic Simulation Fleets">
+    <meta property="og:description" content="Open-source, pre-calibrated vehicle fleet configurations for PTV VISSIM, SUMO, and Aimsun Next. Bridging the local calibration deficit for Egypt, the Arab world, and developing markets.">
+    <meta property="og:url" content="https://sae.fimtosoft.com/">
+    <meta property="og:image" content="https://sae.fimtosoft.com/og-image.png">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:locale:alternate" content="ar_EG">
+    <meta property="og:locale:alternate" content="ru_RU">
+    <meta property="og:locale:alternate" content="hi_IN">
+    <meta property="og:locale:alternate" content="zh_CN">
+    <meta property="og:locale:alternate" content="ja_JP">
+    <meta property="og:locale:alternate" content="ko_KR">
+    <meta property="og:locale:alternate" content="fr_FR">
+    <meta property="og:locale:alternate" content="de_DE">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="SAE AutoSim Hub | Pre-Calibrated Traffic Simulation Fleets">
+    <meta name="twitter:description" content="Open-source, pre-calibrated vehicle fleet configurations for VISSIM, SUMO, and Aimsun Next. Egyptian Ring Road calibration data for researchers.">
+    <meta name="twitter:image" content="https://sae.fimtosoft.com/og-image.png">
+    <meta name="twitter:site" content="@SAEAutoSimHub">
+
+    <!-- Academic / Citation Meta -->
+    <meta name="citation_title" content="SAE AutoSim Hub: Pre-Calibrated Vehicle Fleets for Chaotic and Mixed-Autonomy Traffic Environments">
+    <meta name="citation_author" content="SAE AutoSim Hub">
+    <meta name="citation_publication_date" content="2024">
+    <meta name="citation_journal_title" content="SAE AutoSim Hub Technical Repository">
+    <meta name="citation_pdf_url" content="https://sae.fimtosoft.com/">
+    <meta name="citation_language" content="en">
+    <meta name="citation_language" content="ar">
+    <meta name="DC.title" content="SAE AutoSim Hub: Pre-Calibrated Vehicle Fleets for Chaotic and Mixed-Autonomy Traffic Environments">
+    <meta name="DC.creator" content="SAE AutoSim Hub">
+    <meta name="DC.subject" content="Traffic Micro-Simulation; Vehicle Calibration; Autonomous Vehicles; Mixed Traffic">
+    <meta name="DC.description" content="Open-source pre-calibrated fleet configurations for VISSIM, SUMO, and Aimsun Next targeting Egyptian and developing-market traffic environments.">
+    <meta name="DC.publisher" content="SAE AutoSim Hub">
+    <meta name="DC.identifier" content="https://sae.fimtosoft.com/">
+    <meta name="DC.language" content="en">
+    <meta name="DC.rights" content="MIT License">
+
+    <!-- Schema.org Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "SAE AutoSim Hub",
+      "url": "https://sae.fimtosoft.com",
+      "description": "Pre-calibrated vehicle fleet configurations for PTV VISSIM, SUMO, and Aimsun Next traffic simulation platforms. Egyptian Ring Road calibration data for non-lane-based traffic.",
+      "applicationCategory": "EngineeringApplication",
+      "operatingSystem": "Windows, Linux, macOS",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+      "softwareVersion": "2024.1",
+      "datePublished": "2024-01-01",
+      "license": "https://opensource.org/licenses/MIT",
+      "inLanguage": ["en", "ar", "ru", "hi", "de", "zh", "ja", "ko", "fr"],
+      "about": {
+        "@type": "Thing",
+        "name": "Traffic Micro-Simulation Calibration",
+        "description": "Wiedemann 99, SUMO Krauss, and Aimsun IDM car-following parameters for Egyptian vehicle types"
+      }
+    }
+    </script>
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
     tailwind.config = {
@@ -69,6 +138,8 @@
         .code-block .st { color: #86EFAC; }
         .code-block .cm { color: #94A3B8; font-style: italic; }
         .code-block .num { color: #FCA5A5; }
+        .guide-tab.active { color: #312E81 !important; border-bottom-color: #6366F1 !important; background: white; }
+        .guide-panel { animation: fadeIn 0.3s ease-in; }
         .toast-msg { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px); background: #059669; color: white; padding: 12px 28px; border-radius: 12px; font-weight: 600; z-index: 300; opacity: 0; transition: all 0.4s cubic-bezier(0.4,0,0.2,1); pointer-events: none; box-shadow: 0 8px 30px rgba(0,0,0,0.2); }
         .toast-msg.show { opacity: 1; transform: translateX(-50%) translateY(0); }
         @media (max-width: 768px) { .hero-bg { min-height: 500px; } .flag { font-size: 1.1em; } }
@@ -351,6 +422,150 @@
                     <p class="text-xs text-slate-500 font-mono mb-3" data-key="dc_file">/scripts/vissim_sae_override.py</p>
                     <p class="text-sm text-slate-600 mb-4" data-key="dcd">Python script using TraCI/COM/Aimsun API for real-time TTC-based conflict resolution.</p>
                     <button onclick="openSandbox()" class="w-full download-btn text-orange-600 font-semibold py-3 rounded-lg flex items-center justify-center gap-2"><i class="fas fa-terminal"></i><span data-key="dc">View &amp; Download Script</span></button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Software Integration Guides -->
+    <section id="guides" class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-10">
+                <h2 class="text-3xl font-bold text-slate-800 mb-3" data-key="guide_title">Software Integration Guides</h2>
+                <p class="text-slate-600 max-w-2xl mx-auto" data-key="guide_desc">Step-by-step instructions to deploy our pre-calibrated fleets into your simulation environment.</p>
+            </div>
+            <div class="max-w-4xl mx-auto">
+                <!-- Tab Bar -->
+                <div class="flex border-b-2 border-slate-200 mb-8 gap-1">
+                    <button onclick="switchGuide('vissim')" data-guide-btn data-guide="vissim" class="guide-tab active px-6 py-3 font-semibold text-sm rounded-t-lg transition-all border-b-2 -mb-[2px]">
+                        <i class="fas fa-cog mr-2"></i><span data-key="guide_vissim">PTV VISSIM</span>
+                    </button>
+                    <button onclick="switchGuide('sumo')" data-guide-btn data-guide="sumo" class="guide-tab px-6 py-3 font-semibold text-sm rounded-t-lg transition-all border-b-2 border-transparent -mb-[2px] text-slate-500 hover:text-slate-700">
+                        <i class="fas fa-network-wired mr-2"></i><span data-key="guide_sumo">SUMO</span>
+                    </button>
+                    <button onclick="switchGuide('aimsun')" data-guide-btn data-guide="aimsun" class="guide-tab px-6 py-3 font-semibold text-sm rounded-t-lg transition-all border-b-2 border-transparent -mb-[2px] text-slate-500 hover:text-slate-700">
+                        <i class="fas fa-car mr-2"></i><span data-key="guide_aimsun">Aimsun Next</span>
+                    </button>
+                </div>
+
+                <!-- VISSIM Guide -->
+                <div id="guide-vissim" class="guide-panel">
+                    <div class="bg-gradient-to-br from-indigo-50 to-white rounded-2xl p-8 border border-indigo-100">
+                        <div class="flex items-center gap-3 mb-6">
+                            <div class="w-10 h-10 bg-indigo-600 rounded-lg flex items-center justify-center"><i class="fas fa-cog text-white"></i></div>
+                            <h3 class="text-xl font-bold text-slate-800" data-key="guide_vissim_title">Deploying Fleet into PTV VISSIM</h3>
+                        </div>
+                        <div class="space-y-4">
+                            <div class="flex gap-4 items-start">
+                                <div class="flex-shrink-0 w-8 h-8 bg-indigo-600 text-white rounded-full flex items-center justify-center text-sm font-bold">1</div>
+                                <div>
+                                    <h4 class="font-semibold text-slate-800" data-key="vissim_s1_title">Open Your Base Network</h4>
+                                    <p class="text-sm text-slate-600 mt-1" data-key="vissim_s1_desc">Launch PTV VISSIM and open your existing base network layout file (<code class="bg-indigo-100 text-indigo-700 px-1.5 py-0.5 rounded text-xs font-mono">.inpx</code>) containing your road geometry, signal controllers, and desired traffic demand.</p>
+                                </div>
+                            </div>
+                            <div class="flex gap-4 items-start">
+                                <div class="flex-shrink-0 w-8 h-8 bg-indigo-600 text-white rounded-full flex items-center justify-center text-sm font-bold">2</div>
+                                <div>
+                                    <h4 class="font-semibold text-slate-800" data-key="vissim_s2_title">Read Additional Network</h4>
+                                    <p class="text-sm text-slate-600 mt-1" data-key="vissim_s2_desc">Navigate to <code class="bg-indigo-100 text-indigo-700 px-1.5 py-0.5 rounded text-xs font-mono">File &rarr; Read Additional &rarr; Network</code> from the top menu bar. This command allows you to merge vehicle type definitions without overwriting your existing road links, connectors, or signal plans.</p>
+                                </div>
+                            </div>
+                            <div class="flex gap-4 items-start">
+                                <div class="flex-shrink-0 w-8 h-8 bg-indigo-600 text-white rounded-full flex items-center justify-center text-sm font-bold">3</div>
+                                <div>
+                                    <h4 class="font-semibold text-slate-800" data-key="vissim_s3_title">Select Fleet File</h4>
+                                    <p class="text-sm text-slate-600 mt-1" data-key="vissim_s3_desc">Browse to and select our downloaded <code class="bg-indigo-100 text-indigo-700 px-1.5 py-0.5 rounded text-xs font-mono">/fleets/custom_egypt_fleet.inpx</code> file. Confirm the import dialog — VISSIM will inject the Wiedemann 99 parameters (CC0-CC9, OP0-OP16) for all Egyptian vehicle types into your vehicle type library.</p>
+                                </div>
+                            </div>
+                            <div class="flex gap-4 items-start">
+                                <div class="flex-shrink-0 w-8 h-8 bg-emerald-600 text-white rounded-full flex items-center justify-center text-sm font-bold"><i class="fas fa-check text-xs"></i></div>
+                                <div>
+                                    <h4 class="font-semibold text-slate-800" data-key="vissim_s4_title">Verify & Run</h4>
+                                    <p class="text-sm text-slate-600 mt-1" data-key="vissim_s4_desc">Open the vehicle type list to confirm the new types appear. Assign them to your desired vehicle inputs. Run the simulation and verify that the aggressive Egyptian driving behavior matches expected calibrations.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SUMO Guide -->
+                <div id="guide-sumo" class="guide-panel hidden">
+                    <div class="bg-gradient-to-br from-green-50 to-white rounded-2xl p-8 border border-green-100">
+                        <div class="flex items-center gap-3 mb-6">
+                            <div class="w-10 h-10 bg-green-600 rounded-lg flex items-center justify-center"><i class="fas fa-network-wired text-white"></i></div>
+                            <h3 class="text-xl font-bold text-slate-800" data-key="guide_sumo_title">Deploying Fleet into SUMO</h3>
+                        </div>
+                        <div class="space-y-4">
+                            <div class="flex gap-4 items-start">
+                                <div class="flex-shrink-0 w-8 h-8 bg-green-600 text-white rounded-full flex items-center justify-center text-sm font-bold">1</div>
+                                <div>
+                                    <h4 class="font-semibold text-slate-800" data-key="sumo_s1_title">Place Route File</h4>
+                                    <p class="text-sm text-slate-600 mt-1" data-key="sumo_s1_desc">Copy the downloaded <code class="bg-green-100 text-green-700 px-1.5 py-0.5 rounded text-xs font-mono">/fleets/egypt_sumo_fleet.rou.xml</code> file into your core SUMO project folder (the same directory that contains your <code class="bg-green-100 text-green-700 px-1.5 py-0.5 rounded text-xs font-mono">.sumocfg</code> and network files).</p>
+                                </div>
+                            </div>
+                            <div class="flex gap-4 items-start">
+                                <div class="flex-shrink-0 w-8 h-8 bg-green-600 text-white rounded-full flex items-center justify-center text-sm font-bold">2</div>
+                                <div>
+                                    <h4 class="font-semibold text-slate-800" data-key="sumo_s2_title">Edit Master Config</h4>
+                                    <p class="text-sm text-slate-600 mt-1" data-key="sumo_s2_desc">Open your master configuration file (<code class="bg-green-100 text-green-700 px-1.5 py-0.5 rounded text-xs font-mono">.sumocfg</code>) in a text editor. Inside the <code class="bg-green-100 text-green-700 px-1.5 py-0.5 rounded text-xs font-mono">&lt;input&gt;</code> tag, nest the following route-file reference:<br><code class="bg-green-100 text-green-700 px-1.5 py-0.5 rounded text-xs font-mono block mt-2">&lt;route-files value="egypt_sumo_fleet.rou.xml"/&gt;</code></p>
+                                </div>
+                            </div>
+                            <div class="flex gap-4 items-start">
+                                <div class="flex-shrink-0 w-8 h-8 bg-green-600 text-white rounded-full flex items-center justify-center text-sm font-bold">3</div>
+                                <div>
+                                    <h4 class="font-semibold text-slate-800" data-key="sumo_s3_title">Add Additional Files (Optional)</h4>
+                                    <p class="text-sm text-slate-600 mt-1" data-key="sumo_s3_desc">If using bus stops for microbus dwell-time simulation, add the additional file reference:<br><code class="bg-green-100 text-green-700 px-1.5 py-0.5 rounded text-xs font-mono block mt-2">&lt;additional-files value="egypt_sumo_fleet.rou.xml"/&gt;</code></p>
+                                </div>
+                            </div>
+                            <div class="flex gap-4 items-start">
+                                <div class="flex-shrink-0 w-8 h-8 bg-emerald-600 text-white rounded-full flex items-center justify-center text-sm font-bold"><i class="fas fa-check text-xs"></i></div>
+                                <div>
+                                    <h4 class="font-semibold text-slate-800" data-key="sumo_s4_title">Launch & Validate</h4>
+                                    <p class="text-sm text-slate-600 mt-1" data-key="sumo_s4_desc">Run via <code class="bg-green-100 text-green-700 px-1.5 py-0.5 rounded text-xs font-mono">sumo-gui -c your_config.sumocfg</code> or through Python/TraCI. Open SUMO-GUI to visually confirm vehicle colors, types, and lane-changing behavior match the calibrated Egyptian fleet profiles.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Aimsun Guide -->
+                <div id="guide-aimsun" class="guide-panel hidden">
+                    <div class="bg-gradient-to-br from-orange-50 to-white rounded-2xl p-8 border border-orange-100">
+                        <div class="flex items-center gap-3 mb-6">
+                            <div class="w-10 h-10 bg-orange-600 rounded-lg flex items-center justify-center"><i class="fas fa-car text-white"></i></div>
+                            <h3 class="text-xl font-bold text-slate-800" data-key="guide_aimsun_title">Deploying Fleet into Aimsun Next</h3>
+                        </div>
+                        <div class="space-y-4">
+                            <div class="flex gap-4 items-start">
+                                <div class="flex-shrink-0 w-8 h-8 bg-orange-600 text-white rounded-full flex items-center justify-center text-sm font-bold">1</div>
+                                <div>
+                                    <h4 class="font-semibold text-slate-800" data-key="aimsun_s1_title">Open Your Aimsun Model</h4>
+                                    <p class="text-sm text-slate-600 mt-1" data-key="aimsun_s1_desc">Launch Aimsun Next and open your existing micro-simulation model (<code class="bg-orange-100 text-orange-700 px-1.5 py-0.5 rounded text-xs font-mono">.ang</code> or <code class="bg-orange-100 text-orange-700 px-1.5 py-0.5 rounded text-xs font-mono">.aprx</code>). Ensure your network geometry and demand are properly defined.</p>
+                                </div>
+                            </div>
+                            <div class="flex gap-4 items-start">
+                                <div class="flex-shrink-0 w-8 h-8 bg-orange-600 text-white rounded-full flex items-center justify-center text-sm font-bold">2</div>
+                                <div>
+                                    <h4 class="font-semibold text-slate-800" data-key="aimsun_s2_title">Register API Extension</h4>
+                                    <p class="text-sm text-slate-600 mt-1" data-key="aimsun_s2_desc">Navigate to <code class="bg-orange-100 text-orange-700 px-1.5 py-0.5 rounded text-xs font-mono">Project &rarr; Properties &rarr; API Extension</code>. In the Python/ANSDK script field, browse to and register our <code class="bg-orange-100 text-orange-700 px-1.5 py-0.5 rounded text-xs font-mono">/scripts/vissim_sae_override.py</code> script. This will execute dynamic vehicle kinematic overrides on each simulation time step.</p>
+                                </div>
+                            </div>
+                            <div class="flex gap-4 items-start">
+                                <div class="flex-shrink-0 w-8 h-8 bg-orange-600 text-white rounded-full flex items-center justify-center text-sm font-bold">3</div>
+                                <div>
+                                    <h4 class="font-semibold text-slate-800" data-key="aimsun_s3_title">Configure Vehicle Types</h4>
+                                    <p class="text-sm text-slate-600 mt-1" data-key="aimsun_s3_desc">Open the Vehicle Types editor within Aimsun. Create or import vehicle types matching the profiles in our script (Egyptian Microbus, Mlaiky, Naql, AV L2, AV L4-5). Link each type to the corresponding IDM car-following parameters defined in the override script.</p>
+                                </div>
+                            </div>
+                            <div class="flex gap-4 items-start">
+                                <div class="flex-shrink-0 w-8 h-8 bg-emerald-600 text-white rounded-full flex items-center justify-center text-sm font-bold"><i class="fas fa-check text-xs"></i></div>
+                                <div>
+                                    <h4 class="font-semibold text-slate-800" data-key="aimsun_s4_title">Run & Inspect</h4>
+                                    <p class="text-sm text-slate-600 mt-1" data-key="aimsun_s4_desc">Start the micro-simulation. The registered Python script will dynamically apply TTC-based conflict resolution, override vehicle kinematics during cut-in events, and log calibration data to the output. Check the Aimsun output console for parameter application confirmations.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -682,7 +897,7 @@
         lines.push(hr);
         lines.push("# SAE Calibration Hub — " + platform + " Override Script");
         lines.push("# MPR (AV penetration): " + Math.round(mpr * 100) + "%");
-        lines.push("# Auto-generated by SAE AutoSim Hub (sae-tau.vercel.app)");
+        lines.push("# Auto-generated by SAE AutoSim Hub (sae.fimtosoft.com)");
         lines.push(hr);
         lines.push("");
 
@@ -965,7 +1180,7 @@
     // ══════════════════════════════════════════════════════════
     // CITATION / BibTeX
     // ══════════════════════════════════════════════════════════
-    var BIBTEX = '@misc{sae_autosim_hub_2024,\n  title        = {SAE AutoSim Hub: Pre-calibrated Vehicle Fleets for Chaotic Traffic Environments},\n  author       = {{SAE AutoSim Hub}},\n  year         = {2024},\n  url          = {https://sae-tau.vercel.app},\n  note         = {Accessed: ' + new Date().toISOString().slice(0,10) + '}\n}';
+    var BIBTEX = '@misc{sae_autosim_hub_2024,\n  title        = {SAE AutoSim Hub: Pre-calibrated Vehicle Fleets for Chaotic Traffic Environments},\n  author       = {{SAE AutoSim Hub}},\n  year         = {2024},\n  url          = {https://sae.fimtosoft.com},\n  note         = {Accessed: ' + new Date().toISOString().slice(0,10) + '}\n}';
 
     function copyBibtex() {
         navigator.clipboard.writeText(BIBTEX).then(function() {
@@ -1139,7 +1354,39 @@
     "sandbox_hint": "Review the conflict-resolution logic before downloading.",
     "copy_code": "Copy Code",
     "dl_file": "Download .py",
-    "copied": "Copied to clipboard!"
+    "copied": "Copied to clipboard!",
+    "guide_title": "Software Integration Guides",
+    "guide_desc": "Step-by-step instructions to deploy our pre-calibrated fleets into your simulation environment.",
+    "guide_vissim": "PTV VISSIM",
+    "guide_sumo": "SUMO",
+    "guide_aimsun": "Aimsun Next",
+    "guide_vissim_title": "Deploying Fleet into PTV VISSIM",
+    "vissim_s1_title": "Open Your Base Network",
+    "vissim_s1_desc": "Launch PTV VISSIM and open your existing base network layout file (.inpx) containing road geometry, signal controllers, and traffic demand.",
+    "vissim_s2_title": "Read Additional Network",
+    "vissim_s2_desc": "Navigate to File > Read Additional > Network from the top menu. This merges vehicle type definitions without overwriting your existing road links or signal plans.",
+    "vissim_s3_title": "Select Fleet File",
+    "vissim_s3_desc": "Browse to and select our downloaded /fleets/custom_egypt_fleet.inpx file. VISSIM will inject Wiedemann 99 parameters (CC0-CC9, OP0-OP16) for all Egyptian vehicle types.",
+    "vissim_s4_title": "Verify & Run",
+    "vissim_s4_desc": "Open the vehicle type list to confirm the new types appear. Assign them to your desired vehicle inputs and run the simulation to verify calibrated behavior.",
+    "guide_sumo_title": "Deploying Fleet into SUMO",
+    "sumo_s1_title": "Place Route File",
+    "sumo_s1_desc": "Copy the downloaded /fleets/egypt_sumo_fleet.rou.xml into your core SUMO project folder alongside your .sumocfg and network files.",
+    "sumo_s2_title": "Edit Master Config",
+    "sumo_s2_desc": "Open your .sumocfg in a text editor. Inside the <input> tag, add: <route-files value=\"egypt_sumo_fleet.rou.xml\"/>",
+    "sumo_s3_title": "Add Additional Files (Optional)",
+    "sumo_s3_desc": "For microbus dwell-time simulation with bus stops, add: <additional-files value=\"egypt_sumo_fleet.rou.xml\"/>",
+    "sumo_s4_title": "Launch & Validate",
+    "sumo_s4_desc": "Run via sumo-gui -c your_config.sumocfg or through Python/TraCI. Visually confirm vehicle colors, types, and lane-changing behavior match the calibrated profiles.",
+    "guide_aimsun_title": "Deploying Fleet into Aimsun Next",
+    "aimsun_s1_title": "Open Your Aimsun Model",
+    "aimsun_s1_desc": "Launch Aimsun Next and open your existing micro-simulation model (.ang or .aprx). Ensure network geometry and demand are properly defined.",
+    "aimsun_s2_title": "Register API Extension",
+    "aimsun_s2_desc": "Navigate to Project > Properties > API Extension. Register our /scripts/vissim_sae_override.py script to execute dynamic vehicle kinematic overrides on each time step.",
+    "aimsun_s3_title": "Configure Vehicle Types",
+    "aimsun_s3_desc": "Open the Vehicle Types editor. Create or import types matching the profiles in our script: Egyptian Microbus, Mlaiky, Naql, AV L2, AV L4-5. Link each to the IDM parameters in the override script.",
+    "aimsun_s4_title": "Run & Inspect",
+    "aimsun_s4_desc": "Start the micro-simulation. The Python script will dynamically apply TTC-based conflict resolution and override vehicle kinematics during cut-in events. Check the output console for confirmations."
   },
   "ar": {
     "t": "SAE AutoSim Hub",
@@ -1231,7 +1478,39 @@
     "sandbox_hint": "راجع منطق حل النزاعات قبل التنزيل.",
     "copy_code": "نسخ الكود",
     "dl_file": "تنزيل .py",
-    "copied": "تم النسخ!"
+    "copied": "تم النسخ!",
+    "guide_title": "أدلة تكامل البرمجيات",
+    "guide_desc": "تعليمات خطوة بخطوة لنشر الأساطيل المُعَرَّضة مسبقًا في بيئة المحاكاة الخاصة بك.",
+    "guide_vissim": "PTV VISSIM",
+    "guide_sumo": "SUMO",
+    "guide_aimsun": "Aimsun Next",
+    "guide_vissim_title": "نشر الأسطول في PTV VISSIM",
+    "vissim_s1_title": "افتح شبكتك الأساسية",
+    "vissim_s1_desc": "شغّل PTV VISSIM وافتح ملف تخطيط شبكتك الحالي (.inpx) الذي يحتوي على هندسة الطرق و mù控 الإشارات والطلب المروري.",
+    "vissim_s2_title": "اقرأ شبكة إضافية",
+    "vissim_s2_desc": "انتقل إلى File > Read Additional > Network من القائمة العلوية. هذا يدمج تعريفات أنواع المركبات دون الكتابة فوق روابط الطرق أو خطط الإشارات الحالية.",
+    "vissim_s3_title": "اختر ملف الأسطول",
+    "vissim_s3_desc": "تصفح واختر ملف /fleets/custom_egypt_fleet.inpx الذي حملته. سيقوم VISSIM بحقن معلمات Wiedemann 99 (CC0-CC9, OP0-OP16) لجميع الأنواع المصرية.",
+    "vissim_s4_title": "تحقق وشغّل",
+    "vissim_s4_desc": "افتح قائمة أنواع المركبات للتأكد من ظهور الأنواع الجديدة. عيّنها على مدخلات المركبات المطلوبة وشغّل المحاكاة للتحقق من السلوك المُعاير.",
+    "guide_sumo_title": "نشر الأسطول في SUMO",
+    "sumo_s1_title": "ضع ملف المسار",
+    "sumo_s1_desc": "انسخ ملف /fleets/egypt_sumo_fleet.rou.xml إلى مجلد مشروع SUMO الرئيسي بجانب ملفات .sumocfg والشبكة.",
+    "sumo_s2_title": "عدّل الإعدادات الرئيسية",
+    "sumo_s2_desc": "افتح ملف .sumocfg في محرر نصوص. داخل علامة <input>، أضف: <route-files value=\"egypt_sumo_fleet.rou.xml\"/>",
+    "sumo_s3_title": "أضف ملفات إضافية (اختياري)",
+    "sumo_s3_desc": "لمحاكاة توقف الميكروباص مع محطات الحافلات، أضف: <additional-files value=\"egypt_sumo_fleet.rou.xml\"/>",
+    "sumo_s4_title": "شغّل وتحقق",
+    "sumo_s4_desc": "شغّل عبر sumo-gui -c config.sumocfg أو عبر Python/TraCI. تحقق بصريًا من ألوان المركبات والأنواع وسلوك تبديل المسار.",
+    "guide_aimsun_title": "نشر الأسطول في Aimsun Next",
+    "aimsun_s1_title": "افتح نموذج Aimsun",
+    "aimsun_s1_desc": "شغّل Aimsun Next وافتح نموذج المحاكاة الميكروسكوبية الحالي (.ang أو .aprx). تأكد من تعريف هندسة الشبكة والطلب بشكل صحيح.",
+    "aimsun_s2_title": "سجّل امتداد API",
+    "aimsun_s2_desc": "انتقل إلى Project > Properties > API Extension. سجّل نص /scripts/vissim_sae_override.py للتنفيذ الديناميكي لتجاوز حركية المركبات في كل خطوة زمنية.",
+    "aimsun_s3_title": "heets عناصر أنواع المركبات",
+    "aimsun_s3_desc": "افتح محرر أنواع المركبات. أنشئ أو استورد أنواعاً تطابق الملفات في نصنا: الميكروباص والملاكي والناقل و L2 و L4-5.",
+    "aimsun_s4_title": "شغّل وافحص",
+    "aimsun_s4_desc": "ابدأ المحاكاة الميكروسكوبية. سينفّذ النص Python حل النزاعات_based على TTC وتتجاوز حركية المركبات أثناء أحداث القطع."
   },
   "ru": {
     "t": "SAE AutoSim Hub",
@@ -1323,7 +1602,39 @@
     "sandbox_hint": "Просмотрите логику решения конфликтов перед скачиванием.",
     "copy_code": "Скопировать код",
     "dl_file": "Скачать .py",
-    "copied": "Скопировано!"
+    "copied": "Скопировано!",
+    "guide_title": "Руководства по интеграции",
+    "guide_desc": "Пошаговые инструкции по развертыванию предконфигурированных автопарков в вашей среде симуляции.",
+    "guide_vissim": "PTV VISSIM",
+    "guide_sumo": "SUMO",
+    "guide_aimsun": "Aimsun Next",
+    "guide_vissim_title": "Развёртывание автопарка в PTV VISSIM",
+    "vissim_s1_title": "Откройте базовую сеть",
+    "vissim_s1_desc": "Запустите PTV VISSIM и откройте файл базовой сети (.inpx) с геометрией дорог, контроллерами сигналов и транспортным спросом.",
+    "vissim_s2_title": "Чтение дополнительной сети",
+    "vissim_s2_desc": "Перейдите в File > Read Additional > Network. Это объединит типы транспортных средств без перезаписи существующих дорожных связей и планов сигналов.",
+    "vissim_s3_title": "Выберите файл автопарка",
+    "vissim_s3_desc": "Выберите скачанный файл /fleets/custom_egypt_fleet.inpx. VISSIM внедрит параметры Wiedemann 99 (CC0-CC9, OP0-OP16) для всех египетских типов.",
+    "vissim_s4_title": "Проверьте и запустите",
+    "vissim_s4_desc": "Откройте список типов ТС для подтверждения. Назначьте их и запустите симуляцию для проверки калиброванного поведения.",
+    "guide_sumo_title": "Развёртывание автопарка в SUMO",
+    "sumo_s1_title": "Разместите файл маршрутов",
+    "sumo_s1_desc": "Скопируйте /fleets/egypt_sumo_fleet.rou.xml в основную папку проекта SUMO рядом с .sumocfg и файлами сети.",
+    "sumo_s2_title": "Отредактируйте конфигурацию",
+    "sumo_s2_desc": "Откройте .sumocfg в текстовом редакторе. Внутри тега <input> добавьте: <route-files value=\"egypt_sumo_fleet.rou.xml\"/>",
+    "sumo_s3_title": "Дополнительные файлы (опционально)",
+    "sumo_s3_desc": "Для симуляции остановок микроавтобусов добавьте: <additional-files value=\"egypt_sumo_fleet.rou.xml\"/>",
+    "sumo_s4_title": "Запуск и проверка",
+    "sumo_s4_desc": "Запустите через sumo-gui или Python/TraCI. Визуально подтвердите цвета, типы ТС и поведение смены полосы.",
+    "guide_aimsun_title": "Развёртывание автопарка в Aimsun Next",
+    "aimsun_s1_title": "Откройте модель Aimsun",
+    "aimsun_s1_desc": "Запустите Aimsun Next и откройте микросимуляционную модель (.ang или .aprx). Убедитесь в корректности геометрии сети.",
+    "aimsun_s2_title": "Зарегистрируйте API расширение",
+    "aimsun_s2_desc": "Перейдите в Project > Properties > API Extension. Зарегистрируйте скрипт /scripts/vissim_sae_override.py для динамического переопределения.",
+    "aimsun_s3_title": "Настройте типы ТС",
+    "aimsun_s3_desc": "Откройте редактор типов ТС. Создайте или импортируйте типы из нашего скрипта: египетский микроавтобус, млаики, нақл, L2, L4-5.",
+    "aimsun_s4_title": "Запуск и проверка",
+    "aimsun_s4_desc": "Запустите микросимуляцию. Скрипт будет применять разрешение конфликтов на основе TTC и переопределять кинематику ТС."
   },
   "hi": {
     "t": "SAE AutoSim Hub",
@@ -1415,7 +1726,39 @@
     "sandbox_hint": "डाउनलोड करने से पहले टकराव समाधान तर्क की समीक्षा करें।",
     "copy_code": "कोड कॉपी करें",
     "dl_file": "डाउनलोड .py",
-    "copied": "कॉपी किया गया!"
+    "copied": "कॉपी किया गया!",
+    "guide_title": "सॉफ्टवेयर एकीकरण गाइड",
+    "guide_desc": "हमारे पूर्व-कैलिब्रेटेड फ़्लीट को अपने सिमुलेशन वातावरण में तैनात करने के चरण-दर-चरण निर्देश।",
+    "guide_vissim": "PTV VISSIM",
+    "guide_sumo": "SUMO",
+    "guide_aimsun": "Aimsun Next",
+    "guide_vissim_title": "PTV VISSIM में फ़्लीट तैनात करना",
+    "vissim_s1_title": "अपना बेस नेटवर्क खोलें",
+    "vissim_s1_desc": "PTV VISSIM लॉन्च करें और अपना मौजूदा बेस नेटवर्क लेआउट फ़ाइल (.inpx) खोलें।",
+    "vissim_s2_title": "अतिरिक्त नेटवर्क पढ़ें",
+    "vissim_s2_desc": "File > Read Additional > Network पर जाएं। यह बिना ओवरराइट किए वाहन प्रकारों को मर्ज करता है।",
+    "vissim_s3_title": "फ़्लीट फ़ाइल चुनें",
+    "vissim_s3_desc": "डाउनलोड की गई /fleets/custom_egypt_fleet.inpx फ़ाइल चुनें। VISSIM Wiedemann 99 पैरामीटर इंजेक्ट करेगा।",
+    "vissim_s4_title": "सत्यापित करें और चलाएं",
+    "vissim_s4_desc": "नए प्रकारों की पुष्टि के लिए वाहन प्रकार सूची खोलें। असाइन करें और सिमुलेशन चलाएं।",
+    "guide_sumo_title": "SUMO में फ़्लीट तैनात करना",
+    "sumo_s1_title": "रूट फ़ाइल रखें",
+    "sumo_s1_desc": "/fleets/egypt_sumo_fleet.rou.xml को अपने SUMO प्रोजेक्ट फ़ोल्डर में कॉपी करें।",
+    "sumo_s2_title": "मास्टर कॉन्फ़िग संपादित करें",
+    "sumo_s2_desc": ".sumocfg खोलें। <input> टैग में जोड़ें: <route-files value=\"egypt_sumo_fleet.rou.xml\"/>",
+    "sumo_s3_title": "अतिरिक्त फ़ाइलें (वैकल्पिक)",
+    "sumo_s3_desc": "माइक्रोबस ड्वेल-टाइम के लिए: <additional-files value=\"egypt_sumo_fleet.rou.xml\"/>",
+    "sumo_s4_title": "लॉन्च और सत्यापित करें",
+    "sumo_s4_desc": "sumo-gui या Python/TraCI से चलाएं। वाहन रंग, प्रकार और लेन-चेंजिंग व्यवहार सत्यापित करें।",
+    "guide_aimsun_title": "Aimsun Next में फ़्लीट तैनात करना",
+    "aimsun_s1_title": "अपना Aimsun मॉडल खोलें",
+    "aimsun_s1_desc": "Aimsun Next लॉन्च करें और मौजूदा माइक्रो-सिमुलेशन मॉडल (.ang या .aprx) खोलें।",
+    "aimsun_s2_title": "API एक्सटेंशन रजिस्टर करें",
+    "aimsun_s2_desc": "Project > Properties > API Extension पर जाएं। /scripts/vissim_sae_override.py स्क्रिप्ट रजिस्टर करें।",
+    "aimsun_s3_title": "वाहन प्रकार कॉन्फ़िगर करें",
+    "aimsun_s3_desc": "वाहन प्रकार संपादक खोलें। हमारे स्क्रिप्ट से मेल खाते प्रकार बनाएं या आयात करें।",
+    "aimsun_s4_title": "चलाएं और निरीक्षण करें",
+    "aimsun_s4_desc": "माइक्रो-सिमुलेशन शुरू करें। Python स्क्रिप्ट TTC-आधारित टकराव समाधान लागू करेगा।"
   },
   "de": {
     "t": "SAE AutoSim Hub",
@@ -1507,7 +1850,39 @@
     "sandbox_hint": "Überprüfen Sie die Konfliktlösungslogik vor dem Download.",
     "copy_code": "Code kopieren",
     "dl_file": "Herunterladen .py",
-    "copied": "Kopiert!"
+    "copied": "Kopiert!",
+    "guide_title": "Software-Integrationshilfe",
+    "guide_desc": "Schritt-für-Schritt-Anleitung zur Bereitstellung unserer vorkalibrierten Flotten in Ihrer Simulationsumgebung.",
+    "guide_vissim": "PTV VISSIM",
+    "guide_sumo": "SUMO",
+    "guide_aimsun": "Aimsun Next",
+    "guide_vissim_title": "Flotte in PTV VISSIM bereitstellen",
+    "vissim_s1_title": "Basisnetzwerk öffnen",
+    "vissim_s1_desc": "Starten Sie PTV VISSIM und öffnen Sie Ihre bestehende Netzwerk-Layout-Datei (.inpx) mit Straßengeometrie, Signalgebern und Verkehrsbedarf.",
+    "vissim_s2_title": "Zusätzliches Netzwerk einlesen",
+    "vissim_s2_desc": "Navigieren Sie zu File > Read Additional > Network. Dies fügt Fahrzeugtypdefinitionen zusammen, ohne bestehende Straßenverbindungen oder Signalpläne zu überschreiben.",
+    "vissim_s3_title": "Flottendatei auswählen",
+    "vissim_s3_desc": "Wählen Sie die heruntergeladene /fleets/custom_egypt_fleet.inpx. VISSIM injiziert Wiedemann 99 Parameter (CC0-CC9, OP0-OP16) für alle ägyptischen Fahrzeugtypen.",
+    "vissim_s4_title": "Überprüfen und ausführen",
+    "vissim_s4_desc": "Öffnen Sie die Fahrzeugtypliste zur Bestätigung. Weisen Sie die Typen zu und starten Sie die Simulation zur Überprüfung des kalibrierten Verhaltens.",
+    "guide_sumo_title": "Flotte in SUMO bereitstellen",
+    "sumo_s1_title": "Routendatei platzieren",
+    "sumo_s1_desc": "Kopieren Sie /fleets/egypt_sumo_fleet.rou.xml in Ihren SUMO-Projektordner neben .sumocfg und Netzwerkdateien.",
+    "sumo_s2_title": "Master-Konfiguration bearbeiten",
+    "sumo_s2_desc": "Öffnen Sie .sumocfg im Texteditor. Fügen Sie im <input>-Tag hinzu: <route-files value=\"egypt_sumo_fleet.rou.xml\"/>",
+    "sumo_s3_title": "Zusätzliche Dateien (optional)",
+    "sumo_s3_desc": "Für Mikrobus-Wartezeiten-Simulation: <additional-files value=\"egypt_sumo_fleet.rou.xml\"/>",
+    "sumo_s4_title": "Starten und validieren",
+    "sumo_s4_desc": "Starten Sie über sumo-gui oder Python/TraCI. Überprüfen Sie Fahrzeugfarben, Typen und Spurwechselverhalten visuell.",
+    "guide_aimsun_title": "Flotte in Aimsun Next bereitstellen",
+    "aimsun_s1_title": "Aimsun-Modell öffnen",
+    "aimsun_s1_desc": "Starten Sie Aimsun Next und öffnen Sie Ihr bestehendes Mikrosimulationsmodell (.ang oder .aprx).",
+    "aimsun_s2_title": "API-Erweiterung registrieren",
+    "aimsun_s2_desc": "Navigieren Sie zu Project > Properties > API Extension. Registrieren Sie unser /scripts/vissim_sae_override.py Skript.",
+    "aimsun_s3_title": "Fahrzeugtypen konfigurieren",
+    "aimsun_s3_desc": "Öffnen Sie den Fahrzeugtyp-Editor. Erstellen oder importieren Sie Typen aus unserem Skript: ägyptischer Mikrobus, Mlaiky, Naql, L2, L4-5.",
+    "aimsun_s4_title": "Ausführen und prüfen",
+    "aimsun_s4_desc": "Starten Sie die Mikrosimulation. Das Python-Skript wendet TTC-basierte Konfliktlösung an und überschreibt Fahrzeugkinematik."
   },
   "zh": {
     "t": "SAE AutoSim Hub",
@@ -1599,7 +1974,39 @@
     "sandbox_hint": "下载前查看冲突解决逻辑。",
     "copy_code": "复制代码",
     "dl_file": "下载 .py",
-    "copied": "已复制到剪贴板!"
+    "copied": "已复制到剪贴板!",
+    "guide_title": "软件集成指南",
+    "guide_desc": "将预校准车队部署到模拟环境中的分步说明。",
+    "guide_vissim": "PTV VISSIM",
+    "guide_sumo": "SUMO",
+    "guide_aimsun": "Aimsun Next",
+    "guide_vissim_title": "将车队部署到 PTV VISSIM",
+    "vissim_s1_title": "打开基础网络",
+    "vissim_s1_desc": "启动 PTV VISSIM 并打开现有的基础网络布局文件 (.inpx)，包含道路几何、信号控制器和交通需求。",
+    "vissim_s2_title": "读取附加网络",
+    "vissim_s2_desc": "导航至 File > Read Additional > Network。这将合并车辆类型定义，而不会覆盖现有道路连接或信号计划。",
+    "vissim_s3_title": "选择车队文件",
+    "vissim_s3_desc": "选择下载的 /fleets/custom_egypt_fleet.inpx 文件。VISSIM 将注入所有埃及车辆类型的 Wiedemann 99 参数。",
+    "vissim_s4_title": "验证并运行",
+    "vissim_s4_desc": "打开车辆类型列表确认新类型出现。分配给所需车辆输入并运行模拟以验证校准行为。",
+    "guide_sumo_title": "将车队部署到 SUMO",
+    "sumo_s1_title": "放置路线文件",
+    "sumo_s1_desc": "将 /fleets/egypt_sumo_fleet.rou.xml 复制到 SUMO 项目文件夹中，与 .sumocfg 和网络文件并列。",
+    "sumo_s2_title": "编辑主配置",
+    "sumo_s2_desc": "在文本编辑器中打开 .sumocfg。在 <input> 标签内添加: <route-files value=\"egypt_sumo_fleet.rou.xml\"/>",
+    "sumo_s3_title": "添加附加文件（可选）",
+    "sumo_s3_desc": "用于微型巴士停站模拟: <additional-files value=\"egypt_sumo_fleet.rou.xml\"/>",
+    "sumo_s4_title": "启动并验证",
+    "sumo_s4_desc": "通过 sumo-gui 或 Python/TraCI 运行。目视确认车辆颜色、类型和换道行为。",
+    "guide_aimsun_title": "将车队部署到 Aimsun Next",
+    "aimsun_s1_title": "打开 Aimsun 模型",
+    "aimsun_s1_desc": "启动 Aimsun Next 并打开现有的微观模拟模型 (.ang 或 .aprx)。",
+    "aimsun_s2_title": "注册 API 扩展",
+    "aimsun_s2_desc": "导航至 Project > Properties > API Extension。注册 /scripts/vissim_sae_override.py 脚本。",
+    "aimsun_s3_title": "配置车辆类型",
+    "aimsun_s3_desc": "打开车辆类型编辑器。创建或导入与脚本中配置匹配的类型: 埃及微型巴士、Mlaiky、Naql、L2、L4-5。",
+    "aimsun_s4_title": "运行并检查",
+    "aimsun_s4_desc": "启动微观模拟。Python 脚本将应用基于 TTC 的冲突解决并覆盖车辆运动学。"
   },
   "ja": {
     "t": "SAE AutoSim Hub",
@@ -1691,7 +2098,39 @@
     "sandbox_hint": "ダウンロード前に競合解決ロジックを確認。",
     "copy_code": "コードをコピー",
     "dl_file": "ダウンロード .py",
-    "copied": "コピーしました!"
+    "copied": "コピーしました!",
+    "guide_title": "ソフトウェア統合ガイド",
+    "guide_desc": "事前校正されたフリートをシミュレーション環境にデプロイするためのステップバイステップ手順。",
+    "guide_vissim": "PTV VISSIM",
+    "guide_sumo": "SUMO",
+    "guide_aimsun": "Aimsun Next",
+    "guide_vissim_title": "PTV VISSIMへのフリートデプロイ",
+    "vissim_s1_title": "ベースネットワークを開く",
+    "vissim_s1_desc": "PTV VISSIMを起動し、道路ジオメトリ、信号制御器、交通需要を含む既存のベースネットワークレイアウトファイル (.inpx) を開きます。",
+    "vissim_s2_title": "追加ネットワークの読み込み",
+    "vissim_s2_desc": "File > Read Additional > Network に移動します。既存の道路リンクや信号計画を上書きせずに車両タイプ定義をマージします。",
+    "vissim_s3_title": "フリートファイルを選択",
+    "vissim_s3_desc": "ダウンロードした /fleets/custom_egypt_fleet.inpx を選択します。VISSIM はすべてのエジプト車両タイプに Wiedemann 99 パラメータを注入します。",
+    "vissim_s4_title": "検証して実行",
+    "vissim_s4_desc": "車両タイプリストを開いて新しいタイプの存在を確認します。割り当ててシミュレーションを実行します。",
+    "guide_sumo_title": "SUMOへのフリートデプロイ",
+    "sumo_s1_title": "ルートファイルを配置",
+    "sumo_s1_desc": "/fleets/egypt_sumo_fleet.rou.xml を SUMO プロジェクトフォルダにコピーします。",
+    "sumo_s2_title": "マスター設定を編集",
+    "sumo_s2_desc": ".sumocfg をテキストエディタで開きます。<input> タグ内で追加: <route-files value=\"egypt_sumo_fleet.rou.xml\"/>",
+    "sumo_s3_title": "追加ファイル（オプション）",
+    "sumo_s3_desc": "マイクロバス停留所シミュレーション用: <additional-files value=\"egypt_sumo_fleet.rou.xml\"/>",
+    "sumo_s4_title": "起動して検証",
+    "sumo_s4_desc": "sumo-gui または Python/TraCI で実行します。車両色、タイプ、レーン変更行動を視覚的に確認します。",
+    "guide_aimsun_title": "Aimsun Nextへのフリートデプロイ",
+    "aimsun_s1_title": "Aimsun モデルを開く",
+    "aimsun_s1_desc": "Aimsun Next を起動し、既存のマイクロシミュレーションモデル (.ang または .aprx) を開きます。",
+    "aimsun_s2_title": "API拡張を登録",
+    "aimsun_s2_desc": "Project > Properties > API Extension に移動します。/scripts/vissim_sae_override.py スクリプトを登録します。",
+    "aimsun_s3_title": "車両タイプを設定",
+    "aimsun_s3_desc": "車両タイプエディタを開きます。スクリプトのプロファイルに一致するタイプを作成またはインポートします。",
+    "aimsun_s4_title": "実行して検査",
+    "aimsun_s4_desc": "マイクロシミュレーションを開始します。Python スクリプトが TTC ベースの競合解決を適用します。"
   },
   "ko": {
     "t": "SAE AutoSim Hub",
@@ -1783,7 +2222,39 @@
     "sandbox_hint": "다운로드 전에 충돌 해결 로직을 검토하세요.",
     "copy_code": "코드 복사",
     "dl_file": "다운로드 .py",
-    "copied": "복사되었습니다!"
+    "copied": "복사되었습니다!",
+    "guide_title": "소프트웨어 통합 가이드",
+    "guide_desc": "사전 교정된 플리트를 시뮬레이션 환경에 배포하는 단계별 지침.",
+    "guide_vissim": "PTV VISSIM",
+    "guide_sumo": "SUMO",
+    "guide_aimsun": "Aimsun Next",
+    "guide_vissim_title": "PTV VISSIM에 플리트 배포",
+    "vissim_s1_title": "기본 네트워크 열기",
+    "vissim_s1_desc": "PTV VISSIM을 시작하고 도로 기하학, 신호 제어기, 교통 수요를 포함한 기존 기본 네트워크 레이아웃 파일 (.inpx)을 엽니다.",
+    "vissim_s2_title": "추가 네트워크 읽기",
+    "vissim_s2_desc": "File > Read Additional > Network로 이동합니다. 기존 도로 링크나 신호 계획을 덮어쓰지 않고 차량 유형 정의를 병합합니다.",
+    "vissim_s3_title": "플리트 파일 선택",
+    "vissim_s3_desc": "다운로드한 /fleets/custom_egypt_fleet.inpx를 선택합니다. VISSIM이 모든 이집트 차량 유형에 Wiedemann 99 매개변수를 주입합니다.",
+    "vissim_s4_title": "확인 및 실행",
+    "vissim_s4_desc": "차량 유형 목록을 열어 새 유형을 확인합니다. 할당하고 시뮬레이션을 실행하여 교정된 동작을 확인합니다.",
+    "guide_sumo_title": "SUMO에 플리트 배포",
+    "sumo_s1_title": "경로 파일 배치",
+    "sumo_s1_desc": "/fleets/egypt_sumo_fleet.rou.xml를 SUMO 프로젝트 폴더에 복사합니다.",
+    "sumo_s2_title": "마스터 설정 편집",
+    "sumo_s2_desc": ".sumocfg를 텍스트 편집기에서 엽니다. <input> 태그 내에 추가: <route-files value=\"egypt_sumo_fleet.rou.xml\"/>",
+    "sumo_s3_title": "추가 파일 (선택사항)",
+    "sumo_s3_desc": "마이크로버스 정류장 시뮬레이션용: <additional-files value=\"egypt_sumo_fleet.rou.xml\"/>",
+    "sumo_s4_title": "실행 및 확인",
+    "sumo_s4_desc": "sumo-gui 또는 Python/TraCI로 실행합니다. 차량 색상, 유형, 차선 변경 동작을 시각적으로 확인합니다.",
+    "guide_aimsun_title": "Aimsun Next에 플리트 배포",
+    "aimsun_s1_title": "Aimsun 모델 열기",
+    "aimsun_s1_desc": "Aimsun Next를 시작하고 기존 마이크로시뮬레이션 모델 (.ang 또는 .aprx)을 엽니다.",
+    "aimsun_s2_title": "API 확장 등록",
+    "aimsun_s2_desc": "Project > Properties > API Extension로 이동합니다. /scripts/vissim_sae_override.py 스크립트를 등록합니다.",
+    "aimsun_s3_title": "차량 유형 구성",
+    "aimsun_s3_desc": "차량 유형 편집기를 엽니다. 스크립트의 프로필과 일치하는 유형을 만들거나 가져옵니다.",
+    "aimsun_s4_title": "실행 및 검사",
+    "aimsun_s4_desc": "마이크로시뮬레이션을 시작합니다. Python 스크립트가 TTC 기반 충돌 해결을 적용합니다."
   },
   "fr": {
     "t": "SAE AutoSim Hub",
@@ -1875,7 +2346,39 @@
     "sandbox_hint": "Examinez la logique de resolution avant de telecharger.",
     "copy_code": "Copier le code",
     "dl_file": "Telecharger .py",
-    "copied": "Copie!"
+    "copied": "Copie!",
+    "guide_title": "Guides d Integration Logicielle",
+    "guide_desc": "Instructions etape par etape pour deployer nos flottes pre-calibrees dans votre environnement de simulation.",
+    "guide_vissim": "PTV VISSIM",
+    "guide_sumo": "SUMO",
+    "guide_aimsun": "Aimsun Next",
+    "guide_vissim_title": "Deploiement de la flotte dans PTV VISSIM",
+    "vissim_s1_title": "Ouvrez votre reseau de base",
+    "vissim_s1_desc": "Lancez PTV VISSIM et ouvrez votre fichier de mise en page reseau existant (.inpx) contenant la geometrie des routes, les controleurs de signalisation et la demande de trafic.",
+    "vissim_s2_title": "Lire le reseau supplementaire",
+    "vissim_s2_desc": "Naviguez vers File > Read Additional > Network. Cela fusionne les definitions de types de vehicules sans ecraser vos liaisons routieres ou plans de signalisation existants.",
+    "vissim_s3_title": "Selectionnez le fichier de flotte",
+    "vissim_s3_desc": "Selectionnez notre fichier /fleets/custom_egypt_fleet.inpx telecharge. VISSIM injectera les parametres Wiedemann 99 (CC0-CC9, OP0-OP16) pour tous les types de vehicules egyptiens.",
+    "vissim_s4_title": "Verifiez et executez",
+    "vissim_s4_desc": "Ouvrez la liste des types de vehicules pour confirmer. Affectez-les et lancez la simulation pour verifier le comportement calibre.",
+    "guide_sumo_title": "Deploiement de la flotte dans SUMO",
+    "sumo_s1_title": "Placez le fichier de route",
+    "sumo_s1_desc": "Copiez /fleets/egypt_sumo_fleet.rou.xml dans votre dossier de projet SUMO avec vos fichiers .sumocfg et reseau.",
+    "sumo_s2_title": "Editez la configuration maitre",
+    "sumo_s2_desc": "Ouvrez .sumocfg dans un editeur de texte. Dans la balise <input>, ajoutez: <route-files value=\"egypt_sumo_fleet.rou.xml\"/>",
+    "sumo_s3_title": "Fichiers supplementaires (optionnel)",
+    "sumo_s3_desc": "Pour la simulation d arret de microbus: <additional-files value=\"egypt_sumo_fleet.rou.xml\"/>",
+    "sumo_s4_title": "Lancez et validez",
+    "sumo_s4_desc": "Lancez via sumo-gui ou Python/TraCI. Verifiez visuellement les couleurs, types et comportement de changement de voie.",
+    "guide_aimsun_title": "Deploiement de la flotte dans Aimsun Next",
+    "aimsun_s1_title": "Ouvrez votre modele Aimsun",
+    "aimsun_s1_desc": "Lancez Aimsun Next et ouvrez votre modele de microsimulation existant (.ang ou .aprx).",
+    "aimsun_s2_title": "Enregistrez l extension API",
+    "aimsun_s2_desc": "Naviguez vers Project > Properties > API Extension. Enregistrez notre script /scripts/vissim_sae_override.py.",
+    "aimsun_s3_title": "Configurez les types de vehicules",
+    "aimsun_s3_desc": "Ouvrez l editeur de types de vehicules. Creez ou importez les types correspondant aux profils de notre script.",
+    "aimsun_s4_title": "Executez et inspectez",
+    "aimsun_s4_desc": "Lancez la microsimulation. Le script Python appliquera la resolution de conflits basee sur le TTC et remplacera la cinematique."
   }
 };
     const LANG_OPTIONS = [];
@@ -1914,6 +2417,23 @@
             btn.classList.toggle('active', btn.getAttribute('data-platform') === platform);
         });
         updateDisplay();
+    }
+
+    function switchGuide(name) {
+        document.querySelectorAll('.guide-panel').forEach(function(p) { p.classList.add('hidden'); });
+        document.querySelectorAll('[data-guide-btn]').forEach(function(b) {
+            var isActive = b.getAttribute('data-guide') === name;
+            b.classList.toggle('active', isActive);
+            if (!isActive) {
+                b.style.color = '';
+                b.style.borderColor = 'transparent';
+            } else {
+                b.style.color = '';
+                b.style.borderColor = '';
+            }
+        });
+        var panel = document.getElementById('guide-' + name);
+        if (panel) panel.classList.remove('hidden');
     }
 
     function updateMPR(value) {
