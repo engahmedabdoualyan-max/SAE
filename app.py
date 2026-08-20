@@ -42,21 +42,30 @@ from generators.aimsun_generator import generate_aimsun_script
 from generators.api_script_generator import generate_conflict_script
 
 
-st.set_page_config(
-    page_title="SAE Calibration Hub",
-    page_icon="🚗",
-    layout="wide",
-    initial_sidebar_state="expanded",
-)
+def app():
+    """Main Streamlit application entry point."""
 
-st.markdown("""<style>
-    h1 { color: #1E3A8A; border-bottom: 3px solid #1E3A8A; padding-bottom: 0.3em; }
-    h2 { color: #1E40AF; margin-top: 1.5em; }
-    h3 { color: #3730A3; }
-    .metric-card { background: #F0F9FF; padding: 1em; border-radius: 8px; border-left: 4px solid #0EA5E9; }
-    .stDownloadButton button { width: 100%; }
-    code { background: #1e1e1e; color: #d4d4d4; padding: 2px 6px; border-radius: 3px; }
-</style>""", unsafe_allow_html=True)
+    st.set_page_config(
+        page_title="SAE Calibration Hub",
+        page_icon="🚗",
+        layout="wide",
+        initial_sidebar_state="expanded",
+    )
+
+    st.markdown("""<style>
+        h1 { color: #1E3A8A; border-bottom: 3px solid #1E3A8A; padding-bottom: 0.3em; }
+        h2 { color: #1E40AF; margin-top: 1.5em; }
+        h3 { color: #3730A3; }
+        .metric-card { background: #F0F9FF; padding: 1em; border-radius: 8px; border-left: 4px solid #0EA5E9; }
+        .stDownloadButton button { width: 100%; }
+        code { background: #1e1e1e; color: #d4d4d4; padding: 2px 6px; border-radius: 3px; }
+    </style>""", unsafe_allow_html=True)
+
+    _main_logic()
+
+
+def _main_logic():
+    """Actual app rendering logic."""
 
 
 # ══════════════════════════════════════════════════════════════
@@ -399,7 +408,7 @@ Derived from v_f² = v_i² + 2·a·s with v_f = 0.
 # Main App
 # ══════════════════════════════════════════════════════════════
 
-def main():
+def _main_logic():
     cfg = sidebar_config()
 
     # Header
@@ -558,7 +567,4 @@ def _generate_config(platform, egyptian_profiles, av_profiles, mpr):
 
 
 if __name__ == "__main__":
-    main()
-
-# Entry point for Streamlit Community Cloud / serverless deployments
-app = main
+    app()
