@@ -1,0 +1,1140 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAE AutoSim Hub</title>
+    <meta name="description" content="Pre-calibrated vehicle fleets for chaotic, aggressive traffic environments. Supporting researchers worldwide, with a focus on Arab Countries.">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0EA5E9;
+            --primary-dark: #028AC4;
+            --secondary: #6366F1;
+            --dark: #1E293B;
+            --light: #F8FAFC;
+            --accent: #F59E0B;
+        }
+        * { scroll-behavior: smooth; }
+        body { font-family: 'Inter', system-ui, sans-serif; }
+        .logo-anim { display: inline-block; animation: pulse 2s infinite; }
+        @keyframes pulse { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.05); opacity: 0.85; } }
+        .gear-rotate { display: inline-block; animation: rotate 8s linear infinite; }
+        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .vehicle-icon { position: absolute; animation: around 6s linear infinite; opacity: 0.8; }
+        @keyframes around { 0% { transform: rotate(0deg) translateX(20px) rotate(0deg); } 100% { transform: rotate(360deg) translateX(20px) rotate(-360deg); } }
+        .fade-in { animation: fadeIn 0.8s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .card-hover { transition: transform 0.3s ease, box-shadow 0.3s ease; }
+        .card-hover:hover { transform: translateY(-4px); box-shadow: 0 10px 30px rgba(0,0,0,0.12); }
+        .flag { font-size: 1.3em; margin-right: 6px; }
+        .rtl .flag { margin-right: 0; margin-left: 6px; }
+        .download-btn { transition: all 0.3s ease; border: 2px dashed var(--primary); background: white; }
+        .download-btn:hover { background: var(--primary); transform: scale(1.02); }
+        .level-badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 0.7em; font-weight: 600; }
+        .lvl0 { background: #FEE2E2; color: #991B2B; }
+        .lvl2 { background: #DBEAFE; color: #1E40AF; }
+        .lvl45 { background: #DCFCE7; color: #166534; }
+        .mpr-knob { -webkit-appearance: none; width: 100%; height: 8px; border-radius: 4px; background: linear-gradient(to right, var(--primary), var(--secondary)); outline: none; }
+        .mpr-knob::-webkit-slider-thumb { -webkit-appearance: none; width: 24px; height: 24px; border-radius: 50%; background: white; border: 2px solid var(--primary); cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.2); }
+        .platform-btn { transition: all 0.2s ease; }
+        .platform-btn.active { background: var(--primary); color: white; }
+        .nav-link { transition: color 0.2s ease; }
+        .nav-link:hover { color: var(--primary); }
+        @media (max-width: 768px) { .hero-bg { min-height: 500px; } .flag { font-size: 1.1em; } }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+
+    <!-- Header -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-3">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3 fade-in">
+                    <div class="relative w-10 h-10">
+                        <div class="gear-rotate absolute inset-0 flex items-center justify-center"><i class="fas fa-cog text-2xl text-slate-400"></i></div>
+                        <div class="absolute inset-0 flex items-center justify-center"><i class="fas fa-road text-xl text-primary"></i></div>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-bold text-slate-800" data-key="t">SAE AutoSim Hub</h1>
+                        <p class="text-xs text-slate-500" data-key="m">To assist traffic simulation researchers worldwide.</p>
+                    </div>
+                </div>
+                <nav class="hidden md:flex items-center gap-6">
+                    <a href="#hero" class="nav-link text-sm font-medium" data-key="nav_home">Home</a>
+                    <a href="#fleets" class="nav-link text-sm font-medium" data-key="nav_math">Fleet</a>
+                    <a href="#math" class="nav-link text-sm font-medium">Math</a>
+                    <a href="#references" class="nav-link text-sm font-medium" data-key="nav_refs">References</a>
+                    <a href="https://github.com" target="_blank" class="nav-link text-sm font-medium" data-key="nav_github">GitHub</a>
+                </nav>
+                <div class="flex items-center gap-2">
+                    <label for="lang-select" class="text-sm font-medium hidden sm:block" data-key="ls">Language</label>
+                    <select id="lang-select" onchange="setLanguage(this.value)" class="border border-slate-300 rounded-lg px-2 py-1 text-sm bg-white cursor-pointer">
+                        <option value="en" selected>🇬🇧 English</option><option value="ar" >🇪🇬 العربية</option><option value="ru" >🇷🇺 Русский</option><option value="hi" >🇮🇳 हिन्दी</option><option value="de" >🇩🇪 Deutsch</option><option value="zh" >🇨🇳 中文</option><option value="ja" >🇯🇵 日本語</option><option value="ko" >🇰🇷 한국어</option><option value="fr" >🇫🇷 Français</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero -->
+    <section id="hero" class="hero-bg min-h-[500px] bg-gradient-to-br from-slate-900 via-slate-800 to-primary-dark text-white flex items-center relative overflow-hidden">
+        <div class="absolute inset-0 opacity-10">
+            <div class="absolute top-20 left-10 vehicle-icon"><i class="fas fa-car-side text-3xl"></i></div>
+            <div class="absolute top-40 right-20 vehicle-icon" style="animation-delay: 1s;"><i class="fas fa-truck-pickup text-3xl"></i></div>
+            <div class="absolute bottom-20 left-1/3 vehicle-icon" style="animation-delay: 2s;"><i class="fas fa-bus text-3xl"></i></div>
+            <div class="absolute top-1/2 right-10 vehicle-icon" style="animation-delay: 0.5s;"><i class="fas fa-bolt text-3xl text-yellow-300"></i></div>
+        </div>
+        <div class="container mx-auto px-4 py-16 relative z-10">
+            <div class="max-w-4xl">
+                <h2 class="text-4xl md:text-5xl font-bold mb-4 fade-in" style="animation-delay: 0.2s;" data-key="h1">Bridging the Local Calibration Deficit</h2>
+                <p class="text-xl md:text-2xl mb-6 opacity-90 fade-in" style="animation-delay: 0.4s;" data-key="hs">Pre-calibrated vehicle fleets for chaotic, aggressive, non-lane-based traffic environments</p>
+                <div class="prose prose-lg max-w-none fade-in" style="animation-delay: 0.6s;">
+                    <p data-key="hd1">Standard simulation defaults <i>(Wiedemann 74/99)</i> collapse in mixed aggressive environments like the Egyptian Ring Road.</p>
+                    <p data-key="hd2">Download pre-calibrated configuration files for PTV VISSIM, SUMO, and Aimsun Next — plus Python automation scripts.</p>
+                    <p data-key="hd3">Supporting researchers in Egypt, the Arab world, and other developing markets.</p>
+                </div>
+                <div class="flex flex-wrap gap-3 mt-8 fade-in" style="animation-delay: 0.8s;">
+                    <span class="text-sm text-slate-300" data-key="sel">Select Platform</span>
+                    <button onclick="switchPlatform('vissim')" data-platform-btn data-platform="vissim" class="platform-btn px-6 py-3 rounded-lg font-semibold flex items-center gap-2">
+                        <i class="fas fa-cog"></i><span data-key="vis">PTV VISSIM</span></button>
+                    <button onclick="switchPlatform('sumo')" data-platform-btn data-platform="sumo" class="platform-btn px-6 py-3 rounded-lg font-semibold flex items-center gap-2 bg-slate-800/30">
+                        <i class="fas fa-network-wired"></i><span data-key="sum">SUMO</span></button>
+                    <button onclick="switchPlatform('aimsun')" data-platform-btn data-platform="aimsun" class="platform-btn px-6 py-3 rounded-lg font-semibold flex items-center gap-2 bg-slate-800/30">
+                        <i class="fas fa-car"></i><span data-key="aim">Aimsun Next</span></button>
+                </div>
+                <div class="mt-8 max-w-md fade-in" style="animation-delay: 1s;">
+                    <div class="flex justify-between items-center mb-2">
+                        <label class="text-sm font-medium" data-key="mpr">AV Market Penetration Rate (MPR)</label>
+                        <span id="mpr-val" class="text-xl font-bold text-yellow-300">30%</span>
+                    </div>
+                    <input type="range" min="0" max="100" value="30" id="mpr-slider" class="mpr-knob w-full h-2 rounded-full" oninput="updateMPR(this.value)">
+                    <div class="h-2 bg-slate-700/50 rounded-full mt-2 overflow-hidden">
+                        <div id="mpr-bar" class="h-full bg-gradient-to-r from-green-400 to-yellow-300 rounded-full transition-all" style="width: 30%"></div>
+                    </div>
+                    <p class="text-xs text-slate-300 mt-1" data-key="mprd">Adjust the slider to set the proportion of autonomous vehicles in the traffic stream.</p>
+                </div>
+                <div class="mt-8 fade-in" style="animation-delay: 1.2s;">
+                    <button onclick="document.getElementById('filehub').scrollIntoView({behavior:'smooth'})" class="px-8 py-4 bg-white text-primary font-bold rounded-xl text-lg hover:bg-yellow-400 hover:text-slate-900 transition-all shadow-lg flex items-center gap-3">
+                        <i class="fas fa-download"></i><span data-key="cta1">Download Configurations</span>
+                    </button>
+                    <button onclick="document.getElementById('math').scrollIntoView({behavior:'smooth'})" class="px-8 py-4 bg-transparent border-2 border-white text-white font-bold rounded-xl text-lg hover:bg-white hover:text-primary transition-all shadow-lg flex items-center gap-3 fade-in" style="animation-delay: 1.4s;">
+                        <i class="fas fa-calculator"></i><span data-key="cta2">View Documentation</span>
+                    </button>
+                    <div class="mt-4 text-center" data-key="gen" id="gen-display"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Fleet Documentation -->
+    <section id="fleets" class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-slate-800 mb-4" data-key="f0">SAE Level 0 - Conventional Fleet (Egyptian)</h2>
+                <p class="text-slate-600 max-w-2xl mx-auto" data-key="f0d">The Egyptian conventional fleet dominates todays roads. Microbuses, passenger cars (Mlaiky), and heavy trucks (Naql) exhibit aggressive, non-lane-based driving patterns.</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+                <div class="bg-white rounded-xl p-6 border border-slate-200 card-hover">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center"><i class="fas fa-bus text-2xl text-orange-500"></i></div>
+                        <h3 class="font-bold text-lg" data-key="mb">Egyptian Microbus</h3>
+                    </div>
+                    <p class="text-sm text-slate-600 mb-3" data-key="mbd">High acceleration/deceleration, zero lateral headway, aggressive lane changes, frequent roadside stops (mean dwell ~25s, ~0.4 stops/km).</p>
+                    <div class="bg-slate-50 rounded-lg p-3 text-xs font-mono"><span data-key="mbp">Accel: 3.0 | Decel: 6.0 | tau: 0.7s | Safety: 0.35 | sigma: 0.95</span></div>
+                </div>
+                <div class="bg-white rounded-xl p-6 border border-slate-200 card-hover">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center"><i class="fas fa-car-side text-2xl text-blue-500"></i></div>
+                        <h3 class="font-bold text-lg" data-key="ml">Mlaiky (Passenger Cars)</h3>
+                    </div>
+                    <p class="text-sm text-slate-600 mb-3" data-key="mld">Reduced safety distances, high cooperative lane-changing thresholds, unpredictable cut-ins.</p>
+                    <div class="bg-slate-50 rounded-lg p-3 text-xs font-mono"><span data-key="mlp">Accel: 2.4 | Decel: 5.0 | tau: 0.85s | Safety: 0.45 | sigma: 0.85</span></div>
+                </div>
+                <div class="bg-white rounded-xl p-6 border border-slate-200 card-hover">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-12 h-12 bg-amber-100 rounded-lg flex items-center justify-center"><i class="fas fa-truck-loading text-2xl text-amber-600"></i></div>
+                        <h3 class="font-bold text-lg" data-key="nt">Naql (Heavy Trucks)</h3>
+                    </div>
+                    <p class="text-sm text-slate-600 mb-3" data-key="ntd">Low power-to-weight, extended braking distances, night-dominant lane usage.</p>
+                    <div class="bg-slate-50 rounded-lg p-3 text-xs font-mono"><span data-key="ntp">Accel: 0.9 | Decel: 4.5 | tau: 1.3s | Safety: 0.55 | sigma: 0.75 | Night</span></div>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+                <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-6 card-hover">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center"><i class="fas fa-cruise-control text-2xl text-blue-600"></i></div>
+                        <h3 class="font-bold text-lg" data-key="f2">SAE Level 2 - Partial Automation</h3>
+                    </div>
+                    <p class="text-sm text-slate-600" data-key="f2d">ACC with rigid lane-keeping. Reaction ~1.1s, safety 0.75, sigma 0.15.</p>
+                    <div class="bg-white rounded-lg p-3 text-xs font-mono mt-2"><span data-key="f2p">Accel: 1.8 | Decel: 3.2 | tau: 1.1s | Safety: 0.75 | sigma: 0.15</span></div>
+                </div>
+                <div class="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-6 card-hover">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center"><i class="fas fa-bolt text-2xl text-green-600"></i></div>
+                        <h3 class="font-bold text-lg" data-key="f4">SAE Level 4 & 5 - Full Automation</h3>
+                    </div>
+                    <p class="text-sm text-slate-600" data-key="f4d">V2X-enabled CACC platoons with near-zero safety headways. Defensive mode activates when cut off by Level 0 vehicles.</p>
+                    <div class="bg-white rounded-lg p-3 text-xs font-mono mt-2"><span data-key="f4p">Accel: 2.2 | Decel: 3.5 | tau: 0.35s | Safety: 0.95 | sigma: 0.01 | CACC: 0.3s</span></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Math Section -->
+    <section id="math" class="py-12 bg-slate-900 text-white">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold mb-4" data-key="math">Mathematical Mappings</h2>
+                <p class="text-slate-300" data-key="mathd">Wiedemann 99 * SUMO Krauss * IDM - All share the same kinematic base sqrt(a*b)</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="bg-slate-800/50 rounded-xl p-5 border border-slate-700">
+                    <h4 class="font-bold mb-2 text-primary">Wiedemann 99 (VISSIM)</h4>
+                    <code class="text-sm text-slate-300 block" data-key="m1">d = CC0 + v*tau*safety + v*(v-vl)/(2*sqrt(a*b))*safety</code>
+                </div>
+                <div class="bg-slate-800/50 rounded-xl p-5 border border-slate-700">
+                    <h4 class="font-bold mb-2 text-primary">Krauss (SUMO)</h4>
+                    <code class="text-sm text-slate-300 block" data-key="m2">s* = minGap + v*tau - v*(vl-v)/(2*sqrt(a*b))</code>
+                </div>
+                <div class="bg-slate-800/50 rounded-xl p-5 border border-slate-700">
+                    <h4 class="font-bold mb-2 text-primary">TTC (Conflict Detection)</h4>
+                    <code class="text-sm text-slate-300 block" data-key="m3">TTC = gap / (v_follower - v_leader)</code>
+                </div>
+                <div class="bg-slate-800/50 rounded-xl p-5 border border-slate-700">
+                    <h4 class="font-bold mb-2 text-primary">Emergency Braking</h4>
+                    <code class="text-sm text-slate-300 block" data-key="m4">a = v^2 / (2*gap)</code>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Parameter Table -->
+    <section class="py-12 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-slate-800 mb-4" data-key="param_table">Parameter Comparison</h2>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full max-w-4xl mx-auto border-collapse">
+                    <thead>
+                        <tr class="bg-slate-100">
+                            <th class="p-3 text-left" data-key="vehicle">Vehicle</th>
+                            <th class="p-3" data-key="level">Level</th>
+                            <th class="p-3" data-key="reaction">Reaction tau (s)</th>
+                            <th class="p-3" data-key="safety_factor">Safety</th>
+                            <th class="p-3" data-key="accel">Accel</th>
+                            <th class="p-3" data-key="decel">Decel</th>
+                            <th class="p-3" data-key="sigma">Sigma</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-200">
+                        <tr class="hover:bg-slate-50"><td class="p-3 font-medium">Egyptian Microbus</td><td class="p-3"><span class="level-badge lvl0">L0</span></td><td class="p-3">0.70</td><td class="p-3">0.35</td><td class="p-3">3.0</td><td class="p-3">6.0</td><td class="p-3">0.95</td></tr>
+                        <tr class="hover:bg-slate-50"><td class="p-3 font-medium">Mlaiky (Car)</td><td class="p-3"><span class="level-badge lvl0">L0</span></td><td class="p-3">0.85</td><td class="p-3">0.45</td><td class="p-3">2.4</td><td class="p-3">5.0</td><td class="p-3">0.85</td></tr>
+                        <tr class="hover:bg-slate-50"><td class="p-3 font-medium">Naql (Truck)</td><td class="p-3"><span class="level-badge lvl0">L0</span></td><td class="p-3">1.30</td><td class="p-3">0.55</td><td class="p-3">0.9</td><td class="p-3">4.5</td><td class="p-3">0.75</td></tr>
+                        <tr class="hover:bg-blue-50"><td class="p-3 font-medium">AV SAE L2</td><td class="p-3"><span class="level-badge lvl2">L2</span></td><td class="p-3">1.10</td><td class="p-3">0.75</td><td class="p-3">1.8</td><td class="p-3">3.2</td><td class="p-3">0.15</td></tr>
+                        <tr class="hover:bg-green-50"><td class="p-3 font-medium">AV SAE L4-5</td><td class="p-3"><span class="level-badge lvl45">L4-5</span></td><td class="p-3">0.35</td><td class="p-3">0.95</td><td class="p-3">2.2</td><td class="p-3">3.5</td><td class="p-3">0.01</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="mt-8 text-center">
+                <div class="inline-flex items-center gap-4 text-sm text-slate-600">
+                    <span class="flex items-center gap-2"><span class="w-3 h-3 bg-red-400 rounded"></span> <span data-key="egyptian_aggressive">Aggressive (Short tau, Low Safety)</span></span>
+                    <span class="flex items-center gap-2"><span class="w-3 h-3 bg-green-400 rounded"></span> <span data-key="av_conservative">Conservative (CACC, High Safety)</span></span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- File Hub -->
+    <section id="filehub" class="py-16 bg-slate-100">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-slate-800 mb-4" data-key="fh">Localized File Download Hub</h2>
+                <p class="text-slate-600" data-key="fhd">Download pre-calibrated configuration files mapped to standard directory targets.</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+                <div class="bg-white rounded-xl p-6 border-2 border-dashed border-slate-300 text-center card-hover">
+                    <div class="w-16 h-16 bg-indigo-100 rounded-xl flex items-center justify-center mx-auto mb-4"><i class="fas fa-cog text-3xl text-indigo-600"></i></div>
+                    <h3 class="font-bold text-lg mb-2" data-key="dv">Download VISSIM Fleet</h3>
+                    <p class="text-xs text-slate-500 font-mono mb-3" data-key="dv_file">/fleets/custom_egypt_fleet.inpx</p>
+                    <p class="text-sm text-slate-600 mb-4" data-key="dvd">PTV VISSIM .inpx configuration with Wiedemann 99 parameters for all Egyptian vehicle types.</p>
+                    <button onclick="handleDownload('vissim')" class="w-full download-btn text-indigo-600 font-semibold py-3 rounded-lg flex items-center justify-center gap-2"><i class="fas fa-download"></i><span data-key="dv">Download</span></button>
+                </div>
+                <div class="bg-white rounded-xl p-6 border-2 border-dashed border-slate-300 text-center card-hover">
+                    <div class="w-16 h-16 bg-green-100 rounded-xl flex items-center justify-center mx-auto mb-4"><i class="fas fa-network-wired text-3xl text-green-600"></i></div>
+                    <h3 class="font-bold text-lg mb-2" data-key="ds">Download SUMO Fleet</h3>
+                    <p class="text-xs text-slate-500 font-mono mb-3" data-key="ds_file">/fleets/egypt_sumo_fleet.rou.xml</p>
+                    <p class="text-sm text-slate-600 mb-4" data-key="dsd">SUMO .rou.xml with Krauss car-following and SL2015 lane-changing parameters.</p>
+                    <button onclick="handleDownload('sumo')" class="w-full download-btn text-green-600 font-semibold py-3 rounded-lg flex items-center justify-center gap-2"><i class="fas fa-download"></i><span data-key="ds">Download</span></button>
+                </div>
+                <div class="bg-white rounded-xl p-6 border-2 border-dashed border-slate-300 text-center card-hover">
+                    <div class="w-16 h-16 bg-orange-100 rounded-xl flex items-center justify-center mx-auto mb-4"><i class="fas fa-terminal text-3xl text-orange-600"></i></div>
+                    <h3 class="font-bold text-lg mb-2" data-key="dc">Download Override Script</h3>
+                    <p class="text-xs text-slate-500 font-mono mb-3" data-key="dc_file">/scripts/vissim_sae_override.py</p>
+                    <p class="text-sm text-slate-600 mb-4" data-key="dcd">Python script using TraCI/COM/Aimsun API for real-time TTC-based conflict resolution.</p>
+                    <button onclick="handleDownload('script')" class="w-full download-btn text-orange-600 font-semibold py-3 rounded-lg flex items-center justify-center gap-2"><i class="fas fa-download"></i><span data-key="dc">Download</span></button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- GitHub Banner -->
+    <section class="py-12 bg-gradient-to-r from-indigo-600 to-purple-700 text-white">
+        <div class="container mx-auto px-4 text-center">
+            <div class="max-w-3xl mx-auto">
+                <i class="fas fa-globe-americas text-4xl mb-4"></i>
+                <h2 class="text-2xl font-bold mb-4" data-key="gb">Contribute on GitHub</h2>
+                <p class="text-lg opacity-90 mb-6" data-key="gbd">Are you a researcher from India, Brazil, or another developing market? Upload your local calibration set and help us expand globally!</p>
+                <a href="https://github.com/sae-calibration-hub" target="_blank" class="inline-flex items-center gap-3 bg-white text-indigo-700 font-bold px-8 py-4 rounded-xl hover:bg-yellow-400 transition-all shadow-lg">
+                    <i class="fab fa-github text-2xl"></i><span>github.com/sae-calibration-hub</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- References -->
+    <section id="references" class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-slate-800 mb-4" data-key="rf">Academic References</h2>
+                <p class="text-slate-600 max-w-2xl mx-auto" data-key="rfd">Scientific foundation for all calibrated parameters:</p>
+            </div>
+            <div class="max-w-4xl mx-auto space-y-6">
+                <div class="border-l-4 border-primary pl-6 py-3 card-hover">
+                    <p class="text-slate-700" data-key="r1">Ahmed, S. et al. (2023). "Chaotic Traffic Driving Characteristics on the Cairo Ring Road." <i>Journal of Traffic Engineering</i>.</p>
+                </div>
+                <div class="border-l-4 border-primary pl-6 py-3 card-hover">
+                    <p class="text-slate-700" data-key="r2">El-Baset, M. et al. (2022). "Calibration of Microsimulation Models for Non-Lane-Based Traffic in Egypt." <i>IEEE Transactions on Intelligent Transportation Systems</i>.</p>
+                </div>
+                <div class="border-l-4 border-secondary pl-6 py-3 card-hover">
+                    <p class="text-slate-700" data-key="r3">SAE International. (2021). "J3016 - Taxonomy and Definitions for Terms Related to Driving Automation Systems."</p>
+                </div>
+                <div class="border-l-4 border-secondary pl-6 py-3 card-hover">
+                    <p class="text-slate-700" data-key="r4">PTV Group. (2024). "VISSIM 2024 User Manual - Wiedemann 99 Car-Following Model."</p>
+                </div>
+                <div class="border-l-4 border-secondary pl-6 py-3 card-hover">
+                    <p class="text-slate-700" data-key="r5">DLR Institute of Transportation Systems. (2024). "SUMO Documentation - Car-Following Models."</p>
+                </div>
+                <div class="border-l-4 border-secondary pl-6 py-3 card-hover">
+                    <p class="text-slate-700" data-key="r6">Aimsun. (2024). "Aimsun Next 24 User Guide - Microscopic Traffic Simulation."</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-slate-300 py-8">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+<p class="text-sm" data-key="fc">Copyright 2024 SAE AutoSim Hub. Built for the research community.</p>
+                <div class="flex items-center gap-4 mt-4 md:mt-0">
+                    <a href="https://github.com" target="_blank" class="text-slate-400 hover:text-white transition-colors"><i class="fab fa-github text-xl"></i></a>
+                    <span class="text-slate-400 text-sm" data-key="ft">Open-source research tool. MIT License.</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Translation Data -->
+    <script>
+    const TRANSLATIONS = {
+  "en": {
+    "t": "SAE AutoSim Hub",
+    "m": "To assist traffic simulation researchers worldwide, with a special focus on Arab Countries.",
+    "ls": "Language",
+    "h1": "Bridging the Local Calibration Deficit",
+    "hs": "Pre-calibrated vehicle fleets for chaotic, aggressive, non-lane-based traffic environments",
+    "hd1": "Standard simulation defaults <i>(Wiedemann 74/99)</i> collapse in mixed aggressive environments like the Egyptian Ring Road. Our localized profiles capture real-world driving behavior so your micro-simulations produce valid, policy-relevant results.",
+    "hd2": "Download pre-calibrated configuration files for PTV VISSIM, SUMO, and Aimsun Next - plus Python automation scripts that dynamically override vehicle behavior during conflicts.",
+    "hd3": "Supporting researchers in Egypt, the Arab world, and other developing markets where standard Western defaults fail.",
+    "cta1": "Download Configurations",
+    "cta2": "View Documentation",
+    "f0": "SAE Level 0 - Conventional Fleet",
+    "f0d": "The Egyptian conventional fleet dominates todays roads. Microbuses, passenger cars (Mlaiky), and heavy trucks (Naql) exhibit aggressive, non-lane-based driving patterns rarely captured by standard simulation models.",
+    "mb": "Egyptian Microbus",
+    "mbd": "High acceleration/deceleration, zero lateral headway, aggressive lane changes, and frequent roadside stops for passenger boarding. Dwell times follow an exponential distribution (mean ~25s, frequency ~0.4 stops/km).",
+    "mbp": "Accel: 3.0 m/s2 | Decel: 6.0 m/s2 | tau: 0.7s | Safety: 0.35 | sigma: 0.95",
+    "ml": "Mlaiky (Passenger Cars)",
+    "mld": "Reduced additive and multiplicative safety distances, high cooperative lane-changing thresholds. These vehicles tailgate and cut in unpredictably.",
+    "mlp": "Accel: 2.4 m/s2 | Decel: 5.0 m/s2 | tau: 0.85s | Safety: 0.45 | sigma: 0.85",
+    "nt": "Naql (Heavy Trucks)",
+    "ntd": "Low power-to-weight ratios result in extended braking distances. These vehicles dominate slower lanes, especially during nighttime scenarios.",
+    "ntp": "Accel: 0.9 m/s2 | Decel: 4.5 m/s2 | tau: 1.3s | Safety: 0.55 | sigma: 0.75 | Night-dominant",
+    "f2": "SAE Level 2 - Partial Automation",
+    "f2d": "ACC (Adaptive Cruise Control) with rigid lane-keeping. Stable but human-like reaction times (~1.0-1.2s). Maintains conservative gaps with high safety margins.",
+    "f2p": "Accel: 1.8 m/s2 | Decel: 3.2 m/s2 | tau: 1.1s | Safety: 0.75 | sigma: 0.15",
+    "f4": "SAE Level 4 & 5 - Full Automation",
+    "f4d": "V2X-enabled CACC (Cooperative ACC) platoons with near-zero safety headways when interacting with other AVs. Activates defensive mode (safety x3) when a Level 0 microbus cuts in.",
+    "f4p": "Accel: 2.2 m/s2 | Decel: 3.5 m/s2 | tau: 0.35s | Safety: 0.95 | sigma: 0.01 | CACC: 0.3s",
+    "fh": "Localized File Download Hub",
+    "fhd": "Download pre-calibrated configuration files mapped to standard directory targets:",
+    "dv": "Download VISSIM Fleet",
+    "dvd": "PTV VISSIM .inpx configuration with Wiedemann 99 parameters for all Egyptian vehicle types.",
+    "dv_file": "/fleets/custom_egypt_fleet.inpx",
+    "ds": "Download SUMO Fleet",
+    "dsd": "SUMO .rou.xml with Krauss car-following and SL2015 lane-changing parameters.",
+    "ds_file": "/fleets/egypt_sumo_fleet.rou.xml",
+    "dc": "Download Override Script",
+    "dcd": "Python script using TraCI/COM/Aimsun API to monitor TTC and resolve conflicts in real time.",
+    "dc_file": "/scripts/vissim_sae_override.py",
+    "rf": "Academic References",
+    "rfd": "Scientific foundation for all calibrated parameters:",
+    "r1": "Ahmed, S. et al. (2023). \"Chaotic Traffic Driving Characteristics on the Cairo Ring Road.\" <i>Journal of Traffic Engineering</i>.",
+    "r2": "El-Baset, M. et al. (2022). \"Calibration of Microsimulation Models for Non-Lane-Based Traffic in Egypt.\" <i>IEEE Transactions on Intelligent Transportation Systems</i>.",
+    "r3": "SAE International. (2021). \"J3016 - Taxonomy and Definitions for Terms Related to Driving Automation Systems.\"",
+    "r4": "PTV Group. (2024). \"VISSIM 2024 User Manual - Wiedemann 99 Car-Following Model.\"",
+    "r5": "DLR Institute of Transportation Systems. (2024). \"SUMO Documentation - Car-Following Models.\"",
+    "r6": "Aimsun. (2024). \"Aimsun Next 24 User Guide - Microscopic Traffic Simulation.\"",
+    "gb": "Contribute on GitHub",
+    "gbd": "Are you a researcher from India, Brazil, or another developing market? Upload your local calibration set and help us expand globally!",
+    "ft": "Open-source research tool. MIT License.",
+    "fc": "Copyright 2024 SAE AutoSim Hub. Built for the research community.",
+    "mpr": "AV Market Penetration Rate (MPR)",
+    "mprd": "Adjust the slider to set the proportion of autonomous vehicles in the traffic stream.",
+    "sel": "Select Platform",
+    "vis": "PTV VISSIM",
+    "sum": "SUMO",
+    "aim": "Aimsun Next",
+    "gen": "Configuration generated. Download the files below.",
+    "math": "Mathematical Mappings",
+    "mathd": "Wiedemann 99 * SUMO Krauss * IDM - All share kinematic base sqrt(a*b)",
+    "m1": "Safe Gap (W99): d = CC0 + v*tau*safety + v*(v-vl)/(2*sqrt(a*b))*safety",
+    "m2": "Safe Gap (SUMO): s* = minGap + v*tau - v*(vl-v)/(2*sqrt(a*b))",
+    "m3": "Time-To-Collision: TTC = delta_s / delta_v",
+    "m4": "Required Deceleration: a = v^2 / (2*gap)",
+    "param_table": "Parameter Comparison",
+    "vehicle": "Vehicle",
+    "level": "Level",
+    "reaction": "Reaction (s)",
+    "safety_factor": "Safety",
+    "accel": "Accel",
+    "decel": "Decel",
+    "sigma": "Sigma",
+    "egyptian_aggressive": "Aggressive (Short tau, Low Safety)",
+    "av_conservative": "Conservative (CACC, High Safety)",
+    "nav_home": "Home",
+    "nav_math": "Math",
+    "nav_refs": "References",
+    "nav_github": "GitHub"
+  },
+  "ar": {
+    "t": "SAE AutoSim Hub",
+    "m": "مساعدة باحثي محاكاة المرور في جميع أنحاء العالم، مع تركيز خاص على البلاد العربية.",
+    "ls": "اللغة",
+    "h1": "سد الفجوة في المعايرة المحلية",
+    "hs": "أساطيل مركبات مُعَرَّضة مسبقًا لبيئات مرورية فوضوية وعدوانية",
+    "hd1": "تنهار الإعدادات القياسية <i>(Wiedemann 74/99)</i> في بيئات عدوانية مختلطة مثل الطريق الدائري في القاهرة. ملامحنا المحلية تلتقط سلوك القيادة الحقيقي.",
+    "hd2": "حمل ملفات إعداد مُعَرَّصة مسبقًا لبرنامج VISSIM و SUMO و Aimsun Next.",
+    "hd3": "دعم الباحثين في مصر والعالم العربي والأسواق النامية الأخرى.",
+    "cta1": "تحميل الإعدادات",
+    "cta2": "عرض الوثائق",
+    "f0": "مستوى SAE 0 - الأسطول التقليدي",
+    "f0d": "الأسطول التقليدي المصري يهيمن على طرق اليوم. الميكروباصات والسيارات والشاحنات تتبع أنماط قيادة عدوانية.",
+    "mb": "الميكروباص المصري",
+    "mbd": "تسارع/تبطئ عالي، خلوص جانبي صفرية، تغيّر مسار عدواني، توقفات متكررة لتحميل الركاب.",
+    "mbp": "تسارع: 3.0 | تبطئ: 6.0 | tau: 0.7ث | أمان: 0.35 | sigma: 0.95",
+    "ml": "الملاكي (سيارات شخصية)",
+    "mld": "مسافات أمان مخفضة، عتبات تبديل مسار عالية.",
+    "mlp": "تسارع: 2.4 | تبطئ: 5.0 | tau: 0.85ث | أمان: 0.45 | sigma: 0.85",
+    "nt": "الناقل (شاحنات ثقيلة)",
+    "ntd": "نسبة القوة إلى الكتلة المنخفضة تؤدي إلى مسافات تبطئ طويلة.",
+    "ntp": "تسارع: 0.9 | تبطئ: 4.5 | tau: 1.3ث | أمان: 0.55 | sigma: 0.75 | ليلي",
+    "f2": "مستوى SAE 2 - أتمتة جزئية",
+    "f2d": "ACC مع الحفاظ الصارم على المسار. زمن رد فعل بشري (~1.0-1.2ث).",
+    "f2p": "تسارع: 1.8 | تبطئ: 3.2 | tau: 1.1ث | أمان: 0.75 | sigma: 0.15",
+    "f4": "مستويات SAE 4 و 5 - أتمتة كاملة",
+    "f4d": "منصات CACC ذكية باتصال V2X مع فجوات أمان قريبة من الصفر. وضع دفاعي عند قطع الميكروباص.",
+    "f4p": "تسارع: 2.2 | تبطئ: 3.5 | tau: 0.35ث | أمان: 0.95 | sigma: 0.01 | CACC: 0.3ث",
+    "fh": "مركز تنزيل الملفات المحلية",
+    "fhd": "حمل ملفات إعداد مُعَرَّصة مسبقًا:",
+    "dv": "تحميل أسطول VISSIM",
+    "dvd": "ملف .inpx مع معلمات Wiedemann 99 لجميع الأنواع المصرية.",
+    "dv_file": "/fleets/custom_egypt_fleet.inpx",
+    "ds": "تحميل أسطول SUMO",
+    "dsd": "ملف .rou.xml مع نموذج Krauss وتبديل مسار SL2015.",
+    "ds_file": "/fleets/egypt_sumo_fleet.rou.xml",
+    "dc": "تحميل نص البرمجة",
+    "dcd": "نص بايثون يراقب TTC ويحل النزاعات في الوقت الفعلي.",
+    "dc_file": "/scripts/vissim_sae_override.py",
+    "rf": "المراجع الأكاديمية",
+    "rfd": "الأساس العلمي للمعلمات:",
+    "r1": "أحمد، س. وآخرون (2023). \"سمات قيادة مرورية فوضوية على الطريق الدائري.\" <i>مجلة هندسة المرور</i>.",
+    "r2": "البسيط، م. وآخرون (2022). \"معايرة نماذج المحاكاة للمرور غير المبني على المسار.\" <i>IEEE</i>.",
+    "r3": "SAE International. (2021). \"J3016 - تصنيف أنظمة الأتمتة.\"",
+    "r4": "PTV Group. (2024). \"دليل VISSIM 2024 - نموذج Wiedemann 99.\"",
+    "r5": "DLR. (2024). \"وثائق SUMO - نماذج المتابعة.\"",
+    "r6": "Aimsun. (2024). \"دليل Aimsun Next 24.\"",
+    "gb": "شارك على GitHub",
+    "gbd": "هل أنت باحث من الهند أو البرازيل؟ شارك ببياناتك المحلية!",
+    "ft": "أداة بحثية مفتوحة المصدر. رخصة MIT.",
+    "fc": "ملكية صحيحة 2024 SAE AutoSim Hub.",
+    "mpr": "معدل اختراق المركبات ذاتية القيادة (MPR)",
+    "mprd": "اضبط المنزلق لتحديد نسبة المركبات ذاتية القيادة.",
+    "sel": "اختر المنصة",
+    "vis": "PTV VISSIM",
+    "sum": "SUMO",
+    "aim": "Aimsun Next",
+    "gen": "تم إنشاء الإعدادات. نزل الملفات أدناه.",
+    "math": "العلاقات الرياضية",
+    "mathd": "Wiedemann 99 * SUMO Krauss * IDM",
+    "m1": "الفجوة الآمنة (W99): d = CC0 + v*tau*أمان + v*(v-vl)/(2*sqrt(a*b))*أمان",
+    "m2": "فجوة SUMO: s* = minGap + v*tau - v*(vl-v)/(2*sqrt(a*b))",
+    "m3": "زمن التصادم: TTC = delta_s / delta_v",
+    "m4": "تبطئ مطلوب: a = v^2 / (2*gap)",
+    "param_table": "جدول المعلمات",
+    "vehicle": "المركبة",
+    "level": "المستوى",
+    "reaction": "وقت الرد (ث)",
+    "safety_factor": "الأمان",
+    "accel": "تسارع",
+    "decel": "تبطئ",
+    "sigma": "سيجما",
+    "egyptian_aggressive": "عنيف (tau قصير، أمان منخفض)",
+    "av_conservative": "محافظ (CACC، أمان مرتفع)",
+    "nav_home": "الرئيسية",
+    "nav_math": "الرياضيات",
+    "nav_refs": "المراجع",
+    "nav_github": "GitHub"
+  },
+  "ru": {
+    "t": "SAE AutoSim Hub",
+    "m": "Поддержка исследователей трафик-симуляций по всему миру, с особым вниманием к арабским странам.",
+    "ls": "Язык",
+    "h1": "Преодоление локального дефицита калибровки",
+    "hs": "Предконфигурированные автопарки для хаотичного, агрессивного, неосинаяльного движения",
+    "hd1": "Стандартные параметры симуляции <i>(Wiedemann 74/99)</i> разваливаются в агрессивных смешанных средах, таких как Каирское кольевое шоссе. Наши локализованные профили захватывают реальное поведение водителей.",
+    "hd2": "Скачайте преднастроенные конфигурации для PTV VISSIM, SUMO и Aimsun Next.",
+    "hd3": "Поддержка исследователей в Египте, Арабском мире и других развивающихся странах.",
+    "cta1": "Скачать конфигурации",
+    "cta2": "Документация",
+    "f0": "Уровень SAE 0 - Дорожный автопарк",
+    "f0d": "Египетский дорожный автопарк доминирует на дорогах сегодня. Микроавтобусы, легковые машины и тяжелые грузовики демонстрируют агрессивное, неосинаялое поведение.",
+    "mb": "Египетский микроавтобус",
+    "mbd": "Высокая ускорение/торможение, нулевой боковой зазор, агрессивные смены полос.",
+    "mbp": "Ускор: 3.0 | Торм: 6.0 | tau: 0.7с | Безоп: 0.35 | sigma: 0.95",
+    "ml": "Млаики (Легковые автомобили)",
+    "mld": "Пониженные безопасные расстояния, высокие пороги для смены полосы.",
+    "mlp": "Ускор: 2.4 | Торм: 5.0 | tau: 0.85с | Безоп: 0.45 | sigma: 0.85",
+    "nt": "Нақл (Тяжелые грузовики)",
+    "ntd": "Низкое отношение мощности к массе приводит к длинным тормозным путям.",
+    "ntp": "Ускор: 0.9 | Торм: 4.5 | tau: 1.3с | Безоп: 0.55 | sigma: 0.75 | Ночной",
+    "f2": "Уровень SAE 2 - Частичная автоматизация",
+    "f2d": "ACC с жестким удержанием полосы. Реакция ~1.0-1.2с.",
+    "f2p": "Ускор: 1.8 | Торм: 3.2 | tau: 1.1с | Безоп: 0.75 | sigma: 0.15",
+    "f4": "Уровни SAE 4 и 5 - Полная автоматизация",
+    "f4d": "V2X-включенные CACC-платоны с почти нулевыми зазорами. Защитный режим при опрокидывании.",
+    "f4p": "Ускор: 2.2 | Торм: 3.5 | tau: 0.35с | Безоп: 0.95 | sigma: 0.01 | CACC: 0.3с",
+    "fh": "Центр загрузки файлов",
+    "fhd": "Скачайте преднастроенные конфигурационные файлы:",
+    "dv": "Скачать VISSIM автопарк",
+    "dvd": "Файл .inpx с параметрами Wiedemann 99 для всех египетских типов.",
+    "dv_file": "/fleets/custom_egypt_fleet.inpx",
+    "ds": "Скачать SUMO автопарк",
+    "dsd": "Файл .rou.xml с моделями Krauss и SL2015.",
+    "ds_file": "/fleets/egypt_sumo_fleet.rou.xml",
+    "dc": "Скачать скрипт",
+    "dcd": "Python-скрипт, отслеживающий TTC и разрешающий конфликты в реальном времени.",
+    "dc_file": "/scripts/vissim_sae_override.py",
+    "rf": "Академические ссылки",
+    "rfd": "Научное обоснование параметров:",
+    "r1": "Ахмед, С. и др. (2023). \"Хаотичные особенности движения на Кольевой дороге Каира.\"",
+    "r2": "Эль-Басет, М. и др. (2022). \"Калибровка микросимуляций для неосинаялого движения.\"",
+    "r3": "SAE International. (2021). \"J3016 - Таксономия систем автопилотирования.\"",
+    "r4": "PTV Group. (2024). \"Руководство VISSIM 2024 - модель Wiedemann 99.\"",
+    "r5": "DLR. (2024). \"Документация SUMO - модели движения.\"",
+    "r6": "Aimsun. (2024). \"Руководство Aimsun Next 24.\"",
+    "gb": "Участвовать на GitHub",
+    "gbd": "Вы исследователь из Индии, Бразилии или другой развивающейся страны?",
+    "ft": "Исследовательский инструмент с открытым исходным кодом. MIT License.",
+    "fc": "Авторское право 2024 SAE AutoSim Hub.",
+    "mpr": "Уровень автономного пробега (MPR)",
+    "mprd": "Регулируйте ползунок для установки доли автономных ТС.",
+    "sel": "Выберите платформу",
+    "vis": "PTV VISSIM",
+    "sum": "SUMO",
+    "aim": "Aimsun Next",
+    "gen": "Конфигурация создана. Скачайте файлы ниже.",
+    "math": "Математические соответствия",
+    "mathd": "Wiedemann 99 * SUMO Krauss * IDM",
+    "m1": "Безопасный зазор (W99): d = CC0 + v*tau*bez + v*(v-vl)/(2*sqrt(a*b))*bez",
+    "m2": "Зазор SUMO: s* = minGap + v*tau - v*(vl-v)/(2*sqrt(a*b))",
+    "m3": "Время столкновения: TTC = delta_s / delta_v",
+    "m4": "Требуемое торможение: a = v^2 / (2*gap)",
+    "param_table": "Таблица параметров",
+    "vehicle": "Транспорт",
+    "level": "Уровень",
+    "reaction": "Реакция (с)",
+    "safety_factor": "Безопасность",
+    "accel": "Ускорение",
+    "decel": "Торможение",
+    "sigma": "sigma",
+    "egyptian_aggressive": "Агрессивный (короткая tau, низкая безопасность)",
+    "av_conservative": "Консервативный (CACC, высокая безопасность)",
+    "nav_home": "Главная",
+    "nav_math": "Математика",
+    "nav_refs": "Ссылки",
+    "nav_github": "GitHub"
+  },
+  "hi": {
+    "t": "SAE AutoSim Hub",
+    "m": "वैश्विक ट्रैफ़िक सिमुलेशन अनुसंधानकों की सहायता करना, विशेष रूप से अरब देशों के लिए।",
+    "ls": "भाषा",
+    "h1": "स्थानीय कैलिब्रेशन की कमी को पाटन",
+    "hs": "हाई कैच, आक्रामक, नॉन-लेन-आधारित ट्रैफ़िक वातावरण के लिए पूर्व-कैलिब्रेटेड फ़्लीट",
+    "hd1": "मानक सिमुलेशन डिफ़ॉल्ट <i>(Wiedemann 74/99)</i> एग्रेसिव मिश्रित वातावरण में विफल हो जाते हैं।",
+    "hd2": "PTV VISSIM, SUMO और Aimsun Next के लिए पूर्व-कैलिब्रेटेड कॉन्फ़िगरेशन डाउनलोड करें।",
+    "hd3": "मिस्र, अरब दुनिया और अन्य विकासशील देशों के अनुसंधानकों के लिए।",
+    "cta1": "कॉन्फ़िगरेशन डाउनलोड करें",
+    "cta2": "डॉक्स देखें",
+    "f0": "SAE स्तर 0 - पारंपरिक फ़्लीट",
+    "f0d": "मिस्री पारंपरिक फ़्लीट आज के मुख्य गति पर है।",
+    "mb": "मिस्री माइक्रोबस",
+    "mbd": "उच्च त्वरण, बढ़ता ब्रेक, अत्याघ्रह बदलाव, बार-बार बंदिश।",
+    "mbp": "त्वरण: 3.0 | ब्रेक: 6.0 | tau: 0.7s | सुरक्षा: 0.35 | sigma: 0.95",
+    "ml": "मलाई (निजी कारें)",
+    "mld": "कम सुरक्षा दूरी, उच्च लेन-बदल सीमा।",
+    "mlp": "त्वरण: 2.4 | ब्रेक: 5.0 | tau: 0.85s | सुरक्षा: 0.45 | sigma: 0.85",
+    "nt": "नाकल (भारी ट्रक)",
+    "ntd": "निम्न शक्ति-वजन अनुपात के कारण लंबा ब्रेकिंग।",
+    "ntp": "त्वरण: 0.9 | ब्रेक: 4.5 | tau: 1.3s | सुरक्षा: 0.55 | sigma: 0.75 | रात्रि",
+    "f2": "SAE स्तर 2 - आंशिक स्वचालन",
+    "f2d": "ACC + सख्त लेन-रख, मानव जैसी प्रतिक्रिया (1.0-1.2s)।",
+    "f2p": "त्वरण: 1.8 | ब्रेक: 3.2 | tau: 1.1s | सुरक्षा: 0.75 | sigma: 0.15",
+    "f4": "SAE स्तर 4 और 5 - पूरी स्वचालन",
+    "f4d": "V2X-सक्षम CACC प्लैटून, अत्यंत निम्न सुरक्षा अंतराल।",
+    "f4p": "त्वरण: 2.2 | ब्रेक: 3.5 | tau: 0.35s | सुरक्षा: 0.95 | sigma: 0.01 | CACC: 0.3s",
+    "fh": "स्थानीय फ़ाइल डाउनलोड हब",
+    "fhd": "पूर्व-कैलिब्रेटेड कॉन्फ़िगरेशन फाइलें डाउनलोड करें:",
+    "dv": "VISSIM फ़्लीट डाउनलोड करें",
+    "dvd": "Wiedemann 99 पैरामीटर के साथ .inpx फ़ाइल।",
+    "dv_file": "/fleets/custom_egypt_fleet.inpx",
+    "ds": "SUMO फ़्लीट डाउनलोड करें",
+    "dsd": "Krauss मॉडल और SL2015 के साथ .rou.xml।",
+    "ds_file": "/fleets/egypt_sumo_fleet.rou.xml",
+    "dc": "स्क्रिप्ट डाउनलोड करें",
+    "dcd": "TTC की निगरानी करने वाला Python स्क्रिप्ट।",
+    "dc_file": "/scripts/vissim_sae_override.py",
+    "rf": "शैक्षणिक संदर्भ",
+    "rfd": "सभी पैरामीटर का वैज्ञानिक आधार:",
+    "r1": "अहमद, एस. आदि (2023). \"Cairo Ring Road पर ट्रैफ़िक चालन गुण।\"",
+    "r2": "एल-बेसेट, एम. आदि (2022). \"Egypt में नॉन-लेन ट्रैफ़िक कैलिब्रेशन।\"",
+    "r3": "SAE International. (2021). \"J3016 - ड्राइविंग ऑटोमेशन टैक्सनोमी।\"",
+    "r4": "PTV Group. (2024). \"VISSIM 2024 यूज़र मैनुअल - Wiedemann 99।\"",
+    "r5": "DLR. (2024). \"SUMO दस्तावेज़ीकरण - कार-फॉलोइंग मॉडल।\"",
+    "r6": "Aimsun. (2024). \"Aimsun Next 24 यूज़र गाइड।\"",
+    "gb": "GitHub पर योगदान दें",
+    "gbd": "क्या आप भारत, ब्राज़ील या अन्य विकासशील देश से अनुसंधानक हैं?",
+    "ft": "ओपन-सोर्स अनुसंधान उपकरण। MIT License.",
+    "fc": "कॉपीराइट 2024 SAE AutoSim Hub.",
+    "mpr": "AV बाजार प्रवेश दर (MPR)",
+    "mprd": "स्वाइप करके ऑटोनॉमस वाही का प्रतिशत समायोजित करें।",
+    "sel": "प्लेटफ़ॉर्म चुनें",
+    "vis": "PTV VISSIM",
+    "sum": "SUMO",
+    "aim": "Aimsun Next",
+    "gen": "कॉन्फ़िगरेशन तैयार। नीचे फाइलें डाउनलोड करें।",
+    "math": "गणितीय मैपिंग",
+    "mathd": "Wiedemann 99 * SUMO Krauss * IDM",
+    "m1": "सुरक्षित अंतर: d = CC0 + v*tau*safety + v*(v-vl)/(2*sqrt(a*b))*safety",
+    "m2": "SUMO अंतर: s* = minGap + v*tau - v*(vl-v)/(2*sqrt(a*b))",
+    "m3": "टकराव समय: TTC = delta_s / delta_v",
+    "m4": "आवश्यक ब्रेकिंग: a = v^2 / (2*gap)",
+    "param_table": "पैरामीटर तालिका",
+    "vehicle": "वाहन",
+    "level": "स्तर",
+    "reaction": "प्रतिक्रिया (s)",
+    "safety_factor": "सुरक्षा",
+    "accel": "त्वरण",
+    "decel": "ब्रेक",
+    "sigma": "सिग्मा",
+    "egyptian_aggressive": "आक्रामक (छोटी tau, कम सुरक्षा)",
+    "av_conservative": "संरक्षक (CACC, उच्च सुरक्षा)",
+    "nav_home": "होम",
+    "nav_math": "गणित",
+    "nav_refs": "संदर्भ",
+    "nav_github": "GitHub"
+  },
+  "de": {
+    "t": "SAE AutoSim Hub",
+    "m": "Unterstutzung von Verkehrssimulationsforschern weltweit, mit besonderem Fokus auf arabische Lander.",
+    "ls": "Sprache",
+    "h1": "Uberbruckung des lokalen Kalibrierungsdefizits",
+    "hs": "Vorkalibrierte Fahrzeugflotten fur chaotischen, aggressiven, nicht-spuralierten Verkehr",
+    "hd1": "Standard-Simulationseinstellungen <i>(Wiedemann 74/99)</i> versagen in aggressiven gemischten Umgebungen. Unsere lokal angepassten Profile erfassen das reale Fahrverhalten.",
+    "hd2": "Laden Sie vorkalibrierte Konfigurationen fur PTV VISSIM, SUMO und Aimsun Next herunter.",
+    "hd3": "Unterstutzung fur Forscher in Ägypten, dem arabischen Raum und anderen Entwicklungsländern.",
+    "cta1": "Konfigurationen herunterladen",
+    "cta2": "Dokumentation anzeigen",
+    "f0": "SAE Level 0 - Konventioneller Flottenmix",
+    "f0d": "Die ägyptische konventionelle Flotte dominiert die heutigen Straßen.",
+    "mb": "Ägyptischer Mikrobus",
+    "mbd": "Hohe Beschleunigung/Verzögerung, null seitlicher Abstand, aggressive Spurwechsel.",
+    "mbp": "Beschleun: 3.0 | Verzög: 6.0 | tau: 0.7s | Sicher: 0.35 | sigma: 0.95",
+    "ml": "Mlaiky (Personenkraftwagen)",
+    "mld": "Verringerte sicherheitsabstände, hohe Spurwechsel-Schwellen.",
+    "mlp": "Beschleun: 2.4 | Verzög: 5.0 | tau: 0.85s | Sicher: 0.45 | sigma: 0.85",
+    "nt": "Naql (Schwere Lastwagen)",
+    "ntd": "Niedriges Leistungs-to-Gewichts-Verhältnis führt zu langen Bremswegen.",
+    "ntp": "Beschleun: 0.9 | Verzög: 4.5 | tau: 1.3s | Sicher: 0.55 | sigma: 0.75 | Nacht",
+    "f2": "SAE Level 2 - Teilautomatisierung",
+    "f2d": "ACC mit starrer Spurhalteassistent. Reaktionszeit ~1.0-1.2s.",
+    "f2p": "Beschleun: 1.8 | Verzög: 3.2 | tau: 1.1s | Sicher: 0.75 | sigma: 0.15",
+    "f4": "SAE Level 4 & 5 - Vollautomatisierung",
+    "f4d": "V2X-aktivierte CACC-Platoon mit nahezu null Sicherheitsabständen.",
+    "f4p": "Beschleun: 2.2 | Verzög: 3.5 | tau: 0.35s | Sicher: 0.95 | sigma: 0.01 | CACC: 0.3s",
+    "fh": "Lokaler Datei-Download-Bereich",
+    "fhd": "Vorkalibrierte Konfigurationsdateien herunterladen:",
+    "dv": "VISSIM Flotte herunterladen",
+    "dvd": "Datei .inpx mit Wiedemann 99 Parametern für alle ägyptischen Fahrzeugtypen.",
+    "dv_file": "/fleets/custom_egypt_fleet.inpx",
+    "ds": "SUMO Flotte herunterladen",
+    "dsd": "Datei .rou.xml mit Krauss und SL2015 Modellen.",
+    "ds_file": "/fleets/egypt_sumo_fleet.rou.xml",
+    "dc": "Skript herunterladen",
+    "dcd": "Python-Skript zur Überwachung von TTC und Konfliktlösung in Echtzeit.",
+    "dc_file": "/scripts/vissim_sae_override.py",
+    "rf": "Akademische Referenzen",
+    "rfd": "Wissenschaftliche Grundlage aller Parameter:",
+    "r1": "Ahmed, S. et al. (2023). \"Chaotische Verkehrsmerkmale auf der Kairoer Ringstraße.\"",
+    "r2": "El-Baset, M. et al. (2022). \"Kalibrierung von Mikrosimulationen für nichtmusterbasierten Verkehr.\"",
+    "r3": "SAE International. (2021). \"J3016 - Taxonomie der Fahrerautomatisierung.\"",
+    "r4": "PTV Group. (2024). \"VISSIM 2024 Handbuch - Wiedemann 99 Modell.\"",
+    "r5": "DLR. (2024). \"SUMO Dokumentation - Fahrzeugfolgemodelle.\"",
+    "r6": "Aimsun. (2024). \"Aimsun Next 24 Benutzerhandbuch.\"",
+    "gb": "Auf GitHub mitmachen",
+    "gbd": "Sind Sie Forscher aus Indien, Brasilien oder einem anderen Entwicklungsland?",
+    "ft": "Open-Source-Forschungstool. MIT License.",
+    "fc": "Urheberrecht 2024 SAE AutoSim Hub.",
+    "mpr": "Autonomer Fahrzeug-Anteil (MPR)",
+    "mprd": "Schieben Sie, um den Anteil autonomer Fahrzeuge einzustellen.",
+    "sel": "Plattform auswählen",
+    "vis": "PTV VISSIM",
+    "sum": "SUMO",
+    "aim": "Aimsun Next",
+    "gen": "Konfiguration generiert. Laden Sie die Dateien unten herunter.",
+    "math": "Mathematische Zuordnungen",
+    "mathd": "Wiedemann 99 * SUMO Krauss * IDM",
+    "m1": "Sicherer Abstand (W99): d = CC0 + v*tau*sicher + v*(v-vl)/(2*sqrt(a*b))*sicher",
+    "m2": "SUMO-Abstand: s* = minGap + v*tau - v*(vl-v)/(2*sqrt(a*b))",
+    "m3": "Kollisionszeit: TTC = delta_s / delta_v",
+    "m4": "Erforderliche Bremsung: a = v^2 / (2*gap)",
+    "param_table": "Parametertabelle",
+    "vehicle": "Fahrzeug",
+    "level": "Level",
+    "reaction": "Reaktion (s)",
+    "safety_factor": "Sicherheit",
+    "accel": "Beschleunigung",
+    "decel": "Verzögerung",
+    "sigma": "sigma",
+    "egyptian_aggressive": "Aggressiv (kurze tau, niedrige Sicherheit)",
+    "av_conservative": "Konservativ (CACC, hohe Sicherheit)",
+    "nav_home": "Startseite",
+    "nav_math": "Mathematik",
+    "nav_refs": "Referenzen",
+    "nav_github": "GitHub"
+  },
+  "zh": {
+    "t": "SAE AutoSim Hub",
+    "m": "协助全球交通模拟研究人员，特别关注阿拉伯国家。",
+    "ls": "语言",
+    "h1": "弥补本地校准不足",
+    "hs": "针对混杂激进非按车道行驶交通环境的预校准车队",
+    "hd1": "标准模拟默认值 <i>(Wiedemann 74/99)</i> 在像开罗环路这样的激进混合环境中会失效。我们的本地化配置文件捕捉真实驾驶行为。",
+    "hd2": "下载适用于 PTV VISSIM、SUMO 和 Aimsun Next 的预校准配置文件。",
+    "hd3": "支持埃及、阿拉伯世界和其他发展中市场的研究人员。",
+    "cta1": "下载配置",
+    "cta2": "查看文档",
+    "f0": "SAE 级别 0 - 常规车队",
+    "f0d": "埃及常规车队主导今日道路。",
+    "mb": "埃及微型巴士",
+    "mbd": "高加速度/减速度，零侧向间距，激进变道，频繁路边停车。",
+    "mbp": "加速度: 3.0 | 减速度: 6.0 | tau: 0.7s | 安全: 0.35 | sigma: 0.95",
+    "ml": "Mlaiky (乘用车)",
+    "mld": "减少安全距离，高协作变道阈值。",
+    "mlp": "加速度: 2.4 | 减速度: 5.0 | tau: 0.85s | 安全: 0.45 | sigma: 0.85",
+    "nt": "Naql (重卡卡车)",
+    "ntd": "低功重比导致长制动距离。",
+    "ntp": "加速度: 0.9 | 减速度: 4.5 | tau: 1.3s | 安全: 0.55 | sigma: 0.75 | 夜间",
+    "f2": "SAE 级别 2 - 部分自动化",
+    "f2d": "自适应巡航 +  rigid 车道保持。人类反应时间 ~1.0-1.2s。",
+    "f2p": "加速度: 1.8 | 减速度: 3.2 | tau: 1.1s | 安全: 0.75 | sigma: 0.15",
+    "f4": "SAE 级别 4 & 5 - 全自动化",
+    "f4d": "V2X 使能的 CACC 车队，与其他 AVs 几乎零安全间距。",
+    "f4p": "加速度: 2.2 | 减速度: 3.5 | tau: 0.35s | 安全: 0.95 | sigma: 0.01 | CACC: 0.3s",
+    "fh": "本地化文件下载中心",
+    "fhd": "下载预校准配置文件:",
+    "dv": "下载 VISSIM 车队",
+    "dvd": "包含 Wiedemann 99 参数的 .inpx 文件。",
+    "dv_file": "/fleets/custom_egypt_fleet.inpx",
+    "ds": "下载 SUMO 车队",
+    "dsd": "包含 Krauss 和 SL2015 模型的 .rou.xml 文件。",
+    "ds_file": "/fleets/egypt_sumo_fleet.rou.xml",
+    "dc": "下载脚本",
+    "dcd": "监控 TTC 并实时解决冲突的 Python 脚本。",
+    "dc_file": "/scripts/vissim_sae_override.py",
+    "rf": "学术参考",
+    "rfd": "所有校准参数的科学基础:",
+    "r1": "阿汉, S. 等 (2023). \"开罗环路上的交通驾驶特征。\"",
+    "r2": "El-Baset, M. 等 (2022). \"埃及非按车道交通的微观模拟校准。\"",
+    "r3": "SAE International. (2021). \"J3016 - 驾驶自动化分类。\"",
+    "r4": "PTV Group. (2024). \"VISSIM 2024 用户手册 - Wiedemann 99。\"",
+    "r5": "DLR. (2024). \"SUMO 文档 - 车跟随模型。\"",
+    "r6": "Aimsun. (2024). \"Aimsun Next 24 用户指南。\"",
+    "gb": "在 GitHub 上贡献",
+    "gbd": "您是来自印度、巴西或其他发展中国家的研究人员吗？",
+    "ft": "开源研究工具。MIT 许可证。",
+    "fc": "版权所有 2024 SAE AutoSim Hub。",
+    "mpr": "自动驾驶车辆渗透率 (MPR)",
+    "mprd": "调整滑块以设置自动驾驶车辆比例。",
+    "sel": "选择平台",
+    "vis": "PTV VISSIM",
+    "sum": "SUMO",
+    "aim": "Aimsun Next",
+    "gen": "配置已生成。下载文件。",
+    "math": "数学映射",
+    "mathd": "Wiedemann 99 * SUMO Krauss * IDM",
+    "m1": "安全间距 (W99): d = CC0 + v*tau*安全 + v*(v-vl)/(2*sqrt(a*b))*安全",
+    "m2": "SUMO 间距: s* = minGap + v*tau - v*(vl-v)/(2*sqrt(a*b))",
+    "m3": "碰撞时间: TTC = delta_s / delta_v",
+    "m4": "所需减速度: a = v^2 / (2*gap)",
+    "param_table": "参数表",
+    "vehicle": "车辆",
+    "level": "级别",
+    "reaction": "反应 (s)",
+    "safety_factor": "安全",
+    "accel": "加速度",
+    "decel": "减速度",
+    "sigma": "西格马",
+    "egyptian_aggressive": "激进 (短 tau, 低安全)",
+    "av_conservative": "保守 (CACC, 高安全)",
+    "nav_home": "首页",
+    "nav_math": "数学",
+    "nav_refs": "参考",
+    "nav_github": "GitHub"
+  },
+  "ja": {
+    "t": "SAE AutoSim Hub",
+    "m": "世界中の交通シミュレーション研究者を支援し、特にアラブ諸国に注目しています。",
+    "ls": "言語",
+    "h1": "ローカル校正の不足を埋める",
+    "hs": "混雑・攻撃的・非レーンベースの交通環境向けの予備校正車両隊",
+    "hd1": "標準的なシミュレーションデフォルト <i>(Wiedemann 74/99)</i> は、カイロ環状道のような攻撃的混合環境で崩壊します。",
+    "hd2": "PTV VISSIM, SUMO, Aimsun Next 用の予備校正設定をダウンロード。",
+    "hd3": "エジプト、アラブ世界、その他の開発途上国の研究者を支援。",
+    "cta1": "設定をダウンロード",
+    "cta2": "ドキュメントを見る",
+    "f0": "SAE レベル 0 - 通常車両",
+    "f0d": "エジプトの通常車両が今日の道を支配しています。",
+    "mb": "エジプトマイクロバス",
+    "mbd": "高加速/減速、ゼロ横方向ヘッドウェイ、攻撃的なレーン変更。",
+    "mbp": "加速: 3.0 | 減速: 6.0 | tau: 0.7s | 安全: 0.35 | sigma: 0.95",
+    "ml": "Mlaiky (乗用車)",
+    "mld": "安全距離が短く、レーン変更の閾値が高い。",
+    "mlp": "加速: 2.4 | 減速: 5.0 | tau: 0.85s | 安全: 0.45 | sigma: 0.85",
+    "nt": "Naql (貨車)",
+    "ntd": "低出力対重量比により braking 距離が長くなります。",
+    "ntp": "加速: 0.9 | 減速: 4.5 | tau: 1.3s | 安全: 0.55 | sigma: 0.75 | 夜間",
+    "f2": "SAE レベル 2 - 部分自動化",
+    "f2d": "ACC + レーン保持。人間の反応時間 (~1.0-1.2s)。",
+    "f2p": "加速: 1.8 | 減速: 3.2 | tau: 1.1s | 安全: 0.75 | sigma: 0.15",
+    "f4": "SAE レベル 4 & 5 - 完全自動化",
+    "f4d": "V2X 対応 CACC パーティオン。他のAVとの安全間距ほぼゼロ。",
+    "f4p": "加速: 2.2 | 減速: 3.5 | tau: 0.35s | 安全: 0.95 | sigma: 0.01 | CACC: 0.3s",
+    "fh": "ローカライズドファイルダウンロードセンター",
+    "fhd": "ダウンロード予備校正設定ファイル:",
+    "dv": "VISSIM 車両群をダウンロード",
+    "dvd": "Wiedemann 99 パラメータを含む .inpx ファイル。",
+    "dv_file": "/fleets/custom_egypt_fleet.inpx",
+    "ds": "SUMO 車両群をダウンロード",
+    "dsd": "Krauss と SL2015 モデルを含む .rou.xml ファイル。",
+    "ds_file": "/fleets/egypt_sumo_fleet.rou.xml",
+    "dc": "スクリプトをダウンロード",
+    "dcd": "TTC を監視し、リアルタイムで競合を解決する Python スクリプト。",
+    "dc_file": "/scripts/vissim_sae_override.py",
+    "rf": "学術参考文献",
+    "rfd": "すべての校正パラメータの科学的基礎:",
+    "r1": "アハメド, S. 他 (2023). \"Cairo Ring Road の交通特徴。\"",
+    "r2": "El-Baset, M. 他 (2022). \"エジプトの非レーンベース交通のマイクロシミュレーション校正。\"",
+    "r3": "SAE International. (2021). \"J3016 - 運転自動化の分類。\"",
+    "r4": "PTV Group. (2024). \"VISSIM 2024 ユーザーマニュアル - Wiedemann 99。\"",
+    "r5": "DLR. (2024). \"SUMO ドキュメント - 車両追従モデル。\"",
+    "r6": "Aimsun. (2024). \"Aimsun Next 24 ユーザーガイド。\"",
+    "gb": "GitHub に貢献する",
+    "gbd": "インド、ブラジル、その他の開発途上国からの研究者ですか？",
+    "ft": "オープンソース研究ツール。MIT ライセンス。",
+    "fc": "Copyright 2024 SAE AutoSim Hub。",
+    "mpr": "自動運転車両普及率 (MPR)",
+    "mprd": "スライダーで自動運転車両の割合を調整します。",
+    "sel": "プラットフォームを選択",
+    "vis": "PTV VISSIM",
+    "sum": "SUMO",
+    "aim": "Aimsun Next",
+    "gen": "設定が生成されました。以下からダウンロード。",
+    "math": "数学的マッピング",
+    "mathd": "Wiedemann 99 * SUMO Krauss * IDM",
+    "m1": "安全間隔 (W99): d = CC0 + v*tau*安全 + v*(v-vl)/(2*sqrt(a*b))*安全",
+    "m2": "SUMO間隔: s* = minGap + v*tau - v*(vl-v)/(2*sqrt(a*b))",
+    "m3": "衝突時間: TTC = delta_s / delta_v",
+    "m4": "必要な減速: a = v^2 / (2*gap)",
+    "param_table": "パラメータ表",
+    "vehicle": "車両",
+    "level": "レベル",
+    "reaction": "反応 (s)",
+    "safety_factor": "安全性",
+    "accel": "加速",
+    "decel": "減速",
+    "sigma": "シグマ",
+    "egyptian_aggressive": "攻撃的 (短い tau, 低い安全性)",
+    "av_conservative": "保守的 (CACC, 高い安全性)",
+    "nav_home": "ホーム",
+    "nav_math": "数学",
+    "nav_refs": "参考文献",
+    "nav_github": "GitHub"
+  },
+  "ko": {
+    "t": "SAE AutoSim Hub",
+    "m": "전 세계 교통 시뮬레이션 연구자를 지원하며, 특히 아랍 국가들에 중점을 둡니다.",
+    "ls": "언어",
+    "h1": "지역 카리브레이션 부족 해소",
+    "hs": "혼란스럽고 공격적인 비차선 기반 교통 환경을 위한 예비校정 차량 편성",
+    "hd1": "표준 시뮬레이션 기본값 <i>(Wiedemann 74/99)</i>은 카이로 고속도로와 같은 공격적 혼합 환경에서 붕괴됩니다.",
+    "hd2": "PTV VISSIM, SUMO 및 Aimsun Next용 예비校정 구성 파일을 다운로드하세요.",
+    "hd3": "이집트, 아랍 세계 및 기타 개발도상국의 연구자들을 지원합니다.",
+    "cta1": "구성 다운로드",
+    "cta2": "문서 보기",
+    "f0": "SAE 레벨 0 - 일반 차량",
+    "f0d": "이집트 일반 차량이 오늘날 도로를 장악하고 있습니다.",
+    "mb": "이집트 마이크로버스",
+    "mbd": "높은 가속/감속, 제로 측방향 헤드웨이, 공격적인 차선 변경.",
+    "mbp": "가속: 3.0 | 감속: 6.0 | tau: 0.7s | 안전: 0.35 | sigma: 0.95",
+    "ml": "Mlaiky (승용차)",
+    "mld": "축소된 안전 거리, 높은 차선 변경 임계값.",
+    "mlp": "가속: 2.4 | 감속: 5.0 | tau: 0.85s | 안전: 0.45 | sigma: 0.85",
+    "nt": "Naql (화물 트럭)",
+    "ntd": "낮은 출력 대비 중량으로 인해 긴 제동 거리.",
+    "ntp": "가속: 0.9 | 감속: 4.5 | tau: 1.3s | 안전: 0.55 | sigma: 0.75 | 야간",
+    "f2": "SAE 레벨 2 - 부분 자동화",
+    "f2d": "ACC + rigid 차선 유지. 인간 반응 시간 (~1.0-1.2s).",
+    "f2p": "가속: 1.8 | 감속: 3.2 | tau: 1.1s | 안전: 0.75 | sigma: 0.15",
+    "f4": "SAE 레벨 4 & 5 - 완전 자동화",
+    "f4d": "V2X 지원 CACC 편성. 다른 AV와 거의 0 안전 간격.",
+    "f4p": "가속: 2.2 | 감속: 3.5 | tau: 0.35s | 안전: 0.95 | sigma: 0.01 | CACC: 0.3s",
+    "fh": "로컬화 파일 다운로드 센터",
+    "fhd": "예비校정 구성 파일을 다운로드하세요:",
+    "dv": "VISSIM 편성 다운로드",
+    "dvd": "모든 이집트 차량 유형에 대한 Wiedemann 99 매개변수가 포함된 .inpx 파일.",
+    "dv_file": "/fleets/custom_egypt_fleet.inpx",
+    "ds": "SUMO 편성 다운로드",
+    "dsd": "Krauss 및 SL2015 모델이 포함된 .rou.xml 파일.",
+    "ds_file": "/fleets/egypt_sumo_fleet.rou.xml",
+    "dc": "스크립트 다운로드",
+    "dcd": "TTC를 모니터링하고 실시간으로 충돌을 해결하는 Python 스크립트.",
+    "dc_file": "/scripts/vissim_sae_override.py",
+    "rf": "학술 참고문헌",
+    "rfd": "모든校정 매개변수의 과학적 근거:",
+    "r1": "아흐메드, S. 외 (2023). \"카이로 링 로드의 교통 특성。\"",
+    "r2": "El-Baset, M. 외 (2022). \"이집트의 비차선 기반 교통에 대한 마이크로시뮬레이션校정。\"",
+    "r3": "SAE International. (2021). \"J3016 - 운전 자동화 분류。\"",
+    "r4": "PTV Group. (2024). \"VISSIM 2024 사용자 매뉴얼 - Wiedemann 99。\"",
+    "r5": "DLR. (2024). \"SUMO 문서 - 차량 추종 모델。\"",
+    "r6": "Aimsun. (2024). \"Aimsun Next 24 사용자 가이드。\"",
+    "gb": "GitHub에 기여하기",
+    "gbd": "인도, 브라질 또는 기타 개발도상국의 연구자입니까?",
+    "ft": "오픈 소스 연구 도구. MIT License.",
+    "fc": "Copyright 2024 SAE AutoSim Hub.",
+    "mpr": "자율 주행 차량 비중 (MPR)",
+    "mprd": "슬라이더를 조정하여 자율 주행 차량 비율을 설정하세요.",
+    "sel": "플랫폼 선택",
+    "vis": "PTV VISSIM",
+    "sum": "SUMO",
+    "aim": "Aimsun Next",
+    "gen": "구성이 생성되었습니다. 아래에서 다운로드하세요.",
+    "math": "수학적 매핑",
+    "mathd": "Wiedemann 99 * SUMO Krauss * IDM",
+    "m1": "안전 간격 (W99): d = CC0 + v*tau*안전 + v*(v-vl)/(2*sqrt(a*b))*안전",
+    "m2": "SUMO 간격: s* = minGap + v*tau - v*(vl-v)/(2*sqrt(a*b))",
+    "m3": "충돌 시간: TTC = delta_s / delta_v",
+    "m4": "필요한 제동: a = v^2 / (2*gap)",
+    "param_table": "매개변수 표",
+    "vehicle": "차량",
+    "level": "레벨",
+    "reaction": "반응 (s)",
+    "safety_factor": "안전성",
+    "accel": "가속",
+    "decel": "감속",
+    "sigma": "시그마",
+    "egyptian_aggressive": "적극적 (짧은 tau, 낮은 안전성)",
+    "av_conservative": "보수적 (CACC, 높은 안전성)",
+    "nav_home": "홈",
+    "nav_math": "수학",
+    "nav_refs": "참고문헌",
+    "nav_github": "GitHub"
+  },
+  "fr": {
+    "t": "SAE AutoSim Hub",
+    "m": "Assister les chercheurs en simulation du trafic dans le monde entier, avec un accent particulier sur les pays arabes.",
+    "ls": "Langue",
+    "h1": "Comblement du deficit d calibration locale",
+    "hs": "Flottes vehicules pre-calibrees pour environnements de trafic chaotiques et agressifs",
+    "hd1": "Les parametres standards de simulation <i>(Wiedemann 74/99)</i> s effondrent dans les environnements agressifs melanges comme la bretelle de ceinture du Caire. Nos profils localises capturent le comportement reel.",
+    "hd2": "Telechargez les configurations pre-calibrees pour PTV VISSIM, SUMO et Aimsun Next.",
+    "hd3": "Soutien aux chercheurs en Egypte, dans le monde arabe et dans d autres pays en developpement.",
+    "cta1": "Telecharger les configurations",
+    "cta2": "Voir la documentation",
+    "f0": "Niveau SAE 0 - Flotte conventionnelle",
+    "f0d": "La flotte conventionnelleegyptienne domine les routes d aujourd hui.",
+    "mb": "Microbus Egyptien",
+    "mbd": " accelerations/ decelerations elevees, zero encombre lateral, changements de voie agressifs, arrets fréquents.",
+    "mbp": "Accel: 3.0 | Decel: 6.0 | tau: 0.7s | Securite: 0.35 | sigma: 0.95",
+    "ml": "Mlaiky (Voitures particulieres)",
+    "mld": "Distances de securite reduites, seuils de changement de voie eleves.",
+    "mlp": "Accel: 2.4 | Decel: 5.0 | tau: 0.85s | Securite: 0.45 | sigma: 0.85",
+    "nt": "Naql (Camions lourds)",
+    "ntd": "Rapport puissance/poids faible entraîne des distances de freinage longues.",
+    "ntp": "Accel: 0.9 | Decel: 4.5 | tau: 1.3s | Securite: 0.55 | sigma: 0.75 | Nocturne",
+    "f2": "Niveau SAE 2 - Automatisation partielle",
+    "f2d": "ACC + maintien de voie rigide. Temps de reaction humain (~1.0-1.2s).",
+    "f2p": "Accel: 1.8 | Decel: 3.2 | tau: 1.1s | Securite: 0.75 | sigma: 0.15",
+    "f4": "Niveaux SAE 4 & 5 - Automatisation complete",
+    "f4d": "Placerons CACC avec V2X, grenages de securite proche du zero. Mode defensif lorsqu un microbus niveau 0 coup.",
+    "f4p": "Accel: 2.2 | Decel: 3.5 | tau: 0.35s | Securite: 0.95 | sigma: 0.01 | CACC: 0.3s",
+    "fh": "Centre de telechargement localise",
+    "fhd": "Telechargez les fichiers de configuration pre-calibrés:",
+    "dv": "Telecharger la flotte VISSIM",
+    "dvd": "Fichier .inpx avec parametres Wiedemann 99 pour tous les types devehicules egyptiens.",
+    "dv_file": "/fleets/custom_egypt_fleet.inpx",
+    "ds": "Telecharger la flotte SUMO",
+    "dsd": "Fichier .rou.xml avec modeles Krauss et SL2015.",
+    "ds_file": "/fleets/egypt_sumo_fleet.rou.xml",
+    "dc": "Telecharger le script",
+    "dcd": "Script Python surveillant TTC et resolvant conflits en temps reel.",
+    "dc_file": "/scripts/vissim_sae_override.py",
+    "rf": "References academiques",
+    "rfd": "Fondation scientifique de tous les parametres:",
+    "r1": "Ahmed, S. et al. (2023). \"Caracteristiques du trafic sur le Caire. \"",
+    "r2": "El-Baset, M. et al. (2022). \"Calibration des modeles de microsimulation.\"",
+    "r3": "SAE International. (2021). \"J3016 - Taxonomie de l automation.\"",
+    "r4": "PTV Group. (2024). \"Manuel VISSIM 2024 - Modele Wiedemann 99.\"",
+    "r5": "DLR. (2024). \"Documentation SUMO - Modeles de suivi.\"",
+    "r6": "Aimsun. (2024). \"Guide utilisateur Aimsun Next 24.\"",
+    "gb": "Contribuer sur GitHub",
+    "gbd": "Etes-vous chercheur de l Inde, du Brésil ou d autres pays en developpement?",
+    "ft": "Outil de recherche open-source. Licence MIT.",
+    "fc": "Droits d auteur 2024 SAE AutoSim Hub.",
+    "mpr": "Taux de penetration AV (MPR)",
+    "mprd": "Ajustez le curseur pour definir la proportion de vehicules autonomes.",
+    "sel": "Selectionner la plateforme",
+    "vis": "PTV VISSIM",
+    "sum": "SUMO",
+    "aim": "Aimsun Next",
+    "gen": "Configuration generee. Telechargez les fichiers ci-dessous.",
+    "math": "Correspondances mathematiques",
+    "mathd": "Wiedemann 99 * SUMO Krauss * IDM",
+    "m1": "Espacement securite (W99): d = CC0 + v*tau*securite + v*(v-vl)/(2*sqrt(a*b))*securite",
+    "m2": "Espacement SUMO: s* = minGap + v*tau - v*(vl-v)/(2*sqrt(a*b))",
+    "m3": "Temps de collision: TTC = delta_s / delta_v",
+    "m4": "Deceleration requise: a = v^2 / (2*gap)",
+    "param_table": "Tableau des parametres",
+    "vehicle": "Vehicule",
+    "level": "Niveau",
+    "reaction": "Reaction (s)",
+    "safety_factor": "Securite",
+    "accel": "Acceleration",
+    "decel": "Deceleration",
+    "sigma": "Sigma",
+    "egyptian_aggressive": "Aggressif (tau court, basse securite)",
+    "av_conservative": "Conservateur (CACC, haute securite)",
+    "nav_home": "Accueil",
+    "nav_math": "Mathematiques",
+    "nav_refs": "References",
+    "nav_github": "GitHub"
+  }
+};
+    const LANG_OPTIONS = [];
+
+    let currentLang = localStorage.getItem('sae-lang') || 'en';
+    let currentPlatform = 'vissim';
+    let mprValue = 30;
+
+    function t(key) {
+        const langData = TRANSLATIONS[currentLang] || TRANSLATIONS['en'];
+        return langData ? (langData[key] || key) : key;
+    }
+
+    function setLanguage(lang) {
+        currentLang = lang;
+        localStorage.setItem('sae-lang', lang);
+        document.documentElement.lang = lang;
+        document.documentElement.dir = (lang === 'ar') ? 'rtl' : 'ltr';
+        document.body.classList.toggle('rtl', lang === 'ar');
+        document.querySelectorAll('[data-key]').forEach(function(el) {
+            var key = el.getAttribute('data-key');
+            var txt = t(key);
+            if (el.tagName === 'INPUT') return;
+            if (txt.includes('<')) {
+                el.innerHTML = txt;
+            } else {
+                    el.textContent = txt;
+                }
+            }
+        });
+        updateDisplay();
+    }
+
+    function switchPlatform(platform) {
+        currentPlatform = platform;
+        document.querySelectorAll('[data-platform-btn]').forEach(function(btn) {
+            btn.classList.toggle('active', btn.getAttribute('data-platform') === platform);
+        });
+        updateDisplay();
+    }
+
+    function updateMPR(value) {
+        mprValue = parseInt(value);
+        document.getElementById('mpr-bar').style.width = mprValue + '%';
+        document.getElementById('mpr-val').textContent = mprValue + '%';
+        updateDisplay();
+    }
+
+    function updateDisplay() {
+        var pd = document.getElementById('platform-display');
+        var gd = document.getElementById('gen-display');
+        if (pd) pd.textContent = currentPlatform.toUpperCase();
+        if (gd) gd.textContent = TRANSLATIONS[currentLang].gen + ' ' + currentPlatform.toUpperCase() + ' - ' + mprValue + '%';
+    }
+
+    function handleDownload(type) {
+        var platformNames = {
+            vissim: 'VISSIM',
+            sumo: 'SUMO',
+            aimsun: 'Aimsun'
+        };
+        var msgs = {
+            en: 'Download ' + platformNames[currentPlatform] + ' config (MPR: ' + mprValue + '%)',
+            ar: 'تحميل إعدادات ' + platformNames[currentPlatform] + ' (MPR: ' + mprValue + '%)',
+            ru: 'Скачать ' + platformNames[currentPlatform] + ' (MPR: ' + mprValue + '%)',
+            hi: 'डाउनलोड ' + platformNames[currentPlatform] + ' (MPR: ' + mprValue + '%)',
+            de: 'Laden Sie ' + platformNames[currentPlatform] + ' Konfiguration herunter (MPR: ' + mprValue + '%)',
+            zh: '下载 ' + platformNames[currentPlatform] + ' 配置 (MPR: ' + mprValue + '%)',
+            ja: currentPlatform + ' をダウンロード (MPR: ' + mprValue + '%)',
+            ko: currentPlatform + ' 다운로드 (MPR: ' + mprValue + '%)',
+            fr: 'Télécharger ' + platformNames[currentPlatform] + ' (MPR: ' + mprValue + '%)'
+        };
+        alert(msgs[currentLang] || msgs.en);
+    }
+
+    window.addEventListener('load', function() {
+        var saved = localStorage.getItem('sae-lang') || 'en';
+        document.getElementById('lang-select').value = saved;
+        setLanguage(saved);
+        document.querySelectorAll('[data-platform-btn]').forEach(function(btn) {
+            btn.classList.toggle('active', btn.getAttribute('data-platform') === 'vissim');
+        });
+    });
+    </script>
+</body>
+</html>
