@@ -10,6 +10,9 @@ Author: SAE Calibration Hub
 
 import copy
 import math
+import os
+import threading
+import urllib.request
 from typing import List, Tuple
 
 import pandas as pd
@@ -40,6 +43,31 @@ from generators.vissim_generator import generate_vissim_config, generate_vissim_
 from generators.sumo_generator import generate_sumo_config, generate_sumo_additional_file
 from generators.aimsun_generator import generate_aimsun_script
 from generators.api_script_generator import generate_conflict_script
+
+
+# ── Keep-alive: ping the app URL every 5 minutes to prevent sleep ──
+_KEEP_ALIVE_URL = os.environ.get(
+    "STREAMLIT_SERVER_HEADLESS",
+    "https://sae-tau.streamlit.app",
+)
+
+def _ping():
+    """Send a GET request to the app URL to keep the Streamlit server alive."""
+    try:
+        urllib.request.urlopen(_KEEP_ALIVE_URL, timeout=10)
+    except Exception:
+        pass  # ignore network errors on ping
+
+def _keep_alive_loop():
+    """Background thread that pings the server every 5 minutes."""
+    while True:
+        _ping()
+        threading.Event().wait(300)  # 5 minutes
+
+
+# Start keep-alive daemon thread once
+_keep_alive_thread = threading.Thread(target=_keep_alive_loop, daemon=True)
+_keep_alive_thread.start()
 
 
 def app():
