@@ -126,6 +126,9 @@
                     </button>
                     <div class="mt-4 text-center" data-key="gen" id="gen-display"></div>
                 </div>
+            </div>
+        </div>
+    </section>
 
     <!-- Fleet Documentation -->
     <section id="fleets" class="py-16 bg-white">
@@ -1075,8 +1078,7 @@
             if (txt.includes('<')) {
                 el.innerHTML = txt;
             } else {
-                    el.textContent = txt;
-                }
+                el.textContent = txt;
             }
         });
         updateDisplay();
@@ -1125,8 +1127,9 @@
     }
 
     window.addEventListener('load', function() {
-        setLanguage('en');
-        updateDisplay();
+        var saved = localStorage.getItem('sae-lang') || 'en';
+        document.getElementById('lang-select').value = saved;
+        setLanguage(saved);
         document.querySelectorAll('[data-platform-btn]').forEach(function(btn) {
             btn.classList.toggle('active', btn.getAttribute('data-platform') === 'vissim');
         });
