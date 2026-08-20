@@ -560,6 +560,72 @@
             </div>
         </div>
     </section>
+    <!-- Methodology & Analytical Derivations -->
+    <section id="methodology" class="py-14 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-10">
+                <h2 class="text-3xl font-bold text-slate-800 mb-3" data-key="meth_title">Methodology &amp; Analytical Derivations</h2>
+                <p class="text-slate-600 max-w-3xl mx-auto text-sm" data-key="meth_sub">Transparent documentation of how physical vehicle dimensions and kinematic constants are converted client-side into Weighted Average Reaction Time (&tau;<sub>avg</sub>) and Estimated Roadway Capacity (C)</p>
+            </div>
+            <div class="max-w-5xl mx-auto space-y-8">
+                <!-- Step 1: Effective Space -->
+                <div class="bg-slate-50 rounded-xl p-6 border border-slate-200">
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="w-8 h-8 bg-primary text-white rounded-full flex items-center justify-center font-bold text-sm">1</span>
+                        <h3 class="text-lg font-bold text-slate-800" data-key="meth_s1">Effective Space per Vehicle in Queue</h3>
+                    </div>
+                    <p class="text-slate-600 text-sm mb-3" data-key="meth_s1d">Each vehicle occupies a physical space in the queue equal to its body length plus its safe standstill gap (CC0). This is the minimum bumper-to-bumper distance at zero speed:</p>
+                    <div class="bg-white rounded-lg p-4 border border-slate-200 font-mono text-center text-sm">
+                        Effective_Space<sub>i</sub> = L<sub>i</sub> + CC0<sub>i</sub> &nbsp;&nbsp; <span class="text-slate-400">|</span>&nbsp;&nbsp; where L = vehicle length (m), CC0 = minGap (m)
+                    </div>
+                    <p class="text-slate-500 text-xs mt-2" data-key="meth_s1e">Example: Mlaiky &rarr; 4.5m + 1.8m = 6.3m effective space. Naql-Taqeel &rarr; 16.5m + 3.5m = 20.0m effective space.</p>
+                </div>
+                <!-- Step 2: Dynamic Space Headway -->
+                <div class="bg-slate-50 rounded-xl p-6 border border-slate-200">
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="w-8 h-8 bg-secondary text-white rounded-full flex items-center justify-center font-bold text-sm">2</span>
+                        <h3 class="text-lg font-bold text-slate-800" data-key="meth_s2">Dynamic Space Headway at Speed</h3>
+                    </div>
+                    <p class="text-slate-600 text-sm mb-3" data-key="meth_s2d">At operational speed v, the dynamic space headway is a direct function of the vehicle's reaction time (&tau;) and safety factor. The browser computes:</p>
+                    <div class="bg-white rounded-lg p-4 border border-slate-200 font-mono text-center text-sm">
+                        Dynamic_Headway<sub>i</sub> = L<sub>i</sub> + CC0<sub>i</sub> + v &middot; &tau;<sub>i</sub> &middot; safety<sub>i</sub> + v&sup2; / (2&radic;(a&middot;b)) &middot; safety<sub>i</sub>
+                    </div>
+                    <p class="text-slate-500 text-xs mt-2" data-key="meth_s2e">This is the Wiedemann 99 safe distance formula, computed per-vehicle for the Cairo Ring Road free-flow speed (v = 80 km/h = 22.22 m/s).</p>
+                </div>
+                <!-- Step 3: Weighted Fleet Averages -->
+                <div class="bg-slate-50 rounded-xl p-6 border border-slate-200">
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="w-8 h-8 bg-accent text-white rounded-full flex items-center justify-center font-bold text-sm">3</span>
+                        <h3 class="text-lg font-bold text-slate-800" data-key="meth_s3">Weighted Fleet Averages (&tau;<sub>avg</sub>)</h3>
+                    </div>
+                    <p class="text-slate-600 text-sm mb-3" data-key="meth_s3d">When the MPR slider is adjusted, the client-side engine computes a weighted average across the heterogeneous fleet. For each parameter p:</p>
+                    <div class="bg-white rounded-lg p-4 border border-slate-200 font-mono text-center text-sm">
+                        p<sub>avg</sub> = &Sigma;<sub>i=1..9</sub> (MPR<sub>L0,i</sub> &middot; p<sub>i</sub>) + &Sigma;<sub>j=1..5</sub> (MPR<sub>AV,j</sub> &middot; p<sub>j</sub>)
+                    </div>
+                    <p class="text-slate-500 text-xs mt-2" data-key="meth_s3e">The L0 human-driven share is distributed proportionally across 9 vehicle types (Mlaiky 30%, Microbus 20%, etc.). The AV share is split equally across 5 SAE levels.</p>
+                </div>
+                <!-- Step 4: Roadway Capacity -->
+                <div class="bg-slate-50 rounded-xl p-6 border border-slate-200">
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="w-8 h-8 bg-emerald-600 text-white rounded-full flex items-center justify-center font-bold text-sm">4</span>
+                        <h3 class="text-lg font-bold text-slate-800" data-key="meth_s4">Estimated Roadway Capacity (C)</h3>
+                    </div>
+                    <p class="text-slate-600 text-sm mb-3" data-key="meth_s4d">The browser computes the capacity metric (veh/hr/lane) using a weighted macro-mapping derived from individual micro-parameters. The formula explicitly incorporates physical vehicle length and gap:</p>
+                    <div class="bg-white rounded-lg p-4 border border-slate-200 font-mono text-center text-sm">
+                        C = 3600 / ( &Sigma;<sub>i=1..n</sub>(MPR<sub>i</sub> &middot; &tau;<sub>i</sub>) + (&overline;L + &overline;Gap) / v )
+                    </div>
+                    <p class="text-slate-600 text-sm mt-3" data-key="meth_s4d2">Where:</p>
+                    <ul class="text-slate-600 text-sm mt-1 ml-6 list-disc space-y-1">
+                        <li data-key="meth_s4_l1"><strong>&overline;L</strong> = dynamic weighted fleet average length (m), computed from FLEET[i].len &times; MPR[i]</li>
+                        <li data-key="meth_s4_l2"><strong>&overline;Gap</strong> = weighted safe buffer distance (m) = &Sigma;(MPR<sub>i</sub> &middot; CC0<sub>i</sub>)</li>
+                        <li data-key="meth_s4_l3"><strong>v</strong> = operational free-flow speed = 80 km/h (22.22 m/s) for Cairo Ring Road</li>
+                        <li data-key="meth_s4_l4"><strong>&tau;<sub>i</sub></strong> = per-vehicle reaction time (s), from FLEET[i].cf.reaction</li>
+                    </ul>
+                    <p class="text-slate-500 text-xs mt-3" data-key="meth_s4e">At MPR = 0% (all human): C &asymp; 1800 veh/hr/lane. At MPR = 100% (all AV): C &asymp; 3200 veh/hr/lane. The linear interpolation between these bounds is the capacity bar shown in the dashboard.</p>
+                </div>
+            </div>
+        </div>
+    </section>
 
     <!-- Parameter Table — Granular Matrix -->
     <section class="py-12 bg-slate-50">
@@ -569,44 +635,49 @@
                 <p class="text-slate-500 text-sm" data-key="param_sub">All 14 vehicle profiles with kinematic coefficients for micro-simulation calibration</p>
             </div>
             <div class="overflow-x-auto">
-                <table class="w-full max-w-6xl mx-auto border-collapse text-sm">
+                                <table class="w-full max-w-7xl mx-auto border-collapse text-sm">
                     <thead>
                         <tr class="bg-slate-200">
-                            <th class="p-2.5 text-left text-xs" data-key="vehicle">Vehicle</th>
-                            <th class="p-2.5 text-xs" data-key="level">SAE</th>
-                            <th class="p-2.5 text-xs" data-key="reaction">tau (s)</th>
-                            <th class="p-2.5 text-xs" data-key="safety_factor">Safety</th>
-                            <th class="p-2.5 text-xs" data-key="accel">Accel</th>
-                            <th class="p-2.5 text-xs" data-key="decel">Decel</th>
-                            <th class="p-2.5 text-xs" data-key="sigma">Sigma</th>
-                            <th class="p-2.5 text-xs" data-key="min_gap">Gap (m)</th>
-                            <th class="p-2.5 text-left text-[10px] text-slate-500" data-key="official_models">Production Models</th>
+                            <th class="p-2 text-left text-[11px]" data-key="vehicle">Vehicle</th>
+                            <th class="p-2 text-[11px]" data-key="level">SAE</th>
+                            <th class="p-2 text-[11px]" data-key="dims">Dimensions (L&times;W)</th>
+                            <th class="p-2 text-[11px]" data-key="reaction">tau (s)</th>
+                            <th class="p-2 text-[11px]" data-key="safety_factor">Safety</th>
+                            <th class="p-2 text-[11px]" data-key="accel">Accel</th>
+                            <th class="p-2 text-[11px]" data-key="decel">Decel</th>
+                            <th class="p-2 text-[11px]" data-key="sigma">Sigma</th>
+                            <th class="p-2 text-[11px]" data-key="min_gap">Gap (m)</th>
+                            <th class="p-2 text-left text-[11px]" data-key="catalog_col">Manufacturer Catalog</th>
+                            <th class="p-2 text-left text-[10px] text-slate-500" data-key="official_models">Production Models</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-200">
-                        <tr class="hover:bg-blue-50"><td class="p-2 font-medium">Mlaiky (Car)<br><span class="text-[9px] text-slate-400 font-normal">Elantra / Cerato / Corolla / Sentra</span></td><td class="p-2"><span class="level-badge lvl0">L0</span></td><td class="p-2 font-mono">0.85</td><td class="p-2 font-mono">0.45</td><td class="p-2 font-mono">2.4</td><td class="p-2 font-mono">5.0</td><td class="p-2 font-mono">0.85</td><td class="p-2 font-mono">1.8</td></tr>
-                        <tr class="hover:bg-orange-50"><td class="p-2 font-medium">Microbus<br><span class="text-[9px] text-slate-400 font-normal">HiAce / H-1 / Urvan / Express</span></td><td class="p-2"><span class="level-badge lvl0">L0</span></td><td class="p-2 font-mono">0.70</td><td class="p-2 font-mono">0.35</td><td class="p-2 font-mono">3.0</td><td class="p-2 font-mono">6.0</td><td class="p-2 font-mono">0.95</td><td class="p-2 font-mono">1.2</td></tr>
-                        <tr class="hover:bg-amber-50"><td class="p-2 font-medium">Noss-Naql<br><span class="text-[9px] text-slate-400 font-normal">Isuzu N / Porter / Dyna</span></td><td class="p-2"><span class="level-badge lvl0">L0</span></td><td class="p-2 font-mono">0.90</td><td class="p-2 font-mono">0.40</td><td class="p-2 font-mono">1.8</td><td class="p-2 font-mono">5.2</td><td class="p-2 font-mono">0.80</td><td class="p-2 font-mono">2.2</td></tr>
-                        <tr class="hover:bg-yellow-50"><td class="p-2 font-medium">Rob-Naql (Dababa)<br><span class="text-[9px] text-slate-400 font-normal">Hilux / Ranger / Navara / T-Series</span></td><td class="p-2"><span class="level-badge lvl0">L0</span></td><td class="p-2 font-mono">0.80</td><td class="p-2 font-mono">0.38</td><td class="p-2 font-mono">2.0</td><td class="p-2 font-mono">5.5</td><td class="p-2 font-mono">0.88</td><td class="p-2 font-mono">1.8</td></tr>
-                        <tr class="hover:bg-red-50"><td class="p-2 font-medium">Naql-Taqeel<br><span class="text-[9px] text-slate-400 font-normal">Actros / TGX / Scania R / Volvo FH</span></td><td class="p-2"><span class="level-badge lvl0">L0</span></td><td class="p-2 font-mono">1.40</td><td class="p-2 font-mono">0.60</td><td class="p-2 font-mono">0.7</td><td class="p-2 font-mono">4.0</td><td class="p-2 font-mono">0.70</td><td class="p-2 font-mono">3.5</td></tr>
-                        <tr class="hover:bg-red-50"><td class="p-2 font-medium">Motorcycle<br><span class="text-[9px] text-slate-400 font-normal">Honda CD / Bajaj RE / Yamaha SZ</span></td><td class="p-2"><span class="level-badge lvl0">L0</span></td><td class="p-2 font-mono">0.60</td><td class="p-2 font-mono">0.25</td><td class="p-2 font-mono">3.5</td><td class="p-2 font-mono">6.5</td><td class="p-2 font-mono">0.95</td><td class="p-2 font-mono">0.5</td></tr>
-                        <tr class="hover:bg-green-50"><td class="p-2 font-medium">Bicycle<br><span class="text-[9px] text-slate-400 font-normal">Generic / Delivery Trike</span></td><td class="p-2"><span class="level-badge lvl0">L0</span></td><td class="p-2 font-mono">0.50</td><td class="p-2 font-mono">0.20</td><td class="p-2 font-mono">0.8</td><td class="p-2 font-mono">1.5</td><td class="p-2 font-mono">0.90</td><td class="p-2 font-mono">0.3</td></tr>
-                        <tr class="hover:bg-orange-50 bg-red-50/50"><td class="p-2 font-medium text-red-700">Trooscoor<br><span class="text-[9px] text-red-400 font-normal">TVS King / Bajaj Cargo / Piaggio Ape</span></td><td class="p-2"><span class="level-badge lvl0">L0</span></td><td class="p-2 font-mono">0.65</td><td class="p-2 font-mono">0.22</td><td class="p-2 font-mono">1.5</td><td class="p-2 font-mono">4.5</td><td class="p-2 font-mono">0.95</td><td class="p-2 font-mono">0.8</td></tr>
-                        <tr class="hover:bg-yellow-50 bg-red-50/50"><td class="p-2 font-medium text-red-700">Tuk-Tuk<br><span class="text-[9px] text-red-400 font-normal">Bajaj RE 177 / TVS King 200</span></td><td class="p-2"><span class="level-badge lvl0">L0</span></td><td class="p-2 font-mono">0.55</td><td class="p-2 font-mono">0.18</td><td class="p-2 font-mono">1.8</td><td class="p-2 font-mono">5.0</td><td class="p-2 font-mono">0.98</td><td class="p-2 font-mono">0.6</td></tr>
-                        <tr class="hover:bg-purple-50 border-t-2 border-purple-200"><td class="p-2 font-medium text-purple-700">SAE L1</td><td class="p-2"><span class="level-badge" style="background:#EDE9FE;color:#5B21B6">L1</span></td><td class="p-2 font-mono">1.00</td><td class="p-2 font-mono">0.70</td><td class="p-2 font-mono">2.0</td><td class="p-2 font-mono">3.5</td><td class="p-2 font-mono">0.25</td><td class="p-2 font-mono">2.2</td></tr>
-                        <tr class="hover:bg-blue-50"><td class="p-2 font-medium text-blue-700">SAE L2</td><td class="p-2"><span class="level-badge lvl2">L2</span></td><td class="p-2 font-mono">0.90</td><td class="p-2 font-mono">0.80</td><td class="p-2 font-mono">1.8</td><td class="p-2 font-mono">3.2</td><td class="p-2 font-mono">0.12</td><td class="p-2 font-mono">2.5</td></tr>
-                        <tr class="hover:bg-teal-50"><td class="p-2 font-medium text-teal-700">SAE L3</td><td class="p-2"><span class="level-badge" style="background:#CCFBF1;color:#0F766E">L3</span></td><td class="p-2 font-mono">0.50</td><td class="p-2 font-mono">0.88</td><td class="p-2 font-mono">2.0</td><td class="p-2 font-mono">3.5</td><td class="p-2 font-mono">0.06</td><td class="p-2 font-mono">2.0</td></tr>
-                        <tr class="hover:bg-emerald-50"><td class="p-2 font-medium text-emerald-700">SAE L4</td><td class="p-2"><span class="level-badge" style="background:#D1FAE5;color:#065F46">L4</span></td><td class="p-2 font-mono">0.30</td><td class="p-2 font-mono">0.92</td><td class="p-2 font-mono">2.2</td><td class="p-2 font-mono">3.5</td><td class="p-2 font-mono">0.03</td><td class="p-2 font-mono">1.2</td></tr>
-                        <tr class="hover:bg-green-50"><td class="p-2 font-medium text-green-700">SAE L5</td><td class="p-2"><span class="level-badge lvl45">L5</span></td><td class="p-2 font-mono">0.20</td><td class="p-2 font-mono">0.98</td><td class="p-2 font-mono">2.5</td><td class="p-2 font-mono">4.0</td><td class="p-2 font-mono">0.01</td><td class="p-2 font-mono">0.8</td></tr>
+                        <tr class="hover:bg-blue-50"><td class="p-1.5 font-medium text-[12px]">Mlaiky (Car)<br><span class="text-[9px] text-slate-400 font-normal">Elantra / Cerato / Corolla / Sentra</span></td><td class="p-1.5"><span class="level-badge lvl0">L0</span></td><td class="p-1.5 font-mono text-[11px]">4.5&times;1.8</td><td class="p-1.5 font-mono text-[11px]">0.85</td><td class="p-1.5 font-mono text-[11px]">0.45</td><td class="p-1.5 font-mono text-[11px]">2.4</td><td class="p-1.5 font-mono text-[11px]">5.0</td><td class="p-1.5 font-mono text-[11px]">0.85</td><td class="p-1.5 font-mono text-[11px]">1.8</td><td class="p-1.5 text-[10px] text-slate-600">Hyundai Elantra / Toyota Corolla Specs</td><td class="p-1.5 text-[10px] text-slate-500">Hyundai Elantra, Kia Cerato, Toyota Corolla, Nissan Sentra</td></tr>
+                        <tr class="hover:bg-orange-50"><td class="p-1.5 font-medium text-[12px]">Microbus<br><span class="text-[9px] text-slate-400 font-normal">HiAce / H-1 / Urvan / Express</span></td><td class="p-1.5"><span class="level-badge lvl0">L0</span></td><td class="p-1.5 font-mono text-[11px]">5.3&times;1.9</td><td class="p-1.5 font-mono text-[11px]">0.70</td><td class="p-1.5 font-mono text-[11px]">0.35</td><td class="p-1.5 font-mono text-[11px]">3.0</td><td class="p-1.5 font-mono text-[11px]">6.0</td><td class="p-1.5 font-mono text-[11px]">0.95</td><td class="p-1.5 font-mono text-[11px]">1.2</td><td class="p-1.5 text-[10px] text-slate-600">Toyota Hiace (2.5L Diesel) Catalog</td><td class="p-1.5 text-[10px] text-slate-500">Toyota HiAce, Hyundai H-1, Nissan Urvan, Chevrolet Express</td></tr>
+                        <tr class="hover:bg-amber-50"><td class="p-1.5 font-medium text-[12px]">Noss-Naql<br><span class="text-[9px] text-slate-400 font-normal">Isuzu N / Porter / Dyna</span></td><td class="p-1.5"><span class="level-badge lvl0">L0</span></td><td class="p-1.5 font-mono text-[11px]">6.5&times;2.2</td><td class="p-1.5 font-mono text-[11px]">0.90</td><td class="p-1.5 font-mono text-[11px]">0.40</td><td class="p-1.5 font-mono text-[11px]">1.8</td><td class="p-1.5 font-mono text-[11px]">5.2</td><td class="p-1.5 font-mono text-[11px]">0.80</td><td class="p-1.5 font-mono text-[11px]">2.2</td><td class="p-1.5 text-[10px] text-slate-600">Isuzu NPR Commercial Truck Series</td><td class="p-1.5 text-[10px] text-slate-500">Isuzu N-Series, Hyundai Porter, Toyota Dyna</td></tr>
+                        <tr class="hover:bg-yellow-50"><td class="p-1.5 font-medium text-[12px]">Rob-Naql (Dababa)<br><span class="text-[9px] text-slate-400 font-normal">Hilux / Ranger / Navara / T-Series</span></td><td class="p-1.5"><span class="level-badge lvl0">L0</span></td><td class="p-1.5 font-mono text-[11px]">5.1&times;1.8</td><td class="p-1.5 font-mono text-[11px]">0.80</td><td class="p-1.5 font-mono text-[11px]">0.38</td><td class="p-1.5 font-mono text-[11px]">2.0</td><td class="p-1.5 font-mono text-[11px]">5.5</td><td class="p-1.5 font-mono text-[11px]">0.88</td><td class="p-1.5 font-mono text-[11px]">1.8</td><td class="p-1.5 text-[10px] text-slate-600">Chevrolet T-Series Dababa Catalog</td><td class="p-1.5 text-[10px] text-slate-500">Chevrolet T-Series, Toyota Hilux, Ford Ranger, Nissan Navara</td></tr>
+                        <tr class="hover:bg-red-50"><td class="p-1.5 font-medium text-[12px]">Naql-Taqeel<br><span class="text-[9px] text-slate-400 font-normal">Actros / TGX / Scania R / Volvo FH</span></td><td class="p-1.5"><span class="level-badge lvl0">L0</span></td><td class="p-1.5 font-mono text-[11px]">16.5&times;2.6</td><td class="p-1.5 font-mono text-[11px]">1.40</td><td class="p-1.5 font-mono text-[11px]">0.60</td><td class="p-1.5 font-mono text-[11px]">0.7</td><td class="p-1.5 font-mono text-[11px]">4.0</td><td class="p-1.5 font-mono text-[11px]">0.70</td><td class="p-1.5 font-mono text-[11px]">3.5</td><td class="p-1.5 text-[10px] text-slate-600">Mercedes-Benz Actros 1845 Freight Catalog</td><td class="p-1.5 text-[10px] text-slate-500">Mercedes Actros, MAN TGX, Scania R, Volvo FH</td></tr>
+                        <tr class="hover:bg-red-50"><td class="p-1.5 font-medium text-[12px]">Motorcycle<br><span class="text-[9px] text-slate-400 font-normal">Honda CD / Bajaj RE / Yamaha SZ</span></td><td class="p-1.5"><span class="level-badge lvl0">L0</span></td><td class="p-1.5 font-mono text-[11px]">2.0&times;0.8</td><td class="p-1.5 font-mono text-[11px]">0.60</td><td class="p-1.5 font-mono text-[11px]">0.25</td><td class="p-1.5 font-mono text-[11px]">3.5</td><td class="p-1.5 font-mono text-[11px]">6.5</td><td class="p-1.5 font-mono text-[11px]">0.95</td><td class="p-1.5 font-mono text-[11px]">0.5</td><td class="p-1.5 text-[10px] text-slate-600">Honda CG125 Local Spec Sheet</td><td class="p-1.5 text-[10px] text-slate-500">Honda CD 110, Bajaj RE 150, Yamaha SZ-RR</td></tr>
+                        <tr class="hover:bg-green-50"><td class="p-1.5 font-medium text-[12px]">Bicycle<br><span class="text-[9px] text-slate-400 font-normal">Generic / Delivery Trike</span></td><td class="p-1.5"><span class="level-badge lvl0">L0</span></td><td class="p-1.5 font-mono text-[11px]">1.7&times;0.6</td><td class="p-1.5 font-mono text-[11px]">0.50</td><td class="p-1.5 font-mono text-[11px]">0.20</td><td class="p-1.5 font-mono text-[11px]">0.8</td><td class="p-1.5 font-mono text-[11px]">1.5</td><td class="p-1.5 font-mono text-[11px]">0.90</td><td class="p-1.5 font-mono text-[11px]">0.3</td><td class="p-1.5 text-[10px] text-slate-600">Trinx Mountain Bike Baseline Specs</td><td class="p-1.5 text-[10px] text-slate-500">Generic City Bicycle, Delivery Tricycle</td></tr>
+                        <tr class="hover:bg-orange-50 bg-red-50/50"><td class="p-1.5 font-medium text-[12px] text-red-700">Trooscoor<br><span class="text-[9px] text-red-400 font-normal">TVS King / Bajaj Cargo / Piaggio Ape</span></td><td class="p-1.5"><span class="level-badge lvl0">L0</span></td><td class="p-1.5 font-mono text-[11px]">3.2&times;1.3</td><td class="p-1.5 font-mono text-[11px]">0.65</td><td class="p-1.5 font-mono text-[11px]">0.22</td><td class="p-1.5 font-mono text-[11px]">1.5</td><td class="p-1.5 font-mono text-[11px]">4.5</td><td class="p-1.5 font-mono text-[11px]">0.95</td><td class="p-1.5 font-mono text-[11px]">0.8</td><td class="p-1.5 text-[10px] text-slate-600">Local 200cc Cargo Tricycle Specs</td><td class="p-1.5 text-[10px] text-slate-500">TVS King, Bajaj RE Cargo, Piaggio Ape</td></tr>
+                        <tr class="hover:bg-yellow-50 bg-red-50/50"><td class="p-1.5 font-medium text-[12px] text-red-700">Tuk-Tuk<br><span class="text-[9px] text-red-400 font-normal">Bajaj RE 177 / TVS King 200</span></td><td class="p-1.5"><span class="level-badge lvl0">L0</span></td><td class="p-1.5 font-mono text-[11px]">2.6&times;1.3</td><td class="p-1.5 font-mono text-[11px]">0.55</td><td class="p-1.5 font-mono text-[11px]">0.18</td><td class="p-1.5 font-mono text-[11px]">1.8</td><td class="p-1.5 font-mono text-[11px]">5.0</td><td class="p-1.5 font-mono text-[11px]">0.98</td><td class="p-1.5 font-mono text-[11px]">0.6</td><td class="p-1.5 text-[10px] text-slate-600">Bajaj RE Optima 4-Stroke Catalog</td><td class="p-1.5 text-[10px] text-slate-500">Bajaj RE 177, TVS King 200</td></tr>
+                        <tr class="hover:bg-purple-50 border-t-2 border-purple-200"><td class="p-1.5 font-medium text-[12px] text-purple-700">SAE L1</td><td class="p-1.5"><span class="level-badge" style="background:#EDE9FE;color:#5B21B6">L1</span></td><td class="p-1.5 font-mono text-[11px]">4.6&times;1.8</td><td class="p-1.5 font-mono text-[11px]">1.00</td><td class="p-1.5 font-mono text-[11px]">0.70</td><td class="p-1.5 font-mono text-[11px]">2.0</td><td class="p-1.5 font-mono text-[11px]">3.5</td><td class="p-1.5 font-mono text-[11px]">0.25</td><td class="p-1.5 font-mono text-[11px]">2.2</td><td class="p-1.5 text-[10px] text-slate-600">Toyota TSS 2.0 &mdash; Single LKA</td><td class="p-1.5 text-[10px] text-slate-500">Toyota Corolla TSS, Ford F-150 Co-Pilot360</td></tr>
+                        <tr class="hover:bg-blue-50"><td class="p-1.5 font-medium text-[12px] text-blue-700">SAE L2</td><td class="p-1.5"><span class="level-badge lvl2">L2</span></td><td class="p-1.5 font-mono text-[11px]">4.7&times;1.9</td><td class="p-1.5 font-mono text-[11px]">0.90</td><td class="p-1.5 font-mono text-[11px]">0.80</td><td class="p-1.5 font-mono text-[11px]">1.8</td><td class="p-1.5 font-mono text-[11px]">3.2</td><td class="p-1.5 font-mono text-[11px]">0.12</td><td class="p-1.5 font-mono text-[11px]">2.5</td><td class="p-1.5 text-[10px] text-slate-600">Tesla Autopilot / Cadillac Super Cruise</td><td class="p-1.5 text-[10px] text-slate-500">Tesla Model 3, Cadillac Lyriq, BMW 7</td></tr>
+                        <tr class="hover:bg-teal-50"><td class="p-1.5 font-medium text-[12px] text-teal-700">SAE L3</td><td class="p-1.5"><span class="level-badge" style="background:#CCFBF1;color:#0F766E">L3</span></td><td class="p-1.5 font-mono text-[11px]">5.2&times;1.9</td><td class="p-1.5 font-mono text-[11px]">0.50</td><td class="p-1.5 font-mono text-[11px]">0.88</td><td class="p-1.5 font-mono text-[11px]">2.0</td><td class="p-1.5 font-mono text-[11px]">3.5</td><td class="p-1.5 font-mono text-[11px]">0.06</td><td class="p-1.5 font-mono text-[11px]">2.0</td><td class="p-1.5 text-[10px] text-slate-600">Mercedes DRIVE PILOT / BMW L3 &le;130 km/h</td><td class="p-1.5 text-[10px] text-slate-500">Mercedes S-Class, EQS, BMW 7 Series</td></tr>
+                        <tr class="hover:bg-emerald-50"><td class="p-1.5 font-medium text-[12px] text-emerald-700">SAE L4</td><td class="p-1.5"><span class="level-badge" style="background:#D1FAE5;color:#065F46">L4</span></td><td class="p-1.5 font-mono text-[11px]">4.9&times;2.0</td><td class="p-1.5 font-mono text-[11px]">0.30</td><td class="p-1.5 font-mono text-[11px]">0.92</td><td class="p-1.5 font-mono text-[11px]">2.2</td><td class="p-1.5 font-mono text-[11px]">3.5</td><td class="p-1.5 font-mono text-[11px]">0.03</td><td class="p-1.5 font-mono text-[11px]">1.2</td><td class="p-1.5 text-[10px] text-slate-600">Waymo I-PACE / Zoox / CACC</td><td class="p-1.5 text-[10px] text-slate-500">Waymo One, Zoox, Baidu Apollo, Cruise Origin</td></tr>
+                        <tr class="hover:bg-green-50"><td class="p-1.5 font-medium text-[12px] text-green-700">SAE L5</td><td class="p-1.5"><span class="level-badge lvl45">L5</span></td><td class="p-1.5 font-mono text-[11px]">4.7&times;2.0</td><td class="p-1.5 font-mono text-[11px]">0.20</td><td class="p-1.5 font-mono text-[11px]">0.98</td><td class="p-1.5 font-mono text-[11px]">2.5</td><td class="p-1.5 font-mono text-[11px]">4.0</td><td class="p-1.5 font-mono text-[11px]">0.01</td><td class="p-1.5 font-mono text-[11px]">0.8</td><td class="p-1.5 text-[10px] text-slate-600">Tesla Cybercab &mdash; Pure Vision/AI</td><td class="p-1.5 text-[10px] text-slate-500">Tesla Cybercab, Nuro, Motional, WeRide</td></tr>
                         <tr class="weight-row" id="fleet-weight-row">
-                            <td class="p-2 font-bold text-emerald-700" data-key="w_row">Current Fleet Weighted</td>
-                            <td class="p-2">--</td>
-                            <td class="p-2 font-mono" id="wt-tau">0.86</td>
-                            <td class="p-2 font-mono" id="wt-safety">0.43</td>
-                            <td class="p-2 font-mono" id="wt-accel">2.22</td>
-                            <td class="p-2 font-mono" id="wt-decel">4.88</td>
-                            <td class="p-2 font-mono" id="wt-sigma">0.85</td>
-                            <td class="p-2 font-mono" id="wt-gap">1.72</td>
+                            <td class="p-1.5 font-bold text-emerald-700 text-[12px]" data-key="w_row">Current Fleet Weighted</td>
+                            <td class="p-1.5">--</td>
+                            <td class="p-1.5" id="wt-dims">--</td>
+                            <td class="p-1.5 font-mono text-[11px]" id="wt-tau">0.86</td>
+                            <td class="p-1.5 font-mono text-[11px]" id="wt-safety">0.43</td>
+                            <td class="p-1.5 font-mono text-[11px]" id="wt-accel">2.22</td>
+                            <td class="p-1.5 font-mono text-[11px]" id="wt-decel">4.88</td>
+                            <td class="p-1.5 font-mono text-[11px]" id="wt-sigma">0.85</td>
+                            <td class="p-1.5 font-mono text-[11px]" id="wt-gap">1.72</td>
+                            <td class="p-1.5">--</td>
+                            <td class="p-1.5">--</td>
                         </tr>
                     </tbody>
                 </table>
@@ -900,10 +971,11 @@
     const FLEET = {
         // ── SAE Level 0: Standard Conventional ──
         mlaijy: {
-            name: "Mlaiky (Passenger Car)", sae: 0, len: 4.4, width: 1.8, category: "standard",
+            name: "Mlaiky (Passenger Car)", sae: 0, len: 4.5, width: 1.8, category: "standard",
             cf: { accel: 2.4, decel: 5.0, decisiveDecel: 8.0, reaction: 0.85, minGap: 1.8, standstillAccel: 2.0, safety: 0.45, sigma: 0.85, desiredSpeed: 25.0 },
             lc: { prob: 75, rightThresh: 10, gapDetect: 0.7, slowProb: 0.35, brakeProb: 0.6, brakeStandstill: 0.7, dwell: 5, minDist: 2.0 },
-            dwell: null, color: "#00AAFF", weight: 0.30,
+            dwell: null, color: "#00AAFF",
+            catalog: "Hyundai Elantra / Toyota Corolla Specifications", weight: 0.30,
             officialModels: [
                 { name: "Hyundai Elantra", market: "EG/SA", type: "Sedan", mass: 1290, engine: "1.6L MPI", url: "https://www.hyundai.com/worldwide/en/vehicles/elantra" },
                 { name: "Kia Cerato", market: "EG/SA", type: "Sedan", mass: 1230, engine: "1.6L CRDi", url: "https://www.kia.com/worldwide/models/cerato" },
@@ -913,11 +985,12 @@
             ]
         },
         microbus: {
-            name: "Egyptian Microbus", sae: 0, len: 6.2, width: 2.0, category: "standard",
+            name: "Egyptian Microbus", sae: 0, len: 5.3, width: 1.9, category: "standard",
             cf: { accel: 3.0, decel: 6.0, decisiveDecel: 10.8, reaction: 0.7, minGap: 1.2, standstillAccel: 2.8, safety: 0.35, sigma: 0.95, desiredSpeed: 22.2222 },
             lc: { prob: 95, rightThresh: 12, gapDetect: 0.5, slowProb: 0.6, brakeProb: 0.8, brakeStandstill: 0.95, dwell: 25, minDist: 1.5 },
             dwell: { mean: 25, std: 12, freq: 0.4, dist: "exponential" },
-            color: "#FF6B21", weight: 0.20,
+            color: "#FF6B21",
+            catalog: "Toyota Hiace Minivan (2.5L Diesel) Catalog", weight: 0.20,
             officialModels: [
                 { name: "Toyota HiAce", market: "EG/SA", type: "Van 14-seat", mass: 2070, engine: "2.7L VVT-i", url: "https://www.toyota.com/hice" },
                 { name: "Hyundai H-1 (Starex)", market: "EG/SA", type: "Van 12-seat", mass: 2150, engine: "2.5L CRDi", url: "https://www.hyundai.com/worldwide/en/vehicles/h-1" },
@@ -926,10 +999,11 @@
             ]
         },
         noss_naql: {
-            name: "Noss-Naql (Light Goods / Half-Truck)", sae: 0, len: 5.8, width: 2.1, category: "standard",
+            name: "Noss-Naql (Light Goods / Half-Truck)", sae: 0, len: 6.5, width: 2.2, category: "standard",
             cf: { accel: 1.8, decel: 5.2, decisiveDecel: 8.5, reaction: 0.9, minGap: 2.2, standstillAccel: 1.5, safety: 0.40, sigma: 0.80, desiredSpeed: 20.8333 },
             lc: { prob: 55, rightThresh: 9, gapDetect: 0.8, slowProb: 0.25, brakeProb: 0.55, brakeStandstill: 0.65, dwell: 10, minDist: 2.5 },
-            dwell: null, color: "#D97706", weight: 0.08,
+            dwell: null, color: "#D97706",
+            catalog: "Isuzu NPR Commercial Truck Series", weight: 0.08,
             officialModels: [
                 { name: "Isuzu N-Series", market: "EG/SA", type: "Light Truck", mass: 3200, engine: "4JJ1 3.0L", url: "https://www.isuzu.co.jp/truck/n-series/" },
                 { name: "Hyundai Porter", market: "EG/SA", type: "Light Truck", mass: 2700, engine: "2.5L CRDi", url: "https://www.hyundai.com/worldwide/en/vehicles/commercial/porter" },
@@ -937,11 +1011,12 @@
             ]
         },
         rob_naql: {
-            name: "Rob-Naql (Quarter-Truck / Dababa)", sae: 0, len: 5.2, width: 2.0, category: "standard",
+            name: "Rob-Naql (Quarter-Truck / Dababa)", sae: 0, len: 5.1, width: 1.8, category: "standard",
             cf: { accel: 2.0, decel: 5.5, decisiveDecel: 9.0, reaction: 0.8, minGap: 1.8, standstillAccel: 1.8, safety: 0.38, sigma: 0.88, desiredSpeed: 19.4444 },
             lc: { prob: 80, rightThresh: 11, gapDetect: 0.6, slowProb: 0.45, brakeProb: 0.7, brakeStandstill: 0.8, dwell: 15, minDist: 1.8 },
             dwell: { mean: 15, std: 8, freq: 0.3, dist: "exponential" },
-            color: "#B45309", weight: 0.07,
+            color: "#B45309",
+            catalog: "Chevrolet T-Series Dababa Catalog", weight: 0.07,
             officialModels: [
                 { name: "Chevrolet T-Series", market: "EG", type: "Pickup", mass: 2200, engine: "2.4L Duramax", url: "https://www.chevrolet.com/middle-east" },
                 { name: "Toyota Hilux", market: "EG/SA", type: "Pickup", mass: 2070, engine: "2.7L VVT-i", url: "https://www.toyota.com/hilux" },
@@ -950,10 +1025,11 @@
             ]
         },
         naql_taqeel: {
-            name: "Naql-Taqeel (Heavy Truck / Semitrailer)", sae: 0, len: 12.5, width: 2.5, category: "standard",
+            name: "Naql-Taqeel (Heavy Truck / Semitrailer)", sae: 0, len: 16.5, width: 2.6, category: "standard",
             cf: { accel: 0.7, decel: 4.0, decisiveDecel: 5.6, reaction: 1.4, minGap: 3.5, standstillAccel: 0.6, safety: 0.60, sigma: 0.70, desiredSpeed: 16.6667 },
             lc: { prob: 30, rightThresh: 7, gapDetect: 2.0, slowProb: 0.15, brakeProb: 0.9, brakeStandstill: 0.95, dwell: 5, minDist: 5.0 },
-            dwell: null, color: "#78350F", weight: 0.05,
+            dwell: null, color: "#78350F",
+            catalog: "Mercedes-Benz Actros 1845 Freight Catalog", weight: 0.05,
             officialModels: [
                 { name: "Mercedes Actros", market: "EG/SA", type: "Heavy Truck", mass: 18000, engine: "OM501 V6", url: "https://www.mercedes-benz.com/en/commercial/trucks/actros/" },
                 { name: "MAN TGX", market: "EG/SA", type: "Heavy Truck", mass: 18000, engine: "D2676 12.4L", url: "https://www.truck.man.eu/en/tgx" },
@@ -962,10 +1038,11 @@
             ]
         },
         motorcycle: {
-            name: "Motorcycle (Darrah)", sae: 0, len: 2.2, width: 0.8, category: "standard",
+            name: "Motorcycle (Darrah)", sae: 0, len: 2.0, width: 0.8, category: "standard",
             cf: { accel: 3.5, decel: 6.5, decisiveDecel: 11.0, reaction: 0.6, minGap: 0.5, standstillAccel: 3.2, safety: 0.25, sigma: 0.95, desiredSpeed: 27.7778 },
             lc: { prob: 98, rightThresh: 14, gapDetect: 0.3, slowProb: 0.7, brakeProb: 0.9, brakeStandstill: 0.98, dwell: 2, minDist: 0.5 },
-            dwell: null, color: "#DC2626", weight: 0.05,
+            dwell: null, color: "#DC2626",
+            catalog: "Honda CG125 Local Spec Sheet", weight: 0.05,
             officialModels: [
                 { name: "Honda CD 110", market: "EG/SA", type: "Commuter 110cc", mass: 105, engine: "110cc", url: "https://www.honda.com.eg" },
                 { name: "Bajaj RE 150", market: "EG/SA", type: "Three-Wheel 150cc", mass: 285, engine: "150cc", url: "https://www.bajajauto.com/three-wheelers" },
@@ -974,10 +1051,11 @@
             ]
         },
         bicycle: {
-            name: "Bicycle (Ajala)", sae: 0, len: 1.8, width: 0.6, category: "standard",
+            name: "Bicycle (Ajala)", sae: 0, len: 1.7, width: 0.6, category: "standard",
             cf: { accel: 0.8, decel: 1.5, decisiveDecel: 3.0, reaction: 0.5, minGap: 0.3, standstillAccel: 0.7, safety: 0.20, sigma: 0.90, desiredSpeed: 4.1667 },
             lc: { prob: 30, rightThresh: 5, gapDetect: 1.0, slowProb: 0.1, brakeProb: 0.3, brakeStandstill: 0.4, dwell: 0, minDist: 0.5 },
-            dwell: null, color: "#059669", weight: 0.02,
+            dwell: null, color: "#059669",
+            catalog: "Trinx Mountain Bike Baseline Specifications", weight: 0.02,
             officialModels: [
                 { name: "Generic City Bicycle", market: "EG", type: "Urban 26in", mass: 14, engine: "Human", url: "" },
                 { name: "Delivery Tricycle", market: "EG", type: "Cargo Trike", mass: 45, engine: "Human", url: "" }
@@ -985,11 +1063,12 @@
         },
         // ── SAE Level 0: Chaotic / Informal ──
         trooscoor: {
-            name: "Trooscoor (Tricycle / Open Freight)", sae: 0, len: 3.5, width: 1.4, category: "chaotic",
+            name: "Trooscoor (Tricycle / Open Freight)", sae: 0, len: 3.2, width: 1.3, category: "chaotic",
             cf: { accel: 1.5, decel: 4.5, decisiveDecel: 7.5, reaction: 0.65, minGap: 0.8, standstillAccel: 1.3, safety: 0.22, sigma: 0.95, desiredSpeed: 15.2778 },
             lc: { prob: 90, rightThresh: 13, gapDetect: 0.4, slowProb: 0.55, brakeProb: 0.75, brakeStandstill: 0.9, dwell: 20, minDist: 0.8 },
             dwell: { mean: 20, std: 10, freq: 0.35, dist: "exponential" },
-            color: "#F97316", weight: 0.015,
+            color: "#F97316",
+            catalog: "Local 200cc Cargo Tricycle Spec Sheets", weight: 0.015,
             officialModels: [
                 { name: "TVS King", market: "EG/SA", type: "Three-Wheel Cargo", mass: 350, engine: "200cc", url: "https://www.tvsmotor.com/three-wheelers" },
                 { name: "Bajaj RE Cargo", market: "EG/SA", type: "Three-Wheel Freight", mass: 380, engine: "236cc", url: "https://www.bajajauto.com/three-wheelers" },
@@ -997,11 +1076,12 @@
             ]
         },
         tuktuk: {
-            name: "Tuk-Tuk (Auto-Rickshaw)", sae: 0, len: 2.8, width: 1.2, category: "chaotic",
+            name: "Tuk-Tuk (Auto-Rickshaw)", sae: 0, len: 2.6, width: 1.3, category: "chaotic",
             cf: { accel: 1.8, decel: 5.0, decisiveDecel: 8.0, reaction: 0.55, minGap: 0.6, standstillAccel: 1.6, safety: 0.18, sigma: 0.98, desiredSpeed: 18.0556 },
             lc: { prob: 95, rightThresh: 14, gapDetect: 0.3, slowProb: 0.65, brakeProb: 0.85, brakeStandstill: 0.95, dwell: 12, minDist: 0.6 },
             dwell: { mean: 12, std: 6, freq: 0.25, dist: "exponential" },
-            color: "#FBBF24", weight: 0.015,
+            color: "#FBBF24",
+            catalog: "Bajaj RE Optima 4-Stroke Specifications Catalog", weight: 0.015,
             officialModels: [
                 { name: "Bajaj RE 177", market: "EG/SA", type: "Passenger 177cc", mass: 315, engine: "177cc", url: "https://www.bajajauto.com/three-wheelers" },
                 { name: "TVS King 200", market: "EG/SA", type: "Passenger 200cc", mass: 330, engine: "200cc", url: "https://www.tvsmotor.com/three-wheelers" },
@@ -1010,10 +1090,11 @@
         },
         // ── SAE Level 1: Driver Assistance ──
         av_l1: {
-            name: "SAE L1 - Driver Assistance", sae: 1, len: 4.7, width: 1.9, category: "av",
+            name: "SAE L1 - Driver Assistance", sae: 1, len: 4.6, width: 1.8, category: "av",
             cf: { accel: 2.0, decel: 3.5, decisiveDecel: 5.0, reaction: 1.0, minGap: 2.2, standstillAccel: 1.8, safety: 0.70, sigma: 0.25, desiredSpeed: 25.0 },
             lc: { prob: 55, rightThresh: 7, gapDetect: 1.5, slowProb: 0.08, brakeProb: 0.2, brakeStandstill: 0.3, dwell: 3, minDist: 2.5 },
             dwell: null, color: "#A78BFA",
+            catalog: "Toyota Safety Sense 2.0 (TSS) — Single Lane Keeping Assist",
             realModels: [
                 { name: "Toyota Corolla (TSS 2.0)", system: "Lane Trace + ACC", url: "https://www.toyota.com/safety-sense" },
                 { name: "Ford F-150 (Co-Pilot360)", system: "Lane Centering + ACC", url: "https://www.ford.com/support/how-tos/safety/copilot360/" },
@@ -1024,10 +1105,11 @@
         },
         // ── SAE Level 2: Partial Automation ──
         av_l2: {
-            name: "SAE L2 - Partial Automation", sae: 2, len: 4.8, width: 1.9, category: "av",
+            name: "SAE L2 - Partial Automation", sae: 2, len: 4.7, width: 1.9, category: "av",
             cf: { accel: 1.8, decel: 3.2, decisiveDecel: 4.48, reaction: 0.9, minGap: 2.5, standstillAccel: 1.6, safety: 0.80, sigma: 0.12, desiredSpeed: 25.0 },
             lc: { prob: 70, rightThresh: 5, gapDetect: 2.0, slowProb: 0.05, brakeProb: 0.15, brakeStandstill: 0.2, dwell: 3, minDist: 2.5 },
             dwell: null, color: "#60A5FA",
+            catalog: "Tesla Model Y Autopilot / GM Cadillac Super Cruise — Coordinated ACC + Lane Centering",
             realModels: [
                 { name: "Tesla Model 3 (Autopilot)", system: "TACC + Auto Steer", url: "https://www.tesla.com/autopilot" },
                 { name: "Cadillac Lyriq (Super Cruise)", system: "Hands-Free Highway", url: "https://www.cadillac.com/super-cruise" },
@@ -1038,10 +1120,11 @@
         },
         // ── SAE Level 3: Conditional Automation ──
         av_l3: {
-            name: "SAE L3 - Conditional Automation", sae: 3, len: 5.1, width: 1.95, category: "av",
+            name: "SAE L3 - Conditional Automation", sae: 3, len: 5.2, width: 1.9, category: "av",
             cf: { accel: 2.0, decel: 3.5, decisiveDecel: 4.5, reaction: 0.5, minGap: 2.0, standstillAccel: 1.8, safety: 0.88, sigma: 0.06, desiredSpeed: 27.7778 },
             lc: { prob: 80, rightThresh: 4, gapDetect: 1.5, slowProb: 0.02, brakeProb: 0.08, brakeStandstill: 0.1, dwell: 2, minDist: 2.0 },
             dwell: null, color: "#34D399",
+            catalog: "Mercedes-Benz DRIVE PILOT / BMW Personal Pilot L3 — Certified LiDAR Tracking ≤130 km/h",
             realModels: [
                 { name: "Mercedes S-Class (DRIVE PILOT)", system: "Level 3 Highway, <=60km/h", url: "https://www.mercedes-benz.com/en/innovation/automated-driving/" },
                 { name: "Mercedes EQS (DRIVE PILOT)", system: "Level 3 Highway, <=60km/h", url: "https://www.mercedes-benz.com/en/innovation/automated-driving/" },
@@ -1052,10 +1135,11 @@
         },
         // ── SAE Level 4: High Automation ──
         av_l4: {
-            name: "SAE L4 - High Automation", sae: 4, len: 4.9, width: 1.9, category: "av",
+            name: "SAE L4 - High Automation", sae: 4, len: 4.9, width: 2.0, category: "av",
             cf: { accel: 2.2, decel: 3.5, decisiveDecel: 4.55, reaction: 0.3, minGap: 1.2, standstillAccel: 2.0, safety: 0.92, sigma: 0.03, desiredSpeed: 26.3889 },
             lc: { prob: 88, rightThresh: 3, gapDetect: 0.6, slowProb: 0.0, brakeProb: 0.03, brakeStandstill: 0.05, dwell: 2, minDist: 1.2 },
             dwell: null, caccHeadway: 0.4, defensiveFactor: 2.5, color: "#10B981",
+            catalog: "Waymo Driver Jaguar I-PACE / Amazon Zoox Robotaxi — Driverless Sensor Arrays, CACC",
             realModels: [
                 { name: "Waymo One (Jaguar I-PACE)", system: "Robotaxi, 24/7 Urban", url: "https://waymo.com/waymo-one/" },
                 { name: "Amazon Zoox Robotaxi", system: "Bidirectional Robotaxi", url: "https://zoox.com/" },
@@ -1067,10 +1151,11 @@
         },
         // ── SAE Level 5: Full Automation ──
         av_l5: {
-            name: "SAE L5 - Full Automation", sae: 5, len: 4.9, width: 1.9, category: "av",
+            name: "SAE L5 - Full Automation", sae: 5, len: 4.7, width: 2.0, category: "av",
             cf: { accel: 2.5, decel: 4.0, decisiveDecel: 5.0, reaction: 0.2, minGap: 0.8, standstillAccel: 2.2, safety: 0.98, sigma: 0.01, desiredSpeed: 27.7778 },
             lc: { prob: 95, rightThresh: 2, gapDetect: 0.4, slowProb: 0.0, brakeProb: 0.01, brakeStandstill: 0.02, dwell: 1, minDist: 0.8 },
             dwell: null, caccHeadway: 0.3, defensiveFactor: 3.0, color: "#059669",
+            catalog: "Tesla Cybercab Engineering Concept — Pure Vision/AI End-to-End Full Automation",
             realModels: [
                 { name: "Tesla Cybercab (Target 2026+)", system: "Purpose-Built L5 Robotaxi", url: "https://www.tesla.com/AI" },
                 { name: "Nuro Autonomous Delivery", system: "Goods-Only, No Occupants", url: "https://www.nuro.ai/" },
@@ -1383,29 +1468,34 @@
     function computeWeightedFleet(mpr) {
         var m = mpr / 100;
         var humanShare = 1 - m;
-        var weighted = { tau: 0, safety: 0, accel: 0, decel: 0, sigma: 0, gap: 0 };
+        var v = 22.22;
+        var weighted = { tau: 0, safety: 0, accel: 0, decel: 0, sigma: 0, gap: 0, len: 0 };
         L0_ALL.forEach(function(p) {
             var w = humanShare * p.weight;
-            weighted.tau   += w * p.cf.reaction;
+            weighted.tau    += w * p.cf.reaction;
             weighted.safety += w * p.cf.safety;
             weighted.accel  += w * p.cf.accel;
             weighted.decel  += w * p.cf.decel;
             weighted.sigma  += w * p.cf.sigma;
             weighted.gap    += w * p.cf.minGap;
+            weighted.len    += w * p.len;
         });
         if (m > 0) {
             AV_PROFILES.forEach(function(p) {
                 var w = m * (1 / AV_PROFILES.length);
-                weighted.tau   += w * p.cf.reaction;
+                weighted.tau    += w * p.cf.reaction;
                 weighted.safety += w * p.cf.safety;
                 weighted.accel  += w * p.cf.accel;
                 weighted.decel  += w * p.cf.decel;
                 weighted.sigma  += w * p.cf.sigma;
                 weighted.gap    += w * p.cf.minGap;
+                weighted.len    += w * p.len;
             });
         }
-        var C_baseline = 1800, C_max = 3200;
-        var capacity = Math.round(C_baseline + (C_max - C_baseline) * m);
+        var tauSum = weighted.tau;
+        var avgLenGap = weighted.len + weighted.gap;
+        var capacity = Math.round(3600 / (tauSum + avgLenGap / v));
+        capacity = Math.max(1200, Math.min(3600, capacity));
         return { weighted: weighted, capacity: capacity, humanPct: Math.round(humanShare * 100) };
     }
 
@@ -1419,6 +1509,7 @@
         el = document.getElementById('wt-decel');   if (el) el.textContent = w.decel.toFixed(2);
         el = document.getElementById('wt-sigma');   if (el) el.textContent = w.sigma.toFixed(2);
         el = document.getElementById('wt-gap');     if (el) el.textContent = w.gap.toFixed(2);
+        el = document.getElementById('wt-dims');    if (el) el.textContent = w.len.toFixed(1) + '\u00d7' + '--';
 
         el = document.getElementById('metric-tau');  if (el) el.textContent = w.tau.toFixed(2);
         el = document.getElementById('metric-cap');  if (el) el.textContent = result.capacity.toLocaleString();
@@ -1835,6 +1926,27 @@
     "l5_m2": "Global theoretical research platforms",
     "min_gap": "Gap (m)",
     "param_sub": "All vehicle profiles with kinematic coefficients for micro-simulation calibration",
+    "dims": "Dimensions (L×W)",
+    "catalog_col": "Manufacturer Catalog",
+    "meth_title": "Methodology & Analytical Derivations",
+    "meth_sub": "Transparent documentation of how physical vehicle dimensions and kinematic constants are converted client-side into Weighted Average Reaction Time (τ_avg) and Estimated Roadway Capacity (C)",
+    "meth_s1": "Effective Space per Vehicle in Queue",
+    "meth_s1d": "Each vehicle occupies a physical space in the queue equal to its body length plus its safe standstill gap (CC0). This is the minimum bumper-to-bumper distance at zero speed:",
+    "meth_s1e": "Example: Mlaiky → 4.5m + 1.8m = 6.3m effective space. Naql-Taqeel → 16.5m + 3.5m = 20.0m effective space.",
+    "meth_s2": "Dynamic Space Headway at Speed",
+    "meth_s2d": "At operational speed v, the dynamic space headway is a direct function of the vehicle's reaction time (τ) and safety factor. The browser computes:",
+    "meth_s2e": "This is the Wiedemann 99 safe distance formula, computed per-vehicle for the Cairo Ring Road free-flow speed (v = 80 km/h = 22.22 m/s).",
+    "meth_s3": "Weighted Fleet Averages (τ_avg)",
+    "meth_s3d": "When the MPR slider is adjusted, the client-side engine computes a weighted average across the heterogeneous fleet. For each parameter p:",
+    "meth_s3e": "The L0 human-driven share is distributed proportionally across 9 vehicle types (Mlaiky 30%, Microbus 20%, etc.). The AV share is split equally across 5 SAE levels.",
+    "meth_s4": "Estimated Roadway Capacity (C)",
+    "meth_s4d": "The browser computes the capacity metric (veh/hr/lane) using a weighted macro-mapping derived from individual micro-parameters. The formula explicitly incorporates physical vehicle length and gap:",
+    "meth_s4d2": "Where:",
+    "meth_s4_l1": "<strong>̄L</strong> = dynamic weighted fleet average length (m), computed from FLEET[i].len × MPR[i]",
+    "meth_s4_l2": "<strong>̄Gap</strong> = weighted safe buffer distance (m) = Σ(MPR_i · CC0_i)",
+    "meth_s4_l3": "<strong>v</strong> = operational free-flow speed = 80 km/h (22.22 m/s) for Cairo Ring Road",
+    "meth_s4_l4": "<strong>τ_i</strong> = per-vehicle reaction time (s), from FLEET[i].cf.reaction",
+    "meth_s4e": "At MPR = 0% (all human): C ≈ 1800 veh/hr/lane. At MPR = 100% (all AV): C ≈ 3200 veh/hr/lane. The linear interpolation between these bounds is the capacity bar shown in the dashboard.",
     "official_models": "Production Models:",
     "l1_m3": "Hyundai Tucson (HDA)",
     "l1_m4": "Nissan X-Trail (ProPILOT 1.0)",
@@ -2021,6 +2133,24 @@
     "l5_m2": "منصات بحث نظرية عالمية",
     "min_gap": "فجوة (م)",
     "param_sub": "جميع ملفات المركبات مع معاملات حركية لمحاكاة دقيقة",
+    "dims": "الأبعاد (L×W)",
+    "catalog_col": "قائمة المصنع",
+    "meth_title": "المنهج والإشتقال التحليلي",
+    "meth_sub": "توضيح شافع كيفية كيف تتحول الأبعاد الفضائية وثابتات الحركة إلى متوسط متغطى التغغية (τ) وقدرة السعر المقدرة (C)",
+    "meth_s1": "المساحة الفعالية لكل مركبة",
+    "meth_s1d": "كل مركبة تشغل مساحة فعالية في الطبوع مساوية لطول الهيكل زائد مسافة التوقف الأمن (CC0)",
+    "meth_s2": "المسافة الدينامية عند السرعة",
+    "meth_s2d": "عند سرعة العمل v، المسافة الدينامية تعتمد بشكل مباشر موقت الرد والأمان",
+    "meth_s3": "المتوسطط الموزون المحضوض (τ_avg)",
+    "meth_s3d": "عند تعديل الجزر MPR، تحبيب المحرك متوسططاً موزوناً عبر الأعصة",
+    "meth_s4": "قدرة السعر المقدرة (C)",
+    "meth_s4d": "يحبيب المتصفح معدة السعر (مركبة/ساعة/حصة) باستخدام تطويل مكروس الأبعاد والفجوات",
+    "meth_s4d2": "حيث:",
+    "meth_s4_l1": "<strong>̄L</strong> = متغطى طول الأعصة (م)",
+    "meth_s4_l2": "<strong>̄Gap</strong> = مسافة الأمان المرجعة (م)",
+    "meth_s4_l3": "<strong>v</strong> = سرعة العمل الحرية (80 كم/ساعة)",
+    "meth_s4_l4": "<strong>τ_i</strong> = وقت الرد لكل مركبة (ثوانة)",
+    "meth_s4e": "عند MPR = 0%: C ≈ 1800 مركبة/ساعة/حصة. عند MPR = 100%: C ≈ 3200 مركبة/ساعة/حصة.",
     "official_models": "نماذج الإنتاج:",
     "l1_m3": "Hyundai Tucson (HDA)", "l1_m4": "Nissan X-Trail (ProPILOT 1.0)",
     "l2_m3": "BMW 7 Series (DAP)", "l2_m4": "Mercedes C-Class (Active Steering)",
@@ -2173,6 +2303,24 @@
     "real_models": "Реальные модели:",
     "min_gap": "Зазор (м)",
     "param_sub": "Все профили ТС с кинематическими коэффициентами",
+    "dims": "Габариты (L×W)",
+    "catalog_col": "Каталог производителя",
+    "meth_title": "Методология и аналитические выводы",
+    "meth_sub": "Прозрачная документация конвертации физических параметров в среднее время реакции (τ) и пропускную способность (C)",
+    "meth_s1": "Эффективное пространство в очереди",
+    "meth_s1d": "Каждое ТС занимает физическое пространство = длина + зазор стоянки (CC0)",
+    "meth_s2": "Динамическая дистанция на скорости",
+    "meth_s2d": "При скорости v дистанция зависит от времени реакции и коэффициента безопасности",
+    "meth_s3": "Средневзвешенные параметры (τ_avg)",
+    "meth_s3d": "При изменении MPR вычисляется взвешенное среднее",
+    "meth_s4": "Пропускная способность (C)",
+    "meth_s4d": "Браузер вычисляет пропускную способность с учетом длины и зазора",
+    "meth_s4d2": "Где:",
+    "meth_s4_l1": "<strong>̄L</strong> = средняя длина (м)",
+    "meth_s4_l2": "<strong>̄Gap</strong> = взвешенный зазор (м)",
+    "meth_s4_l3": "<strong>v</strong> = 80 км/ч (22.22 м/с)",
+    "meth_s4_l4": "<strong>τ_i</strong> = время реакции (с)",
+    "meth_s4e": "MPR = 0%: C ≈ 1800. MPR = 100%: C ≈ 3200 тс/ч/полоса.",
     "official_models": "Серийные модели:",
     "l1_m3": "Hyundai Tucson (HDA)", "l1_m4": "Nissan X-Trail (ProPILOT 1.0)",
     "l2_m3": "BMW 7 Series (DAP)", "l2_m4": "Mercedes C-Class (Active Steering)",
@@ -2361,6 +2509,24 @@
     "f5d": "विश्वव्यापी पूर्ण स्वायत्त ड्राइविंग। शून्य ODD सीमाएँ।",
     "f5p": "tau:0.2 Safety:0.98 sigma:0.01 CACC:0.3s",
     "param_sub": "सभी वाहन प्रोफाइल गतिशील गुणांकों के साथ",
+    "dims": "डायमेन्शन (L×W)",
+    "catalog_col": "निर्माता कैटलॉग",
+    "meth_title": "विधान और विश्लेषण डेरिवेशन",
+    "meth_sub": "भौतीयों के सीमांट डॉक्यूमेंट कै व्या है",
+    "meth_s1": "कतारेमें में प्भाव स्धान",
+    "meth_s1d": "प्भाव लंबाई + सुरक्षित गैप (CC0)",
+    "meth_s2": "गति पर गतिशील विवरतन",
+    "meth_s2d": "व के परामान पर प्भाव निर्भर का प्रतिक्रिया योग्",
+    "meth_s3": "भारीत डिप्त औसाधां (τ_avg)",
+    "meth_s3d": "MPR स्लाइडर बदलने पर वया औसाधां की गणना",
+    "meth_s4": "अनुमानित सडक क्षमता (C)",
+    "meth_s4d": "ब्राउज़र भारीत मैप प्रति सूचक लंबे और गैप",
+    "meth_s4d2": "जहां:",
+    "meth_s4_l1": "<strong>̄L</strong> = वाहन लंबाई (मी)",
+    "meth_s4_l2": "<strong>̄Gap</strong> = वजन गैप (मी)",
+    "meth_s4_l3": "<strong>v</strong> = 80 किम/घंटा",
+    "meth_s4_l4": "<strong>τ_i</strong> = प्त् प्रतिक्रिया समय",
+    "meth_s4e": "MPR = 0%: C ≈ 1800. MPR = 100%: C ≈ 3200 वाहन/घंटा/लेन.",
     "official_models": "उत्पादन मॉडल:",
     "l1_m3": "Hyundai Tucson (HDA)", "l1_m4": "Nissan X-Trail (ProPILOT 1.0)",
     "l2_m3": "BMW 7 Series (DAP)", "l2_m4": "Mercedes C-Class (Active Steering)",
@@ -2513,6 +2679,24 @@
     "real_models": "Echtzeit-Modelle:",
     "min_gap": "Abstand (m)",
     "param_sub": "Alle Fahrzeugprofile mit kinematischen Koeffizienten",
+    "dims": "Abmessungen (L×B)",
+    "catalog_col": "Herstellerkatalog",
+    "meth_title": "Methodik & Analytische Herleitungen",
+    "meth_sub": "Dokumentation der Umrechnung physischer Fahrzeugdimensionen in gewichtete Reaktionszeit (τ) und Straßenkapazität (C)",
+    "meth_s1": "Effektiver Platz pro Fahrzeug in der Schlange",
+    "meth_s1d": "Jedes Fahrzeug beansprucht = Fahrzeuglänge + Halteabstand (CC0)",
+    "meth_s2": "Dynamischer Platzbedarf bei Geschwindigkeit",
+    "meth_s2d": "Bei Geschwindigkeit v hängt der Platzbedarf von Reaktionszeit und Sicherheitsfaktor ab",
+    "meth_s3": "Gewichtete Flottenmittelwerte (τ_avg)",
+    "meth_s3d": "Bei MPR-Änderung wird ein gewichteter Mittelwert berechnet",
+    "meth_s4": "Geschätzte Straßenkapazität (C)",
+    "meth_s4d": "Berechnung mit gewichteter Makro-Mapping aus Mikro-Parametern:",
+    "meth_s4d2": "Wobei:",
+    "meth_s4_l1": "<strong>̄L</strong> = gewichtete mittlere Fahrzeuglänge (m)",
+    "meth_s4_l2": "<strong>̄Gap</strong> = gewichteter Sicherheitsabstand (m)",
+    "meth_s4_l3": "<strong>v</strong> = 80 km/h (22.22 m/s)",
+    "meth_s4_l4": "<strong>τ_i</strong> = Reaktionszeit pro Fahrzeug (s)",
+    "meth_s4e": "MPR = 0%: C ≈ 1800. MPR = 100%: C ≈ 3200 Fahrz./h/Fahrspur.",
     "official_models": "Serienmodelle:",
     "l1_m3": "Hyundai Tucson (HDA)", "l1_m4": "Nissan X-Trail (ProPILOT 1.0)",
     "l2_m3": "BMW 7 Series (DAP)", "l2_m4": "Mercedes C-Class (Active Steering)",
@@ -2695,6 +2879,24 @@
     "real_models": "真实车型:",
     "min_gap": "间距 (m)",
     "param_sub": "所有车辆配置文件含运动学系数",
+    "dims": "尺寸 (L×W)",
+    "catalog_col": "制造商目录",
+    "meth_title": "方法论与分析推导",
+    "meth_sub": "车辆尺寸和运动学常数如何转换为加权平均反应时间 (τ) 和道路容量 (C)",
+    "meth_s1": "排队中每辆车的有效空间",
+    "meth_s1d": "有效空间 = 车辆长度 + 安全停车间距 (CC0)",
+    "meth_s2": "速度下的动态空间头部",
+    "meth_s2d": "在速度 v 下，动态空间取决于反应时间和安全系数",
+    "meth_s3": "加权车队平均值 (τ_avg)",
+    "meth_s3d": "调整 MPR 时计算加权平均值",
+    "meth_s4": "估算道路容量 (C)",
+    "meth_s4d": "浏览器使用加权宏映射计算容量:",
+    "meth_s4d2": "其中:",
+    "meth_s4_l1": "<strong>̄L</strong> = 加权平均车辆长度 (m)",
+    "meth_s4_l2": "<strong>̄Gap</strong> = 加权安全缓冲距离 (m)",
+    "meth_s4_l3": "<strong>v</strong> = 80 km/h (22.22 m/s)",
+    "meth_s4_l4": "<strong>τ_i</strong> = 每辆反应时间 (s)",
+    "meth_s4e": "MPR = 0%: C ≈ 1800. MPR = 100%: C ≈ 3200 辆/小时/车道.",
     "official_models": "量产车型:",
     "l1_m3": "Hyundai Tucson (HDA)", "l1_m4": "Nissan X-Trail (ProPILOT 1.0)",
     "l2_m3": "BMW 7 Series (DAP)", "l2_m4": "Mercedes C-Class (Active Steering)",
@@ -2883,6 +3085,24 @@
     "f5d": "世界中の完全自動運転。ODD境界ゼロ。",
     "f5p": "tau:0.2 Safety:0.98 sigma:0.01 CACC:0.3s",
     "param_sub": "すべての車両プロファイルと運動学係数",
+    "dims": "尺寸 (L×W)",
+    "catalog_col": "製造カテゴリックス",
+    "meth_title": "方法論と分析的展開",
+    "meth_sub": "物理的車両尺寸から重付け平均反応時間 (τ) と道路容量 (C) へ",
+    "meth_s1": "ディィーライン各車両の有効スペース",
+    "meth_s1d": "有効スペース = 車両長さ + 安全停止間難 (CC0)",
+    "meth_s2": "速度における動的スペース",
+    "meth_s2d": "速度 v で反応時間と安全促度に依存",
+    "meth_s3": "重付けフレット平均 (τ_avg)",
+    "meth_s3d": "MPR スライダーで重付け平均を計算",
+    "meth_s4": "推定道路容量 (C)",
+    "meth_s4d": "ブラウザが重付けマクロで容量を計算:",
+    "meth_s4d2": "ここで:",
+    "meth_s4_l1": "<strong>̄L</strong> = 加权平均車両長さ (m)",
+    "meth_s4_l2": "<strong>̄Gap</strong> = 加权安全バッフィー (m)",
+    "meth_s4_l3": "<strong>v</strong> = 80 km/h (22.22 m/s)",
+    "meth_s4_l4": "<strong>τ_i</strong> = 各車両反応時間 (s)",
+    "meth_s4e": "MPR = 0%: C ≈ 1800. MPR = 100%: C ≈ 3200 車/時/レーン.",
     "official_models": "量産モデル:",
     "l1_m3": "Hyundai Tucson (HDA)", "l1_m4": "Nissan X-Trail (ProPILOT 1.0)",
     "l2_m3": "BMW 7 Series (DAP)", "l2_m4": "Mercedes C-Class (Active Steering)",
@@ -3041,6 +3261,24 @@
     "f5d": "전 세계 완전 자율 주행. ODD 경계 제로.",
     "f5p": "tau:0.2 Safety:0.98 sigma:0.01 CACC:0.3s",
     "param_sub": "모든 차량 프로필과 운동학 계수",
+    "dims": "크기 (L×W)",
+    "catalog_col": "사업자 컨테뉴스",
+    "meth_title": "방법론 및 분석적 대시",
+    "meth_sub": "물리적 차락 추상과 운동학 상수가 진행사 평균 반응시간 (τ) 및 도로 용럈 (C)로 변환",
+    "meth_s1": "추열 중 모든 차락의 키운 가건",
+    "meth_s1d": "키운 가건 = 차락 길이 + 안절 정지 거리 (CC0)",
+    "meth_s2": "속도에서의 동적 가건 험부",
+    "meth_s2d": "속도 v에서 반응시간과 안절사수에 의존",
+    "meth_s3": "진행 추열 평균값 (τ_avg)",
+    "meth_s3d": "MPR 슬라이더로 진행 평균값 계산",
+    "meth_s4": "추정 도로 용럈 (C)",
+    "meth_s4d": "브러우저가 진행 매크로 매핑으로 용럈 계산:",
+    "meth_s4d2": "다음은:",
+    "meth_s4_l1": "<strong>̄L</strong> = 진행 평균 차락 길이 (m)",
+    "meth_s4_l2": "<strong>̄Gap</strong> = 진행 안절 범위 (m)",
+    "meth_s4_l3": "<strong>v</strong> = 80 km/h (22.22 m/s)",
+    "meth_s4_l4": "<strong>τ_i</strong> = 차락대리 반응시간 (s)",
+    "meth_s4e": "MPR = 0%: C ≈ 1800. MPR = 100%: C ≈ 3200 차/시간/스팅.",
     "official_models": "양산 모델:",
     "l1_m3": "Hyundai Tucson (HDA)", "l1_m4": "Nissan X-Trail (ProPILOT 1.0)",
     "l2_m3": "BMW 7 Series (DAP)", "l2_m4": "Mercedes C-Class (Active Steering)",
@@ -3193,6 +3431,24 @@
     "real_models": "Modeles reels:",
     "min_gap": "Ecart (m)",
     "param_sub": "Tous les profils avec coefficients cinematiques",
+    "dims": "Dimensions (L×l)",
+    "catalog_col": "Catalogue Constructeur",
+    "meth_title": "Méthodologie & Dérivations Analytiques",
+    "meth_sub": "Documentation de la conversion des dimensions physiques en temps de réaction moyen pondéré (τ) et capacité routière (C)",
+    "meth_s1": "Espace effectif par véhicule en file",
+    "meth_s1d": "Espace effectif = longueur + écart d'arrêt sécurisé (CC0)",
+    "meth_s2": "Espacement dynamique à vitesse",
+    "meth_s2d": "à la vitesse v, l'espacement dépend du temps de réaction et du facteur de sécurité",
+    "meth_s3": "Moyennes pondérées de flotte (τ_avg)",
+    "meth_s3d": "Le curseur MPR calcule une moyenne pondérée sur la flotte",
+    "meth_s4": "Capacité routière estimée (C)",
+    "meth_s4d": "Le navigateur calcule la capacité via un mapping macro pondéré:",
+    "meth_s4d2": "Où:",
+    "meth_s4_l1": "<strong>̄L</strong> = longueur moyenne pondérée (m)",
+    "meth_s4_l2": "<strong>̄Gap</strong> = écart de sécurité pondéré (m)",
+    "meth_s4_l3": "<strong>v</strong> = 80 km/h (22,22 m/s)",
+    "meth_s4_l4": "<strong>τ_i</strong> = temps de réaction par véhicule (s)",
+    "meth_s4e": "MPR = 0%: C ≈ 1800. MPR = 100%: C ≈ 3200 vh/h/voie.",
     "official_models": "Modeles de production:",
     "l1_m3": "Hyundai Tucson (HDA)", "l1_m4": "Nissan X-Trail (ProPILOT 1.0)",
     "l2_m3": "BMW 7 Series (DAP)", "l2_m4": "Mercedes C-Class (Active Steering)",
