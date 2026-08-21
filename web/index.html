@@ -144,6 +144,7 @@
         .toast-msg.show { opacity: 1; transform: translateX(-50%) translateY(0); }
         @media (max-width: 768px) { .hero-bg { min-height: 500px; } .flag { font-size: 1.1em; } }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
 </head>
 <body class="bg-slate-50 text-slate-800">
 
@@ -683,29 +684,33 @@
                     </div>
                 </div> </section>
 
-        <!-- ========== AV COMPARISON ENGINE ========== -->
+        <!-- ========== FLEET COMPARISON ENGINE ========== -->
     <section id="comparison" class="py-16 bg-white">
         <div class="container mx-auto px-4">
             <div class="text-center mb-8">
-                <h2 class="text-3xl font-bold text-slate-800 mb-3" data-key="cmp_title">Autonomous Vehicle Comparison Engine</h2>
-                <p class="text-slate-600 max-w-3xl mx-auto text-sm" data-key="cmp_desc">Compare real-world commercial autonomous platforms across sensor suites, operational domains, and liability frameworks</p>
+                <h2 class="text-3xl font-bold text-slate-800 mb-3" data-key="cmp_title">Autonomous Fleet Comparison Engine</h2>
+                <p class="text-slate-600 max-w-3xl mx-auto text-sm" data-key="cmp_desc">Select a SAE automation tier, choose vehicles, and perform side-by-side analytical benchmarking with live performance charts</p>
             </div>
-            <div class="flex justify-center gap-3 mb-8 flex-wrap">
-                <button onclick="setComparePlatform('tesla')" id="cmp-tesla" class="cmp-btn active px-5 py-2.5 rounded-lg font-medium text-sm transition bg-slate-800 text-white border-2 border-slate-800"><i class="fas fa-bolt mr-1"></i> Tesla Autopilot/FSD</button>
-                <button onclick="setComparePlatform('mercedes')" id="cmp-mercedes" class="cmp-btn px-5 py-2.5 rounded-lg font-medium text-sm transition bg-white text-slate-600 border-2 border-slate-200 hover:border-slate-400"><i class="fas fa-star mr-1"></i> Mercedes DRIVE PILOT</button>
-                <button onclick="setComparePlatform('waymo')" id="cmp-waymo" class="cmp-btn px-5 py-2.5 rounded-lg font-medium text-sm transition bg-white text-slate-600 border-2 border-slate-200 hover:border-slate-400"><i class="fas fa-route mr-1"></i> Waymo Driver</button>
+            <div class="flex flex-col md:flex-row justify-center gap-3 mb-6">
+                <div class="flex items-center gap-2">
+                    <label class="text-xs font-semibold text-slate-500 uppercase tracking-wide" data-key="fleet_sae">SAE Level</label>
+                    <select id="fleet-level" onchange="fleetOnLevel()" class="border-2 border-slate-200 rounded-lg px-3 py-2 text-sm bg-white cursor-pointer font-medium">
+                        <option value="L1">SAE Level 1</option><option value="L2" selected>SAE Level 2</option><option value="L3">SAE Level 3</option><option value="L45">SAE Level 4/5</option>
+                    </select>
+                </div>
+                <div class="flex items-center gap-2">
+                    <label class="text-xs font-semibold text-slate-500 uppercase tracking-wide" data-key="fleet_model_a">Vehicle A</label>
+                    <select id="fleet-sel-a" onchange="fleetRender()" class="border-2 border-slate-200 rounded-lg px-3 py-2 text-sm bg-white cursor-pointer"></select>
+                </div>
+                <div class="flex items-center gap-2">
+                    <label class="text-xs font-semibold text-slate-500 uppercase tracking-wide" data-key="fleet_model_b">Vehicle B</label>
+                    <select id="fleet-sel-b" onchange="fleetRender()" class="border-2 border-slate-200 rounded-lg px-3 py-2 text-sm bg-white cursor-pointer"></select>
+                </div>
             </div>
-            <div id="cmp-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto"></div>
-            <div class="mt-10 max-w-5xl mx-auto overflow-x-auto">
-                <table class="w-full text-sm">
-                    <thead><tr class="border-b-2 border-slate-200">
-                        <th class="text-left py-3 px-4 text-slate-500 font-medium" data-key="cmp_spec">Specification</th>
-                        <th class="text-center py-3 px-4 text-slate-800 font-bold">Tesla</th>
-                        <th class="text-center py-3 px-4 text-slate-800 font-bold">Mercedes</th>
-                        <th class="text-center py-3 px-4 text-slate-800 font-bold">Waymo</th>
-                    </tr></thead>
-                    <tbody id="cmp-table-body"></tbody>
-                </table>
+            <div id="fleet-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto mb-10"></div>
+            <div class="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="bg-slate-50 rounded-xl p-5 border border-slate-200"><h4 class="font-bold text-slate-800 mb-3"><i class="fas fa-microchip mr-2 text-primary"></i><span data-key="chart_sensor">Sensor Density vs. Cost</span></h4><div style="height:280px"><canvas id="fleet-chart-sensor"></canvas></div></div>
+                <div class="bg-slate-50 rounded-xl p-5 border border-slate-200"><h4 class="font-bold text-slate-800 mb-3"><i class="fas fa-shield-alt mr-2 text-secondary"></i><span data-key="chart_safety">Safety Intervention Curves</span></h4><div style="height:280px"><canvas id="fleet-chart-safety"></canvas></div></div>
             </div>
         </div>
     </section>
@@ -2333,6 +2338,16 @@
     "rr_pce_full": "Passenger Car Equivalent (PCE)",
     "rr_weather": "Weather",
 
+
+    "fleet_sae": "SAE Level",
+    "fleet_model_a": "Vehicle A",
+    "fleet_model_b": "Vehicle B",
+    "fleet_sensors": "Total Sensors",
+    "fleet_odd": "Operational Design Domain",
+    "fleet_liability": "Legal Liability",
+    "fleet_price": "Est. Price / Option",
+    "chart_sensor": "Sensor Density vs. Cost",
+    "chart_safety": "Safety Intervention Curves",
   },
   "ar": {
     "t": "SAE AutoSim Hub",
@@ -2608,6 +2623,16 @@
     "rr_pce_full": "مكافئ السيارة الركاب (PCE)",
     "rr_weather": "الطقس",
 
+
+    "fleet_sae": "مستوى SAE",
+    "fleet_model_a": "المركبة أ",
+    "fleet_model_b": "المركبة ب",
+    "fleet_sensors": "عدد أجهزة الاستشعار Всего",
+    "fleet_odd": "نطاق التشغيل المحدد",
+    "fleet_liability": "المسؤولية القانونية",
+    "fleet_price": "السعر التقديري",
+    "chart_sensor": "كثافة أجهزة الاستشعار مقابل التكلفة",
+    "chart_safety": "منحنى التدخل الأمني",
   },
   "ru": {
     "t": "SAE AutoSim Hub",
@@ -2880,6 +2905,16 @@
     "rr_pce_full": "Ekvivalent legkovogo ATS (PCE)",
     "rr_weather": "Pogoda",
 
+
+    "fleet_sae": "Uroven SAE",
+    "fleet_model_a": "Transportnoe sredstvo A",
+    "fleet_model_b": "Transportnoe sredstvo B",
+    "fleet_sensors": "Vsego datchikov",
+    "fleet_odd": "Oblast primeneniya",
+    "fleet_liability": "Yuridicheskaya otvetstvennost",
+    "fleet_price": "Otsenochnaya cena",
+    "chart_sensor": "Plotnost datchikov k stoimosti",
+    "chart_safety": "Krivye bezopasnosti",
   },
   "hi": {
     "t": "SAE AutoSim Hub",
@@ -3128,6 +3163,16 @@
     "rr_pce_full": "Passenger Car Equivalent (PCE)",
     "rr_weather": "Mausam",
 
+
+    "fleet_sae": "SAE Star",
+    "fleet_model_a": "Vahan A",
+    "fleet_model_b": "Vahan B",
+    "fleet_sensors": "Kul Sensors",
+    "fleet_odd": "Operation Design Domain",
+    "fleet_liability": "Kanooni Zimmedari",
+    "fleet_price": "Anumanit Moolya",
+    "chart_sensor": "Sensor Ghanta vs. Cost",
+    "chart_safety": "Suraksha Dakhal Vartaman",
   },
   "de": {
     "t": "SAE AutoSim Hub",
@@ -3400,6 +3445,16 @@
     "rr_pce_full": "Personenwagen-Aequivalent (PCE)",
     "rr_weather": "Wetter",
 
+
+    "fleet_sae": "SAE Stufe",
+    "fleet_model_a": "Fahrzeug A",
+    "fleet_model_b": "Fahrzeug B",
+    "fleet_sensors": "Gesamt Sensoren",
+    "fleet_odd": "Einsatzbereich",
+    "fleet_liability": "Haftung",
+    "fleet_price": "Geschatzter Preis",
+    "chart_sensor": "Sensorichte vs. Kosten",
+    "chart_safety": "Sicherheitsinterventionskurven",
   },
   "zh": {
     "t": "SAE AutoSim Hub",
@@ -3672,6 +3727,16 @@
     "rr_pce_full": "客车当量 (PCE)",
     "rr_weather": "天气",
 
+
+    "fleet_sae": "SAE 等级",
+    "fleet_model_a": "车辆 A",
+    "fleet_model_b": "车辆 B",
+    "fleet_sensors": "传感器总数",
+    "fleet_odd": "运行设计域",
+    "fleet_liability": "法律责任",
+    "fleet_price": "估价",
+    "chart_sensor": "传感器密度 vs. 成本",
+    "chart_safety": "安全干预曲线",
   },
   "ja": {
     "t": "SAE AutoSim Hub",
@@ -3920,6 +3985,16 @@
     "rr_pce_full": "乗用車等価 (PCE)",
     "rr_weather": "天候",
 
+
+    "fleet_sae": "SAE レベル",
+    "fleet_model_a": "車両 A",
+    "fleet_model_b": "車両 B",
+    "fleet_sensors": "センサー合計",
+    "fleet_odd": "運用設計領域",
+    "fleet_liability": "法的責任",
+    "fleet_price": "推定価格",
+    "chart_sensor": "センサー密度 vs. コスト",
+    "chart_safety": "安全介入曲線",
   },
   "ko": {
     "t": "SAE AutoSim Hub",
@@ -4168,6 +4243,16 @@
     "rr_pce_full": "승용차 등가 (PCE)",
     "rr_weather": "날씨",
 
+
+    "fleet_sae": "SAE 등급",
+    "fleet_model_a": "차량 A",
+    "fleet_model_b": "차량 B",
+    "fleet_sensors": "센서 합계",
+    "fleet_odd": "운용 설계 영역",
+    "fleet_liability": "법적 책임",
+    "fleet_price": "예상 가격",
+    "chart_sensor": "센서 밀도 vs. 비용",
+    "chart_safety": "안전 개입 곡선",
   },
   "fr": {
     "t": "SAE AutoSim Hub",
@@ -4440,6 +4525,16 @@
     "rr_pce_full": "Equivalent Voiture (PCE)",
     "rr_weather": "Meteo",
 
+
+    "fleet_sae": "Niveau SAE",
+    "fleet_model_a": "Vehicule A",
+    "fleet_model_b": "Vehicule B",
+    "fleet_sensors": "Capteurs totaux",
+    "fleet_odd": "Domaine Operationnel",
+    "fleet_liability": "Responsabilite Legale",
+    "fleet_price": "Prix Estime",
+    "chart_sensor": "Densite Capteurs vs. Cout",
+    "chart_safety": "Courbes Intervention Securite",
   }
 };
     const LANG_OPTIONS = [];
@@ -4889,95 +4984,101 @@ function setScenario(s) {
 }
 
 // ---- AV Comparison Engine ----
-var AV_COMPARE = {
-    tesla: { name: 'Tesla Autopilot / FSD', sae: 'L2+ (Supervised) / L3 pending',
-        sensors: { lidar: 0, radar: 0, cameras: 8, ultrasonic: 12, compute: 'HW4 (50 TOPS)' },
-        odd: 'Mapped highways and urban roads; clear weather; driver supervision required',
-        maxSpeed: 135,
-        liability: 'Driver assumes full liability. FSD is a Level 2 driver-assist requiring constant supervision.',
-        footprint: { len: 4.9, width: 1.9, height: 1.44, wheelbase: 2.875 },
-        features: ['Vision-only neural net (no LiDAR)','End-to-end AI driving','OTA software updates','8-camera surround view','Smart Summon / Auto Park','City + highway driving'] },
-    mercedes: { name: 'Mercedes-Benz DRIVE PILOT', sae: 'L3 (Certified, up to 130 km/h)',
-        sensors: { lidar: 1, radar: 5, cameras: 4, ultrasonic: 12, compute: 'NVIDIA DRIVE Orin' },
-        odd: 'Highways with physical divider; up to 130 km/h; no construction; clear weather; day/night',
-        maxSpeed: 130,
-        liability: 'Manufacturer assumes liability when DRIVE PILOT is active. First certified L3 system globally.',
-        footprint: { len: 5.3, width: 1.95, height: 1.50, wheelbase: 3.216 },
-        features: ['First certified Level 3 system','LiDAR + radar + camera fusion','Manufacturer liability when active','Highway-only operational domain','Hands-off up to 130 km/h','Automatic safe stop'] },
-    waymo: { name: 'Waymo Driver (5th Gen)', sae: 'L4 (Full autonomous, no human driver)',
-        sensors: { lidar: 5, radar: 6, cameras: 29, ultrasonic: 0, compute: 'Custom Waymo compute' },
-        odd: 'Geofenced urban areas (Phoenix, SF, LA); day/night; most weather',
-        maxSpeed: 113,
-        liability: 'Waymo assumes full liability when operating autonomously. No human driver required.',
-        footprint: { len: 4.9, width: 1.9, height: 1.6, wheelbase: 2.96 },
-        features: ['Full Level 4 driverless operation','29 cameras + 5 LiDAR + 6 radar','No steering wheel (Zoox variant)','Urban ride-hailing deployed','360-degree sensor coverage','Real-time 3D mapping'] }
+// ---- Fleet Comparison Engine (SAE Level Tiered) ----
+var FLEET_DB = {
+  L1: [
+    { key:'toyota_corolla', name:'Toyota Corolla (TSS 2.0)', sensors:{lidar:0,radar:1,cameras:3,ultrasonic:4}, odScope:'Lane-keep assist, adaptive cruise, pre-collision up to 180 km/h; clear weather; any paved road', liability:'OEM', priceEst:28500, intervention:0.15 },
+    { key:'ford_f150', name:'Ford F-150 (Co-Pilot360)', sensors:{lidar:0,radar:1,cameras:4,ultrasonic:4}, odScope:'Adaptive cruise + lane centering; clear weather; highways and urban roads', liability:'OEM', priceEst:52000, intervention:0.14 }
+  ],
+  L2: [
+    { key:'tesla_m3', name:'Tesla Model 3/Y (Autopilot/FSD)', sensors:{lidar:0,radar:0,cameras:8,ultrasonic:0}, odScope:'Mapped highways + urban; clear weather; driver supervision required', liability:'Driver', priceEst:42000, intervention:0.32 },
+    { key:'cadillac_lyriq', name:'Cadillac Lyriq (Super Cruise)', sensors:{lidar:0,radar:1,cameras:4,ultrasonic:8}, odScope:'Mapped highways with dividers only; clear weather; 200 km/h max', liability:'Driver', priceEst:58000, intervention:0.25 },
+    { key:'bmw_7', name:'BMW 7 Series (Driving Assistant Pro)', sensors:{lidar:0,radar:4,cameras:4,ultrasonic:10}, odScope:'Highways + urban; clear weather; hands-off below 60 km/h', liability:'Driver', priceEst:95000, intervention:0.22 }
+  ],
+  L3: [
+    { key:'mercedes_s', name:'Mercedes-Benz S-Class (DRIVE PILOT)', sensors:{lidar:1,radar:5,cameras:4,ultrasonic:12}, odScope:'Highways with physical divider; up to 130 km/h; clear weather; day/night', liability:'OEM', priceEst:120000, intervention:0.08 },
+    { key:'honda_legend', name:'Honda Legend (Traffic Jam Pilot)', sensors:{lidar:5,radar:5,cameras:12,ultrasonic:12}, odScope:'Highways; traffic jam below 30 km/h; clear weather; Japan only (limited)', liability:'OEM', priceEst:50000, intervention:0.05 }
+  ],
+  L45: [
+    { key:'waymo_one', name:'Waymo One Robotaxi (5th Gen)', sensors:{lidar:5,radar:6,cameras:29,ultrasonic:0}, odScope:'Geofenced urban (Phoenix/SF/LA); day/night; most weather; max 113 km/h', liability:'OEM', priceEst:200000, intervention:0.02 },
+    { key:'zoox', name:'Amazon Zoox Autonomous Platform', sensors:{lidar:6,radar:6,cameras:16,ultrasonic:6}, odScope:'Geofenced urban corridors; bidirectional; max 72 km/h; San Francisco', liability:'OEM', priceEst:250000, intervention:0.01 },
+    { key:'tesla_cybercab', name:'Tesla Cybercab (Robotaxi)', sensors:{lidar:0,radar:0,cameras:8,ultrasonic:0}, odScope:'Mapped urban + highway; vision-only; max 115 km/h; no steering wheel', liability:'OEM', priceEst:30000, intervention:0.03 }
+  ]
 };
-var currentComparePlatform = 'tesla';
+var fleetLevel = 'L2';
+var fleetChartA = null, fleetChartB = null;
 
-function setComparePlatform(platform) {
-    currentComparePlatform = platform;
-    ['tesla','mercedes','waymo'].forEach(function(p) {
-        var btn = document.getElementById('cmp-' + p);
-        if (!btn) return;
-        if (p === platform) btn.className = 'cmp-btn active px-5 py-2.5 rounded-lg font-medium text-sm transition bg-slate-800 text-white border-2 border-slate-800';
-        else btn.className = 'cmp-btn px-5 py-2.5 rounded-lg font-medium text-sm transition bg-white text-slate-600 border-2 border-slate-200 hover:border-slate-400';
-    });
-    renderComparison();
+function fleetOnLevel() {
+  var el = document.getElementById('fleet-level');
+  fleetLevel = el ? el.value : 'L2';
+  var selA = document.getElementById('fleet-sel-a');
+  var selB = document.getElementById('fleet-sel-b');
+  var list = FLEET_DB[fleetLevel] || [];
+  if (selA) { selA.innerHTML = ''; list.forEach(function(v,i){ var o = document.createElement('option'); o.value = i; o.textContent = v.name; selA.appendChild(o); }); }
+  if (selB) { selB.innerHTML = ''; list.forEach(function(v,i){ var o = document.createElement('option'); o.value = i; o.textContent = v.name; if (list.length > 1 && i === 1) o.selected = true; selB.appendChild(o); }); }
+  fleetRender();
 }
 
-function renderComparison() {
-    var p = AV_COMPARE[currentComparePlatform];
-    if (!p) return;
-    var grid = document.getElementById('cmp-grid');
-    if (!grid) return;
-    var sensorHTML = '<div class="bg-white rounded-xl shadow-md border border-slate-200 p-6"><h4 class="font-bold text-slate-800 mb-3"><i class="fas fa-microchip mr-2 text-primary"></i>Sensor Suite</h4><div class="grid grid-cols-2 gap-3">'
-        + '<div class="text-center p-3 bg-slate-50 rounded-lg"><div class="text-2xl font-bold text-red-500">'+p.sensors.lidar+'</div><div class="text-xs text-slate-500">LiDAR</div></div>'
-        + '<div class="text-center p-3 bg-slate-50 rounded-lg"><div class="text-2xl font-bold text-blue-500">'+p.sensors.radar+'</div><div class="text-xs text-slate-500">Radar</div></div>'
-        + '<div class="text-center p-3 bg-slate-50 rounded-lg"><div class="text-2xl font-bold text-green-500">'+p.sensors.cameras+'</div><div class="text-xs text-slate-500">Cameras</div></div>'
-        + '<div class="text-center p-3 bg-slate-50 rounded-lg"><div class="text-2xl font-bold text-purple-500">'+p.sensors.ultrasonic+'</div><div class="text-xs text-slate-500">Ultrasonic</div></div>'
-        + '</div><div class="mt-3 text-xs text-slate-500"><i class="fas fa-microchip mr-1"></i>'+p.sensors.compute+'</div></div>';
-    var oddHTML = '<div class="bg-white rounded-xl shadow-md border border-slate-200 p-6"><h4 class="font-bold text-slate-800 mb-3"><i class="fas fa-map-marked-alt mr-2 text-secondary"></i>Operational Design Domain</h4><p class="text-sm text-slate-600">'+p.odd+'</p><div class="mt-3 flex items-center gap-2"><span class="text-xs text-slate-400">Max Speed:</span><span class="font-bold text-lg text-primary">'+p.maxSpeed+' km/h</span></div></div>';
-    var liabHTML = '<div class="bg-white rounded-xl shadow-md border border-slate-200 p-6"><h4 class="font-bold text-slate-800 mb-3"><i class="fas fa-gavel mr-2 text-accent"></i>Liability Framework</h4><p class="text-sm text-slate-600">'+p.liability+'</p><div class="mt-3"><span class="text-xs px-2 py-1 rounded-full '+(p.sae.indexOf('L4')>=0?'bg-green-100 text-green-700':p.sae.indexOf('L3')>=0?'bg-blue-100 text-blue-700':'bg-yellow-100 text-yellow-700')+'">'+p.sae+'</span></div></div>';
-    var footHTML = '<div class="bg-white rounded-xl shadow-md border border-slate-200 p-6"><h4 class="font-bold text-slate-800 mb-3"><i class="fas fa-ruler-combined mr-2 text-red-500"></i>Physical Footprint</h4><div class="grid grid-cols-2 gap-2 text-sm">'
-        + '<div><span class="text-slate-400">Length:</span> <span class="font-mono">'+p.footprint.len+' m</span></div>'
-        + '<div><span class="text-slate-400">Width:</span> <span class="font-mono">'+p.footprint.width+' m</span></div>'
-        + '<div><span class="text-slate-400">Height:</span> <span class="font-mono">'+p.footprint.height+' m</span></div>'
-        + '<div><span class="text-slate-400">Wheelbase:</span> <span class="font-mono">'+p.footprint.wheelbase+' m</span></div>'
-        + '</div></div>';
-    var featHTML = '<div class="bg-white rounded-xl shadow-md border border-slate-200 p-6 md:col-span-2 lg:col-span-3"><h4 class="font-bold text-slate-800 mb-3"><i class="fas fa-check-circle mr-2 text-green-500"></i>Key Features</h4><div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">';
-    p.features.forEach(function(f) { featHTML += '<div class="flex items-start gap-2 text-sm text-slate-600"><i class="fas fa-check text-green-500 mt-0.5"></i>'+f+'</div>'; });
-    featHTML += '</div></div>';
-    grid.innerHTML = sensorHTML + oddHTML + liabHTML + footHTML + featHTML;
-    renderComparisonTable();
+function fleetRender() {
+  var selA = document.getElementById('fleet-sel-a');
+  var selB = document.getElementById('fleet-sel-b');
+  var list = FLEET_DB[fleetLevel] || [];
+  var idxA = selA ? parseInt(selA.value, 10) : 0;
+  var idxB = selB ? parseInt(selB.value, 10) : (list.length > 1 ? 1 : 0);
+  var vA = list[idxA], vB = list[idxB];
+  if (!vA || !vB) return;
+  var grid = document.getElementById('fleet-grid');
+  if (grid) grid.innerHTML = fleetCardHTML(vA, 'border-primary') + fleetCardHTML(vB, 'border-secondary');
+  fleetRenderCharts(vA, vB);
 }
 
-function renderComparisonTable() {
-    var tbody = document.getElementById('cmp-table-body');
-    if (!tbody) return;
-    var specs = [
-        { label: 'SAE Level', t: 'L2+ (Supervised)', m: 'L3 (Certified)', w: 'L4 (Driverless)' },
-        { label: 'LiDAR Units', t: '0', m: '1', w: '5' },
-        { label: 'Radar Units', t: '0', m: '5', w: '6' },
-        { label: 'Camera Units', t: '8', m: '4', w: '29' },
-        { label: 'Max Speed', t: '135 km/h', m: '130 km/h', w: '113 km/h' },
-        { label: 'Liability', t: 'Driver', m: 'Manufacturer', w: 'Waymo' },
-        { label: 'Length', t: '4.9 m', m: '5.3 m', w: '4.9 m' },
-        { label: 'Width', t: '1.9 m', m: '1.95 m', w: '1.9 m' },
-        { label: 'ODD', t: 'Roads + Weather', m: 'Highways Only', w: 'Urban Geofenced' },
-        { label: 'Driver Required', t: 'Yes (Hands-on)', m: 'No (Hands-off)', w: 'No' }
-    ];
-    var html = '';
-    specs.forEach(function(s) {
-        html += '<tr class="border-b border-slate-100 hover:bg-slate-50"><td class="py-2.5 px-4 text-slate-500 font-medium">'+s.label+'</td>'
-            + '<td class="py-2.5 px-4 text-center font-mono text-sm">'+s.t+'</td>'
-            + '<td class="py-2.5 px-4 text-center font-mono text-sm">'+s.m+'</td>'
-            + '<td class="py-2.5 px-4 text-center font-mono text-sm">'+s.w+'</td></tr>';
-    });
-    tbody.innerHTML = html;
+function fleetCardHTML(v, borderCls) {
+  var tot = v.sensors.lidar + v.sensors.radar + v.sensors.cameras + v.sensors.ultrasonic;
+  var cPS = Math.round(v.priceEst / Math.max(1, tot));
+  var lvlTag = fleetLevel === 'L45' ? '<span class="text-xs px-2 py-0.5 rounded bg-green-100 text-green-700 font-semibold">L4/L5</span>' : '<span class="text-xs px-2 py-0.5 rounded bg-blue-100 text-blue-700 font-semibold">' + fleetLevel + '</span>';
+  return '<div class="bg-white rounded-xl shadow-md border-2 ' + borderCls + ' p-5">'
+    + '<div class="flex items-center justify-between mb-3"><h4 class="font-bold text-slate-800">' + v.name + '</h4>' + lvlTag + '</div>'
+    + '<div class="grid grid-cols-2 gap-2 mb-3 text-center">'
+    + '<div class="bg-slate-50 rounded-lg p-2"><div class="text-xl font-bold text-red-500">' + v.sensors.lidar + '</div><div class="text-[10px] text-slate-400 uppercase">LiDAR</div></div>'
+    + '<div class="bg-slate-50 rounded-lg p-2"><div class="text-xl font-bold text-blue-500">' + v.sensors.radar + '</div><div class="text-[10px] text-slate-400 uppercase">Radar</div></div>'
+    + '<div class="bg-slate-50 rounded-lg p-2"><div class="text-xl font-bold text-green-500">' + v.sensors.cameras + '</div><div class="text-[10px] text-slate-400 uppercase">Cameras</div></div>'
+    + '<div class="bg-slate-50 rounded-lg p-2"><div class="text-xl font-bold text-purple-500">' + v.sensors.ultrasonic + '</div><div class="text-[10px] text-slate-400 uppercase">Ultrasonic</div></div>'
+    + '</div>'
+    + '<div class="space-y-2 text-sm">'
+    + '<div class="flex justify-between border-b border-slate-100 pb-1"><span class="text-slate-400">' + t('fleet_sensors') + ':</span><span class="font-mono font-bold">' + tot + '</span></div>'
+    + '<div class="flex justify-between border-b border-slate-100 pb-1"><span class="text-slate-400">' + t('fleet_odd') + ':</span><span class="text-right text-xs max-w-[60%]">' + v.odScope + '</span></div>'
+    + '<div class="flex justify-between border-b border-slate-100 pb-1"><span class="text-slate-400">' + t('fleet_liability') + ':</span><span class="font-semibold ' + (v.liability === 'OEM' ? 'text-green-600' : 'text-amber-600') + '">' + v.liability + '</span></div>'
+    + '<div class="flex justify-between border-b border-slate-100 pb-1"><span class="text-slate-400">' + t('fleet_price') + ':</span><span class="font-mono">$' + v.priceEst.toLocaleString() + '</span></div>'
+    + '<div class="flex justify-between pb-1"><span class="text-slate-400">' + t('chart_sensor') + ':</span><span class="font-mono">$' + cPS.toLocaleString() + '/sensor</span></div>'
+    + '</div></div>';
 }
 
+function fleetRenderCharts(vA, vB) {
+  if (typeof Chart === 'undefined') return;
+  if (fleetChartA) { fleetChartA.destroy(); fleetChartA = null; }
+  if (fleetChartB) { fleetChartB.destroy(); fleetChartB = null; }
+  var ctxS = document.getElementById('fleet-chart-sensor');
+  var ctxI = document.getElementById('fleet-chart-safety');
+  if (!ctxS || !ctxI) return;
+  var cA = ['rgba(14,165,233,0.85)','rgba(99,102,241,0.85)','rgba(245,158,11,0.85)','rgba(168,162,158,0.7)'];
+  var cB = ['rgba(14,165,233,0.45)','rgba(99,102,241,0.45)','rgba(245,158,11,0.45)','rgba(168,162,158,0.35)'];
+  var sLabels = ['LiDAR','Radar','Cameras','Ultrasonic'];
+  fleetChartA = new Chart(ctxS, { type:'bar', data:{ labels: sLabels, datasets:[
+    { label: vA.name, data:[vA.sensors.lidar,vA.sensors.radar,vA.sensors.cameras,vA.sensors.ultrasonic], backgroundColor: cA, borderRadius: 6 },
+    { label: vB.name, data:[vB.sensors.lidar,vB.sensors.radar,vB.sensors.cameras,vB.sensors.ultrasonic], backgroundColor: cB, borderRadius: 6 }
+  ]}, options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ position:'bottom', labels:{ font:{ size:11 } } } }, scales:{ y:{ beginAtZero:true, title:{ display:true, text:'Count', font:{size:11} } } } }});
+  var lvls = ['L0','L1','L2','L3','L4/5'];
+  var ivA = [0, 0.15, 0.32, 0.08, 0.03];
+  var ivB = [0, 0.14, 0.25, 0.05, 0.02];
+  fleetChartB = new Chart(ctxI, { type:'line', data:{ labels: lvls, datasets:[
+    { label: vA.name, data: ivA, borderColor:'rgb(14,165,233)', backgroundColor:'rgba(14,165,233,0.1)', fill:true, tension:0.4, pointRadius:4 },
+    { label: vB.name, data: ivB, borderColor:'rgb(99,102,241)', backgroundColor:'rgba(99,102,241,0.1)', fill:true, tension:0.4, pointRadius:4 }
+  ]}, options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ position:'bottom', labels:{ font:{ size:11 } } } }, scales:{ y:{ beginAtZero:true, max:0.5, title:{ display:true, text:'Interventions/km', font:{size:11} } } } }});
+}
 
-// ════════════════════════ MULTI-COUNTRY CALIBRATION HUB ════════════════════════
+window.addEventListener('load', function () { setTimeout(fleetOnLevel, 500); });
+
+// ════════════════════════════════ MULTI-COUNTRY CALIBRATION HUB ════════════════════════════════
 var COUNTRY_DATA = {
     egypt: { name: 'Egypt (Cairo Ring Road)',
         fleet: { mlaijy: 0.30, microbus: 0.20, noss_naql: 0.08, rob_naql: 0.07, naql_taqeel: 0.05, motorcycle: 0.05, bicycle: 0.02, trooscoor: 0.015, tuktuk: 0.015, av: 0.20 },
