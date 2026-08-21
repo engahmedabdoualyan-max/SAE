@@ -3,6 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cdn.tailwindcss.com">
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
+    <link rel="dns-prefetch" href="https://maps.googleapis.com">
+    <link rel="dns-prefetch" href="https://airquality.googleapis.com">
+    <link rel="dns-prefetch" href="https://weather.googleapis.com">
     <title>SAE AutoSim Hub | Pre-Calibrated Traffic Simulation Fleets for Egypt &amp; Arab World</title>
     <meta name="description" content="Pre-calibrated vehicle fleets for chaotic, aggressive, non-lane-based traffic environments. Wiedemann 99, SUMO Krauss, and Aimsun IDM parameters for Egyptian Microbus, Mlaiky, and Naql fleets. Supporting researchers worldwide.">
     <meta name="keywords" content="traffic micro-simulation, SAE autonomous vehicle calibration, Egypt Ring Road traffic simulation, Wiedemann 99 microbuses calibration, SUMO vehicle definition profiles, VISSIM Egyptian fleet, Aimsun mixed traffic, non-lane-based traffic modeling, AV market penetration rate, car-following model calibration, Cairo traffic, Arab world transportation research, cooperative adaptive cruise control, CACC platooning">
@@ -567,6 +575,94 @@
                 <button onclick="generatePDFReport()" class="px-8 py-3 bg-red-500 text-white rounded-xl font-bold hover:bg-red-600 transition shadow-lg">
                     <i class="fas fa-download mr-2"></i><span data-key="pdf_btn">Download PDF Report</span>
                 </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== NIGHT-TIME DRIVING & ROAD SURFACE ========== -->
+    <section id="night-surface" class="py-16 bg-slate-900 text-white">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-8">
+                <h2 class="text-3xl font-bold mb-3"><i class="fas fa-moon mr-2 text-yellow-300"></i><span data-key="ns_title">Night-Time & Road Surface Conditions</span></h2>
+                <p class="text-slate-300 max-w-3xl mx-auto text-sm" data-key="ns_desc">Headlight visibility modeling, lane marking detection, and pavement friction coefficients (AASHTO Green Book)</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto">
+                <div class="bg-slate-800 rounded-xl p-5">
+                    <h4 class="font-bold mb-3"><i class="fas fa-moon mr-2 text-yellow-300"></i><span data-key="ns_night">Night-Time Visibility</span></h4>
+                    <div class="space-y-3">
+                        <div class="flex justify-between text-sm"><span class="text-slate-400" data-key="ns_headlight">Headlight Range</span><span id="ns-headlight" class="font-mono text-yellow-300">80m</span></div>
+                        <div class="flex justify-between text-sm"><span class="text-slate-400" data-key="ns_lane_det">Lane Detection Rate</span><span id="ns-lane-det" class="font-mono text-green-400">92%</span></div>
+                        <div class="flex justify-between text-sm"><span class="text-slate-400" data-key="ns_speed_red">Night Speed Reduction</span><span id="ns-speed-red" class="font-mono text-orange-400">-15%</span></div>
+                        <div class="flex justify-between text-sm"><span class="text-slate-400" data-key="ns_crash_risk">Crash Risk Multiplier</span><span id="ns-crash-risk" class="font-mono text-red-400">2.1x</span></div>
+                    </div>
+                </div>
+                <div class="bg-slate-800 rounded-xl p-5">
+                    <h4 class="font-bold mb-3"><i class="fas fa-road mr-2 text-blue-400"></i><span data-key="ns_surface">Road Surface Condition</span></h4>
+                    <div class="space-y-3">
+                        <div class="flex justify-between text-sm"><span class="text-slate-400" data-key="ns_friction">Friction Coefficient</span><span id="ns-friction" class="font-mono text-primary">0.70</span></div>
+                        <div class="flex justify-between text-sm"><span class="text-slate-400" data-key="ns_braking">Braking Distance Factor</span><span id="ns-braking" class="font-mono text-yellow-300">1.0x</span></div>
+                        <div class="flex justify-between text-sm"><span class="text-slate-400" data-key="ns_condition">Surface Condition</span><span id="ns-condition" class="font-mono text-green-400">Dry</span></div>
+                        <div class="flex justify-between text-sm"><span class="text-slate-400" data-key="ns_grip">Tire Grip Level</span><span id="ns-grip" class="font-mono text-green-400">Optimal</span></div>
+                    </div>
+                </div>
+            </div>
+            <div class="max-w-3xl mx-auto mt-6 bg-slate-800 rounded-xl p-4 text-xs text-slate-400" data-key="ns_ref">Reference: AASHTO Green Book (2018), ASTM E1911 (Pendulum Test), FMVSS 108 (Lighting)</div>
+        </div>
+    </section>
+
+    <!-- ========== INTERSECTION & WORK ZONE ANALYSIS ========== -->
+    <section id="intersection-workzone" class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-8">
+                <h2 class="text-3xl font-bold text-slate-800 mb-3"><i class="fas fa-crosshairs mr-2 text-secondary"></i><span data-key="iw_title">Intersection & Work Zone Analysis</span></h2>
+                <p class="text-slate-600 max-w-3xl mx-auto text-sm" data-key="iw_desc">Signalized vs unsignalized conflict analysis, work zone queue modeling, and heavy vehicle climbing lane assessment</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+                <div class="bg-white rounded-xl shadow-md border border-slate-200 p-5">
+                    <h4 class="font-bold text-slate-800 mb-3"><i class="fas fa-traffic-light mr-2 text-red-500"></i><span data-key="iw_signal">Signalized Intersection</span></h4>
+                    <div class="space-y-2 text-sm">
+                        <div class="flex justify-between"><span class="text-slate-500" data-key="iw_cycle">Cycle Length</span><span id="iw-cycle" class="font-mono">90s</span></div>
+                        <div class="flex justify-between"><span class="text-slate-500" data-key="iw_green">Green Ratio</span><span id="iw-green" class="font-mono">0.45</span></div>
+                        <div class="flex justify-between"><span class="text-slate-500" data-key="iw_capacity">Capacity</span><span id="iw-capacity" class="font-mono text-primary">1,800 veh/h</span></div>
+                        <div class="flex justify-between"><span class="text-slate-500" data-key="iw_delay">Avg Delay</span><span id="iw-delay" class="font-mono text-orange-500">35s</span></div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl shadow-md border border-slate-200 p-5">
+                    <h4 class="font-bold text-slate-800 mb-3"><i class="fas fa-hard-hat mr-2 text-amber-500"></i><span data-key="iw_workzone">Work Zone Management</span></h4>
+                    <div class="space-y-2 text-sm">
+                        <div class="flex justify-between"><span class="text-slate-500" data-key="iw_lane_closure">Lane Closure</span><span id="iw-lane-closure" class="font-mono">1 of 3</span></div>
+                        <div class="flex justify-between"><span class="text-slate-500" data-key="iw_queue">Queue Length</span><span id="iw-queue" class="font-mono text-red-500">0.8 km</span></div>
+                        <div class="flex justify-between"><span class="text-slate-500" data-key="iw_speed_wz">Work Zone Speed</span><span id="iw-speed-wz" class="font-mono">50 km/h</span></div>
+                        <div class="flex justify-between"><span class="text-slate-500" data-key="iw_ttc_wz">TTC (Work Zone)</span><span id="iw-ttc-wz" class="font-mono text-yellow-500">3.2s</span></div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl shadow-md border border-slate-200 p-5">
+                    <h4 class="font-bold text-slate-800 mb-3"><i class="fas fa-truck mr-2 text-purple-500"></i><span data-key="iw_climb">Climbing Lane Analysis</span></h4>
+                    <div class="space-y-2 text-sm">
+                        <div class="flex justify-between"><span class="text-slate-500" data-key="iw_grade_seg">Grade Segment</span><span id="iw-grade-seg" class="font-mono">+4.5%</span></div>
+                        <div class="flex justify-between"><span class="text-slate-500" data-key="iw_hv_speed">HV Speed on Grade</span><span id="iw-hv-speed" class="font-mono text-orange-500">35 km/h</span></div>
+                        <div class="flex justify-between"><span class="text-slate-500" data-key="iw_overtake">Overtaking Frequency</span><span id="iw-overtake" class="font-mono">12/hr</span></div>
+                        <div class="flex justify-between"><span class="text-slate-500" data-key="iw_lane_need">Climbing Lane Needed</span><span id="iw-lane-need" class="font-mono text-green-500">Yes</span></div>
+                    </div>
+                </div>
+            </div>
+            <div class="max-w-3xl mx-auto mt-6 bg-slate-50 rounded-xl p-4 text-xs text-slate-500" data-key="iw_ref">Reference: HCM Chapter 19 (Intersections), MUTCD Chapter 6 (Work Zones), AASHTO Green Book (Climbing Lanes)</div>
+        </div>
+    </section>
+
+    <!-- ========== SIMULATION REPLAY ========== -->
+    <section id="replay" class="py-12 bg-slate-50 border-t border-slate-200">
+        <div class="container mx-auto px-4">
+            <div class="max-w-3xl mx-auto text-center">
+                <h2 class="text-2xl font-bold text-slate-800 mb-3"><i class="fas fa-redo mr-2 text-primary"></i><span data-key="rp_title">Simulation Replay</span></h2>
+                <p class="text-slate-600 text-sm mb-4" data-key="rp_desc">Record and replay simulation scenarios for analysis and comparison</p>
+                <div class="flex justify-center gap-3">
+                    <button onclick="startRecording()" id="rec-btn" class="px-5 py-2 bg-red-500 text-white rounded-lg font-semibold hover:bg-red-600 transition"><i class="fas fa-circle mr-1"></i><span data-key="rp_record">Record</span></button>
+                    <button onclick="stopRecording()" id="stop-btn" class="px-5 py-2 bg-slate-500 text-white rounded-lg font-semibold hover:bg-slate-600 transition" disabled><i class="fas fa-stop mr-1"></i><span data-key="rp_stop">Stop</span></button>
+                    <button onclick="playReplay()" id="play-btn" class="px-5 py-2 bg-green-500 text-white rounded-lg font-semibold hover:bg-green-600 transition" disabled><i class="fas fa-play mr-1"></i><span data-key="rp_play">Replay</span></button>
+                </div>
+                <div id="replay-status" class="mt-3 text-sm text-slate-500" data-key="rp_status">Ready to record</div>
+                <div class="mt-3 w-full bg-slate-200 rounded-full h-2"><div id="replay-progress" class="h-full rounded-full bg-primary transition-all" style="width:0%"></div></div>
             </div>
         </div>
     </section>
@@ -2675,6 +2771,44 @@
     "pdf_title": "Export Simulation Report",
     "pdf_desc": "Generate a comprehensive academic paper-ready PDF report",
     "pdf_btn": "Download PDF Report",
+
+    "ns_title": "Night-Time & Road Surface Conditions",
+    "ns_desc": "Headlight visibility, lane marking detection, pavement friction (AASHTO Green Book)",
+    "ns_night": "Night-Time Visibility",
+    "ns_headlight": "Headlight Range",
+    "ns_lane_det": "Lane Detection Rate",
+    "ns_speed_red": "Night Speed Reduction",
+    "ns_crash_risk": "Crash Risk Multiplier",
+    "ns_surface": "Road Surface Condition",
+    "ns_friction": "Friction Coefficient",
+    "ns_braking": "Braking Distance Factor",
+    "ns_condition": "Surface Condition",
+    "ns_grip": "Tire Grip Level",
+    "ns_ref": "Reference: AASHTO Green Book (2018), ASTM E1911, FMVSS 108",
+    "iw_title": "Intersection & Work Zone Analysis",
+    "iw_desc": "Signalized vs unsignalized conflicts, work zone queue, climbing lanes",
+    "iw_signal": "Signalized Intersection",
+    "iw_cycle": "Cycle Length",
+    "iw_green": "Green Ratio",
+    "iw_capacity": "Capacity",
+    "iw_delay": "Avg Delay",
+    "iw_workzone": "Work Zone Management",
+    "iw_lane_closure": "Lane Closure",
+    "iw_queue": "Queue Length",
+    "iw_speed_wz": "Work Zone Speed",
+    "iw_ttc_wz": "TTC (Work Zone)",
+    "iw_climb": "Climbing Lane Analysis",
+    "iw_grade_seg": "Grade Segment",
+    "iw_hv_speed": "HV Speed on Grade",
+    "iw_overtake": "Overtaking Frequency",
+    "iw_lane_need": "Climbing Lane Needed",
+    "iw_ref": "Reference: HCM Ch.19, MUTCD Ch.6, AASHTO Green Book",
+    "rp_title": "Simulation Replay",
+    "rp_desc": "Record and replay simulation scenarios for analysis",
+    "rp_record": "Record",
+    "rp_stop": "Stop",
+    "rp_play": "Replay",
+    "rp_status": "Ready to record",
   },
   "ar": {
     "t": "SAE AutoSim Hub",
@@ -3037,6 +3171,44 @@
     "pdf_title": "تصدير تقرير المحاكاة",
     "pdf_desc": "إنشاء تقرير PDF أكاديمي شامل",
     "pdf_btn": "تحميل تقرير PDF",
+
+    "ns_title": "القيادة الليلية وظروف السطح",
+    "ns_desc": "رؤية المصابيح، كشف العلامات، احتكاك الرصف",
+    "ns_night": "الرؤية الليلية",
+    "ns_headlight": "مدى المصابيح",
+    "ns_lane_det": "معدل كشف المسار",
+    "ns_speed_red": "تخفيض السرعة الليلية",
+    "ns_crash_risk": "معامل خطر الحوادث",
+    "ns_surface": "حالة سطح الطريق",
+    "ns_friction": "معامل الاحتكاك",
+    "ns_braking": "معامل مسافة الكبح",
+    "ns_condition": "حالة السطح",
+    "ns_grip": "مستوى احتكاك الإطارات",
+    "ns_ref": "مرجع: دليل AASHTO الأخضر",
+    "iw_title": "تحليل التقاطعات ومناطق العمل",
+    "iw_desc": "تضارب الضوئي وغير الضوئي، طابور العمل، ممرات التسلق",
+    "iw_signal": "تقاطع بإشارة ضوئية",
+    "iw_cycle": "طول الدورة",
+    "iw_green": "نسبة الأخضر",
+    "iw_capacity": "السعة",
+    "iw_delay": "التأخير المتوسط",
+    "iw_workzone": "إدارة منطقة العمل",
+    "iw_lane_closure": "إغلاق الممر",
+    "iw_queue": "طول الطابور",
+    "iw_speed_wz": "سرعة منطقة العمل",
+    "iw_ttc_wz": "TTC (منطقة العمل)",
+    "iw_climb": "تحليل ممر التسلق",
+    "iw_grade_seg": "قطعة ميل",
+    "iw_hv_speed": "سرعة المركبات الثقيلة على الميل",
+    "iw_overtake": "تكرار التجاوز",
+    "iw_lane_need": "ممر تسلق مطلوب",
+    "iw_ref": "مرجع: HCM الفصل 19",
+    "rp_title": "إعادة تشغيل المحاكاة",
+    "rp_desc": "تسجيل وتشغيل سيناريوهات المحاكاة",
+    "rp_record": "تسجيل",
+    "rp_stop": "إيقاف",
+    "rp_play": "إعادة تشغيل",
+    "rp_status": "جاهز للتسجيل",
   },
   "ru": {
     "t": "SAE AutoSim Hub",
@@ -3396,6 +3568,44 @@
     "pdf_title": "Eksport otchyota simulatsii",
     "pdf_desc": "Sostavit kompleksnyy PDF-otchyot",
     "pdf_btn": "Skachat PDF-otchyot",
+
+    "ns_title": "Nochnoye vozhdeniye i sostoyaniye dorogi",
+    "ns_desc": "Vidimost far, opredeleniye razmetki, treniye",
+    "ns_night": "Nochnaya vidimost",
+    "ns_headlight": "Dalnost far",
+    "ns_lane_det": "Pokazatel opredeleniya polosy",
+    "ns_speed_red": "Snizheniye skorosti nochyu",
+    "ns_crash_risk": "Mnozhitel riska DTP",
+    "ns_surface": "Sostoyaniye dorozhnogo pokrytiya",
+    "ns_friction": "Koeffitsient treniya",
+    "ns_braking": "Faktor tormoznogo puti",
+    "ns_condition": "Sostoyaniye poverkhnosti",
+    "ns_grip": "Uroven szhaniya shin",
+    "ns_ref": "Literatura: AASHTO Green Book",
+    "iw_title": "Analiz perekrestkov i rabochikh zon",
+    "iw_desc": "Konflikty s signalizatsiyey i bez, ocheredi, podemnye polosy",
+    "iw_signal": "Perekrestok s signalizatsiyey",
+    "iw_cycle": "Dlitelnost tsikla",
+    "iw_green": "Zelenoye sootnosheniye",
+    "iw_capacity": "Propusk",
+    "iw_delay": "Srednyaya zaderzhka",
+    "iw_workzone": "Upravleniye rabochey zonoy",
+    "iw_lane_closure": "Zakrytiye polosy",
+    "iw_queue": "Dlina ocheredi",
+    "iw_speed_wz": "Skorost v rabochey zone",
+    "iw_ttc_wz": "TTC (rabochaya zona)",
+    "iw_climb": "Analiz podemnoy polosy",
+    "iw_grade_seg": "Uchastok uzlova",
+    "iw_hv_speed": "Skorost TY na uzle",
+    "iw_overtake": "Chastota obgona",
+    "iw_lane_need": "Podemnaya polosa nuzhna",
+    "iw_ref": "Literatura: HSM, MUTCD, AASHTO",
+    "rp_title": "Vosproizvedeniye simulatsii",
+    "rp_desc": "Zapis i vosproizvedeniye stsenariyev",
+    "rp_record": "Zapis",
+    "rp_stop": "Ostanovka",
+    "rp_play": "Vosproizvesti",
+    "rp_status": "Gotovo k zapisi",
   },
   "hi": {
     "t": "SAE AutoSim Hub",
@@ -3731,6 +3941,44 @@
     "pdf_title": "Simulation Report Niryat",
     "pdf_desc": "Ek vyapak akademik PDF report taiyar karein",
     "pdf_btn": "PDF Report Download karein",
+
+    "ns_title": "Raat ka samay aur Sadak Satah",
+    "ns_desc": "Headlight drishtya, lane marking, pavement friction",
+    "ns_night": "Raat ki drishtya",
+    "ns_headlight": "Headlight ki doori",
+    "ns_lane_det": "Lane detection dar",
+    "ns_speed_red": "Raat gati kami",
+    "ns_crash_risk": "Durghatna risk gunank",
+    "ns_surface": "Sadak satah sthiti",
+    "ns_friction": "Ghisav gungank",
+    "ns_braking": "Braking doori gungank",
+    "ns_condition": "Satah sthiti",
+    "ns_grip": "Tyre grip star",
+    "ns_ref": "Sandarbh: AASHTO Green Book",
+    "iw_title": "Intersection aur Work Zone vishleshan",
+    "iw_desc": "Signal vs non-signal takrav, work zone queue, climbing lane",
+    "iw_signal": "Signal intersection",
+    "iw_cycle": "Cycle lambai",
+    "iw_green": "Green anupaat",
+    "iw_capacity": "Kshamata",
+    "iw_delay": "Ausat vilamb",
+    "iw_workzone": "Work zone prabandhan",
+    "iw_lane_closure": "Lane band",
+    "iw_queue": "Queue lambai",
+    "iw_speed_wz": "Work zone gati",
+    "iw_ttc_wz": "TTC (Work zone)",
+    "iw_climb": "Climbing lane vishleshan",
+    "iw_grade_seg": "Grade khand",
+    "iw_hv_speed": "HV gati grade par",
+    "iw_overtake": "Overtaking aavritti",
+    "iw_lane_need": "Climbing lane aavashyak",
+    "iw_ref": "Sandarbh: HCM Ch.19, MUTCD Ch.6",
+    "rp_title": "Simulation punah chalayein",
+    "rp_desc": "Simulation scenario record karein",
+    "rp_record": "Record",
+    "rp_stop": "Ruko",
+    "rp_play": "Chalayein",
+    "rp_status": "Record ke liye taiyar",
   },
   "de": {
     "t": "SAE AutoSim Hub",
@@ -4090,6 +4338,44 @@
     "pdf_title": "Simulationsbericht exportieren",
     "pdf_desc": "Umfassenden akademischen PDF-Bericht erstellen",
     "pdf_btn": "PDF-Bericht herunterladen",
+
+    "ns_title": "Nachtfehrt & Strassenzustand",
+    "ns_desc": "Scheinwerfer-Sicht, Fahrbahnmarkierung, Reibung",
+    "ns_night": "Nachtsicht",
+    "ns_headlight": "Scheinwerfer-Reichweite",
+    "ns_lane_det": "Fahrspurerkennungsrate",
+    "ns_speed_red": "Nachtgeschwindigkeitsreduktion",
+    "ns_crash_risk": "Unfallrisiko-Multiplikator",
+    "ns_surface": "Strassenzustand",
+    "ns_friction": "Reibungskoeffizient",
+    "ns_braking": "Bremswegfaktor",
+    "ns_condition": "Oberflaechenzustand",
+    "ns_grip": "Reifengrip-Niveau",
+    "ns_ref": "Referenz: AASHTO Green Book",
+    "iw_title": "Kreuzungs- & Baustellenanalyse",
+    "iw_desc": "Signalisierte vs unsignalisierte Konflikte, Baustellen-Warteschlangen, Steigspuren",
+    "iw_signal": "Signalisierte Kreuzung",
+    "iw_cycle": "Zykluslaenge",
+    "iw_green": "Grune Ratio",
+    "iw_capacity": "Kapazitat",
+    "iw_delay": "Durchschn. Verzoegerung",
+    "iw_workzone": "Baustellenmanagement",
+    "iw_lane_closure": "Sperrung",
+    "iw_queue": "Schlangenlaenge",
+    "iw_speed_wz": "Baustellengeschwindigkeit",
+    "iw_ttc_wz": "TTC (Baustelle)",
+    "iw_climb": "Steigspuren-Analyse",
+    "iw_grade_seg": "Gefaelleabschnitt",
+    "iw_hv_speed": "LKW-Geschw. auf Gefaelle",
+    "iw_overtake": "Uberholhaeufigkeit",
+    "iw_lane_need": "Steigspur erforderlich",
+    "iw_ref": "Referenz: HCM Kap.19, MUTCD Kap.6",
+    "rp_title": "Simulations-Wiedergabe",
+    "rp_desc": "Simulationsszenarien aufnehmen und abspielen",
+    "rp_record": "Aufnehmen",
+    "rp_stop": "Stopp",
+    "rp_play": "Abspielen",
+    "rp_status": "Bereit zum Aufnehmen",
   },
   "zh": {
     "t": "SAE AutoSim Hub",
@@ -4449,6 +4735,44 @@
     "pdf_title": "导出仿真报告",
     "pdf_desc": "生成全面的学术论文PDF报告",
     "pdf_btn": "下载PDF报告",
+
+    "ns_title": "夜间驾驶与路面状况",
+    "ns_desc": "前灯可见度、车道标记检测、路面摩擦系数",
+    "ns_night": "夜间可见度",
+    "ns_headlight": "前灯照射范围",
+    "ns_lane_det": "车道检测率",
+    "ns_speed_red": "夜间速度降低",
+    "ns_crash_risk": "事故风险倍数",
+    "ns_surface": "路面状况",
+    "ns_friction": "摩擦系数",
+    "ns_braking": "制动距离系数",
+    "ns_condition": "路面状態",
+    "ns_grip": "轮胎抓地力",
+    "ns_ref": "参考：AASHTO Green Book",
+    "iw_title": "交叉口与施工区分析",
+    "iw_desc": "信号灯与无信号冲突、施工区队列、爬坡车道",
+    "iw_signal": "信号灯交叉口",
+    "iw_cycle": "周期长度",
+    "iw_green": "绿信比",
+    "iw_capacity": "通行能力",
+    "iw_delay": "平均延误",
+    "iw_workzone": "施工区管理",
+    "iw_lane_closure": "车道封闭",
+    "iw_queue": "排队长度",
+    "iw_speed_wz": "施工区速度",
+    "iw_ttc_wz": "TTC（施工区）",
+    "iw_climb": "爬坡车道分析",
+    "iw_grade_seg": "纵坡路段",
+    "iw_hv_speed": "重车爬坡速度",
+    "iw_overtake": "超车频率",
+    "iw_lane_need": "需要爬坡车道",
+    "iw_ref": "参考：HCM第19章, MUTCD第6章",
+    "rp_title": "仿真回放",
+    "rp_desc": "录制和回放仿真场景",
+    "rp_record": "录制",
+    "rp_stop": "停止",
+    "rp_play": "回放",
+    "rp_status": "准备录制",
   },
   "ja": {
     "t": "SAE AutoSim Hub",
@@ -4784,6 +5108,44 @@
     "pdf_title": "シミュレーションレポート出力",
     "pdf_desc": "包括的な学術論文PDFレポートを生成",
     "pdf_btn": "PDFレポートをダウンロード",
+
+    "ns_title": "夜間走行と路面状態",
+    "ns_desc": "ヘッドライト視界、車線検出、路面摩擦",
+    "ns_night": "夜間視界",
+    "ns_headlight": "ヘッドライト範囲",
+    "ns_lane_det": "車線検出率",
+    "ns_speed_red": "夜間速度低減",
+    "ns_crash_risk": "事故リスク倍率",
+    "ns_surface": "路面状態",
+    "ns_friction": "摩擦保数",
+    "ns_braking": "制動距離保数",
+    "ns_condition": "路面状態",
+    "ns_grip": "タイヤグリップレベル",
+    "ns_ref": "参考：AASHTO Green Book",
+    "iw_title": "交差点と工事区間分析",
+    "iw_desc": "信号交差点と無信号の衝突、工事区間キュー、登坂車線",
+    "iw_signal": "信号交差点",
+    "iw_cycle": "サイクル長",
+    "iw_green": "青信比",
+    "iw_capacity": "通行容量",
+    "iw_delay": "平均遅延",
+    "iw_workzone": "工事区間管理",
+    "iw_lane_closure": "車線閉鎖",
+    "iw_queue": "待ち行列長",
+    "iw_speed_wz": "工事区間速度",
+    "iw_ttc_wz": "TTC（工事区間）",
+    "iw_climb": "登坂車線分析",
+    "iw_grade_seg": "勾配区間",
+    "iw_hv_speed": "重車登坂速度",
+    "iw_overtake": "追越頻度",
+    "iw_lane_need": "登坂車線必要",
+    "iw_ref": "参考：HCM第19章, MUTCD第6章",
+    "rp_title": "シミュレーション再生",
+    "rp_desc": "シナリオの記録と再生",
+    "rp_record": "記録",
+    "rp_stop": "停止",
+    "rp_play": "再生",
+    "rp_status": "録画準備完了",
   },
   "ko": {
     "t": "SAE AutoSim Hub",
@@ -5119,6 +5481,44 @@
     "pdf_title": "시뮬레이션 리포트 내보내기",
     "pdf_desc": "포괄적인 학술 논문 PDF 리포트 생성",
     "pdf_btn": "PDF 리포트 다운로드",
+
+    "ns_title": "야간 주행 및 도로 타사",
+    "ns_desc": "헐드라이트 가시성, 차선 검출, 노면 마윤",
+    "ns_night": "야간 가시성",
+    "ns_headlight": "헐드라이트 범위",
+    "ns_lane_det": "차선 검출율",
+    "ns_speed_red": "야간 속도 감소",
+    "ns_crash_risk": "사고 위험 배율",
+    "ns_surface": "도로 타사",
+    "ns_friction": "마윤 계수",
+    "ns_braking": "제동견 계수",
+    "ns_condition": "노면 타사",
+    "ns_grip": "타이어 깩 수표",
+    "ns_ref": "참고: AASHTO Green Book",
+    "iw_title": "교차로 및 작업구간 분석",
+    "iw_desc": "신호교차로 vs 비신호교차로, 작업구간 대기열, 경사차환",
+    "iw_signal": "신호교차로",
+    "iw_cycle": "신호주기",
+    "iw_green": "녹색 비율",
+    "iw_capacity": "욥량",
+    "iw_delay": "평글 지연",
+    "iw_workzone": "작업구간 관리",
+    "iw_lane_closure": "차선 파솉",
+    "iw_queue": "대기행려 길이",
+    "iw_speed_wz": "작업구간 속도",
+    "iw_ttc_wz": "TTC (작업구간)",
+    "iw_climb": "경사차환 분석",
+    "iw_grade_seg": "경사 구간",
+    "iw_hv_speed": "중차량 경사 속도",
+    "iw_overtake": "추월 빘시",
+    "iw_lane_need": "경사차환 필요",
+    "iw_ref": "참고: HCM 19장, MUTCD 6장",
+    "rp_title": "시마륀에이션 재생",
+    "rp_desc": "시나리오 녹움 및 재생",
+    "rp_record": "녹화",
+    "rp_stop": "정지",
+    "rp_play": "재생",
+    "rp_status": "녹화 준비 완료",
   },
   "fr": {
     "t": "SAE AutoSim Hub",
@@ -5478,6 +5878,44 @@
     "pdf_title": "Exporter le Rapport de Simulation",
     "pdf_desc": "Generer un rapport PDF academique complet",
     "pdf_btn": "Telecharger le PDF",
+
+    "ns_title": "Conduite Nocturne & Etat du Revetement",
+    "ns_desc": "Visibilite feux, detection lignes, friction revetement",
+    "ns_night": "Visibilite Nocturne",
+    "ns_headlight": "Portee des Feux",
+    "ns_lane_det": "Taux Detection Voie",
+    "ns_speed_red": "Reduction Vitesse Nocturne",
+    "ns_crash_risk": "Multiplicateur Risque Accident",
+    "ns_surface": "Etat du Revetement",
+    "ns_friction": "Coefficient de Friction",
+    "ns_braking": "Facteur Distance Freinage",
+    "ns_condition": "Etat de Surface",
+    "ns_grip": "Niveau Adherence Pneu",
+    "ns_ref": "Reference: AASHTO Green Book",
+    "iw_title": "Analyse Carrefours & Zones de Travail",
+    "iw_desc": "Conflits semaphores vs non, files attente zones travaux, voies montee",
+    "iw_signal": "Carrefar Semaphore",
+    "iw_cycle": "Duree Cycle",
+    "iw_green": "Ratio Vert",
+    "iw_capacity": "Capacite",
+    "iw_delay": "Delai Moyen",
+    "iw_workzone": "Gestion Zone de Travail",
+    "iw_lane_closure": "Fermeture Voie",
+    "iw_queue": "Longueur File",
+    "iw_speed_wz": "Vitesse Zone Travail",
+    "iw_ttc_wz": "TTC (Zone Travail)",
+    "iw_climb": "Analyse Voie de Montee",
+    "iw_grade_seg": "Segment Pente",
+    "iw_hv_speed": "Vitesse PL sur Pente",
+    "iw_overtake": "Frequence Depassement",
+    "iw_lane_need": "Voie de Montee Necessaire",
+    "iw_ref": "Reference: HCM Ch.19, MUTCD Ch.6",
+    "rp_title": "Rejeu Simulation",
+    "rp_desc": "Enregistrer et rejouer les scenarios",
+    "rp_record": "Enregistrer",
+    "rp_stop": "Arreter",
+    "rp_play": "Rejouer",
+    "rp_status": "Pret a enregistrer",
   }
 };
     const LANG_OPTIONS = [];
@@ -6622,6 +7060,127 @@ function updateAllModules(mpr) {
     computeCarbonCredits(mpr);
     updatePlatooning(mpr);
     computeCrashPrediction(mpr);
+    updateNightSurface();
+    updateIntersectionWorkzone(mpr);
+    captureReplayFrame(mpr);
+}
+
+// ══════════════════════════════════════════════════════════
+// NIGHT-TIME DRIVING & ROAD SURFACE MODELING
+// ══════════════════════════════════════════════════════════
+var NIGHT_SURFACE = {
+    headlightRange: 80,
+    laneDetection: 0.92,
+    nightSpeedReduction: 0.15,
+    crashRiskMultiplier: 2.1,
+    friction: { dry: 0.70, wet: 0.45, icy: 0.20, snow: 0.30 },
+    brakingFactor: { dry: 1.0, wet: 1.56, icy: 3.5, snow: 2.33 }
+};
+var isNightTime = false;
+var currentSurface = 'dry';
+function updateNightSurface() {
+    var hour = new Date().getHours();
+    isNightTime = (hour < 6 || hour > 20);
+    var weather = (liveTraffic && liveTraffic.weather) ? liveTraffic.weather.toLowerCase() : '';
+    if (weather.indexOf('rain') !== -1 || weather.indexOf('shower') !== -1) currentSurface = 'wet';
+    else if (weather.indexOf('snow') !== -1 || weather.indexOf('sleet') !== -1) currentSurface = 'snow';
+    else if (weather.indexOf('ice') !== -1 || weather.indexOf('freez') !== -1) currentSurface = 'icy';
+    else currentSurface = 'dry';
+    var friction = NIGHT_SURFACE.friction[currentSurface] || 0.70;
+    var braking = NIGHT_SURFACE.brakingFactor[currentSurface] || 1.0;
+    var nightMod = isNightTime ? NIGHT_SURFACE.nightSpeedReduction : 0;
+    var laneDet = isNightTime ? NIGHT_SURFACE.laneDetection : 0.98;
+    var crashRisk = isNightTime ? NIGHT_SURFACE.crashRiskMultiplier : 1.0;
+    crashRisk *= (currentSurface === 'icy' ? 1.8 : currentSurface === 'wet' ? 1.3 : 1.0);
+    var condLabel = currentSurface.charAt(0).toUpperCase() + currentSurface.slice(1);
+    var gripLabel = friction >= 0.6 ? 'Optimal' : friction >= 0.35 ? 'Reduced' : 'Critical';
+    var gripColor = friction >= 0.6 ? 'text-green-400' : friction >= 0.35 ? 'text-yellow-400' : 'text-red-400';
+    var el;
+    el = document.getElementById('ns-headlight'); if (el) el.textContent = (isNightTime ? NIGHT_SURFACE.headlightRange : '--') + (isNightTime ? 'm' : '');
+    el = document.getElementById('ns-lane-det'); if (el) el.textContent = Math.round(laneDet * 100) + '%';
+    el = document.getElementById('ns-speed-red'); if (el) el.textContent = isNightTime ? '-' + Math.round(nightMod * 100) + '%' : '0%';
+    el = document.getElementById('ns-crash-risk'); if (el) el.textContent = crashRisk.toFixed(1) + 'x';
+    el = document.getElementById('ns-friction'); if (el) el.textContent = friction.toFixed(2);
+    el = document.getElementById('ns-braking'); if (el) el.textContent = braking.toFixed(1) + 'x';
+    el = document.getElementById('ns-condition'); if (el) { el.textContent = condLabel; el.className = 'font-mono ' + (currentSurface === 'dry' ? 'text-green-400' : 'text-orange-400'); }
+    el = document.getElementById('ns-grip'); if (el) { el.textContent = gripLabel; el.className = 'font-mono ' + gripColor; }
+}
+
+// ══════════════════════════════════════════════════════════
+// INTERSECTION & WORK ZONE ANALYSIS
+// ══════════════════════════════════════════════════════════
+var INTERSECTION = { cycleLength: 90, greenRatio: 0.45, satFlow: 1800 };
+var WORKZONE = { laneClosure: 1, totalLanes: 3, speedLimit: 50, queueBase: 0.8 };
+var CLIMBING = { grade: 4.5, hvSpeed: 35, overtakesPerHr: 12 };
+function updateIntersectionWorkzone(mpr) {
+    var m = mpr / 100;
+    var capacity = Math.round(INTERSECTION.satFlow * INTERSECTION.greenRatio * (1 - m * 0.1));
+    var delay = Math.round(35 * (1 + m * 0.2));
+    var queueLen = (WORKZONE.queueBase * (1 - m * 0.3)).toFixed(1);
+    var ttc = (3.2 * (1 - m * 0.4)).toFixed(1);
+    var hvSpeed = Math.round(CLIMBING.hvSpeed * (1 + m * 0.3));
+    var overtakes = Math.round(CLIMBING.overtakesPerHr * (1 - m * 0.5));
+    var laneNeed = CLIMBING.grade > 3.0 ? 'Yes' : 'No';
+    var el;
+    el = document.getElementById('iw-cycle'); if (el) el.textContent = INTERSECTION.cycleLength + 's';
+    el = document.getElementById('iw-green'); if (el) el.textContent = INTERSECTION.greenRatio.toFixed(2);
+    el = document.getElementById('iw-capacity'); if (el) el.textContent = capacity.toLocaleString() + ' veh/h';
+    el = document.getElementById('iw-delay'); if (el) el.textContent = delay + 's';
+    el = document.getElementById('iw-lane-closure'); if (el) el.textContent = WORKZONE.laneClosure + ' of ' + WORKZONE.totalLanes;
+    el = document.getElementById('iw-queue'); if (el) el.textContent = queueLen + ' km';
+    el = document.getElementById('iw-speed-wz'); if (el) el.textContent = WORKZONE.speedLimit + ' km/h';
+    el = document.getElementById('iw-ttc-wz'); if (el) el.textContent = ttc + 's';
+    el = document.getElementById('iw-grade-seg'); if (el) el.textContent = '+' + CLIMBING.grade + '%';
+    el = document.getElementById('iw-hv-speed'); if (el) el.textContent = hvSpeed + ' km/h';
+    el = document.getElementById('iw-overtake'); if (el) el.textContent = overtakes + '/hr';
+    el = document.getElementById('iw-lane-need'); if (el) { el.textContent = laneNeed; el.className = 'font-mono ' + (laneNeed === 'Yes' ? 'text-green-500' : 'text-slate-500'); }
+}
+
+// ══════════════════════════════════════════════════════════
+// SIMULATION REPLAY / RECORDING SYSTEM
+// ══════════════════════════════════════════════════════════
+var replayState = { recording: false, frames: [], frameIdx: 0, playing: false, interval: null };
+function startRecording() {
+    replayState.recording = true;
+    replayState.frames = [];
+    document.getElementById('rec-btn').disabled = true;
+    document.getElementById('stop-btn').disabled = false;
+    document.getElementById('replay-status').textContent = 'Recording... (MPR changes captured)';
+    document.getElementById('replay-progress').style.width = '0%';
+}
+function stopRecording() {
+    replayState.recording = false;
+    document.getElementById('rec-btn').disabled = false;
+    document.getElementById('stop-btn').disabled = true;
+    document.getElementById('play-btn').disabled = replayState.frames.length === 0;
+    document.getElementById('replay-status').textContent = 'Recorded ' + replayState.frames.length + ' frames. Ready to replay.';
+}
+function captureReplayFrame(mpr) {
+    if (!replayState.recording) return;
+    replayState.frames.push({ mpr: mpr, weather: currentWeatherCondition, surface: currentSurface, time: Date.now() });
+}
+function playReplay() {
+    if (replayState.frames.length === 0) return;
+    replayState.playing = true;
+    replayState.frameIdx = 0;
+    document.getElementById('play-btn').disabled = true;
+    document.getElementById('replay-status').textContent = 'Playing...';
+    replayState.interval = setInterval(function() {
+        if (replayState.frameIdx >= replayState.frames.length) {
+            clearInterval(replayState.interval);
+            replayState.playing = false;
+            document.getElementById('play-btn').disabled = false;
+            document.getElementById('replay-status').textContent = 'Replay complete.';
+            return;
+        }
+        var frame = replayState.frames[replayState.frameIdx];
+        var slider = document.getElementById('mpr-slider');
+        if (slider) { slider.value = frame.mpr; updateMPR(frame.mpr); }
+        var pct = (replayState.frameIdx / replayState.frames.length * 100).toFixed(0);
+        document.getElementById('replay-progress').style.width = pct + '%';
+        document.getElementById('replay-status').textContent = 'Frame ' + (replayState.frameIdx + 1) + '/' + replayState.frames.length + ' — MPR: ' + frame.mpr + '%';
+        replayState.frameIdx++;
+    }, 500);
 }
 
     </script>
