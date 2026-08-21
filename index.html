@@ -6011,100 +6011,7 @@
         if (gd) gd.textContent = TRANSLATIONS[currentLang].gen + ' ' + currentPlatform.toUpperCase() + ' - ' + mprValue + '%';
     }
 
-    window.addEventListener('load', function() {
-        var saved = localStorage.getItem('sae-lang') || 'en';
-        document.getElementById('lang-select').value = saved;
-        setLanguage(saved);
-        document.querySelectorAll('[data-platform-btn]').forEach(function(btn) {
-            btn.classList.toggle('active', btn.getAttribute('data-platform') === 'vissim');
-        });
-        updateFleetTable(mprValue);
-        setTimeout(initSim, 500);
-        loadGoogleMaps();
-        if (typeof fleetOnLevel === 'function') fleetOnLevel();
-        renderCountryHub();
-        setTimeout(function() {
-            if (typeof renderForecastChart === 'function') renderForecastChart();
-            if (typeof renderConflictChart === 'function') renderConflictChart();
-            if (typeof updateAllModules === 'function') updateAllModules(mprValue);
-        }, 800);
-    });
-
-// ════════════════════════ CAIRO RING ROAD + AV COMPARISON ════════════════════════
-
-
-
-var currentCountry = 'egypt';
-var currentScenario = 'A';
-var rrScenario = 'A';
-var rrMap = null, rrPolyA = null, rrPolyB = null, rrMarkers = [], rrMPR = 10;
-var rrOverlay = null, rrAnim = null;
-var liveTraffic = { volume: 0.62, hvShare: 0.22, speed: 45, aqi: 120, co2: 0, nox: 0, weather: 'Clear', ts: 0 };
-var GOOGLE_API_KEY = 'AIzaSyBkFu8PekIyzEhmHy1wYc6MgfxgKl6mUcM';
-var airQuality = { aqi: null, pm25: null, co: null, no2: null, pm25u: '', cou: '', no2u: '', ts: 0 };
-var airPCEmult = 1;
-
-function corridorCentroid() {
-  var cor = CORRIDORS[currentCorridor] || CORRIDORS.egypt;
-  var coords = cor.coords;
-  var la = 0, lo = 0;
-  coords.forEach(function (p) { la += p.lat; lo += p.lng; });
-  return { lat: la / coords.length, lng: lo / coords.length };
-}
-function fetchAirQuality() {
-  if (!GOOGLE_API_KEY) return;
-  var now = Date.now();
-  if (API_RATE_LIMIT.lastCall['aq'] && (now - API_RATE_LIMIT.lastCall['aq']) < API_RATE_LIMIT.minInterval) return;
-  API_RATE_LIMIT.lastCall['aq'] = now;
-  var c = corridorCentroid();
-  var url = 'https://airquality.googleapis.com/v1/currentConditions:lookup?key=' + GOOGLE_API_KEY;
-  var body = JSON.stringify({
-    location: { latitude: c.lat, longitude: c.lng },
-    extraComputations: ['LOCAL_AQI', 'POLLUTANT_CONCENTRATION', 'HEALTH_RECOMMENDATIONS'],
-    languageCode: 'en', universalAqi: true
-  });
-  fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: body })
-    .then(function (r) { if (!r.ok) throw new Error('aq' + r.status); return r.json(); })
-    .then(function (data) {
-      var aqi = null;
-      if (data.indexes && data.indexes.length) {
-        var u = data.indexes.filter(function (i) { return i.code === 'uaqi'; })[0] || data.indexes[0];
-        aqi = u.aqi;
-      }
-      var pm25 = null, co = null, no2 = null, pm25u = '', cou = '', no2u = '';
-      if (data.pollutants) {
-        data.pollutants.forEach(function (p) {
-          if (!p.concentration) return;
-          if (p.code === 'pm25') { pm25 = p.concentration.value; pm25u = p.concentration.units || ''; }
-          else if (p.code === 'co') { co = p.concentration.value; cou = p.concentration.units || ''; }
-          else if (p.code === 'no2') { no2 = p.concentration.value; no2u = p.concentration.units || ''; }
-        });
-      }
-      airQuality.aqi = aqi; airQuality.pm25 = pm25; airQuality.co = co; airQuality.no2 = no2;
-      airQuality.pm25u = pm25u; airQuality.cou = cou; airQuality.no2u = no2u; airQuality.ts = Date.now();
-      airPCEmult = 1 + (pm25 != null ? Math.min(2.5, pm25 / 120) : 0);
-      if (typeof updateEnvTracker === 'function') updateEnvTracker(rrMPR);
-      if (typeof updatePhysicsBox === 'function') updatePhysicsBox(rrMPR);
-    })
-    .catch(function () { /* keep computed eco metrics on failure */ });
-}
-function fetchWeather() {
-  if (!GOOGLE_API_KEY) return;
-  var now = Date.now();
-  if (API_RATE_LIMIT.lastCall['wx'] && (now - API_RATE_LIMIT.lastCall['wx']) < API_RATE_LIMIT.minInterval) return;
-  API_RATE_LIMIT.lastCall['wx'] = now;
-  var c = corridorCentroid();
-  var url = 'https://weather.googleapis.com/v1/currentConditions:lookup?key=' + GOOGLE_API_KEY
-    + '&location.latitude=' + c.lat + '&location.longitude=' + c.lng;
-  fetch(url)
-    .then(function (r) { if (!r.ok) throw new Error('wx' + r.status); return r.json(); })
-    .then(function (data) {
-      var cond = (data.weatherCondition && data.weatherCondition.description && data.weatherCondition.description.text) || null;
-      if (cond) liveTraffic.weather = cond;
-      if (typeof updateLiveTelemetry === 'function') updateLiveTelemetry();
-    })
-    .catch(function () { /* keep simulated weather on failure */ });
-}
+    var GOOGLE_API_KEY = 'AIzaSyBkFu8PekIyzEhmHy1wYc6MgfxgKl6mUcM';
 
 // True analytical corridor: Qalyub Interchange -> Dar Al Salam bottleneck -> Adly Mansour Intermodal Hub
 var RING_ROAD_COORDS = [
@@ -6201,6 +6108,116 @@ var CORRIDORS = {
 var currentCorridor = 'egypt';
 
 var RING_ROAD_MARKERS = CORRIDORS.egypt.markers;
+window.addEventListener('load', function() {
+        // Check for file:// protocol (causes black screens for YouTube/Maps)
+        if (window.location.protocol === 'file:') {
+            var msg = document.createElement('div');
+            msg.id = 'file-protocol-warning';
+            msg.className = 'fixed top-0 inset-x-0 bg-red-500 text-white text-center py-3 text-sm z-[100]';
+            msg.innerHTML = '<i class="fas fa-exclamation-triangle mr-2"></i>Local file mode detected. YouTube videos, Google Maps, and Air Quality API will not work. Please deploy to <strong>https://sae.fimtosoft.com</strong> or use a local HTTP server <code>python3 -m http.server 8080</code>';
+            document.body.insertBefore(msg, document.body.firstChild);
+        }
+        try {
+            var saved = localStorage.getItem('sae-lang') || 'en';
+            document.getElementById('lang-select').value = saved;
+            setLanguage(saved);
+            document.querySelectorAll('[data-platform-btn]').forEach(function(btn) {
+                btn.classList.toggle('active', btn.getAttribute('data-platform') === 'vissim');
+            });
+            updateFleetTable(mprValue);
+            setTimeout(initSim, 500);
+            loadGoogleMaps();
+            if (typeof fleetOnLevel === 'function') fleetOnLevel();
+            renderCountryHub();
+            setTimeout(function() {
+                if (typeof renderForecastChart === 'function') renderForecastChart();
+                if (typeof renderConflictChart === 'function') renderConflictChart();
+                if (typeof updateAllModules === 'function') updateAllModules(mprValue);
+            }, 800);
+        } catch(err) {
+            console.error('SAE AutoSim Hub initialization error:', err, err.stack);
+            console.error('CORRIDORS type:', typeof CORRIDORS, 'value:', CORRIDORS);
+            console.error('currentCorridor:', currentCorridor);
+            console.error('GOOGLE_API_KEY:', GOOGLE_API_KEY);
+            console.error('Window load handler reached CORRIDORS?', typeof CORRIDORS !== 'undefined');
+        }
+    });
+
+// ════════════════════════ CAIRO RING ROAD + AV COMPARISON ════════════════════════
+
+
+
+var currentCountry = 'egypt';
+var currentScenario = 'A';
+var rrScenario = 'A';
+var rrMap = null, rrPolyA = null, rrPolyB = null, rrMarkers = [], rrMPR = 10;
+var rrOverlay = null, rrAnim = null;
+var liveTraffic = { volume: 0.62, hvShare: 0.22, speed: 45, aqi: 120, co2: 0, nox: 0, weather: 'Clear', ts: 0 };
+var airQuality = { aqi: null, pm25: null, co: null, no2: null, pm25u: '', cou: '', no2u: '', ts: 0 };
+var airPCEmult = 1;
+
+function corridorCentroid() {
+  var cor = CORRIDORS[currentCorridor] || CORRIDORS.egypt;
+  var coords = cor.coords;
+  var la = 0, lo = 0;
+  coords.forEach(function (p) { la += p.lat; lo += p.lng; });
+  return { lat: la / coords.length, lng: lo / coords.length };
+}
+function fetchAirQuality() {
+  if (!GOOGLE_API_KEY) return;
+  var now = Date.now();
+  if (API_RATE_LIMIT.lastCall['aq'] && (now - API_RATE_LIMIT.lastCall['aq']) < API_RATE_LIMIT.minInterval) return;
+  API_RATE_LIMIT.lastCall['aq'] = now;
+  var c = corridorCentroid();
+  var url = 'https://airquality.googleapis.com/v1/currentConditions:lookup?key=' + GOOGLE_API_KEY;
+  var body = JSON.stringify({
+    location: { latitude: c.lat, longitude: c.lng },
+    extraComputations: ['LOCAL_AQI', 'POLLUTANT_CONCENTRATION', 'HEALTH_RECOMMENDATIONS'],
+    languageCode: 'en', universalAqi: true
+  });
+  fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: body })
+    .then(function (r) { if (!r.ok) throw new Error('aq' + r.status); return r.json(); })
+    .then(function (data) {
+      var aqi = null;
+      if (data.indexes && data.indexes.length) {
+        var u = data.indexes.filter(function (i) { return i.code === 'uaqi'; })[0] || data.indexes[0];
+        aqi = u.aqi;
+      }
+      var pm25 = null, co = null, no2 = null, pm25u = '', cou = '', no2u = '';
+      if (data.pollutants) {
+        data.pollutants.forEach(function (p) {
+          if (!p.concentration) return;
+          if (p.code === 'pm25') { pm25 = p.concentration.value; pm25u = p.concentration.units || ''; }
+          else if (p.code === 'co') { co = p.concentration.value; cou = p.concentration.units || ''; }
+          else if (p.code === 'no2') { no2 = p.concentration.value; no2u = p.concentration.units || ''; }
+        });
+      }
+      airQuality.aqi = aqi; airQuality.pm25 = pm25; airQuality.co = co; airQuality.no2 = no2;
+      airQuality.pm25u = pm25u; airQuality.cou = cou; airQuality.no2u = no2u; airQuality.ts = Date.now();
+      airPCEmult = 1 + (pm25 != null ? Math.min(2.5, pm25 / 120) : 0);
+      if (typeof updateEnvTracker === 'function') updateEnvTracker(rrMPR);
+      if (typeof updatePhysicsBox === 'function') updatePhysicsBox(rrMPR);
+    })
+    .catch(function () { /* keep computed eco metrics on failure */ });
+}
+function fetchWeather() {
+  if (!GOOGLE_API_KEY) return;
+  var now = Date.now();
+  if (API_RATE_LIMIT.lastCall['wx'] && (now - API_RATE_LIMIT.lastCall['wx']) < API_RATE_LIMIT.minInterval) return;
+  API_RATE_LIMIT.lastCall['wx'] = now;
+  var c = corridorCentroid();
+  var url = 'https://weather.googleapis.com/v1/currentConditions:lookup?key=' + GOOGLE_API_KEY
+    + '&location.latitude=' + c.lat + '&location.longitude=' + c.lng;
+  fetch(url)
+    .then(function (r) { if (!r.ok) throw new Error('wx' + r.status); return r.json(); })
+    .then(function (data) {
+      var cond = (data.weatherCondition && data.weatherCondition.description && data.weatherCondition.description.text) || null;
+      if (cond) liveTraffic.weather = cond;
+      if (typeof updateLiveTelemetry === 'function') updateLiveTelemetry();
+    })
+    .catch(function () { /* keep simulated weather on failure */ });
+}
+
 
 function markerContent(mk) {
   var G = countryGrade();
@@ -6243,6 +6260,11 @@ function refreshRingRoadLabels() {
 }
 
 function initRingRoadMap() {
+  if (typeof CORRIDORS === 'undefined' || !CORRIDORS[currentCorridor]) {
+    console.error('CORRIDORS not defined - retrying...');
+    setTimeout(initRingRoadMap, 500);
+    return;
+  }
   var el = document.getElementById('ringroad-map');
   if (!el) return;
   if (typeof google === 'undefined' || !google.maps) {
@@ -6251,6 +6273,7 @@ function initRingRoadMap() {
   }
   try {
     var cor = CORRIDORS[currentCorridor] || CORRIDORS.egypt;
+    RingRoadOverlay.prototype = new google.maps.OverlayView();
     rrMap = new google.maps.Map(el, {
       center: cor.center, zoom: cor.zoom,
       styles: [
@@ -6282,6 +6305,7 @@ function initRingRoadMap() {
     if (sl) sl.addEventListener('input', function () {
       var v = parseInt(this.value, 10);
       updateRingRoadStyle(v); updateEnvTracker(v); updatePhysicsBox(v);
+      if (typeof updateAllModules === 'function') updateAllModules(v);
     });
   } catch (e) {
     el.innerHTML = '<div class="h-full flex items-center justify-center text-slate-200 text-sm p-6 text-center">Google Maps failed to initialize.</div>';
@@ -6346,10 +6370,9 @@ function routePoint(path, frac) {
 
 function RingRoadOverlay(map) {
   this.map_ = map; this.div_ = null; this.canvas_ = null;
-  this.vehicles_ = []; this.proj_ = null;
-  this.setMap(map);
+   this.vehicles_ = []; this.proj_ = null;
+   this.setMap(map);
 }
-RingRoadOverlay.prototype = new google.maps.OverlayView();
 RingRoadOverlay.prototype.onAdd = function () {
   var self = this;
   var div = document.createElement('div');
@@ -6450,12 +6473,19 @@ function loadGoogleMaps() {
   var s = document.createElement('script');
   s.src = 'https://maps.googleapis.com/maps/api/js?key=' + GOOGLE_API_KEY + '&callback=initRingRoadMap';
   s.async = true; s.defer = true;
+  s.referrerPolicy = 'no-referrer-when-downgrade';
   s.onerror = function () {
     var el = document.getElementById('ringroad-map');
-    if (el) el.innerHTML = '<div class="h-full flex items-center justify-center text-slate-400 text-sm p-6 text-center">Google Maps script failed to load. Provide a valid API key.</div>';
+    if (el) el.innerHTML = '<div class="h-full flex items-center justify-center text-slate-200 text-sm p-6 text-center">Google Maps script failed to load. <br>Ensure the API key is valid and Maps JavaScript API is enabled.<br><small>Current protocol: ' + window.location.protocol + '</small></div>';
   };
   document.head.appendChild(s);
-  updateRingRoadStyle(rrMPR);
+  // Verify callback was invoked within 10 seconds
+  setTimeout(function() {
+    if (!rrMap && typeof google !== 'undefined' && google.maps) {
+      var el = document.getElementById('ringroad-map');
+      if (el) el.innerHTML = '<div class="h-full flex items-center justify-center text-slate-200 text-sm p-6 text-center">Google Maps loaded but map initialization failed.<br>Ensure the API key is valid and Maps JavaScript API is enabled.</div>';
+    }
+  }, 10000);
 }
 
 function setScenario(s) {
