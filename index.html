@@ -4277,7 +4277,7 @@ function initRingRoadMap() {
   var el = document.getElementById('ringroad-map');
   if (!el) return;
   if (typeof google === 'undefined' || !google.maps) {
-    el.innerHTML = '<div class="h-full flex items-center justify-center text-slate-400 text-sm p-6 text-center">Google Maps could not load. Add a valid API key (YOUR_GOOGLE_MAPS_API_KEY) to enable the live corridor view.</div>';
+    el.innerHTML = '<div class="h-full flex items-center justify-center text-slate-400 text-sm p-6 text-center">Google Maps could not load. Check that the API key is valid and allowed for this domain.</div>';
     return;
   }
   try {
@@ -4308,7 +4308,7 @@ function initRingRoadMap() {
 function loadGoogleMaps() {
   if (typeof google !== 'undefined' && google.maps) { initRingRoadMap(); return; }
   var s = document.createElement('script');
-  s.src = 'https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY&callback=initRingRoadMap';
+  s.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyBkFu8PekIyzEhmHy1wYc6MgfxgKl6mUcM&callback=initRingRoadMap';
   s.async = true; s.defer = true;
   s.onerror = function () {
     var el = document.getElementById('ringroad-map');
