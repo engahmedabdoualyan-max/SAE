@@ -1,0 +1,30 @@
+{
+  "name": "sae",
+  "version": "1.0.0",
+  "description": "Welcome to the ultimate repository and configuration framework for **SAE AutoSim Hub (https://sae.fimtosoft.com)**. This platform bridges the gap between dynamic macro traffic engineering constraints and real-world commercial automated driving parameters, with a dedicated strategic focus on global researchers and the Arab World infrastructure scaling.",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/engahmedabdoualyan-max/SAE.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/engahmedabdoualyan-max/SAE/issues"
+  },
+  "homepage": "https://github.com/engahmedabdoualyan-max/SAE#readme",
+  "dependencies": {
+    "jest": "^30.4.2",
+    "jsdom": "^30.0.1",
+    "puppeteer": "^25.8.0",
+    "sharp": "^0.35.3"
+  }
+}
