@@ -285,6 +285,26 @@
                 <div id="ringroad-map" class="w-full h-[460px] bg-slate-800"></div>
                 <div id="rr-stats" class="absolute top-3 right-3 bg-slate-900/80 rounded-lg p-3 text-xs font-mono"></div>
             </div>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4">
+                <div class="bg-slate-800 rounded-xl p-5">
+                    <h3 class="font-bold text-slate-100 mb-3"><i class="fas fa-leaf mr-2 text-green-400"></i><span data-key="env_tracker">Environmental &amp; Air Quality Tracker</span></h3>
+                    <div class="grid grid-cols-3 gap-3 text-center">
+                        <div class="bg-slate-900/60 rounded-lg p-3"><div class="text-xs text-slate-400" data-key="env_aqi">AQI</div><div id="env-aqi" class="text-2xl font-bold text-orange-400">--</div></div>
+                        <div class="bg-slate-900/60 rounded-lg p-3"><div class="text-xs text-slate-400" data-key="env_co2">CO2</div><div id="env-co2" class="text-lg font-bold text-yellow-300">--</div></div>
+                        <div class="bg-slate-900/60 rounded-lg p-3"><div class="text-xs text-slate-400" data-key="env_nox">NOx</div><div id="env-nox" class="text-lg font-bold text-red-300">--</div></div>
+                    </div>
+                    <div id="env-banner" class="mt-3 px-3 py-2 rounded-lg text-sm bg-red-500/20 border border-red-400 text-red-200"></div>
+                </div>
+                <div class="bg-slate-800 rounded-xl p-5">
+                    <h3 class="font-bold text-slate-100 mb-3"><i class="fas fa-calculator mr-2 text-primary"></i><span data-key="phys_title">Advanced Traffic Physics</span></h3>
+                    <div class="space-y-2 text-sm">
+                        <div class="flex justify-between"><span class="text-slate-400" data-key="phys_grade">Active Grade</span><span id="phys-grade" class="font-mono text-yellow-300">--</span></div>
+                        <div class="flex justify-between"><span class="text-slate-400" data-key="pce_lbl">Avg PCE</span><span id="phys-pce" class="font-mono text-primary">--</span></div>
+                        <div class="flex justify-between"><span class="text-slate-400" data-key="phys_fhv">Heavy-Vehicle fHV</span><span id="phys-fhv" class="font-mono text-primary">--</span></div>
+                        <div class="flex justify-between"><span class="text-slate-400" data-key="phys_cap">PCE Capacity</span><span id="phys-cap" class="font-mono text-green-300">--</span></div>
+                    </div>
+                </div>
+            </div>
             <div class="flex flex-wrap justify-center gap-4 mt-4 text-xs text-slate-300">
                 <span class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-red-500"></span> <span data-key="rr_leg_ramp">Entry Ramp</span></span>
                 <span class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-blue-500"></span> <span data-key="rr_leg_exit">Exit Lane</span></span>
@@ -1640,6 +1660,86 @@
     // ══════════════════════════════════════════════════════════
     // FLEET CALCULATOR — Weighted τ, capacity, metrics
     // ══════════════════════════════════════════════════════════
+
+    const PHYS = {
+        dCoeff: { mlaijy:0.25, microbus:0.6, noss_naql:0.8, rob_naql:0.7, naql_taqeel:1.4, motorcycle:0.15, bicycle:0.05, trooscoor:0.5, tuktuk:0.4, av:0.1 },
+        pceFlat: { mlaijy:1.0, microbus:1.5, noss_naql:1.8, rob_naql:1.6, naql_taqeel:2.5, motorcycle:0.5, bicycle:0.3, trooscoor:0.8, tuktuk:0.7, av:1.0 },
+        pceIncline: { mlaijy:1.1, microbus:2.2, noss_naql:2.6, rob_naql:2.3, naql_taqeel:4.5, motorcycle:0.6, bicycle:0.35, trooscoor:1.1, tuktuk:0.9, av:1.0 },
+        baseSpeed: { mlaijy:25.0, microbus:22.2, noss_naql:20.8, rob_naql:19.4, naql_taqeel:16.7, motorcycle:27.8, bicycle:4.2, trooscoor:12.0, tuktuk:10.0, av:22.0 }
+    };
+    function countryGrade() {
+        var g = { egypt: 3.5, ksa: 0.5, uae: 1.0, jordan: 4.0 };
+        return g[currentCountry] !== undefined ? g[currentCountry] : 3.0;
+    }
+    function gradeAdjustedSpeed(key, G) {
+        var vf = PHYS.baseSpeed[key] !== undefined ? PHYS.baseSpeed[key] : 22.0;
+        var d = PHYS.dCoeff[key] !== undefined ? PHYS.dCoeff[key] : 0.3;
+        var s = vf - d * G;
+        return s < 5 ? 5 : s;
+    }
+    function dynamicPCE(key, G, platoonShare) {
+        var pce = (G > 3) ? (PHYS.pceIncline[key] !== undefined ? PHYS.pceIncline[key] : 1.5)
+                          : (PHYS.pceFlat[key] !== undefined ? PHYS.pceFlat[key] : 1.0);
+        if ((key === 'naql_taqeel' || key === 'noss_naql') && platoonShare > 0.2) pce *= 0.75;
+        return pce;
+    }
+    function compositeCapacity(mpr, G) {
+        var m = mpr / 100;
+        var fleet = (COUNTRY_DATA[currentCountry] && COUNTRY_DATA[currentCountry].fleet)
+            ? COUNTRY_DATA[currentCountry].fleet
+            : { mlaijy:0.30, microbus:0.20, noss_naql:0.08, rob_naql:0.07, naql_taqeel:0.05, motorcycle:0.05, bicycle:0.02, trooscoor:0.015, tuktuk:0.015, av:0.20 };
+        var numPCE = 0, denom = 0, pHV = 0;
+        Object.keys(fleet).forEach(function (k) {
+            var share = fleet[k];
+            if (k === 'av') {
+                var pa = dynamicPCE('av', G, m);
+                numPCE += m * share * pa; denom += m * share;
+            } else {
+                var p = dynamicPCE(k, G, m);
+                numPCE += (1 - m) * share * p; denom += (1 - m) * share;
+                if (p > 1.3) pHV += (1 - m) * share;
+            }
+        });
+        var pceAvg = denom > 0 ? numPCE / denom : 1;
+        var fHV = 1 / (1 + pHV * (pceAvg - 1));
+        var v = (COUNTRY_DATA[currentCountry] ? COUNTRY_DATA[currentCountry].road.speedLimit / 3.6 : 22.22);
+        var tauSum = computeWeightedFleet(mpr).weighted.tau;
+        var avgLenGap = 6.0;
+        var C = Math.round(3600 * fHV / (tauSum + avgLenGap / v));
+        C = Math.max(800, Math.min(3600, C));
+        return { C: C, pceAvg: pceAvg, fHV: fHV, pHV: pHV };
+    }
+    function emissionsIndex(mpr, G) {
+        return 1 + (G / 10) + ((100 - mpr) / 100) * 1.2;
+    }
+    function updatePhysicsBox(mpr) {
+        var G = countryGrade();
+        var res = compositeCapacity(mpr, G);
+        var el;
+        el = document.getElementById('phys-grade'); if (el) el.textContent = '+' + G.toFixed(1) + '%';
+        el = document.getElementById('phys-pce'); if (el) el.textContent = res.pceAvg.toFixed(2);
+        el = document.getElementById('phys-fhv'); if (el) el.textContent = res.fHV.toFixed(3);
+        el = document.getElementById('phys-cap'); if (el) el.textContent = res.C.toLocaleString();
+    }
+    function updateEnvTracker(mpr) {
+        var G = countryGrade();
+        var e = emissionsIndex(mpr, G);
+        var el;
+        el = document.getElementById('env-co2'); if (el) el.textContent = (e * 0.18).toFixed(2) + ' g/km';
+        el = document.getElementById('env-nox'); if (el) el.textContent = (e * 0.9).toFixed(2) + ' mg/km';
+        var aqi = Math.round(40 + (e - 1) * 60);
+        el = document.getElementById('env-aqi'); if (el) el.textContent = aqi;
+        var banner = document.getElementById('env-banner');
+        if (banner) {
+            if (mpr < 40) { banner.className = 'mt-3 px-3 py-2 rounded-lg text-sm bg-red-500/20 border border-red-400 text-red-200'; banner.textContent = t('env_high'); }
+            else if (mpr < 75) { banner.className = 'mt-3 px-3 py-2 rounded-lg text-sm bg-yellow-500/20 border border-yellow-400 text-yellow-200'; banner.textContent = t('env_mid'); }
+            else { banner.className = 'mt-3 px-3 py-2 rounded-lg text-sm bg-green-500/20 border border-green-400 text-green-200'; banner.textContent = t('carbon_red'); }
+        }
+    }
+    function updateMapPhysics() {
+        try { if (typeof refreshRingRoadLabels === 'function') refreshRingRoadLabels(); } catch (e) {}
+    }
+
     function computeWeightedFleet(mpr) {
         var m = mpr / 100;
         var humanShare = 1 - m;
@@ -1695,6 +1795,9 @@
         el = document.getElementById('cap-bar');     if (el) el.style.width = Math.max(2, capPct) + '%';
 
         el = document.getElementById('sim-mpr-label'); if (el) el.textContent = 'MPR: ' + mpr + '%';
+        updatePhysicsBox(mpr);
+        updateEnvTracker(mpr);
+        updateMapPhysics();
     }
 
     // ══════════════════════════════════════════════════════════
@@ -2186,6 +2289,21 @@
     "rr_mk_mostorod_d": "Chronic congestion hotspot where heavy trucks and microbuses compete for limited lane width.",
     "rr_mk_dar": "Dar Al Salam / Maadi Exit Lane",
     "rr_mk_dar_d": "Southern terminus exit distributing traffic toward Maadi and Dar Al Salam districts.",
+    "env_tracker": "Environmental & Air Quality Tracker",
+    "env_aqi": "AQI",
+    "env_co2": "CO2",
+    "env_nox": "NOx",
+    "env_high": "High emissions: microbus stop-and-go shockwaves on steep inclines dominate.",
+    "env_mid": "Transitioning: partial AV penetration beginning to smooth traffic flow.",
+    "env_low": "Low emissions: fluent platooning reduces carbon output.",
+    "phys_title": "Advanced Traffic Physics",
+    "phys_grade": "Active Grade",
+    "pce_lbl": "Passenger Car Equivalent",
+    "phys_fhv": "Heavy-Vehicle fHV",
+    "phys_cap": "PCE Capacity",
+    "carbon_red": "Carbon Emissions Reduction achieved via AV platooning.",
+    "ksa_express": "Saudi Arabia Expressways",
+    "grade_lbl": "Grade Incline",
   },
   "ar": {
     "t": "SAE AutoSim Hub",
@@ -2441,6 +2559,21 @@
     "rr_mk_mostorod_d": "نقطة اختناق مزمنة حيث تتنافس الشاحنات الثقيلة والميكروباصات على عرض حارة محدود.",
     "rr_mk_dar": "مخرج دار السلام / المعادي",
     "rr_mk_dar_d": "مخرج النهاية الجنوبية الذي يوزع المرور نحو حي المعادي ودار السلام.",
+    "env_tracker": "متتبع البيئة وجودة الهواء",
+    "env_aqi": "مؤشر AQI",
+    "env_co2": "ثاني أكسيد الكربون",
+    "env_nox": "أكاسيد النيتروجين",
+    "env_high": "انبعاثات عالية: موجات صدمية من الميكروباص على المنحدرات الحادة.",
+    "env_mid": "انتقال: اختراق جزئي للمركبات الذاتية يبدأ بتنعيم التدفق.",
+    "env_low": "انبعاثات منخفضة: القطر الموحد يقلل الكربون.",
+    "phys_title": "فيزياء المرور المتقدمة",
+    "phys_grade": "المنحدر النشط",
+    "pce_lbl": "مكافئ السيارة الركاب",
+    "phys_fhv": "عامل المركبات الثقيلة fHV",
+    "phys_cap": "سعة PCE",
+    "carbon_red": "خفض انبعاثات الكربون عبر القطر الموحد للمركبات الذاتية.",
+    "ksa_express": "طرق السعودية السريعة",
+    "grade_lbl": "انحدار المرتفع",
   },
   "ru": {
     "t": "SAE AutoSim Hub",
@@ -2693,6 +2826,21 @@
     "rr_mk_mostorod_d": "Хроническая точка затора, где тяжёлые грузовики и микроавтобусы делят узкую полосу.",
     "rr_mk_dar": "Съезд Дар Аль-Салам / Маади",
     "rr_mk_dar_d": "Южный терминальный съезд, распределяющий поток к Маади и Дар Аль-Салам.",
+    "env_tracker": "Мониторинг экологии и качества воздуха",
+    "env_aqi": "AQI",
+    "env_co2": "CO2",
+    "env_nox": "NOx",
+    "env_high": "Высокие выбросы: волны остановок микроавтобусов на крутых подъёмах.",
+    "env_mid": "Переход: частичное проникновение АТС сглаживает поток.",
+    "env_low": "Низкие выбросы: плавный платонинг снижает углерод.",
+    "phys_title": "Продвинутая физика трафика",
+    "phys_grade": "Активный уклон",
+    "pce_lbl": "Эквивалент легкового авто",
+    "phys_fhv": "Коэффициент тяжёлых ТС fHV",
+    "phys_cap": "Пропускная PCE",
+    "carbon_red": "Снижение выбросов углерода за счёт платонинга АТС.",
+    "ksa_express": "Скоростные трассы Саудовской Аравии",
+    "grade_lbl": "Наклон подъёма",
   },
   "hi": {
     "t": "SAE AutoSim Hub",
@@ -2921,6 +3069,21 @@
     "rr_mk_mostorod_d": "गंभीर भीड़ हॉटस्पॉट जहां भारी ट्रक और माइक्रोबस सीमित लेन चौड़ाई के लिए प्रतिस्पर्धा करते हैं.",
     "rr_mk_dar": "दार अल सलाम / मआदी निकास लेन",
     "rr_mk_dar_d": "दक्षिणी टर्मिनस निकास जो मआदी और दार अल सलाम जिलों की ओर ट्रैफिक वितरित करता है.",
+    "env_tracker": "पर्यावरण और वायु गुणवत्ता ट्रैकर",
+    "env_aqi": "AQI",
+    "env_co2": "CO2",
+    "env_nox": "NOx",
+    "env_high": "उच्च उत्सर्जन: खड़ी चढ़ाई पर माइक्रोबस रुक-रुक कर चलने की शॉकवेव प्रभावी.",
+    "env_mid": "संक्रमण: आंशिक AV प्रवेश प्रवाह को सुचारू कर रहा है.",
+    "env_low": "निम्न उत्सर्जन: सुचारू प्लाटूनिंग कार्बन घटाती है.",
+    "phys_title": "उन्नत ट्रैफिक फिजिक्स",
+    "phys_grade": "सक्रिय ग्रेड",
+    "pce_lbl": "यात्री कार समतुल्य",
+    "phys_fhv": "भारी वाहन fHV",
+    "phys_cap": "PCE क्षमता",
+    "carbon_red": "AV प्लाटूनिंग से कार्बन उत्सर्जन में कमी.",
+    "ksa_express": "सऊदी अरब एक्सप्रेसवे",
+    "grade_lbl": "ढाल चढ़ाव",
   },
   "de": {
     "t": "SAE AutoSim Hub",
@@ -3173,6 +3336,21 @@
     "rr_mk_mostorod_d": "Chronischer Stau-Hotspot, an dem schwere LKW und Microbusse um begrenzte Spurbreite kämpfen.",
     "rr_mk_dar": "Ausfahrt Dar Al Salam / Maadi",
     "rr_mk_dar_d": "Südlicher Endpunkt, der den Verkehr Richtung Maadi und Dar Al Salam verteilt.",
+    "env_tracker": "Umwelt- und Luftqualitäts-Tracker",
+    "env_aqi": "AQI",
+    "env_co2": "CO2",
+    "env_nox": "NOx",
+    "env_high": "Hohe Emissionen: Stop-and-Go-Schockwellen der Microbusse an steilen Rampen.",
+    "env_mid": "Übergang: Teilweise AV-Durchdringung glättet den Verkehr.",
+    "env_low": "Niedrige Emissionen: Flüssiges Platooning senkt den Kohlenstoff.",
+    "phys_title": "Erweiterte Verkehrsphysik",
+    "phys_grade": "Aktiver Gradient",
+    "pce_lbl": "Pkw-Äquivalent",
+    "phys_fhv": "Schwerfahrzeug-fHV",
+    "phys_cap": "PCE-Kapazität",
+    "carbon_red": "Kohlenstoffreduktion durch AV-Platooning erreicht.",
+    "ksa_express": "Saudi-Arabien Autobahnen",
+    "grade_lbl": "Steigungsgefälle",
   },
   "zh": {
     "t": "SAE AutoSim Hub",
@@ -3425,6 +3603,21 @@
     "rr_mk_mostorod_d": "重型卡车与面包车争夺有限车道宽度的长期拥堵热点.",
     "rr_mk_dar": "达拉萨拉姆 / 马阿迪出口车道",
     "rr_mk_dar_d": "向南端出口分流至马阿迪与达拉萨拉姆片区.",
+    "env_tracker": "环境与空气质量追踪器",
+    "env_aqi": "AQI",
+    "env_co2": "CO2",
+    "env_nox": "NOx",
+    "env_high": "高排放：陡坡上微型巴士走走停停的冲击波主导.",
+    "env_mid": "过渡：部分自动驾驶渗透开始平顺车流.",
+    "env_low": "低排放：流畅车队降低碳输出.",
+    "phys_title": "高级交通物理",
+    "phys_grade": "活动坡度",
+    "pce_lbl": "客车当量",
+    "phys_fhv": "重型车 fHV",
+    "phys_cap": "PCE 通行能力",
+    "carbon_red": "通过自动驾驶车队实现碳减排.",
+    "ksa_express": "沙特阿拉伯高速公路",
+    "grade_lbl": "坡度",
   },
   "ja": {
     "t": "SAE AutoSim Hub",
@@ -3653,6 +3846,21 @@
     "rr_mk_mostorod_d": "重トラックとマイクロバスが限られた車線幅を奪い合う慢性的渋滞ホットスポット.",
     "rr_mk_dar": "ダルアッサラーム / マアディ出口車線",
     "rr_mk_dar_d": "マアディとダルアッサラーム地区へ交通を分配する南端出口.",
+    "env_tracker": "環境・大気質トラッカー",
+    "env_aqi": "AQI",
+    "env_co2": "CO2",
+    "env_nox": "NOx",
+    "env_high": "高排出：急勾配でのマイクロバスの発停ショック波が支配的.",
+    "env_mid": "移行中：部分的なAV普及が流れを滑らかに.",
+    "env_low": "低排出：流暢なプラトーン走行が炭素を削減.",
+    "phys_title": "高度交通物理学",
+    "phys_grade": "活動勾配",
+    "pce_lbl": "乗用車等価",
+    "phys_fhv": "重型車 fHV",
+    "phys_cap": "PCE 容量",
+    "carbon_red": "AVプラトーンによる炭素排出削減.",
+    "ksa_express": "サウジアラビア高速道路",
+    "grade_lbl": "勾配",
   },
   "ko": {
     "t": "SAE AutoSim Hub",
@@ -3881,6 +4089,21 @@
     "rr_mk_mostorod_d": "중대형 트럭과 마이크로버스가 좁은 차선 폭을 두고 경쟁하는 만성 정체 지점.",
     "rr_mk_dar": "다르 알 살람 / 마아디 출구 차선",
     "rr_mk_dar_d": "마아디와 다르 알 살람 지역으로 교통을 분배하는 남단 출구.",
+    "env_tracker": "환경 및 대기질 추적기",
+    "env_aqi": "AQI",
+    "env_co2": "CO2",
+    "env_nox": "NOx",
+    "env_high": "높은 배출: 급경사에서 마이크로버스 정지-출발 쇼크파가 지배적.",
+    "env_mid": "전환 중: 부분적 AV 침투가 흐름을 부드럽게.",
+    "env_low": "낮은 배출: 원활한 플래투닝이 탄소를 줄임.",
+    "phys_title": "고급 교통 물리학",
+    "phys_grade": "활성 경사",
+    "pce_lbl": "승용차 등가",
+    "phys_fhv": "중차량 fHV",
+    "phys_cap": "PCE 용량",
+    "carbon_red": "AV 플래투닝을 통한 탄소 배출 감소.",
+    "ksa_express": "사우디아라비아 고속도로",
+    "grade_lbl": "경사",
   },
   "fr": {
     "t": "SAE AutoSim Hub",
@@ -4133,6 +4356,21 @@
     "rr_mk_mostorod_d": "Point de congestion chronique ou poids lourds et microbus se disputent une largeur de voie limitee.",
     "rr_mk_dar": "Sortie Dar Al Salam / Maadi",
     "rr_mk_dar_d": "Terminus sud distribuant le trafic vers les quartiers Maadi et Dar Al Salam.",
+    "env_tracker": "Suivi environnement et qualite de l air",
+    "env_aqi": "AQI",
+    "env_co2": "CO2",
+    "env_nox": "NOx",
+    "env_high": "Emissions elevees: ondes de choc des microbus en arrets-redemarrages sur fortes pentes.",
+    "env_mid": "Transition: penetration AV partielle lisse le flux.",
+    "env_low": "Faibles emissions: platooning fluide reduit le carbone.",
+    "phys_title": "Physique du trafic avancee",
+    "phys_grade": "Pente active",
+    "pce_lbl": "Equivalent voiture",
+    "phys_fhv": "fHV vehicules lourds",
+    "phys_cap": "Capacite PCE",
+    "carbon_red": "Reduction des emissions de carbone par le platooning AV.",
+    "ksa_express": "Autoroutes Arabie saoudite",
+    "grade_lbl": "Pente incline",
   }
 };
     const LANG_OPTIONS = [];
@@ -4223,6 +4461,7 @@
 // ════════════════════════ CAIRO RING ROAD + AV COMPARISON ════════════════════════
 
 
+
 var currentCountry = 'egypt';
 var currentScenario = 'A';
 var rrScenario = 'A';
@@ -4243,6 +4482,15 @@ var RING_ROAD_MARKERS = [
   { pos: { lat: 30.105, lng: 31.262 }, t: 'rr_mk_mostorod', d: 'rr_mk_mostorod_d' },
   { pos: { lat: 29.991, lng: 31.233 }, t: 'rr_mk_dar', d: 'rr_mk_dar_d' }
 ];
+
+function markerContent(mk) {
+  var G = countryGrade();
+  var microPCE = dynamicPCE('microbus', G, mprValue / 100).toFixed(1);
+  var linkSpeed = Math.round(gradeAdjustedSpeed('microbus', G) * 3.6);
+  return '<div style="min-width:210px"><strong>' + t(mk.t) + '</strong><br>'
+    + '<span style="font-size:12px;color:#334155">' + t(mk.d) + '</span><br>'
+    + '<span style="font-size:11px;color:#0ea5e9">Active Grade Profile: +' + G.toFixed(1) + '% Incline | Adjusted Microbus PCE: ' + microPCE + ' | Current Link Speed: ' + linkSpeed + ' km/h</span></div>';
+}
 
 function ringRoadColorForMPR(mpr) {
   var r1 = 239, g1 = 68, b1 = 68, r2 = 16, g2 = 185, b2 = 129;
@@ -4269,7 +4517,7 @@ function updateRingRoadStyle(mpr) {
 function refreshRingRoadLabels() {
   rrMarkers.forEach(function (o) {
     o.marker.setTitle(t(o.t));
-    o.iw.setContent('<div style="min-width:180px"><strong>' + t(o.t) + '</strong><br><span style="font-size:12px;color:#334155">' + t(o.d) + '</span></div>');
+    o.iw.setContent(markerContent(o.mk));
   });
 }
 
@@ -4293,13 +4541,16 @@ function initRingRoadMap() {
     rrPoly = new google.maps.Polyline({ path: RING_ROAD_COORDS, geodesic: true, strokeColor: ringRoadColorForMPR(rrMPR), strokeWeight: 6, map: rrMap });
     RING_ROAD_MARKERS.forEach(function (mk) {
       var m = new google.maps.Marker({ position: mk.pos, map: rrMap, title: t(mk.t) });
-      var iw = new google.maps.InfoWindow({ content: '<div style="min-width:180px"><strong>' + t(mk.t) + '</strong><br><span style="font-size:12px;color:#334155">' + t(mk.d) + '</span></div>' });
+      var iw = new google.maps.InfoWindow({ content: markerContent(mk) });
       m.addListener('click', function () { iw.open(rrMap, m); });
-      rrMarkers.push({ marker: m, iw: iw, t: mk.t, d: mk.d });
+      rrMarkers.push({ marker: m, iw: iw, t: mk.t, d: mk.d, mk: mk });
     });
     updateRingRoadStyle(rrMPR);
     var sl = document.getElementById('mpr-slider');
-    if (sl) sl.addEventListener('input', function () { updateRingRoadStyle(parseInt(this.value, 10)); });
+    if (sl) sl.addEventListener('input', function () {
+      var v = parseInt(this.value, 10);
+      updateRingRoadStyle(v); updateEnvTracker(v); updatePhysicsBox(v);
+    });
   } catch (e) {
     el.innerHTML = '<div class="h-full flex items-center justify-center text-slate-400 text-sm p-6 text-center">Google Maps failed to initialize.</div>';
   }
