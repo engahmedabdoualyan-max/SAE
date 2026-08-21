@@ -93,12 +93,15 @@ Dedicated to the general public, technology enthusiasts, automotive buyers, and 
   - L4 Waymo: `https://www.youtube.com/embed/Y0n6wY_nI0g`
   - L5 Tesla Cybercab: `https://www.youtube.com/embed/v9C2CunC7_k`
 
-### Cairo Ring Road Geospatial
+### Multi-Corridor Geospatial Engine
+- [x] **4 Active Corridors:** Cairo Ring Road, Riyadh King Fahd Rd, Dubai Sheikh Zayed Rd, Amman King Abdullah II Hwy
 - [x] **Two-Way Polylines:** Dual-direction road visualization with offset coordinates
 - [x] **Traffic Layer:** Google Maps native traffic overlay
-- [x] **Canvas Vehicle Simulation:** Animated vehicles moving along corridor
-- [x] **Ramp Markers:** Interactive markers with required InfoWindow format
+- [x] **Canvas Vehicle Simulation:** Animated vehicles moving along corridor with country-specific vehicle types
+- [x] **Ramp Markers:** Interactive markers with required InfoWindow format (4 per corridor)
 - [x] **Live Traffic Volume:** Dynamic data display in InfoWindows
+- [x] **Corridor Switching:** `switchCorridor()` dynamically rebuilds polylines, markers, and overlay when country changes
+- [x] **`CORRIDORS` Object:** Per-corridor coords, center, zoom, markers, vehicleTypes
 
 ### Multi-Country Calibration Hub
 - [x] **4 Country Modules:** Egypt (EG), Saudi Arabia (KSA), UAE, Jordan
