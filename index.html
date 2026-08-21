@@ -282,7 +282,7 @@
                 <button id="scenario-b-btn" onclick="setScenario('B')" class="px-6 py-2 rounded-lg font-medium bg-slate-600/20 border border-slate-500 text-slate-400 hover:bg-green-500/30 transition"><i class="fas fa-robot mr-1"></i> <span data-key="rr_scenB">Scenario B: Managed AV Corridor</span></button>
             </div>
             <div class="relative bg-black rounded-xl overflow-hidden border border-slate-600">
-                <canvas id="ringroad-canvas"></canvas>
+                <div id="ringroad-map" class="w-full h-[460px] bg-slate-800"></div>
                 <div id="rr-stats" class="absolute top-3 right-3 bg-slate-900/80 rounded-lg p-3 text-xs font-mono"></div>
             </div>
             <div class="flex flex-wrap justify-center gap-4 mt-4 text-xs text-slate-300">
@@ -2178,6 +2178,14 @@
     "rr_incline": "Incline Grade",
     "rr_decline": "Decline Grade",
     "rr_av_lane": "Dedicated AV Lane",
+    "rr_mk_qalyub": "Qalyub Entry Ramp Interconnect",
+    "rr_mk_qalyub_d": "Primary northern interconnect feeding express traffic onto the Ring Road corridor.",
+    "rr_mk_bahtim": "Bahtim / Shubra El-Kheima Junction",
+    "rr_mk_bahtim_d": "Dense mixed-traffic junction with frequent lane encroachment and merging conflicts.",
+    "rr_mk_mostorod": "Mostorod Core Bottleneck Zone",
+    "rr_mk_mostorod_d": "Chronic congestion hotspot where heavy trucks and microbuses compete for limited lane width.",
+    "rr_mk_dar": "Dar Al Salam / Maadi Exit Lane",
+    "rr_mk_dar_d": "Southern terminus exit distributing traffic toward Maadi and Dar Al Salam districts.",
   },
   "ar": {
     "t": "SAE AutoSim Hub",
@@ -2425,6 +2433,14 @@
     "rr_incline": "منحدر صاعد",
     "rr_decline": "منحدر هابط",
     "rr_av_lane": "مسار مخصص للمركبات الذاتية",
+    "rr_mk_qalyub": "مخرج صاعد قليوب",
+    "rr_mk_qalyub_d": "نقطة الربط الشمالية الرئيسية التي تغذي حركة المرور السريعة على طريق القاهرة الدائري.",
+    "rr_mk_bahtim": "مفترق بتهيم / شبرا الخيمة",
+    "rr_mk_bahtim_d": "مفترق كثيف بحركة مختلطة واعتداء متكرر على الحارات وتصادمات اندماج.",
+    "rr_mk_mostorod": "منطقة عنق زجاجة مصطرة الرئيسية",
+    "rr_mk_mostorod_d": "نقطة اختناق مزمنة حيث تتنافس الشاحنات الثقيلة والميكروباصات على عرض حارة محدود.",
+    "rr_mk_dar": "مخرج دار السلام / المعادي",
+    "rr_mk_dar_d": "مخرج النهاية الجنوبية الذي يوزع المرور نحو حي المعادي ودار السلام.",
   },
   "ru": {
     "t": "SAE AutoSim Hub",
@@ -2669,6 +2685,14 @@
     "rr_incline": "Подъём",
     "rr_decline": "Спуск",
     "rr_av_lane": "Выделенная полоса АТС",
+    "rr_mk_qalyub": "Развязка Кальюб (въезд)",
+    "rr_mk_qalyub_d": "Основной северный узел, подающий скоростной поток на трассу кольцевой дороги.",
+    "rr_mk_bahtim": "Развязка Бахтим / Шубра Эль-Хейма",
+    "rr_mk_bahtim_d": "Плотный перекрёсток со смешанным движением и частыми нарушениями полос.",
+    "rr_mk_mostorod": "Зона затора Мосторед",
+    "rr_mk_mostorod_d": "Хроническая точка затора, где тяжёлые грузовики и микроавтобусы делят узкую полосу.",
+    "rr_mk_dar": "Съезд Дар Аль-Салам / Маади",
+    "rr_mk_dar_d": "Южный терминальный съезд, распределяющий поток к Маади и Дар Аль-Салам.",
   },
   "hi": {
     "t": "SAE AutoSim Hub",
@@ -2889,6 +2913,14 @@
     "rr_incline": "चढ़ाव ढाल",
     "rr_decline": "ढलान",
     "rr_av_lane": "समर्पित AV लेन",
+    "rr_mk_qalyub": "कल्यूब प्रवेश रैंप इंटरकनेक्ट",
+    "rr_mk_qalyub_d": "रिंग रोड कॉरिडोर पर एक्सप्रेस ट्रैफिक लाने वाला प्राथमिक उत्तरी इंटरकनेक्ट.",
+    "rr_mk_bahtim": "बहतीम / शुब्रा एल-खैमा जंक्शन",
+    "rr_mk_bahtim_d": "घनी मिश्रित यातायात जंक्शन जहां बार-बार लेन उल्लंघन और मर्जर संघर्ष होते हैं.",
+    "rr_mk_mostorod": "मोस्टोरॉड कोर बॉटलनेक ज़ोन",
+    "rr_mk_mostorod_d": "गंभीर भीड़ हॉटस्पॉट जहां भारी ट्रक और माइक्रोबस सीमित लेन चौड़ाई के लिए प्रतिस्पर्धा करते हैं.",
+    "rr_mk_dar": "दार अल सलाम / मआदी निकास लेन",
+    "rr_mk_dar_d": "दक्षिणी टर्मिनस निकास जो मआदी और दार अल सलाम जिलों की ओर ट्रैफिक वितरित करता है.",
   },
   "de": {
     "t": "SAE AutoSim Hub",
@@ -3133,6 +3165,14 @@
     "rr_incline": "Steigung",
     "rr_decline": "Gefälle",
     "rr_av_lane": "Dedizierte AV-Spur",
+    "rr_mk_qalyub": "Anschluss Kalyub (Einfall)",
+    "rr_mk_qalyub_d": "Primärer nördlicher Knoten, der den Expressverkehr auf den Ringstraßen-Korridor leitet.",
+    "rr_mk_bahtim": "Knoten Bahtim / Shubra El-Kheima",
+    "rr_mk_bahtim_d": "Dichter Mischverkehrsknoten mit häufigem Spurübergriff und Einfädelfkonflikten.",
+    "rr_mk_mostorod": "Kern-Stauzone Mostorod",
+    "rr_mk_mostorod_d": "Chronischer Stau-Hotspot, an dem schwere LKW und Microbusse um begrenzte Spurbreite kämpfen.",
+    "rr_mk_dar": "Ausfahrt Dar Al Salam / Maadi",
+    "rr_mk_dar_d": "Südlicher Endpunkt, der den Verkehr Richtung Maadi und Dar Al Salam verteilt.",
   },
   "zh": {
     "t": "SAE AutoSim Hub",
@@ -3377,6 +3417,14 @@
     "rr_incline": "上坡坡度",
     "rr_decline": "下坡坡度",
     "rr_av_lane": "专用自动驾驶车道",
+    "rr_mk_qalyub": "卡柳布入口匝道互通",
+    "rr_mk_qalyub_d": "将快速交通引入环路走廊的主要北部互通枢纽.",
+    "rr_mk_bahtim": "巴赫提姆 / 舒布拉埃尔海马立交",
+    "rr_mk_bahtim_d": "混合交通密集的立交，频繁出现越线并线与冲突.",
+    "rr_mk_mostorod": "莫斯托罗德核心瓶颈区",
+    "rr_mk_mostorod_d": "重型卡车与面包车争夺有限车道宽度的长期拥堵热点.",
+    "rr_mk_dar": "达拉萨拉姆 / 马阿迪出口车道",
+    "rr_mk_dar_d": "向南端出口分流至马阿迪与达拉萨拉姆片区.",
   },
   "ja": {
     "t": "SAE AutoSim Hub",
@@ -3597,6 +3645,14 @@
     "rr_incline": "上り勾配",
     "rr_decline": "下り勾配",
     "rr_av_lane": "専用AV車線",
+    "rr_mk_qalyub": "カリュブ入口ランプ接続",
+    "rr_mk_qalyub_d": "環状道路回廊へ高速交通を流し込む主要な北部接続点.",
+    "rr_mk_bahtim": "バフティム / シュブラ・エル・カイマジャンクション",
+    "rr_mk_bahtim_d": "混合交通の稠密なジャンクションで、頻繁に車線侵入と合流衝突が発生.",
+    "rr_mk_mostorod": "モストレッド中心ボトルネックゾーン",
+    "rr_mk_mostorod_d": "重トラックとマイクロバスが限られた車線幅を奪い合う慢性的渋滞ホットスポット.",
+    "rr_mk_dar": "ダルアッサラーム / マアディ出口車線",
+    "rr_mk_dar_d": "マアディとダルアッサラーム地区へ交通を分配する南端出口.",
   },
   "ko": {
     "t": "SAE AutoSim Hub",
@@ -3817,6 +3873,14 @@
     "rr_incline": "오르막 경사",
     "rr_decline": "내리막 경사",
     "rr_av_lane": "전용 AV 차선",
+    "rr_mk_qalyub": "칼류브 진입 ramp 인터커넥트",
+    "rr_mk_qalyub_d": "링 로드 회랑으로 고속 교통을 공급하는 주요 북부 연결 지점.",
+    "rr_mk_bahtim": "바흐팀 / 슈브라 엘 카이마 junction",
+    "rr_mk_bahtim_d": "혼합 교통이 밀집한 분기점으로 차선 침범과 합류 충돌이 잦음.",
+    "rr_mk_mostorod": "모스토레드 핵심 병목 구역",
+    "rr_mk_mostorod_d": "중대형 트럭과 마이크로버스가 좁은 차선 폭을 두고 경쟁하는 만성 정체 지점.",
+    "rr_mk_dar": "다르 알 살람 / 마아디 출구 차선",
+    "rr_mk_dar_d": "마아디와 다르 알 살람 지역으로 교통을 분배하는 남단 출구.",
   },
   "fr": {
     "t": "SAE AutoSim Hub",
@@ -4061,6 +4125,14 @@
     "rr_incline": "Rampes montee",
     "rr_decline": "Rampes descente",
     "rr_av_lane": "Voie AV dediee",
+    "rr_mk_qalyub": "Bretelle entree Qalyub Interconnexion",
+    "rr_mk_qalyub_d": "Noeud nord principal alimentant le trafic express sur le corridor de la rocade.",
+    "rr_mk_bahtim": "Carrefour Bahtim / Shubra El-Kheima",
+    "rr_mk_bahtim_d": "Carrefour a trafic melange dense avec empietement frequent de voie et conflits de fusion.",
+    "rr_mk_mostorod": "Zone goulot Mostorod",
+    "rr_mk_mostorod_d": "Point de congestion chronique ou poids lourds et microbus se disputent une largeur de voie limitee.",
+    "rr_mk_dar": "Sortie Dar Al Salam / Maadi",
+    "rr_mk_dar_d": "Terminus sud distribuant le trafic vers les quartiers Maadi et Dar Al Salam.",
   }
 };
     const LANG_OPTIONS = [];
@@ -4090,6 +4162,7 @@
                 el.textContent = txt;
             }
         });
+        try { if (typeof refreshRingRoadLabels === 'function') refreshRingRoadLabels(); } catch (e) {}
         updateDisplay();
     }
 
@@ -4142,178 +4215,123 @@
         });
         updateFleetTable(mprValue);
         setTimeout(initSim, 300);
-        setTimeout(initRingRoad, 200);
+        loadGoogleMaps();
         renderComparison();
         renderCountryHub();
     });
 
 // ════════════════════════ CAIRO RING ROAD + AV COMPARISON ════════════════════════
 
+
 var currentCountry = 'egypt';
 var currentScenario = 'A';
 var rrScenario = 'A';
-var rrCanvas = null, rrCtx = null, rrVehicles = [], rrAnimId = null, rrT = 0;
+var rrMap = null, rrPoly = null, rrMarkers = [], rrMPR = 10;
 
-var RING_ROAD = {
-    length: 28,
-    lanes: 3,
-    entries: [ { km: 1, key: 'rr_qalyub_entry' }, { km: 5, key: 'rr_bahtim_entry' } ],
-    exits: [ { km: 20, key: 'rr_maadi_exit' }, { km: 27, key: 'rr_dar_exit' } ],
-    grades: [ { km: 12, pct: 3.5, up: true }, { km: 18, pct: -2.8, up: false } ],
-    elev: [ {km:0,e:18},{km:4,e:24},{km:8,e:22},{km:12,e:34},{km:15,e:33},{km:18,e:27},{km:22,e:36},{km:25,e:40},{km:28,e:44} ]
-};
+var RING_ROAD_COORDS = [
+  { lat: 30.178, lng: 31.252 },
+  { lat: 30.140, lng: 31.248 },
+  { lat: 30.105, lng: 31.262 },
+  { lat: 30.060, lng: 31.310 },
+  { lat: 29.990, lng: 31.250 },
+  { lat: 29.991, lng: 31.233 }
+];
 
-function initRingRoad() {
-    rrCanvas = document.getElementById('ringroad-canvas');
-    if (!rrCanvas) return;
-    rrCtx = rrCanvas.getContext('2d');
-    var parent = rrCanvas.parentElement;
-    rrCanvas.width = parent.clientWidth;
-    rrCanvas.height = 480;
-    createRingRoadVehicles();
-    if (rrAnimId) cancelAnimationFrame(rrAnimId);
-    rrT = 0;
-    animateRingRoad();
+var RING_ROAD_MARKERS = [
+  { pos: { lat: 30.178, lng: 31.252 }, t: 'rr_mk_qalyub', d: 'rr_mk_qalyub_d' },
+  { pos: { lat: 30.140, lng: 31.248 }, t: 'rr_mk_bahtim', d: 'rr_mk_bahtim_d' },
+  { pos: { lat: 30.105, lng: 31.262 }, t: 'rr_mk_mostorod', d: 'rr_mk_mostorod_d' },
+  { pos: { lat: 29.991, lng: 31.233 }, t: 'rr_mk_dar', d: 'rr_mk_dar_d' }
+];
+
+function ringRoadColorForMPR(mpr) {
+  var r1 = 239, g1 = 68, b1 = 68, r2 = 16, g2 = 185, b2 = 129;
+  var f = Math.max(0, Math.min(100, mpr)) / 100;
+  var r = Math.round(r1 + (r2 - r1) * f);
+  var g = Math.round(g1 + (g2 - g1) * f);
+  var b = Math.round(b1 + (b2 - b1) * f);
+  return 'rgb(' + r + ',' + g + ',' + b + ')';
 }
 
-function createRingRoadVehicles() {
-    rrVehicles = [];
-    var types = [
-        { t: 'microbus', c: '#ef4444', chaos: true, len: 5.3 },
-        { t: 'mlaijy', c: '#38bdf8', chaos: false, len: 4.5 },
-        { t: 'naql', c: '#a16207', chaos: false, len: 16.5 },
-        { t: 'av', c: '#10b981', chaos: false, len: 4.8 }
-    ];
-    for (var i = 0; i < 60; i++) {
-        var ty = types[Math.floor(Math.random() * types.length)];
-        var bl = Math.floor(Math.random() * RING_ROAD.lanes);
-        rrVehicles.push({
-            x: Math.random() * RING_ROAD.length,
-            lane: bl, baseLane: bl, type: ty.t, color: ty.c, chaos: ty.chaos, len: ty.len,
-            speed: (8 + Math.random() * 16) / 3600,
-            dwell: 0, phase: Math.random() * 6.28, target: Math.floor(Math.random() * RING_ROAD.lanes)
-        });
-    }
-    if (rrScenario === 'B') {
-        rrVehicles = rrVehicles.filter(function (v) { return v.type !== 'av'; });
-        for (var j = 0; j < 14; j++) {
-            rrVehicles.push({ x: j * 2.0, lane: 0, baseLane: 0, type: 'av', color: '#10b981',
-                chaos: false, len: 4.8, speed: 22 / 3600, dwell: 0, phase: 0, target: 0, platoon: true });
-        }
-    }
+function updateRingRoadStyle(mpr) {
+  rrMPR = mpr;
+  if (rrPoly) rrPoly.setOptions({ strokeColor: ringRoadColorForMPR(mpr), strokeWeight: 4 + mpr / 16 });
+  var stats = document.getElementById('rr-stats');
+  if (stats) {
+    var cc = mpr < 40 ? 'text-red-400' : (mpr < 75 ? 'text-yellow-400' : 'text-green-400');
+    var label = mpr < 40 ? 'Congested' : (mpr < 75 ? 'Transitioning' : 'Fluent Platooning');
+    stats.innerHTML = '<div class="text-slate-400">MPR: ' + Math.round(mpr) + '%</div>'
+      + '<div class="' + cc + '">Status: ' + label + '</div>'
+      + '<div class="text-primary">Capacity: ' + (1850 + Math.round(mpr * 11)) + ' veh/h/lane</div>';
+  }
+}
+
+function refreshRingRoadLabels() {
+  rrMarkers.forEach(function (o) {
+    o.marker.setTitle(t(o.t));
+    o.iw.setContent('<div style="min-width:180px"><strong>' + t(o.t) + '</strong><br><span style="font-size:12px;color:#334155">' + t(o.d) + '</span></div>');
+  });
+}
+
+function initRingRoadMap() {
+  var el = document.getElementById('ringroad-map');
+  if (!el) return;
+  if (typeof google === 'undefined' || !google.maps) {
+    el.innerHTML = '<div class="h-full flex items-center justify-center text-slate-400 text-sm p-6 text-center">Google Maps could not load. Add a valid API key (YOUR_GOOGLE_MAPS_API_KEY) to enable the live corridor view.</div>';
+    return;
+  }
+  try {
+    rrMap = new google.maps.Map(el, {
+      center: { lat: 30.08, lng: 31.25 }, zoom: 11,
+      styles: [
+        { elementType: 'geometry', stylers: [ { color: '#1e293b' } ] },
+        { elementType: 'labels.text.fill', stylers: [ { color: '#94a3b8' } ] },
+        { featureType: 'water', stylers: [ { color: '#0f172a' } ] },
+        { featureType: 'road', stylers: [ { color: '#334155' } ] }
+      ]
+    });
+    rrPoly = new google.maps.Polyline({ path: RING_ROAD_COORDS, geodesic: true, strokeColor: ringRoadColorForMPR(rrMPR), strokeWeight: 6, map: rrMap });
+    RING_ROAD_MARKERS.forEach(function (mk) {
+      var m = new google.maps.Marker({ position: mk.pos, map: rrMap, title: t(mk.t) });
+      var iw = new google.maps.InfoWindow({ content: '<div style="min-width:180px"><strong>' + t(mk.t) + '</strong><br><span style="font-size:12px;color:#334155">' + t(mk.d) + '</span></div>' });
+      m.addListener('click', function () { iw.open(rrMap, m); });
+      rrMarkers.push({ marker: m, iw: iw, t: mk.t, d: mk.d });
+    });
+    updateRingRoadStyle(rrMPR);
+    var sl = document.getElementById('mpr-slider');
+    if (sl) sl.addEventListener('input', function () { updateRingRoadStyle(parseInt(this.value, 10)); });
+  } catch (e) {
+    el.innerHTML = '<div class="h-full flex items-center justify-center text-slate-400 text-sm p-6 text-center">Google Maps failed to initialize.</div>';
+  }
+}
+
+function loadGoogleMaps() {
+  if (typeof google !== 'undefined' && google.maps) { initRingRoadMap(); return; }
+  var s = document.createElement('script');
+  s.src = 'https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY&callback=initRingRoadMap';
+  s.async = true; s.defer = true;
+  s.onerror = function () {
+    var el = document.getElementById('ringroad-map');
+    if (el) el.innerHTML = '<div class="h-full flex items-center justify-center text-slate-400 text-sm p-6 text-center">Google Maps script failed to load. Provide a valid API key.</div>';
+  };
+  document.head.appendChild(s);
+  updateRingRoadStyle(rrMPR);
 }
 
 function setScenario(s) {
-    rrScenario = s;
-    currentScenario = s;
-    var a = document.getElementById('scenario-a-btn');
-    var b = document.getElementById('scenario-b-btn');
-    if (a) a.className = s === 'A'
-        ? 'px-6 py-2 rounded-lg font-medium bg-red-500/20 border border-red-400 text-red-300 hover:bg-red-500/30 transition active'
-        : 'px-6 py-2 rounded-lg font-medium bg-slate-600/20 border border-slate-500 text-slate-400 hover:bg-red-500/30 transition';
-    if (b) b.className = s === 'B'
-        ? 'px-6 py-2 rounded-lg font-medium bg-green-500/20 border border-green-400 text-green-300 hover:bg-green-500/30 transition active'
-        : 'px-6 py-2 rounded-lg font-medium bg-slate-600/20 border border-slate-500 text-slate-400 hover:bg-green-500/30 transition';
-    createRingRoadVehicles();
-    var sl = document.getElementById('mpr-slider');
-    if (sl) updateFleetTable(parseInt(sl.value, 10));
-}
-
-function animateRingRoad() {
-    if (!rrCtx) return;
-    rrT += 1 / 60;
-    var w = rrCanvas.width, h = rrCanvas.height;
-    var kmToPx = w / RING_ROAD.length;
-    var roadTop = 230, laneH = 40, roadBot = roadTop + laneH * RING_ROAD.lanes;
-    rrCtx.fillStyle = '#0f172a'; rrCtx.fillRect(0, 0, w, h);
-    rrCtx.strokeStyle = '#334155'; rrCtx.lineWidth = 2;
-    rrCtx.beginPath();
-    RING_ROAD.elev.forEach(function (p, i) {
-        var x = p.km * kmToPx, y = 150 - (p.e - 18) * 2.2;
-        if (i === 0) rrCtx.moveTo(x, y); else rrCtx.lineTo(x, y);
-    });
-    rrCtx.stroke();
-    rrCtx.fillStyle = '#64748b'; rrCtx.font = '10px Inter, sans-serif'; rrCtx.textAlign = 'center';
-    RING_ROAD.elev.forEach(function (p) { var x = p.km * kmToPx, y = 150 - (p.e - 18) * 2.2; rrCtx.fillText(Math.round(p.e) + 'm', x, y - 4); });
-    RING_ROAD.grades.forEach(function (g) {
-        var x = g.km * kmToPx;
-        var label = (g.up ? '+' : '') + g.pct + '% ' + (g.up ? t('rr_incline') : t('rr_decline'));
-        rrCtx.fillStyle = g.up ? '#eab308' : '#38bdf8';
-        rrCtx.fillText(label, x, 120);
-        rrCtx.fillRect(x - 1, 128, 2, 18);
-    });
-    RING_ROAD.entries.forEach(function (en) {
-        var x = en.km * kmToPx;
-        rrCtx.fillStyle = '#475569';
-        rrCtx.beginPath();
-        rrCtx.moveTo(x - 26, 120); rrCtx.lineTo(x + 26, 120);
-        rrCtx.lineTo(x + 10, roadTop); rrCtx.lineTo(x - 10, roadTop); rrCtx.closePath(); rrCtx.fill();
-        rrCtx.fillStyle = '#cbd5e1'; rrCtx.font = '11px Inter, sans-serif'; rrCtx.textAlign = 'center';
-        rrCtx.fillText(t(en.key), x, 112);
-    });
-    RING_ROAD.exits.forEach(function (ex) {
-        var x = ex.km * kmToPx;
-        rrCtx.fillStyle = '#475569';
-        rrCtx.beginPath();
-        rrCtx.moveTo(x - 10, roadBot); rrCtx.lineTo(x + 10, roadBot);
-        rrCtx.lineTo(x + 26, h - 30); rrCtx.lineTo(x - 26, h - 30); rrCtx.closePath(); rrCtx.fill();
-        rrCtx.fillStyle = '#cbd5e1'; rrCtx.font = '11px Inter, sans-serif'; rrCtx.textAlign = 'center';
-        rrCtx.fillText(t(ex.key), x, h - 18);
-    });
-    rrCtx.fillStyle = '#1e293b'; rrCtx.fillRect(0, roadTop, w, laneH * RING_ROAD.lanes);
-    if (rrScenario === 'B') {
-        rrCtx.fillStyle = 'rgba(16,185,129,0.18)';
-        rrCtx.fillRect(0, roadTop, w, laneH);
-        rrCtx.fillStyle = '#10b981'; rrCtx.font = 'bold 12px Inter, sans-serif'; rrCtx.textAlign = 'left';
-        rrCtx.fillText(t('rr_av_lane'), 8, roadTop + 16);
-    }
-    rrCtx.strokeStyle = '#facc15'; rrCtx.lineWidth = 1; rrCtx.setLineDash([14, 12]);
-    for (var l = 1; l < RING_ROAD.lanes; l++) {
-        var ly = roadTop + l * laneH;
-        rrCtx.beginPath(); rrCtx.moveTo(0, ly); rrCtx.lineTo(w, ly); rrCtx.stroke();
-    }
-    rrCtx.setLineDash([]);
-    rrCtx.strokeStyle = '#94a3b8'; rrCtx.lineWidth = 2;
-    rrCtx.beginPath(); rrCtx.moveTo(0, roadTop); rrCtx.lineTo(w, roadTop); rrCtx.moveTo(0, roadBot); rrCtx.lineTo(w, roadBot); rrCtx.stroke();
-    rrVehicles.forEach(function (v) {
-        if (v.dwell > 0) { v.dwell -= 1 / 60; }
-        else {
-            v.x += v.speed * 60;
-            if (v.x > RING_ROAD.length) v.x -= RING_ROAD.length;
-        }
-        if (rrScenario === 'A' && v.chaos) {
-            v.phase += 0.04;
-            v.lane = v.baseLane + Math.sin(v.phase) * 0.9;
-            RING_ROAD.entries.concat(RING_ROAD.exits).forEach(function (m) {
-                if (Math.abs(v.x - m.km) < 0.25 && v.dwell <= 0 && Math.random() < 0.02) { v.dwell = 25; }
-            });
-        } else if (rrScenario === 'B' && v.platoon) {
-            v.lane = 0;
-        }
-        var vx = v.x * kmToPx;
-        var vy = roadTop + v.lane * laneH + laneH / 2;
-        var vw = Math.max(8, v.len * 2.2), vh = 16;
-        if (v.type === 'av') { rrCtx.shadowColor = '#10b981'; rrCtx.shadowBlur = 10; }
-        else if (v.dwell > 0) { rrCtx.shadowColor = '#ef4444'; rrCtx.shadowBlur = 8; }
-        rrCtx.fillStyle = v.color;
-        rrCtx.fillRect(vx - vw / 2, vy - vh / 2, vw, vh);
-        rrCtx.shadowBlur = 0;
-        if (v.dwell > 0) {
-            rrCtx.fillStyle = '#fca5a5'; rrCtx.font = '9px Inter'; rrCtx.textAlign = 'center';
-            rrCtx.fillText('STOP', vx, vy - vh / 2 - 3);
-        }
-    });
-    var stats = document.getElementById('rr-stats');
-    if (stats) {
-        var cong = rrScenario === 'A' ? 'High (Chaotic)' : 'Managed (AV Corridor)';
-        var cc = rrScenario === 'A' ? 'text-red-400' : 'text-green-400';
-        var cap = rrScenario === 'A' ? '1,850' : '2,950';
-        stats.innerHTML = '<div class="text-slate-400">Scenario: ' + (rrScenario === 'A' ? 'Current Baseline' : 'Managed AV') + '</div>'
-            + '<div class="text-yellow-400">Vehicles: ' + rrVehicles.length + '</div>'
-            + '<div class="' + cc + '">Congestion: ' + cong + '</div>'
-            + '<div class="text-primary">Capacity: ' + cap + ' veh/h/lane</div>';
-    }
-    rrAnimId = requestAnimationFrame(animateRingRoad);
+  rrScenario = s;
+  currentScenario = s;
+  var a = document.getElementById('scenario-a-btn');
+  var b = document.getElementById('scenario-b-btn');
+  if (a) a.className = s === 'A'
+    ? 'px-6 py-2 rounded-lg font-medium bg-red-500/20 border border-red-400 text-red-300 hover:bg-red-500/30 transition active'
+    : 'px-6 py-2 rounded-lg font-medium bg-slate-600/20 border border-slate-500 text-slate-400 hover:bg-red-500/30 transition';
+  if (b) b.className = s === 'B'
+    ? 'px-6 py-2 rounded-lg font-medium bg-green-500/20 border border-green-400 text-green-300 hover:bg-green-500/30 transition active'
+    : 'px-6 py-2 rounded-lg font-medium bg-slate-600/20 border border-slate-500 text-slate-400 hover:bg-green-500/30 transition';
+  var sl = document.getElementById('mpr-slider');
+  if (sl) { sl.value = (s === 'B' ? 90 : 10); updateMPR(sl.value); }
+  if (rrPoly) updateRingRoadStyle(parseInt(sl ? sl.value : 10, 10));
 }
 
 // ---- AV Comparison Engine ----
