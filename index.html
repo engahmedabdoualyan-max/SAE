@@ -1687,6 +1687,7 @@
         var pce = (G > 3) ? (PHYS.pceIncline[key] !== undefined ? PHYS.pceIncline[key] : 1.5)
                           : (PHYS.pceFlat[key] !== undefined ? PHYS.pceFlat[key] : 1.0);
         if ((key === 'naql_taqeel' || key === 'noss_naql') && platoonShare > 0.2) pce *= 0.75;
+        if (typeof airPCEmult !== 'undefined' && airPCEmult > 1) pce *= airPCEmult;
         return pce;
     }
     function compositeCapacity(mpr, G) {
@@ -1737,18 +1738,26 @@
         var G = countryGrade();
         var e = emissionsIndex(mpr, G);
         var el;
-        el = document.getElementById('env-co2'); if (el) el.textContent = (e * 0.18).toFixed(2) + ' g/km';
-        el = document.getElementById('env-nox'); if (el) el.textContent = (e * 0.9).toFixed(2) + ' mg/km';
-        var aqi = Math.round(40 + (e - 1) * 60);
-        if (typeof liveTraffic !== 'undefined' && liveTraffic && liveTraffic.volume) {
-            aqi = Math.round(aqi + liveTraffic.volume * 40);
+        if (airQuality.co != null && airQuality.no2 != null) {
+            el = document.getElementById('env-co2'); if (el) el.textContent = (airQuality.co).toFixed(airQuality.cou === 'PARTS_PER_BILLION' ? 0 : 2) + ' ' + (airQuality.cou || '');
+            el = document.getElementById('env-nox'); if (el) el.textContent = (airQuality.no2).toFixed(1) + ' ' + (airQuality.no2u || '');
+        } else {
+            el = document.getElementById('env-co2'); if (el) el.textContent = (e * 0.18).toFixed(2) + ' g/km';
+            el = document.getElementById('env-nox'); if (el) el.textContent = (e * 0.9).toFixed(2) + ' mg/km';
+        }
+        var aqi;
+        if (airQuality.aqi != null) aqi = Math.round(airQuality.aqi);
+        else {
+            aqi = Math.round(40 + (e - 1) * 60);
+            if (typeof liveTraffic !== 'undefined' && liveTraffic && liveTraffic.volume) aqi = Math.round(aqi + liveTraffic.volume * 40);
         }
         el = document.getElementById('env-aqi'); if (el) el.textContent = aqi;
         var banner = document.getElementById('env-banner');
         if (banner) {
-            if (mpr < 40) { banner.className = 'mt-3 px-3 py-2 rounded-lg text-sm bg-red-500/20 border border-red-400 text-red-200'; banner.textContent = t('env_high'); }
-            else if (mpr < 75) { banner.className = 'mt-3 px-3 py-2 rounded-lg text-sm bg-yellow-500/20 border border-yellow-400 text-yellow-200'; banner.textContent = t('env_mid'); }
-            else { banner.className = 'mt-3 px-3 py-2 rounded-lg text-sm bg-green-500/20 border border-green-400 text-green-200'; banner.textContent = t('carbon_red'); }
+            var liveNote = (airQuality.aqi != null) ? '  • Live Google AQ' : '';
+            if (mpr < 40) { banner.className = 'mt-3 px-3 py-2 rounded-lg text-sm bg-red-500/20 border border-red-400 text-red-200'; banner.textContent = t('env_high') + liveNote; }
+            else if (mpr < 75) { banner.className = 'mt-3 px-3 py-2 rounded-lg text-sm bg-yellow-500/20 border border-yellow-400 text-yellow-200'; banner.textContent = t('env_mid') + liveNote; }
+            else { banner.className = 'mt-3 px-3 py-2 rounded-lg text-sm bg-green-500/20 border border-green-400 text-green-200'; banner.textContent = t('carbon_red') + liveNote; }
         }
     }
     function updateMapPhysics() {
@@ -4537,6 +4546,63 @@ var rrScenario = 'A';
 var rrMap = null, rrPolyA = null, rrPolyB = null, rrMarkers = [], rrMPR = 10;
 var rrOverlay = null, rrAnim = null;
 var liveTraffic = { volume: 0.62, hvShare: 0.22, speed: 45, aqi: 120, co2: 0, nox: 0, weather: 'Clear', ts: 0 };
+var GOOGLE_API_KEY = 'AIzaSyBkFu8PekIyzEhmHy1wYc6MgfxgKl6mUcM';
+var airQuality = { aqi: null, pm25: null, co: null, no2: null, pm25u: '', cou: '', no2u: '', ts: 0 };
+var airPCEmult = 1;
+
+function corridorCentroid() {
+  var la = 0, lo = 0;
+  RING_ROAD_COORDS.forEach(function (p) { la += p.lat; lo += p.lng; });
+  return { lat: la / RING_ROAD_COORDS.length, lng: lo / RING_ROAD_COORDS.length };
+}
+function fetchAirQuality() {
+  if (!GOOGLE_API_KEY) return;
+  var c = corridorCentroid();
+  var url = 'https://airquality.googleapis.com/v1/currentConditions:lookup?key=' + GOOGLE_API_KEY;
+  var body = JSON.stringify({
+    location: { latitude: c.lat, longitude: c.lng },
+    extraComputations: ['LOCAL_AQI', 'POLLUTANT_CONCENTRATION', 'HEALTH_RECOMMENDATIONS'],
+    languageCode: 'en', universalAqi: true
+  });
+  fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: body })
+    .then(function (r) { if (!r.ok) throw new Error('aq' + r.status); return r.json(); })
+    .then(function (data) {
+      var aqi = null;
+      if (data.indexes && data.indexes.length) {
+        var u = data.indexes.filter(function (i) { return i.code === 'uaqi'; })[0] || data.indexes[0];
+        aqi = u.aqi;
+      }
+      var pm25 = null, co = null, no2 = null, pm25u = '', cou = '', no2u = '';
+      if (data.pollutants) {
+        data.pollutants.forEach(function (p) {
+          if (!p.concentration) return;
+          if (p.code === 'pm25') { pm25 = p.concentration.value; pm25u = p.concentration.units || ''; }
+          else if (p.code === 'co') { co = p.concentration.value; cou = p.concentration.units || ''; }
+          else if (p.code === 'no2') { no2 = p.concentration.value; no2u = p.concentration.units || ''; }
+        });
+      }
+      airQuality.aqi = aqi; airQuality.pm25 = pm25; airQuality.co = co; airQuality.no2 = no2;
+      airQuality.pm25u = pm25u; airQuality.cou = cou; airQuality.no2u = no2u; airQuality.ts = Date.now();
+      airPCEmult = 1 + (pm25 != null ? Math.min(2.5, pm25 / 120) : 0);
+      if (typeof updateEnvTracker === 'function') updateEnvTracker(rrMPR);
+      if (typeof updatePhysicsBox === 'function') updatePhysicsBox(rrMPR);
+    })
+    .catch(function () { /* keep computed eco metrics on failure */ });
+}
+function fetchWeather() {
+  if (!GOOGLE_API_KEY) return;
+  var c = corridorCentroid();
+  var url = 'https://weather.googleapis.com/v1/currentConditions:lookup?key=' + GOOGLE_API_KEY
+    + '&location.latitude=' + c.lat + '&location.longitude=' + c.lng;
+  fetch(url)
+    .then(function (r) { if (!r.ok) throw new Error('wx' + r.status); return r.json(); })
+    .then(function (data) {
+      var cond = (data.weatherCondition && data.weatherCondition.description && data.weatherCondition.description.text) || null;
+      if (cond) liveTraffic.weather = cond;
+      if (typeof updateLiveTelemetry === 'function') updateLiveTelemetry();
+    })
+    .catch(function () { /* keep simulated weather on failure */ });
+}
 
 // True analytical corridor: Qalyub Interchange -> Dar Al Salam bottleneck -> Adly Mansour Intermodal Hub
 var RING_ROAD_COORDS = [
@@ -4633,6 +4699,9 @@ function initRingRoadMap() {
     rrOverlay = new RingRoadOverlay(rrMap);
     updateRingRoadStyle(rrMPR);
     startLiveTrafficFeed();
+    fetchAirQuality();
+    fetchWeather();
+    if (!window._rrAir) window._rrAir = setInterval(function () { fetchAirQuality(); fetchWeather(); }, 300000);
     if (rrScenario === 'B') respacePlatoon();
     var sl = document.getElementById('mpr-slider');
     if (sl) sl.addEventListener('input', function () {
@@ -4801,7 +4870,7 @@ function respacePlatoon() {
 function loadGoogleMaps() {
   if (typeof google !== 'undefined' && google.maps) { initRingRoadMap(); return; }
   var s = document.createElement('script');
-  s.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyBkFu8PekIyzEhmHy1wYc6MgfxgKl6mUcM&callback=initRingRoadMap';
+  s.src = 'https://maps.googleapis.com/maps/api/js?key=' + GOOGLE_API_KEY + '&callback=initRingRoadMap';
   s.async = true; s.defer = true;
   s.onerror = function () {
     var el = document.getElementById('ringroad-map');
