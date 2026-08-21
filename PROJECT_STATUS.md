@@ -7,7 +7,7 @@
 
 ---
 
-## PART A: COMPLETED FEATURES (36 items)
+## PART A: COMPLETED FEATURES (37 items)
 
 ### A1. Core Architecture
 | # | Feature | Status | Commit | Reference |
@@ -80,12 +80,24 @@
 |---|---------|--------|--------|-----------|
 | 35 | File Download Hub (VISSIM/SUMO/Script cards) | ✅ Done | `c55df3b` | PTV VISSIM / SUMO file formats |
 | 36 | Integration Guides (VISSIM/SUMO/Aimsun tabs) | ✅ Done | `5d40923` | Software documentation standards |
+| 37 | Unit Test Suite (19 tests, all passing) | ✅ Done | `0582c0c` | Jest testing framework |
+
+---
+
+## PART A-FIXES: CRITICAL BUG FIXES (3 items)
+
+### Black Screen / Render Failure Fixes
+| # | Bug | Root Cause | Fix | Commit |
+|---|-----|-----------|-----|--------|
+| 1 | **Black screen on all sections** — Google Maps shows "Google Maps failed to initialize", all dark sections appear black | `RingRoadOverlay.prototype = new google.maps.OverlayView()` was a top-level statement at line 6375 that executed during script parsing, when `google` was undefined. This threw `google is not defined`, aborting the entire script before `COUNTRY_DATA` (line 6654) was defined. Downstream, `computeWeightedFleet()` called from the load handler crashed because `COUNTRY_DATA` was undefined. | Moved `RingRoadOverlay.prototype = new google.maps.OverlayView()` into `initRingRoadMap()` where `google.maps` is guaranteed to be loaded. Also moved `CORRIDORS`, `currentCorridor`, `RING_ROAD_COORDS`, `GOOGLE_API_KEY` definitions BEFORE the load handler for defensive ordering. Added guard check + retry in `initRingRoadMap`. | `6b49002` |
+| 2 | **Slider MPR changes not cascading to modules** | Slider `oninput` handler was missing `if (typeof updateAllModules === 'function') updateAllModules(mprValue);` call | Added the missing update call in the slider event listener | `6b49002` |
+| 3 | **YouTube videos blank on local file:// protocol** | `file://` protocol blocks YouTube embeds (requires HTTPS origin) and Google Maps API callbacks | Added file:// protocol detection warning at page load, YouTube iframe fallback divs, and Google Maps error messages upgraded to `text-slate-200` for visibility on dark backgrounds | `6b49002` |
 
 ---
 
 ## PART B: NOT YET DONE — CLASSIFIED BY PRIORITY
 
-### B1. HIGH PRIORITY — Safety & Life Protection (12 items)
+### B1. HIGH PRIORITY — Safety & Life Protection (11 items)
 
 | # | Feature | Why Not Done | What's Needed | Reference |
 |---|---------|-------------|---------------|-----------|
@@ -98,8 +110,7 @@
 | 7 | **PDF Export of Simulation Reports** (academic paper-ready format) | Not started — requires PDF generation library (jsPDF or server-side) | jsPDF library integration, academic template design | IEEE/ACM paper templates |
 | 8 | **Real-Time Traffic Data Integration** (Google Directions API) | Not started — requires additional API quota + data processing pipeline | Google Directions API key, congestion modeling algorithm | Google Maps Platform documentation |
 | 9 | **AV Penetration Forecasting** (S-curve adoption model) | Not started — requires technology adoption lifecycle data | Bass diffusion model parameters, regional adoption curves | Bass (1969), ITS America forecasts |
-| 10 | **Unit Test Suite** (Jest/Vitest for physics engine + generators) | Not started — requires test framework setup + test case design | Jest/Vitest configuration, test data sets | Software testing best practices |
-| 11 | **Content Security Policy Headers** (XSS prevention) | Not started — requires Vercel configuration + CSP policy design | CSP directive definitions, nonce generation | OWASP CSP Cheat Sheet |
+| 10 | **Content Security Policy Headers** (XSS prevention) | Not started — requires Vercel configuration + CSP policy design | CSP directive definitions, nonce generation | OWASP CSP Cheat Sheet |
 | 12 | **Rate Limiting for API Calls** (Google API abuse prevention) | Not started — requires server-side or client-side throttling | Rate limit configuration, API quota management | Google API best practices |
 
 ### B2. MEDIUM PRIORITY — Environmental & Productivity (11 items)
