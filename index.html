@@ -4733,9 +4733,11 @@ var airQuality = { aqi: null, pm25: null, co: null, no2: null, pm25u: '', cou: '
 var airPCEmult = 1;
 
 function corridorCentroid() {
+  var cor = CORRIDORS[currentCorridor] || CORRIDORS.egypt;
+  var coords = cor.coords;
   var la = 0, lo = 0;
-  RING_ROAD_COORDS.forEach(function (p) { la += p.lat; lo += p.lng; });
-  return { lat: la / RING_ROAD_COORDS.length, lng: lo / RING_ROAD_COORDS.length };
+  coords.forEach(function (p) { la += p.lat; lo += p.lng; });
+  return { lat: la / coords.length, lng: lo / coords.length };
 }
 function fetchAirQuality() {
   if (!GOOGLE_API_KEY) return;
@@ -4804,12 +4806,83 @@ function offsetPath(path, dLat, dLng) {
 }
 var RING_ROAD_COORDS_B = offsetPath(RING_ROAD_COORDS, 0.006, 0.006);
 
-var RING_ROAD_MARKERS = [
-  { pos: { lat: 30.178, lng: 31.252 }, t: 'rr_mk_qalyub', d: 'rr_mk_qalyub_d' },
-  { pos: { lat: 30.105, lng: 31.262 }, t: 'rr_mk_bahtim', d: 'rr_mk_bahtim_d' },
-  { pos: { lat: 29.991, lng: 31.233 }, t: 'rr_mk_mostorod', d: 'rr_mk_mostorod_d' },
-  { pos: { lat: 30.141, lng: 31.401 }, t: 'rr_mk_dar', d: 'rr_mk_dar_d' }
-];
+// ═══════════════════════════════ MULTI-CORRIDOR DATA ═══════════════════════════════
+var CORRIDORS = {
+  egypt: {
+    coords: RING_ROAD_COORDS,
+    center: { lat: 30.06, lng: 31.32 }, zoom: 10,
+    markers: [
+      { pos: { lat: 30.178, lng: 31.252 }, t: 'rr_mk_qalyub', d: 'rr_mk_qalyub_d' },
+      { pos: { lat: 30.105, lng: 31.262 }, t: 'rr_mk_bahtim', d: 'rr_mk_bahtim_d' },
+      { pos: { lat: 29.991, lng: 31.233 }, t: 'rr_mk_mostorod', d: 'rr_mk_mostorod_d' },
+      { pos: { lat: 30.141, lng: 31.401 }, t: 'rr_mk_dar', d: 'rr_mk_dar_d' }
+    ],
+    vehicleTypes: ['microbus', 'tuktuk', 'mlaiky', 'mlaiky']
+  },
+  ksa: {
+    coords: [
+      { lat: 24.745, lng: 46.645 },   // King Fahd Rd North Entry
+      { lat: 24.710, lng: 46.670 },
+      { lat: 24.680, lng: 46.695 },   // Eastern Ring Interchange
+      { lat: 24.650, lng: 46.720 },
+      { lat: 24.610, lng: 46.740 },   // Al Batha Bottleneck
+      { lat: 24.580, lng: 46.710 },
+      { lat: 24.555, lng: 46.680 },
+      { lat: 24.530, lng: 46.655 }    // Riyadh Southern Terminal
+    ],
+    center: { lat: 24.640, lng: 46.690 }, zoom: 11,
+    markers: [
+      { pos: { lat: 24.745, lng: 46.645 }, t: 'rr_mk_qalyub', d: 'rr_mk_qalyub_d' },
+      { pos: { lat: 24.680, lng: 46.695 }, t: 'rr_mk_bahtim', d: 'rr_mk_bahtim_d' },
+      { pos: { lat: 24.610, lng: 46.740 }, t: 'rr_mk_mostorod', d: 'rr_mk_mostorod_d' },
+      { pos: { lat: 24.530, lng: 46.655 }, t: 'rr_mk_dar', d: 'rr_mk_dar_d' }
+    ],
+    vehicleTypes: ['sedan', 'suv', 'truck', 'bus']
+  },
+  uae: {
+    coords: [
+      { lat: 25.230, lng: 55.270 },   // Sheikh Zayed Rd North (Deira)
+      { lat: 25.210, lng: 55.255 },
+      { lat: 25.190, lng: 55.240 },   // Bur Dubai Corridor
+      { lat: 25.170, lng: 55.225 },
+      { lat: 25.140, lng: 55.210 },   // Al Quoz Industrial
+      { lat: 25.120, lng: 55.195 },
+      { lat: 25.100, lng: 55.180 },
+      { lat: 25.080, lng: 55.155 }    // Dubai Marina / Abu Dhabi Link
+    ],
+    center: { lat: 25.155, lng: 55.215 }, zoom: 11,
+    markers: [
+      { pos: { lat: 25.230, lng: 55.270 }, t: 'rr_mk_qalyub', d: 'rr_mk_qalyub_d' },
+      { pos: { lat: 25.190, lng: 55.240 }, t: 'rr_mk_bahtim', d: 'rr_mk_bahtim_d' },
+      { pos: { lat: 25.140, lng: 55.210 }, t: 'rr_mk_mostorod', d: 'rr_mk_mostorod_d' },
+      { pos: { lat: 25.080, lng: 55.155 }, t: 'rr_mk_dar', d: 'rr_mk_dar_d' }
+    ],
+    vehicleTypes: ['sedan', 'suv', 'luxury', 'truck']
+  },
+  jordan: {
+    coords: [
+      { lat: 31.970, lng: 35.930 },   // King Abdullah II Hwy North
+      { lat: 31.950, lng: 35.945 },
+      { lat: 31.930, lng: 35.960 },   // 4th Circle Interchange
+      { lat: 31.910, lng: 35.975 },
+      { lat: 31.890, lng: 35.990 },   // Airport Road Junction
+      { lat: 31.870, lng: 36.005 },
+      { lat: 31.855, lng: 36.020 },
+      { lat: 31.840, lng: 36.035 }    // Queen Alia Airport Link
+    ],
+    center: { lat: 31.905, lng: 35.980 }, zoom: 11,
+    markers: [
+      { pos: { lat: 31.970, lng: 35.930 }, t: 'rr_mk_qalyub', d: 'rr_mk_qalyub_d' },
+      { pos: { lat: 31.930, lng: 35.960 }, t: 'rr_mk_bahtim', d: 'rr_mk_bahtim_d' },
+      { pos: { lat: 31.890, lng: 35.990 }, t: 'rr_mk_mostorod', d: 'rr_mk_mostorod_d' },
+      { pos: { lat: 31.840, lng: 36.035 }, t: 'rr_mk_dar', d: 'rr_mk_dar_d' }
+    ],
+    vehicleTypes: ['microbus', 'sedan', 'truck', 'taxi']
+  }
+};
+var currentCorridor = 'egypt';
+
+var RING_ROAD_MARKERS = CORRIDORS.egypt.markers;
 
 function markerContent(mk) {
   var G = countryGrade();
@@ -4859,8 +4932,9 @@ function initRingRoadMap() {
     return;
   }
   try {
+    var cor = CORRIDORS[currentCorridor] || CORRIDORS.egypt;
     rrMap = new google.maps.Map(el, {
-      center: { lat: 30.06, lng: 31.32 }, zoom: 10,
+      center: cor.center, zoom: cor.zoom,
       styles: [
         { elementType: 'geometry', stylers: [ { color: '#1e293b' } ] },
         { elementType: 'labels.text.fill', stylers: [ { color: '#94a3b8' } ] },
@@ -4868,11 +4942,12 @@ function initRingRoadMap() {
         { featureType: 'road', stylers: [ { color: '#334155' } ] }
       ]
     });
-    rrPolyA = new google.maps.Polyline({ path: RING_ROAD_COORDS, geodesic: true, strokeColor: ringRoadColorForMPR(rrMPR), strokeWeight: 6, map: rrMap });
-    rrPolyB = new google.maps.Polyline({ path: RING_ROAD_COORDS_B, geodesic: true, strokeColor: ringRoadColorForMPR(rrMPR), strokeWeight: 6, map: rrMap });
+    rrPolyA = new google.maps.Polyline({ path: cor.coords, geodesic: true, strokeColor: ringRoadColorForMPR(rrMPR), strokeWeight: 6, map: rrMap });
+    var pathB = offsetPath(cor.coords, 0.006, 0.006);
+    rrPolyB = new google.maps.Polyline({ path: pathB, geodesic: true, strokeColor: ringRoadColorForMPR(rrMPR), strokeWeight: 6, map: rrMap });
     var traffic = new google.maps.TrafficLayer();
     traffic.setMap(rrMap);
-    RING_ROAD_MARKERS.forEach(function (mk) {
+    cor.markers.forEach(function (mk) {
       var m = new google.maps.Marker({ position: mk.pos, map: rrMap, title: t(mk.t) });
       var iw = new google.maps.InfoWindow({ content: markerContent(mk) });
       m.addListener('click', function () { iw.open(rrMap, m); });
@@ -4992,7 +5067,8 @@ RingRoadOverlay.prototype.draw = function () {
 };
 RingRoadOverlay.prototype.initVehicles = function () {
   this.vehicles_ = [];
-  var types = ['microbus', 'tuktuk', 'mlaiky', 'mlaiky'];
+  var cor = CORRIDORS[currentCorridor] || CORRIDORS.egypt;
+  var types = cor.vehicleTypes;
   for (var i = 0; i < 9; i++) {
     var ty = types[i % types.length];
     this.vehicles_.push({ dir: 'A', frac: i / 9 + Math.random() * 0.03, baseSpeed: 0.55 + Math.random() * 0.5, type: ty, weave: (ty === 'microbus' || ty === 'tuktuk'), phase: Math.random() * 6.28, dwell: 0 });
@@ -5025,7 +5101,9 @@ RingRoadOverlay.prototype.drawVehicles = function () {
   var B = (rrScenario === 'B');
   var self = this;
   this.vehicles_.forEach(function (v) {
-    var path = v.dir === 'B' ? RING_ROAD_COORDS_B : RING_ROAD_COORDS;
+    var cor = CORRIDORS[currentCorridor] || CORRIDORS.egypt;
+    var pathB2 = offsetPath(cor.coords, 0.006, 0.006);
+    var path = v.dir === 'B' ? pathB2 : cor.coords;
     var pt = routePoint(path, v.frac);
     var px = proj.fromLatLngToDivPixel(new google.maps.LatLng(pt.lat, pt.lng));
     if (!px) return;
@@ -5252,6 +5330,40 @@ var COUNTRY_DATA = {
         avgReaction: 0.80, avgSafety: 0.48, avgSigma: 0.75 }
 };
 
+function switchCorridor(country) {
+  if (!CORRIDORS[country] || !rrMap) return;
+  currentCorridor = country;
+  var cor = CORRIDORS[country];
+  // Clear existing polylines
+  if (rrPolyA) { rrPolyA.setMap(null); rrPolyA = null; }
+  if (rrPolyB) { rrPolyB.setMap(null); rrPolyB = null; }
+  // Clear existing markers
+  rrMarkers.forEach(function(o) { o.marker.setMap(null); });
+  rrMarkers = [];
+  // Remove old overlay
+  if (rrOverlay) { rrOverlay.setMap(null); rrOverlay = null; }
+  // Pan map
+  rrMap.setCenter(cor.center);
+  rrMap.setZoom(cor.zoom);
+  // Draw new polylines
+  var pathB = offsetPath(cor.coords, 0.006, 0.006);
+  rrPolyA = new google.maps.Polyline({ path: cor.coords, geodesic: true, strokeColor: ringRoadColorForMPR(rrMPR), strokeWeight: 6, map: rrMap });
+  rrPolyB = new google.maps.Polyline({ path: pathB, geodesic: true, strokeColor: ringRoadColorForMPR(rrMPR), strokeWeight: 6, map: rrMap });
+  // Add new markers
+  cor.markers.forEach(function (mk) {
+    var m = new google.maps.Marker({ position: mk.pos, map: rrMap, title: t(mk.t) });
+    var iw = new google.maps.InfoWindow({ content: markerContent(mk) });
+    m.addListener('click', function () { iw.open(rrMap, m); });
+    rrMarkers.push({ marker: m, iw: iw, t: mk.t, d: mk.d, mk: mk });
+  });
+  // New overlay
+  rrOverlay = new RingRoadOverlay(rrMap);
+  updateRingRoadStyle(rrMPR);
+  // Update AQI centroid
+  fetchAirQuality();
+  fetchWeather();
+}
+
 function selectCountry(country) {
     currentCountry = country;
     ['egypt','ksa','uae','jordan'].forEach(function(c) {
@@ -5261,6 +5373,7 @@ function selectCountry(country) {
         else btn.className = 'ch-btn px-5 py-2.5 rounded-lg font-medium text-sm transition bg-white text-slate-600 border-2 border-slate-200 hover:border-primary';
     });
     renderCountryHub();
+    if (rrMap && country !== currentCorridor) switchCorridor(country);
     var slider = document.getElementById('mpr-slider');
     if (slider) updateFleetTable(parseInt(slider.value, 10));
 }
