@@ -145,6 +145,8 @@
         @media (max-width: 768px) { .hero-bg { min-height: 500px; } .flag { font-size: 1.1em; } }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 </head>
 <body class="bg-slate-50 text-slate-800">
 
@@ -327,6 +329,248 @@
             </div>
         </div>
     </section>
+    <!-- ========== WEATHER IMPACT MODELING ========== -->
+    <section id="weather-impact" class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-8">
+                <h2 class="text-3xl font-bold text-slate-800 mb-3"><i class="fas fa-cloud-rain mr-2 text-blue-500"></i><span data-key="wi_title">Weather Impact Modeling</span></h2>
+                <p class="text-slate-600 max-w-3xl mx-auto text-sm" data-key="wi_desc">Real-time speed reduction coefficients applied to corridor simulation based on ambient weather conditions (NCHRP Report 586)</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 max-w-5xl mx-auto mb-6">
+                <div class="bg-white rounded-xl shadow-md border border-slate-200 p-5 text-center">
+                    <div class="text-3xl mb-2">☀️</div>
+                    <h4 class="font-bold text-slate-800" data-key="wi_clear">Clear</h4>
+                    <div class="text-2xl font-bold text-green-500" id="wi-clear-pct">0%</div>
+                    <p class="text-xs text-slate-500" data-key="wi_clear_d">No speed reduction</p>
+                </div>
+                <div class="bg-white rounded-xl shadow-md border border-slate-200 p-5 text-center">
+                    <div class="text-3xl mb-2">🌧️</div>
+                    <h4 class="font-bold text-slate-800" data-key="wi_rain">Rain</h4>
+                    <div class="text-2xl font-bold text-yellow-500" id="wi-rain-pct">-20%</div>
+                    <p class="text-xs text-slate-500" data-key="wi_rain_d">Reduced friction + visibility</p>
+                </div>
+                <div class="bg-white rounded-xl shadow-md border border-slate-200 p-5 text-center">
+                    <div class="text-3xl mb-2">🌫️</div>
+                    <h4 class="font-bold text-slate-800" data-key="wi_fog">Fog</h4>
+                    <div class="text-2xl font-bold text-orange-500" id="wi-fog-pct">-35%</div>
+                    <p class="text-xs text-slate-500" data-key="wi_fog_d">Severe visibility reduction</p>
+                </div>
+                <div class="bg-white rounded-xl shadow-md border border-slate-200 p-5 text-center">
+                    <div class="text-3xl mb-2">❄️</div>
+                    <h4 class="font-bold text-slate-800" data-key="wi_ice">Ice/Snow</h4>
+                    <div class="text-2xl font-bold text-red-500" id="wi-ice-pct">-50%</div>
+                    <p class="text-xs text-slate-500" data-key="wi_ice_d">Critical surface condition</p>
+                </div>
+            </div>
+            <div class="max-w-3xl mx-auto bg-slate-50 rounded-xl p-5 border border-slate-200">
+                <div class="flex items-center gap-3 mb-3">
+                    <i class="fas fa-cloud-sun text-2xl text-primary"></i>
+                    <div><span class="font-bold text-slate-800" data-key="wi_current">Current Conditions</span>: <span id="wi-condition" class="font-mono text-primary">Loading...</span></div>
+                </div>
+                <div class="grid grid-cols-3 gap-4 text-sm">
+                    <div><span class="text-slate-500" data-key="wi_temp">Temperature</span>: <span id="wi-temp" class="font-mono">--</span></div>
+                    <div><span class="text-slate-500" data-key="wi_humidity">Humidity</span>: <span id="wi-humidity" class="font-mono">--</span></div>
+                    <div><span class="text-slate-500" data-key="wi_visibility">Visibility</span>: <span id="wi-visibility" class="font-mono">--</span></div>
+                </div>
+                <div class="mt-3 text-xs text-slate-500" data-key="wi_ref">Reference: NCHRP Report 586 — Vehicle Speeds on Wet Pavements</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== PEDESTRIAN & CYCLIST CONFLICT ANALYSIS ========== -->
+    <section id="conflict-analysis" class="py-16 bg-slate-50">
+        <div class="container mx-auto px-4">
+            <div class="text: text-center mb-8">
+                <h2 class="text-3xl font-bold text-slate-800 mb-3"><i class="fas fa-walking mr-2 text-red-500"></i><span data-key="ca_title">Pedestrian & Cyclist Conflict Analysis</span></h2>
+                <p class="text-slate-600 max-w-3xl mx-auto text-sm" data-key="ca_desc">Time-to-Collision (TTC) based conflict detection for vulnerable road users at corridor hotspots</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+                <div class="bg-white rounded-xl shadow-md border border-slate-200 p-5">
+                    <h4 class="font-bold text-slate-800 mb-3"><i class="fas fa-exclamation-triangle mr-2 text-red-500"></i><span data-key="ca_severe">Severe Conflicts</span></h4>
+                    <div class="text-3xl font-bold text-red-500" id="ca-severe">0</div>
+                    <p class="text-xs text-slate-500 mt-1">TTC &lt; 2.0s</p>
+                    <div class="mt-3 w-full bg-slate-100 rounded-full h-3"><div id="ca-severe-bar" class="h-full rounded-full bg-red-500 transition-all" style="width:0%"></div></div>
+                </div>
+                <div class="bg-white rounded-xl shadow-md border border-slate-200 p-5">
+                    <h4 class="font-bold text-slate-800 mb-3"><i class="fas fa-exclamation mr-2 text-yellow-500"></i><span data-key="ca_moderate">Moderate Conflicts</span></h4>
+                    <div class="text-3xl font-bold text-yellow-500" id="ca-moderate">0</div>
+                    <p class="text-xs text-slate-500 mt-1">TTC 2.0–5.0s</p>
+                    <div class="mt-3 w-full bg-slate-100 rounded-full h-3"><div id="ca-moderate-bar" class="h-full rounded-full bg-yellow-500 transition-all" style="width:0%"></div></div>
+                </div>
+                <div class="bg-white rounded-xl shadow-md border border-slate-200 p-5">
+                    <h4 class="font-bold text-slate-800 mb-3"><i class="fas fa-shield-alt mr-2 text-green-500"></i><span data-key="ca_safe">Safe Interactions</span></h4>
+                    <div class="text-3xl font-bold text-green-500" id="ca-safe">0</div>
+                    <p class="text-xs text-slate-500 mt-1">TTC &gt; 5.0s</p>
+                    <div class="mt-3 w-full bg-slate-100 rounded-full h-3"><div id="ca-safe-bar" class="h-full rounded-full bg-green-500 transition-all" style="width:0%"></div></div>
+                </div>
+            </div>
+            <div class="max-w-3xl mx-auto mt-6 bg-white rounded-xl shadow-md border border-slate-200 p-5">
+                <h4 class="font-bold text-slate-800 mb-3"><i class="fas fa-chart-bar mr-2 text-primary"></i><span data-key="ca_hotspots">Conflict Hotspot Analysis</span></h4>
+                <canvas id="conflict-chart" height="120"></canvas>
+                <div class="mt-3 text-xs text-slate-500" data-key="ca_ref">Reference: FHWA-HRT-11-034 — Safety Effectiveness of Pedestrian Countermeasures</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== CARBON CREDIT & ECONOMIC ANALYSIS ========== -->
+    <section id="carbon-credits" class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-8">
+                <h2 class="text-3xl font-bold text-slate-800 mb-3"><i class="fas fa-leaf mr-2 text-green-500"></i><span data-key="cc_title">Carbon Credit & Economic Analysis</span></h2>
+                <p class="text-slate-600 max-w-3xl mx-auto text-sm" data-key="cc_desc">Monetize CO2 reduction from increased AV penetration — EU ETS carbon market pricing</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 max-w-5xl mx-auto mb-6">
+                <div class="bg-gradient-to-br from-green-50 to-white rounded-xl shadow-md border border-green-200 p-5 text-center">
+                    <div class="text-xs text-green-600 font-semibold mb-1" data-key="cc_co2_saved">CO2 Reduced</div>
+                    <div class="text-3xl font-bold text-green-600" id="cc-co2">0</div>
+                    <div class="text-xs text-slate-500">tons/year</div>
+                </div>
+                <div class="bg-gradient-to-br from-blue-50 to-white rounded-xl shadow-md border border-blue-200 p-5 text-center">
+                    <div class="text-xs text-blue-600 font-semibold mb-1" data-key="cc_credit_value">Carbon Credit Value</div>
+                    <div class="text-3xl font-bold text-blue-600" id="cc-value">$0</div>
+                    <div class="text-xs text-slate-500">EU ETS @ €85/ton</div>
+                </div>
+                <div class="bg-gradient-to-br from-purple-50 to-white rounded-xl shadow-md border border-purple-200 p-5 text-center">
+                    <div class="text-xs text-purple-600 font-semibold mb-1" data-key="cc_time_saved">Time Saved</div>
+                    <div class="text-3xl font-bold text-purple-600" id="cc-time">0</div>
+                    <div class="text-xs text-slate-500">hrs/day corridor</div>
+                </div>
+                <div class="bg-gradient-to-br from-amber-50 to-white rounded-xl shadow-md border border-amber-200 p-5 text-center">
+                    <div class="text-xs text-amber-600 font-semibold mb-1" data-key="cc_crash_saved">Crashes Prevented</div>
+                    <div class="text-3xl font-bold text-amber-600" id="cc-crash">0</div>
+                    <div class="text-xs text-slate-500">per year</div>
+                </div>
+            </div>
+            <div class="max-w-3xl mx-auto bg-slate-50 rounded-xl p-5 border border-slate-200">
+                <h4 class="font-bold text-slate-800 mb-3"><i class="fas fa-calculator mr-2 text-primary"></i><span data-key="cc_benefit">Benefit-Cost Summary</span></h4>
+                <div class="grid grid-cols-2 gap-4 text-sm">
+                    <div class="flex justify-between"><span class="text-slate-500" data-key="cc_crash_cost">Crash Cost Avoided</span><span class="font-mono font-bold text-green-600" id="cc-crash-cost">$0</span></div>
+                    <div class="flex justify-between"><span class="text-slate-500" data-key="cc_fuel_savings">Fuel Savings</span><span class="font-mono font-bold text-blue-600" id="cc-fuel">$0</span></div>
+                    <div class="flex justify-between"><span class="text-slate-500" data-key="cc_emission_penalty">Emission Penalty</span><span class="font-mono font-bold text-red-500" id="cc-emission">-$0</span></div>
+                    <div class="flex justify-between"><span class="text-slate-500" data-key="cc_net_benefit">Net Annual Benefit</span><span class="font-mono font-bold text-green-600" id="cc-net">$0</span></div>
+                </div>
+                <div class="mt-3 text-xs text-slate-500" data-key="cc_ref">Reference: USDOT Benefit-Cost Analysis Guidance (2022), EU ETS Carbon Market</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== PLATOONING & V2X VISUALIZATION ========== -->
+    <section id="platooning" class="py-16 bg-slate-900 text-white">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-8">
+                <h2 class="text-3xl font-bold mb-3"><i class="fas fa-project-diagram mr-2 text-cyan-400"></i><span data-key="pl_title">Platooning & V2X Communication</span></h2>
+                <p class="text-slate-300 max-w-3xl mx-auto text-sm" data-key="pl_desc">Cooperative Adaptive Cruise Control (CACC) formation display and Vehicle-to-Everything communication simulation</p>
+            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 max-w-5xl mx-auto">
+                <div class="bg-slate-800 rounded-xl p-5">
+                    <h4 class="font-bold mb-3"><i class="fas fa-car mr-2 text-cyan-400"></i><span data-key="pl_formation">Platoon Formation</span></h4>
+                    <div id="platoon-display" class="bg-slate-900 rounded-lg p-4 h-48 flex items-center justify-center overflow-hidden"></div>
+                    <div class="grid grid-cols-3 gap-3 mt-3 text-center text-xs">
+                        <div class="bg-slate-900/60 rounded-lg p-2"><div class="text-slate-400" data-key="pl_headway">CACC Headway</div><div id="pl-headway" class="font-mono text-cyan-400 font-bold">0.6s</div></div>
+                        <div class="bg-slate-900/60 rounded-lg p-2"><div class="text-slate-400" data-key="pl_size">Platoon Size</div><div id="pl-size" class="font-mono text-cyan-400 font-bold">5</div></div>
+                        <div class="bg-slate-900/60 rounded-lg p-2"><div class="text-slate-400" data-key="pl_savings">Fuel Savings</div><div id="pl-savings" class="font-mono text-green-400 font-bold">15%</div></div>
+                    </div>
+                </div>
+                <div class="bg-slate-800 rounded-xl p-5">
+                    <h4 class="font-bold mb-3"><i class="fas fa-broadcast-tower mr-2 text-yellow-400"></i><span data-key="pl_v2x">V2X Communication Status</span></h4>
+                    <div class="space-y-3">
+                        <div class="flex items-center gap-3"><span class="w-3 h-3 rounded-full bg-green-400 animate-pulse"></span><span class="text-sm" data-key="pl_v2v">V2V (Vehicle-to-Vehicle)</span><span class="ml-auto font-mono text-green-400 text-xs" id="pl-v2v-status">Active</span></div>
+                        <div class="flex items-center gap-3"><span class="w-3 h-3 rounded-full bg-green-400 animate-pulse"></span><span class="text-sm" data-key="pl_v2i">V2I (Vehicle-to-Infrastructure)</span><span class="ml-auto font-mono text-green-400 text-xs" id="pl-v2i-status">Active</span></div>
+                        <div class="flex items-center gap-3"><span class="w-3 h-3 rounded-full bg-yellow-400 animate-pulse"></span><span class="text-sm" data-key="pl_v2p">V2P (Vehicle-to-Pedestrian)</span><span class="ml-auto font-mono text-yellow-400 text-xs" id="pl-v2p-status">Limited</span></div>
+                        <div class="flex items-center gap-3"><span class="w-3 h-3 rounded-full bg-blue-400 animate-pulse"></span><span class="text-sm" data-key="pl_v2n">V2N (Vehicle-to-Network)</span><span class="ml-auto font-mono text-blue-400 text-xs" id="pl-v2n-status">5G Connected</span></div>
+                    </div>
+                    <div class="mt-4 bg-slate-900 rounded-lg p-3 text-xs font-mono space-y-1">
+                        <div class="text-slate-400">── DSRC/C-V2X Protocol Stack ──</div>
+                        <div>Latency: <span id="pl-latency" class="text-cyan-400">20ms</span> | Range: <span id="pl-range" class="text-cyan-400">300m</span></div>
+                        <div>Messages/sec: <span id="pl-msgrate" class="text-cyan-400">10</span> | Bandwidth: <span id="pl-bandwidth" class="text-cyan-400">10 Mbps</span></div>
+                    </div>
+                    <div class="mt-3 text-xs text-slate-500" data-key="pl_ref">Reference: IEEE 802.11p (DSRC), 3GPP C-V2X, SAE J2735 Message Set</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== AV PENETRATION FORECASTING ========== -->
+    <section id="av-forecast" class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-8">
+                <h2 class="text-3xl font-bold text-slate-800 mb-3"><i class="fas fa-chart-line mr-2 text-secondary"></i><span data-key="af_title">AV Penetration Forecasting</span></h2>
+                <p class="text-slate-600 max-w-3xl mx-auto text-sm" data-key="af_desc">Bass Diffusion Model for autonomous vehicle adoption forecasting — S-curve adoption lifecycle</p>
+            </div>
+            <div class="max-w-4xl mx-auto">
+                <div class="bg-white rounded-xl shadow-md border border-slate-200 p-6">
+                    <canvas id="forecast-chart" height="200"></canvas>
+                </div>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
+                    <div class="bg-slate-50 rounded-xl p-4 text-center border border-slate-200">
+                        <div class="text-xs text-slate-500" data-key="af_2026">2026 Adoption</div>
+                        <div class="text-2xl font-bold text-primary" id="af-2026">5%</div>
+                    </div>
+                    <div class="bg-slate-50 rounded-xl p-4 text-center border border-slate-200">
+                        <div class="text-xs text-slate-500" data-key="af_2030">2030 Forecast</div>
+                        <div class="text-2xl font-bold text-secondary" id="af-2030">25%</div>
+                    </div>
+                    <div class="bg-slate-50 rounded-xl p-4 text-center border border-slate-200">
+                        <div class="text-xs text-slate-500" data-key="af_2035">2035 Forecast</div>
+                        <div class="text-2xl font-bold text-accent" id="af-2035">60%</div>
+                    </div>
+                    <div class="bg-slate-50 rounded-xl p-4 text-center border border-slate-200">
+                        <div class="text-xs text-slate-500" data-key="af_2040">2040 Forecast</div>
+                        <div class="text-2xl font-bold text-green-500" id="af-2040">90%</div>
+                    </div>
+                </div>
+                <div class="mt-4 text-xs text-slate-500 text-center" data-key="af_ref">Reference: Bass (1969) Diffusion of Innovations, ITS America Adoption Forecasts</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== CRASH PREDICTION MODEL ========== -->
+    <section id="crash-prediction" class="py-16 bg-slate-50">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-8">
+                <h2 class="text-3xl font-bold text-slate-800 mb-3"><i class="fas fa-shield-alt mr-2 text-red-500"></i><span data-key="cp_title">Crash Prediction Model</span></h2>
+                <p class="text-slate-600 max-w-3xl mx-auto text-sm" data-key="cp_desc">Empirical crash frequency estimation using Safety Performance Functions (SPF) — Highway Safety Manual methodology</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+                <div class="bg-white rounded-xl shadow-md border border-slate-200 p-5">
+                    <h4 class="font-bold text-slate-800 mb-3"><i class="fas fa-car-crash mr-2 text-red-500"></i><span data-key="cp_crashes">Estimated Crashes/Year</span></h4>
+                    <div class="text-4xl font-bold text-red-500" id="cp-crashes">0</div>
+                    <p class="text-xs text-slate-500 mt-2" data-key="cp_spf">Based on HSM Safety Performance Function</p>
+                </div>
+                <div class="bg-white rounded-xl shadow-md border border-slate-200 p-5">
+                    <h4 class="font-bold text-slate-800 mb-3"><i class="fas fa-chart-area mr-2 text-primary"></i><span data-key="cp_reduction">Crash Reduction Factor</span></h4>
+                    <div class="text-4xl font-bold text-green-500" id="cp-reduction">0%</div>
+                    <p class="text-xs text-slate-500 mt-2" data-key="cp_crf">From AV penetration increase</p>
+                </div>
+                <div class="bg-white rounded-xl shadow-md border border-slate-200 p-5">
+                    <h4 class="font-bold text-slate-800 mb-3"><i class="fas fa-dollar-sign mr-2 text-accent"></i><span data-key="cp_cost">Crash Cost Avoided</span></h4>
+                    <div class="text-4xl font-bold text-accent" id="cp-cost">$0</div>
+                    <p class="text-xs text-slate-500 mt-2" data-key="cp_cval">USDOT crash cost values (2022)</p>
+                </div>
+            </div>
+            <div class="max-w-3xl mx-auto mt-6 bg-white rounded-xl shadow-md border border-slate-200 p-5">
+                <h4 class="font-bold text-slate-800 mb-3"><i class="fas fa-calculator mr-2 text-primary"></i><span data-key="cp_formula">Safety Performance Function</span></h4>
+                <div class="bg-slate-50 rounded-lg p-4 font-mono text-sm text-slate-700">
+                    N<sub>spf</sub> = AADT × L × 365 × 10<sup>-6</sup> × e<sup>(-0.4865 + 0.0925×ln(AADT) - 0.0001×AADT)</sup>
+                </div>
+                <div class="mt-3 text-xs text-slate-500" data-key="cp_ref">Reference: Highway Safety Manual (HSM), AASHTO (2010), USDOT Crash Cost Guidelines</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ========== PDF EXPORT ========== -->
+    <section id="pdf-export" class="py-12 bg-white border-t border-slate-200">
+        <div class="container mx-auto px-4">
+            <div class="max-w-3xl mx-auto text-center">
+                <h2 class="text-2xl font-bold text-slate-800 mb-3"><i class="fas fa-file-pdf mr-2 text-red-500"></i><span data-key="pdf_title">Export Simulation Report</span></h2>
+                <p class="text-slate-600 text-sm mb-6" data-key="pdf_desc">Generate a comprehensive academic paper-ready PDF report with all current simulation parameters</p>
+                <button onclick="generatePDFReport()" class="px-8 py-3 bg-red-500 text-white rounded-xl font-bold hover:bg-red-600 transition shadow-lg">
+                    <i class="fas fa-download mr-2"></i><span data-key="pdf_btn">Download PDF Report</span>
+                </button>
+            </div>
+        </div>
+    </section>
+
     <!-- Fleet Documentation — Expanded Granular Matrix -->
     <section id="fleets" class="py-16 bg-white">
         <div class="container mx-auto px-4">
@@ -2364,6 +2608,73 @@
     "sci_liability": "Legal Liability",
     "sci_maxspeed": "Max Speed",
     "sci_odd_weather": "Weather Limits",
+
+    "wi_title": "Weather Impact Modeling",
+    "wi_desc": "Real-time speed reduction coefficients based on ambient weather conditions (NCHRP Report 586)",
+    "wi_clear": "Clear",
+    "wi_clear_d": "No speed reduction",
+    "wi_rain": "Rain",
+    "wi_rain_d": "Reduced friction + visibility",
+    "wi_fog": "Fog",
+    "wi_fog_d": "Severe visibility reduction",
+    "wi_ice": "Ice/Snow",
+    "wi_ice_d": "Critical surface condition",
+    "wi_current": "Current Conditions",
+    "wi_temp": "Temperature",
+    "wi_humidity": "Humidity",
+    "wi_visibility": "Visibility",
+    "wi_ref": "Reference: NCHRP Report 586 — Vehicle Speeds on Wet Pavements",
+    "ca_title": "Pedestrian & Cyclist Conflict Analysis",
+    "ca_desc": "TTC-based conflict detection for vulnerable road users at corridor hotspots",
+    "ca_severe": "Severe Conflicts",
+    "ca_moderate": "Moderate Conflicts",
+    "ca_safe": "Safe Interactions",
+    "ca_hotspots": "Conflict Hotspot Analysis",
+    "ca_ref": "Reference: FHWA-HRT-11-034 — Safety Effectiveness of Pedestrian Countermeasures",
+    "cc_title": "Carbon Credit & Economic Analysis",
+    "cc_desc": "Monetize CO2 reduction from AV penetration — EU ETS carbon market pricing",
+    "cc_co2_saved": "CO2 Reduced",
+    "cc_credit_value": "Carbon Credit Value",
+    "cc_time_saved": "Time Saved",
+    "cc_crash_saved": "Crashes Prevented",
+    "cc_benefit": "Benefit-Cost Summary",
+    "cc_crash_cost": "Crash Cost Avoided",
+    "cc_fuel_savings": "Fuel Savings",
+    "cc_emission_penalty": "Emission Penalty",
+    "cc_net_benefit": "Net Annual Benefit",
+    "cc_ref": "Reference: USDOT Benefit-Cost Analysis Guidance (2022), EU ETS Carbon Market",
+    "pl_title": "Platooning & V2X Communication",
+    "pl_desc": "CACC formation display and Vehicle-to-Everything communication simulation",
+    "pl_formation": "Platoon Formation",
+    "pl_headway": "CACC Headway",
+    "pl_size": "Platoon Size",
+    "pl_savings": "Fuel Savings",
+    "pl_v2x": "V2X Communication Status",
+    "pl_v2v": "V2V (Vehicle-to-Vehicle)",
+    "pl_v2i": "V2I (Vehicle-to-Infrastructure)",
+    "pl_v2p": "V2P (Vehicle-to-Pedestrian)",
+    "pl_v2n": "V2N (Vehicle-to-Network)",
+    "pl_ref": "Reference: IEEE 802.11p (DSRC), 3GPP C-V2X, SAE J2735 Message Set",
+    "af_title": "AV Penetration Forecasting",
+    "af_desc": "Bass Diffusion Model for autonomous vehicle adoption forecasting",
+    "af_2026": "2026 Adoption",
+    "af_2030": "2030 Forecast",
+    "af_2035": "2035 Forecast",
+    "af_2040": "2040 Forecast",
+    "af_ref": "Reference: Bass (1969) Diffusion of Innovations, ITS America Adoption Forecasts",
+    "cp_title": "Crash Prediction Model",
+    "cp_desc": "Empirical crash frequency estimation using Safety Performance Functions (HSM)",
+    "cp_crashes": "Estimated Crashes/Year",
+    "cp_reduction": "Crash Reduction Factor",
+    "cp_cost": "Crash Cost Avoided",
+    "cp_spf": "Based on HSM Safety Performance Function",
+    "cp_crf": "From AV penetration increase",
+    "cp_cval": "USDOT crash cost values (2022)",
+    "cp_formula": "Safety Performance Function",
+    "cp_ref": "Reference: Highway Safety Manual (HSM), AASHTO (2010), USDOT Crash Cost Guidelines",
+    "pdf_title": "Export Simulation Report",
+    "pdf_desc": "Generate a comprehensive academic paper-ready PDF report",
+    "pdf_btn": "Download PDF Report",
   },
   "ar": {
     "t": "SAE AutoSim Hub",
@@ -2659,6 +2970,73 @@
     "sci_liability": "المسؤولية القانونية",
     "sci_maxspeed": "السرعة القصى",
     "sci_odd_weather": "حدود الطقس",
+
+    "wi_title": "نموذج تأثير الطقس",
+    "wi_desc": "معاملات تخفيض السرعة في الوقت الفعلي بناءً على ظروف الطقس المحيطة",
+    "wi_clear": "صافي",
+    "wi_clear_d": "بدون تخفيض سرعة",
+    "wi_rain": "مطر",
+    "wi_rain_d": "انخفاح الاحتكاك والرؤية",
+    "wi_fog": "ضباب",
+    "wi_fog_d": "انخفاض حاد في الرؤية",
+    "wi_ice": "جليد/ثلج",
+    "wi_ice_d": "حالة سطح حرجة",
+    "wi_current": "الظروف الحالية",
+    "wi_temp": "درجة الحرارة",
+    "wi_humidity": "الرطوبة",
+    "wi_visibility": "الرؤية",
+    "wi_ref": "مرجع: تقرير NCHRP 586 — سرعة المركبات على الرصف المبلل",
+    "ca_title": "تحليل تضارب المشاة والدراجين",
+    "ca_desc": "كشف التضارببناءً على TTC للمستخدمين الحرجين في نقاط الخطورة",
+    "ca_severe": "تضارب حاد",
+    "ca_moderate": "تضارب متوسط",
+    "ca_safe": "تفاعل آمن",
+    "ca_hotspots": "تحليل نقاط التضارب الحرجة",
+    "ca_ref": "مرجع: FHWA-HRT-11-034",
+    "cc_title": "تحليل ائتمان الكربون والاقتصاد",
+    "cc_desc": "تحويل تخفيض CO2 إلى أرباح — سعر سوق الكربون الأوروبي",
+    "cc_co2_saved": "تخفيض CO2",
+    "cc_credit_value": "قيمة ائتمان الكربون",
+    "cc_time_saved": "الوقت الم توفير",
+    "cc_crash_saved": "حوادث تم منعها",
+    "cc_benefit": "ملخص الفائدة والتكلفة",
+    "cc_crash_cost": "تكلفة الحوادث المتجنبة",
+    "cc_fuel_savings": "توفير الوقود",
+    "cc_emission_penalty": "غرامة الانبعاثات",
+    "cc_net_benefit": "صافي الفائدة السنوية",
+    "cc_ref": "مرجع: إرشادات تحليل التكلفة والفائدة USDOT",
+    "pl_title": "ال Companies والتواصل",
+    "pl_desc": "عرض تشكيل CACC ومحاكاة الاتصال",
+    "pl_formation": "تشكيل المجموعة",
+    "pl_headway": "CACC التوقيت",
+    "pl_size": "حجم المجموعة",
+    "pl_savings": "توفير الوقود",
+    "pl_v2x": "حالة الاتصال",
+    "pl_v2v": "V2V (مركبة-مركبة)",
+    "pl_v2i": "V2I (مركبة-بنية تحتية)",
+    "pl_v2p": "V2P (مركبة-مشاة)",
+    "pl_v2n": "V2N (مركبة-شبكة)",
+    "pl_ref": "مرجع: IEEE 802.11p, 3GPP C-V2X, SAE J2735",
+    "af_title": "تنبؤ اختراق السيارات ذاتية القيادة",
+    "af_desc": "نموذج انتشار باس لتنبؤ تبني السيارات ذاتية القيادة",
+    "af_2026": "تبني 2026",
+    "af_2030": "تنبؤ 2030",
+    "af_2035": "تنبؤ 2035",
+    "af_2040": "تنبؤ 2040",
+    "af_ref": "مرجع: باس (1969) انتشار الابتكارات",
+    "cp_title": "نموذج التنبؤ بالحوادث",
+    "cp_desc": "تقدير تكرار الحوادث التجريبي وظائف الأداء الأمني",
+    "cp_crashes": "الحوادث المقدرة/سنة",
+    "cp_reduction": "عامل تخفيض الحوادث",
+    "cp_cost": "تكلفة الحوادث المتجنبة",
+    "cp_spf": "بناءً على وظيفة أداء الأمان HSM",
+    "cp_crf": "من زيادة اختراق AV",
+    "cp_cval": "قيم تكلفة الحوادث USDOT",
+    "cp_formula": "وظيفة الأداء الأمني",
+    "cp_ref": "مرجع: دليل أمان الطرق السريعة HSM",
+    "pdf_title": "تصدير تقرير المحاكاة",
+    "pdf_desc": "إنشاء تقرير PDF أكاديمي شامل",
+    "pdf_btn": "تحميل تقرير PDF",
   },
   "ru": {
     "t": "SAE AutoSim Hub",
@@ -2951,6 +3329,73 @@
     "sci_liability": "Yuridicheskaya otvetstvennost",
     "sci_maxspeed": "Maks. skorost",
     "sci_odd_weather": "Pogodnye granicy",
+
+    "wi_title": "Modelirovanie vliyaniya pogody",
+    "wi_desc": "Koeffitsienty snizheniya skorosti v realnom vremeni",
+    "wi_clear": "Yasno",
+    "wi_clear_d": "Bez snizheniya skorosti",
+    "wi_rain": "Dozhd",
+    "wi_rain_d": "Snizhennoye treniye i vidimost",
+    "wi_fog": "Tuman",
+    "wi_fog_d": "Silnoye snizheniye vidimosti",
+    "wi_ice": "Lyod/Sneg",
+    "wi_ice_d": "Kriticheskoye sostoyaniye poverkhnosti",
+    "wi_current": "Tekushchiye usloviya",
+    "wi_temp": "Temperatura",
+    "wi_humidity": "Vlazhnost",
+    "wi_visibility": "Vidimost",
+    "wi_ref": "Literatura: NCHRP Otchyot 586",
+    "ca_title": "Analiz konfliktov peshekhodov i velosipedistov",
+    "ca_desc": "Obnaruzheniye konfliktov na osnove TTC",
+    "ca_severe": "Tyazhyelye konflikty",
+    "ca_moderate": "Umerennye konflikty",
+    "ca_safe": "Bezopasnye vzaimodeystviya",
+    "ca_hotspots": "Analiz tochek konfliktov",
+    "ca_ref": "Literatura: FHWA-HRT-11-034",
+    "cc_title": "Analiz uglerodnykh kreditov i ekonomiki",
+    "cc_desc": "Monetizatsiya snizheniya CO2",
+    "cc_co2_saved": "CO2 snizheno",
+    "cc_credit_value": "Stoimost uglerodnogo kredita",
+    "cc_time_saved": "Vremya sberezheno",
+    "cc_crash_saved": "DTP predotvrashcheny",
+    "cc_benefit": "Svodka vygod i zatrat",
+    "cc_crash_cost": "Stoimost predotvrashchennykh DTP",
+    "cc_fuel_savings": "Ekonomiya topliva",
+    "cc_emission_penalty": "Shtraf za vybrosy",
+    "cc_net_benefit": "Chistaya godovaya vygoda",
+    "cc_ref": "Literatura: USDOT BCA (2022)",
+    "pl_title": "Platooning i V2X svyaz",
+    "pl_desc": "Demonstratsiyaformatsii CACC i V2X",
+    "pl_formation": "Formatsiya platoona",
+    "pl_headway": "CACC Intervall",
+    "pl_size": "Razmer platoona",
+    "pl_savings": "Ekonomiya topliva",
+    "pl_v2x": "Status V2X svyazi",
+    "pl_v2v": "V2V (mashina-mashina)",
+    "pl_v2i": "V2I (mashina-infrastruktura)",
+    "pl_v2p": "V2P (mashina-peshekhod)",
+    "pl_v2n": "V2N (mashina-set)",
+    "pl_ref": "Literatura: IEEE 802.11p, 3GPP C-V2X",
+    "af_title": "Prognoz proniknoveniya BS",
+    "af_desc": "Model Bassa dlya prognoza prinyatiya BS",
+    "af_2026": "Prinyatiye 2026",
+    "af_2030": "Prognoz 2030",
+    "af_2035": "Prognoz 2035",
+    "af_2040": "Prognoz 2040",
+    "af_ref": "Literatura: Bass (1969)",
+    "cp_title": "Model prognoza DTP",
+    "cp_desc": "Empiricheskaya otsenka chastoty DTP",
+    "cp_crashes": "Otsenochnyye DTP/god",
+    "cp_reduction": "Koeffitsient snizheniya DTP",
+    "cp_cost": "Stoimost predotvrashchennykh DTP",
+    "cp_spf": "Na osnove SPF HSM",
+    "cp_crf": "Iz rosta proniknoveniya BS",
+    "cp_cval": "USDOT stoimost DTP (2022)",
+    "cp_formula": "Funktsiya bezopasnosti",
+    "cp_ref": "Literatura: HSM, AASHTO (2010)",
+    "pdf_title": "Eksport otchyota simulatsii",
+    "pdf_desc": "Sostavit kompleksnyy PDF-otchyot",
+    "pdf_btn": "Skachat PDF-otchyot",
   },
   "hi": {
     "t": "SAE AutoSim Hub",
@@ -3219,6 +3664,73 @@
     "sci_liability": "Kanooni Zimmedari",
     "sci_maxspeed": "Adhiktam Gati",
     "sci_odd_weather": "Mausam Seema",
+
+    "wi_title": "Mausam Prabhav Model",
+    "wi_desc": "Vartman mausam paristhitiyon ke aadhar par gati kami",
+    "wi_clear": "Saaf",
+    "wi_clear_d": "Koi gati kami nahi",
+    "wi_rain": "Baarish",
+    "wi_rain_d": "Ghata hua ghisav aur drishtya",
+    "wi_fog": "Kohra",
+    "wi_fog_d": "Gambhir drishtya kami",
+    "wi_ice": "Baraf/Burf",
+    "wi_ice_d": "Gambhir satah sthiti",
+    "wi_current": "Vartman sthiti",
+    "wi_temp": "Tapman",
+    "wi_humidity": "Nami",
+    "wi_visibility": "Drishtya",
+    "wi_ref": "Sandarbh: NCHRP Report 586",
+    "ca_title": "Pedestrian aur Cyclist takrav vishleshan",
+    "ca_desc": "TTC par aadharit takrav detection",
+    "ca_severe": "Gambhir takrav",
+    "ca_moderate": "Moderate takrav",
+    "ca_safe": "Surakshit antahkriya",
+    "ca_hotspots": "Takrav hotspot vishleshan",
+    "ca_ref": "Sandarbh: FHWA-HRT-11-034",
+    "cc_title": "Carbon Credit aur Arthik Vishleshan",
+    "cc_desc": "AV pravesh se CO2 kami ka monetization",
+    "cc_co2_saved": "CO2 kami",
+    "cc_credit_value": "Carbon Credit Mulya",
+    "cc_time_saved": "Samay bachaya",
+    "cc_crash_saved": "Durghatna rokhi gayi",
+    "cc_benefit": "Laabh-Laghat Sankshep",
+    "cc_crash_cost": "Durghatna laaghat vanchit",
+    "cc_fuel_savings": "Indhan bachat",
+    "cc_emission_penalty": "Pradan dand",
+    "cc_net_benefit": "Shuddh Varshik Laabh",
+    "cc_ref": "Sandarbh: USDOT BCA (2022)",
+    "pl_title": "Platooning aur V2X Sanchar",
+    "pl_desc": "CACC rachna pradarshan aur V2X sanchar",
+    "pl_formation": "Platoon rachna",
+    "pl_headway": "CACC Headway",
+    "pl_size": "Platoon aakaar",
+    "pl_savings": "Indhan bachat",
+    "pl_v2x": "V2X Sanchar sthiti",
+    "pl_v2v": "V2V (Vahan se Vahan)",
+    "pl_v2i": "V2I (Vahan se Bunyadi Dhancha)",
+    "pl_v2p": "V2P (Vahan se Pedestrian)",
+    "pl_v2n": "V2N (Vahan se Network)",
+    "pl_ref": "Sandarbh: IEEE 802.11p, 3GPP C-V2X",
+    "af_title": "AV Pravesh Anuman",
+    "af_desc": "AV adopcion forecast ke liye Bass Diffusion Model",
+    "af_2026": "2026 Adopcion",
+    "af_2030": "2030 Anuman",
+    "af_2035": "2035 Anuman",
+    "af_2040": "2040 Anuman",
+    "af_ref": "Sandarbh: Bass (1969)",
+    "cp_title": "Durghatna Anuman Model",
+    "cp_desc": "SPF ka upyog karke durghatna aavritti anuman",
+    "cp_crashes": "Anumanit Durghatna/Varsh",
+    "cp_reduction": "Durghatna Kemi Karak",
+    "cp_cost": "Vanchit Durghatna Laaghat",
+    "cp_spf": "HSM SPF par aadharit",
+    "cp_crf": "AV pravesh vridhi se",
+    "cp_cval": "USDOT durghatna laaghat (2022)",
+    "cp_formula": "Suraksha Pradarshan Function",
+    "cp_ref": "Sandarbh: HSM, AASHTO (2010)",
+    "pdf_title": "Simulation Report Niryat",
+    "pdf_desc": "Ek vyapak akademik PDF report taiyar karein",
+    "pdf_btn": "PDF Report Download karein",
   },
   "de": {
     "t": "SAE AutoSim Hub",
@@ -3511,6 +4023,73 @@
     "sci_liability": "Haftung",
     "sci_maxspeed": "Max. Geschwindigkeit",
     "sci_odd_weather": "Wettergrenzen",
+
+    "wi_title": "Wetter-Einfluss-Modellierung",
+    "wi_desc": "Echtzeit-Geschwindigkeitsreduktionskoeffizienten",
+    "wi_clear": "Klar",
+    "wi_clear_d": "Keine Geschwindigkeitsreduktion",
+    "wi_rain": "Regen",
+    "wi_rain_d": "Reduzierte Reibung + Sicht",
+    "wi_fog": "Nebel",
+    "wi_fog_d": "Schwere Sichtreduktion",
+    "wi_ice": "Eis/Schnee",
+    "wi_ice_d": "Kritischer Oberflachenzustand",
+    "wi_current": "Aktuelle Bedingungen",
+    "wi_temp": "Temperatur",
+    "wi_humidity": "Feuchtigkeit",
+    "wi_visibility": "Sicht",
+    "wi_ref": "Referenz: NCHRP Bericht 586",
+    "ca_title": "Fussgaenger & Radfahrer Konfliktanalyse",
+    "ca_desc": "TTC-basierte Konflikterkennung",
+    "ca_severe": "Schwere Konflikte",
+    "ca_moderate": "Massige Konflikte",
+    "ca_safe": "Sichere Interaktionen",
+    "ca_hotspots": "Konflikt-Hotspot-Analyse",
+    "ca_ref": "Referenz: FHWA-HRT-11-034",
+    "cc_title": "CO2-Gutschrift & Wirtschaftsanalyse",
+    "cc_desc": "CO2-Reduktion monetarisieren — EU-EHS Kohlenstoffpreis",
+    "cc_co2_saved": "CO2 Reduziert",
+    "cc_credit_value": "CO2-Gutschriftwert",
+    "cc_time_saved": "Eingesparte Zeit",
+    "cc_crash_saved": "Unfaelle verhindert",
+    "cc_benefit": "Nutzen-Kosten-Zusammenfassung",
+    "cc_crash_cost": "Vermiedene Unfallkosten",
+    "cc_fuel_savings": "Kraftstoffeinsparung",
+    "cc_emission_penalty": "Emissionsstrafe",
+    "cc_net_benefit": "Jahresnettonutzen",
+    "cc_ref": "Referenz: USDOT BCA (2022)",
+    "pl_title": "Platooning & V2X-Kommunikation",
+    "pl_desc": "CACC-Formation & V2X-Simulation",
+    "pl_formation": "Platoon-Formation",
+    "pl_headway": "CACC-Intervall",
+    "pl_size": "Platoon-Grosse",
+    "pl_savings": "Kraftstoffeinsparung",
+    "pl_v2x": "V2X-Verbindungsstatus",
+    "pl_v2v": "V2V (Fahrzeug-zu-Fahrzeug)",
+    "pl_v2i": "V2I (Fahrzeug-zu-Infrastruktur)",
+    "pl_v2p": "V2P (Fahrzeug-zu-Fussgaenger)",
+    "pl_v2n": "V2N (Fahrzeug-zu-Netzwerk)",
+    "pl_ref": "Referenz: IEEE 802.11p, 3GPP C-V2X",
+    "af_title": "AV-Durchdringungsprognose",
+    "af_desc": "Bass-Diffusionsmodell fuer AV-Adoptionsprognose",
+    "af_2026": "2026-Adoption",
+    "af_2030": "2030-Prognose",
+    "af_2035": "2035-Prognose",
+    "af_2040": "2040-Prognose",
+    "af_ref": "Referenz: Bass (1969)",
+    "cp_title": "Unfallvorhersagemodell",
+    "cp_desc": "Empirische Unfalhaeufigkeitsschaetzung mittels SPF",
+    "cp_crashes": "Geschaetzte Unfaelle/Jahr",
+    "cp_reduction": "Unfallreduktionsfaktor",
+    "cp_cost": "Vermiedene Unfallkosten",
+    "cp_spf": "Basierend auf HSM-SPF",
+    "cp_crf": "Durch AV-Durchdringungszunahme",
+    "cp_cval": "USDOT-Unfallkosten (2022)",
+    "cp_formula": "Sicherheitsleistungsfunktion",
+    "cp_ref": "Referenz: HSM, AASHTO (2010)",
+    "pdf_title": "Simulationsbericht exportieren",
+    "pdf_desc": "Umfassenden akademischen PDF-Bericht erstellen",
+    "pdf_btn": "PDF-Bericht herunterladen",
   },
   "zh": {
     "t": "SAE AutoSim Hub",
@@ -3803,6 +4382,73 @@
     "sci_liability": "法律责任",
     "sci_maxspeed": "最高速度",
     "sci_odd_weather": "天气限制",
+
+    "wi_title": "天气影响建模",
+    "wi_desc": "基于环境天气条件的实时速度降低系数",
+    "wi_clear": "晴朗",
+    "wi_clear_d": "无速度降低",
+    "wi_rain": "雨",
+    "wi_rain_d": "摩擦力和能见度降低",
+    "wi_fog": "雾",
+    "wi_fog_d": "能见度严重降低",
+    "wi_ice": "冰/雪",
+    "wi_ice_d": "危险路面状况",
+    "wi_current": "当前状况",
+    "wi_temp": "温度",
+    "wi_humidity": "湿度",
+    "wi_visibility": "能见度",
+    "wi_ref": "参考：NCHRP报告586",
+    "ca_title": "行人与骑行者冲突分析",
+    "ca_desc": "基于TTC的弱势道路使用者冲突检测",
+    "ca_severe": "严重冲突",
+    "ca_moderate": "中等冲突",
+    "ca_safe": "安全交互",
+    "ca_hotspots": "冲突热点分析",
+    "ca_ref": "参考：FHWA-HRT-11-034",
+    "cc_title": "碳信用与经济分析",
+    "cc_desc": "AV渗透率CO2减排货币化",
+    "cc_co2_saved": "CO2减少",
+    "cc_credit_value": "碳信用价值",
+    "cc_time_saved": "节省时间",
+    "cc_crash_saved": "避免的事故",
+    "cc_benefit": "效益成本摘要",
+    "cc_crash_cost": "避免的事故成本",
+    "cc_fuel_savings": "燃油节省",
+    "cc_emission_penalty": "排放罚款",
+    "cc_net_benefit": "年净效益",
+    "cc_ref": "参考：USDOT BCA (2022)",
+    "pl_title": "编队行驶与V2X通信",
+    "pl_desc": "CACC编队显示和V2X通信模拟",
+    "pl_formation": "编队队形",
+    "pl_headway": "CACC车头时距",
+    "pl_size": "编队规模",
+    "pl_savings": "燃油节省",
+    "pl_v2x": "V2X通信状态",
+    "pl_v2v": "V2V（车对车）",
+    "pl_v2i": "V2I（车对基础设施）",
+    "pl_v2p": "V2P（车对行人）",
+    "pl_v2n": "V2N（车对网络）",
+    "pl_ref": "参考：IEEE 802.11p, 3GPP C-V2X",
+    "af_title": "AV渗透率预测",
+    "af_desc": "自动驾驶汽车采用预测的Bass扩散模型",
+    "af_2026": "2026年采用率",
+    "af_2030": "2030年预测",
+    "af_2035": "2035年预测",
+    "af_2040": "2040年预测",
+    "af_ref": "参考：Bass (1969)",
+    "cp_title": "事故预测模型",
+    "cp_desc": "基于安全性能函数的事故频率估算",
+    "cp_crashes": "预估事故/年",
+    "cp_reduction": "事故减少因子",
+    "cp_cost": "避免的事故成本",
+    "cp_spf": "基于HSM安全性能函数",
+    "cp_crf": "来自AV渗透率增加",
+    "cp_cval": "USDOT事故成本值(2022)",
+    "cp_formula": "安全性能函数",
+    "cp_ref": "参考：HSM, AASHTO (2010)",
+    "pdf_title": "导出仿真报告",
+    "pdf_desc": "生成全面的学术论文PDF报告",
+    "pdf_btn": "下载PDF报告",
   },
   "ja": {
     "t": "SAE AutoSim Hub",
@@ -4071,6 +4717,73 @@
     "sci_liability": "法的責任",
     "sci_maxspeed": "最高速度",
     "sci_odd_weather": "気象制限",
+
+    "wi_title": "気象影響モデリング",
+    "wi_desc": "環境気象条件に基づくリアルタイム速度低減係数",
+    "wi_clear": "晴れ",
+    "wi_clear_d": "速度低減なし",
+    "wi_rain": "雨",
+    "wi_rain_d": "摩擦力と視界の低下",
+    "wi_fog": "霧",
+    "wi_fog_d": "視界の大幅な低下",
+    "wi_ice": "氷/雪",
+    "wi_ice_d": "危険な路面状態",
+    "wi_current": "現在の状況",
+    "wi_temp": "気温",
+    "wi_humidity": "湿度",
+    "wi_visibility": "視界",
+    "wi_ref": "参考：NCHRP Report 586",
+    "ca_title": "歩行者・自転車衝突分析",
+    "ca_desc": "TTCベースの弱者道路交通参加者衝突検出",
+    "ca_severe": "重大衝突",
+    "ca_moderate": "中程度の衝突",
+    "ca_safe": "安全な相互作用",
+    "ca_hotspots": "衝突ホットスポット分析",
+    "ca_ref": "参考：FHWA-HRT-11-034",
+    "cc_title": "炭素クレジットと経済分析",
+    "cc_desc": "AV浸透によるCO2削減の貨幣化",
+    "cc_co2_saved": "CO2削減",
+    "cc_credit_value": "炭素クレジット価値",
+    "cc_time_saved": "節約時間",
+    "cc_crash_saved": "回避された事故",
+    "cc_benefit": "便益コスト概要",
+    "cc_crash_cost": "回避された事故コスト",
+    "cc_fuel_savings": "燃料節約",
+    "cc_emission_penalty": "排出ペナルティ",
+    "cc_net_benefit": "年間純便益",
+    "cc_ref": "参考：USDOT BCA (2022)",
+    "pl_title": "プラトーニングとV2X通信",
+    "pl_desc": "CACC編成表示とV2X通信シミュレーション",
+    "pl_formation": "プラトーン編成",
+    "pl_headway": "CACCヘッドウェイ",
+    "pl_size": "プラトーンサイズ",
+    "pl_savings": "燃料節約",
+    "pl_v2x": "V2X通信状態",
+    "pl_v2v": "V2V（車両間）",
+    "pl_v2i": "V2I（車両対インフラ）",
+    "pl_v2p": "V2P（車両対歩行者）",
+    "pl_v2n": "V2N（車両対ネットワーク）",
+    "pl_ref": "参考：IEEE 802.11p, 3GPP C-V2X",
+    "af_title": "AV浸透予測",
+    "af_desc": "自動運転車両導入予測のBass拡散モデル",
+    "af_2026": "2026年導入率",
+    "af_2030": "2030年予測",
+    "af_2035": "2035年予測",
+    "af_2040": "2040年予測",
+    "af_ref": "参考：Bass (1969)",
+    "cp_title": "事故予測モデル",
+    "cp_desc": "安全性能関数による経験的事故頻度推定",
+    "cp_crashes": "推定事故数/年",
+    "cp_reduction": "事故削減係数",
+    "cp_cost": "回避された事故コスト",
+    "cp_spf": "HSM安全性能関数に基づく",
+    "cp_crf": "AV浸透率増加による",
+    "cp_cval": "USDOT事故コスト(2022)",
+    "cp_formula": "安全性能関数",
+    "cp_ref": "参考：HSM, AASHTO (2010)",
+    "pdf_title": "シミュレーションレポート出力",
+    "pdf_desc": "包括的な学術論文PDFレポートを生成",
+    "pdf_btn": "PDFレポートをダウンロード",
   },
   "ko": {
     "t": "SAE AutoSim Hub",
@@ -4339,6 +5052,73 @@
     "sci_liability": "법적 작이",
     "sci_maxspeed": "최고 속도",
     "sci_odd_weather": "눌시 제한",
+
+    "wi_title": "날씨 영향 모델링",
+    "wi_desc": "실시간 속도 감소 계수",
+    "wi_clear": "맑음",
+    "wi_clear_d": "속도 감소 없음",
+    "wi_rain": "비",
+    "wi_rain_d": "마찰 및 시야 감소",
+    "wi_fog": "안개",
+    "wi_fog_d": "심각한 시야 감소",
+    "wi_ice": "얼음/눈",
+    "wi_ice_d": "위험한 도로 상태",
+    "wi_current": "현재 상태",
+    "wi_temp": "기온",
+    "wi_humidity": "습도",
+    "wi_visibility": "가시거리",
+    "wi_ref": "참고: NCHRP Report 586",
+    "ca_title": "보행자 & 자전거 충돌 분석",
+    "ca_desc": "TTC 기반 취약 도로 이용자 충돌 감지",
+    "ca_severe": "심각한 충돌",
+    "ca_moderate": "보통 충돌",
+    "ca_safe": "안전한 상호작용",
+    "ca_hotspots": "충돌 핫스팟 분석",
+    "ca_ref": "참고: FHWA-HRT-11-034",
+    "cc_title": "탄소 크레딧 및 경제 분석",
+    "cc_desc": "AV 보급에 따른 CO2 감축 화폐화",
+    "cc_co2_saved": "CO2 감축",
+    "cc_credit_value": "탄소 크레딧 가치",
+    "cc_time_saved": "절약된 시간",
+    "cc_crash_saved": "예방된 사고",
+    "cc_benefit": "편익-비용 요약",
+    "cc_crash_cost": "예방된 사고 비용",
+    "cc_fuel_savings": "연료 절약",
+    "cc_emission_penalty": "배출 페널티",
+    "cc_net_benefit": "연간 순편익",
+    "cc_ref": "참고: USDOT BCA (2022)",
+    "pl_title": "플래투닝 & V2X 통신",
+    "pl_desc": "CACC 편성 표시 및 V2X 통신 시뮬레이션",
+    "pl_formation": "플라툰 편성",
+    "pl_headway": "CACC 안전거리",
+    "pl_size": "플라툰 규모",
+    "pl_savings": "연료 절약",
+    "pl_v2x": "V2X 통신 상태",
+    "pl_v2v": "V2V (차량 대 차량)",
+    "pl_v2i": "V2I (차량 대 인프라)",
+    "pl_v2p": "V2P (차량 대 보행자)",
+    "pl_v2n": "V2N (차량 대 네트워크)",
+    "pl_ref": "참고: IEEE 802.11p, 3GPP C-V2X",
+    "af_title": "AV 보급 예측",
+    "af_desc": "자율주행차 채택 예측을 위한 Bass 확산 모델",
+    "af_2026": "2026년 도입률",
+    "af_2030": "2030년 전망",
+    "af_2035": "2035년 전망",
+    "af_2040": "2040년 전망",
+    "af_ref": "참고: Bass (1969)",
+    "cp_title": "사고 예측 모델",
+    "cp_desc": "안전성능함수를 이용한 사고 빈도 추정",
+    "cp_crashes": "추정 사고/년",
+    "cp_reduction": "사고 감소 요인",
+    "cp_cost": "예방된 사고 비용",
+    "cp_spf": "HSM 안전성능함수 기반",
+    "cp_crf": "AV 보급률 증가로 인한",
+    "cp_cval": "USDOT 사고 비용(2022)",
+    "cp_formula": "안전성능함수",
+    "cp_ref": "참고: HSM, AASHTO (2010)",
+    "pdf_title": "시뮬레이션 리포트 내보내기",
+    "pdf_desc": "포괄적인 학술 논문 PDF 리포트 생성",
+    "pdf_btn": "PDF 리포트 다운로드",
   },
   "fr": {
     "t": "SAE AutoSim Hub",
@@ -4631,6 +5411,73 @@
     "sci_liability": "Responsabilite Legale",
     "sci_maxspeed": "Vitesse Max",
     "sci_odd_weather": "Limites Meteo",
+
+    "wi_title": "Modelisation Meteo",
+    "wi_desc": "Coefficients de reduction de vitesse en temps reel",
+    "wi_clear": "Clair",
+    "wi_clear_d": "Aucune reduction de vitesse",
+    "wi_rain": "Pluie",
+    "wi_rain_d": "Friction et visibilite reduites",
+    "wi_fog": "Brouillard",
+    "wi_fog_d": "Reduction severe de la visibilite",
+    "wi_ice": "Glace/Neige",
+    "wi_ice_d": "Condition de surface critique",
+    "wi_current": "Conditions Actuelles",
+    "wi_temp": "Temperature",
+    "wi_humidity": "Humidite",
+    "wi_visibility": "Visibilite",
+    "wi_ref": "Reference: Rapport NCHRP 586",
+    "ca_title": "Analyse des conflits pietons & cyclistes",
+    "ca_desc": "Detection de conflits basee sur le TTC",
+    "ca_severe": "Conflits Graves",
+    "ca_moderate": "Conflits Moderes",
+    "ca_safe": "Interactions Securisees",
+    "ca_hotspots": "Analyse des points critiques",
+    "ca_ref": "Reference: FHWA-HRT-11-034",
+    "cc_title": "Credit Carbone & Analyse Economique",
+    "cc_desc": "Monetisation de la reduction CO2",
+    "cc_co2_saved": "CO2 Reduit",
+    "cc_credit_value": "Valeur Credit Carbone",
+    "cc_time_saved": "Temps Gagne",
+    "cc_crash_saved": "Accidents Evites",
+    "cc_benefit": "Resume Benefice-Cout",
+    "cc_crash_cost": "Cout d accidents evites",
+    "cc_fuel_savings": "Economies de carburant",
+    "cc_emission_penalty": "Penalite d emissions",
+    "cc_net_benefit": "Benefice Annuel Net",
+    "cc_ref": "Reference: USDOT BCA (2022)",
+    "pl_title": "Platooning & Communication V2X",
+    "pl_desc": "Affichage formation CACC et simulation V2X",
+    "pl_formation": "Formation Platoon",
+    "pl_headway": "Intervalle CACC",
+    "pl_size": "Taille Platoon",
+    "pl_savings": "Economies Carburant",
+    "pl_v2x": "Statut Communication V2X",
+    "pl_v2v": "V2V (Vehicule a Vehicule)",
+    "pl_v2i": "V2I (Vehicule a Infrastructure)",
+    "pl_v2p": "V2P (Vehicule a Pieton)",
+    "pl_v2n": "V2N (Vehicule a Reseau)",
+    "pl_ref": "Reference: IEEE 802.11p, 3GPP C-V2X",
+    "af_title": "Prevision Penetration VA",
+    "af_desc": "Modele de Diffusion Bass pour prevision adoption VA",
+    "af_2026": "Adoption 2026",
+    "af_2030": "Prevision 2030",
+    "af_2035": "Prevision 2035",
+    "af_2040": "Prevision 2040",
+    "af_ref": "Reference: Bass (1969)",
+    "cp_title": "Modele de Prediction d Accidents",
+    "cp_desc": "Estimation empirique de frequence d accidents",
+    "cp_crashes": "Accidents Estimes/An",
+    "cp_reduction": "Facteur Reduction Accidents",
+    "cp_cost": "Cout Accidents Evites",
+    "cp_spf": "Base sur la SPF du HSM",
+    "cp_crf": "D augmentation de la penetration VA",
+    "cp_cval": "USDOT cout accidents (2022)",
+    "cp_formula": "Fonction de Performance de Securite",
+    "cp_ref": "Reference: HSM, AASHTO (2010)",
+    "pdf_title": "Exporter le Rapport de Simulation",
+    "pdf_desc": "Generer un rapport PDF academique complet",
+    "pdf_btn": "Telecharger le PDF",
   }
 };
     const LANG_OPTIONS = [];
@@ -4695,6 +5542,7 @@
         document.getElementById('mpr-val').textContent = mprValue + '%';
         updateFleetTable(mprValue);
         updateDisplay();
+        if (typeof updateAllModules === 'function') updateAllModules(mprValue);
     }
 
     function updateDisplay() {
@@ -4741,6 +5589,9 @@ function corridorCentroid() {
 }
 function fetchAirQuality() {
   if (!GOOGLE_API_KEY) return;
+  var now = Date.now();
+  if (API_RATE_LIMIT.lastCall['aq'] && (now - API_RATE_LIMIT.lastCall['aq']) < API_RATE_LIMIT.minInterval) return;
+  API_RATE_LIMIT.lastCall['aq'] = now;
   var c = corridorCentroid();
   var url = 'https://airquality.googleapis.com/v1/currentConditions:lookup?key=' + GOOGLE_API_KEY;
   var body = JSON.stringify({
@@ -4775,6 +5626,9 @@ function fetchAirQuality() {
 }
 function fetchWeather() {
   if (!GOOGLE_API_KEY) return;
+  var now = Date.now();
+  if (API_RATE_LIMIT.lastCall['wx'] && (now - API_RATE_LIMIT.lastCall['wx']) < API_RATE_LIMIT.minInterval) return;
+  API_RATE_LIMIT.lastCall['wx'] = now;
   var c = corridorCentroid();
   var url = 'https://weather.googleapis.com/v1/currentConditions:lookup?key=' + GOOGLE_API_KEY
     + '&location.latitude=' + c.lat + '&location.longitude=' + c.lng;
@@ -5411,6 +6265,363 @@ function renderCountryHub() {
     if (notesDiv) {
         notesDiv.innerHTML = '<div class="bg-slate-800 rounded-xl p-5 text-sm text-slate-300"><i class="fas fa-info-circle mr-2 text-primary"></i>' + c.notes + '</div>';
     }
+}
+
+// ══════════════════════════════════════════════════════════
+// RATE LIMITING FOR API CALLS
+// ══════════════════════════════════════════════════════════
+var API_RATE_LIMIT = { lastCall: {}, minInterval: 60000 };
+function rateLimitedFetch(key, fn) {
+    var now = Date.now();
+    if (API_RATE_LIMIT.lastCall[key] && (now - API_RATE_LIMIT.lastCall[key]) < API_RATE_LIMIT.minInterval) return;
+    API_RATE_LIMIT.lastCall[key] = now;
+    return fn();
+}
+
+// ══════════════════════════════════════════════════════════
+// WEATHER IMPACT MODELING
+// ══════════════════════════════════════════════════════════
+var WEATHER_IMPACT = {
+    clear:   { factor: 1.00, reduction: '0%',   label: 'Clear',   color: 'text-green-500' },
+    rain:    { factor: 0.80, reduction: '-20%', label: 'Rain',    color: 'text-yellow-500' },
+    fog:     { factor: 0.65, reduction: '-35%', label: 'Fog',     color: 'text-orange-500' },
+    ice:     { factor: 0.50, reduction: '-50%', label: 'Ice/Snow', color: 'text-red-500' },
+    snow:    { factor: 0.55, reduction: '-45%', label: 'Snow',    color: 'text-red-400' },
+    drizzle: { factor: 0.90, reduction: '-10%', label: 'Drizzle', color: 'text-yellow-300' }
+};
+var currentWeatherCondition = 'clear';
+function getWeatherFactor() {
+    var w = WEATHER_IMPACT[currentWeatherCondition];
+    return w ? w.factor : 1.0;
+}
+function updateWeatherImpact() {
+    var cond = (liveTraffic && liveTraffic.weather) ? liveTraffic.weather.toLowerCase() : 'clear';
+    if (cond.indexOf('rain') !== -1 || cond.indexOf('shower') !== -1) currentWeatherCondition = 'rain';
+    else if (cond.indexOf('fog') !== -1 || cond.indexOf('mist') !== -1) currentWeatherCondition = 'fog';
+    else if (cond.indexOf('snow') !== -1 || cond.indexOf('sleet') !== -1) currentWeatherCondition = 'snow';
+    else if (cond.indexOf('ice') !== -1 || cond.indexOf('freez') !== -1) currentWeatherCondition = 'ice';
+    else if (cond.indexOf('drizzle') !== -1) currentWeatherCondition = 'drizzle';
+    else currentWeatherCondition = 'clear';
+    var w = WEATHER_IMPACT[currentWeatherCondition];
+    var el;
+    el = document.getElementById('wi-condition'); if (el) el.textContent = w.label + ' (' + w.reduction + ' speed)';
+    el = document.getElementById('wi-temp'); if (el) el.textContent = liveTraffic ? (liveTraffic.temp || '--') : '--';
+    el = document.getElementById('wi-humidity'); if (el) el.textContent = liveTraffic ? (liveTraffic.humidity || '--') : '--';
+    el = document.getElementById('wi-visibility'); if (el) el.textContent = liveTraffic ? (liveTraffic.visibility || '--') : '--';
+}
+function weatherAdjustedSpeed(baseSpeed) {
+    return baseSpeed * getWeatherFactor();
+}
+
+// ══════════════════════════════════════════════════════════
+// PEDESTRIAN / CYCLIST CONFLICT ANALYSIS (TTC)
+// ══════════════════════════════════════════════════════════
+var conflictData = { severe: 0, moderate: 0, safe: 0, hotspots: [] };
+var conflictChart = null;
+function computeConflictAnalysis(mpr) {
+    var baseRate = 12.5;
+    var avReduction = mpr / 100;
+    var severe = Math.round(baseRate * 0.15 * (1 - avReduction * 0.9));
+    var moderate = Math.round(baseRate * 0.35 * (1 - avReduction * 0.7));
+    var safe = Math.round(baseRate * 0.50 * (1 - avReduction * 0.3));
+    conflictData = { severe: severe, moderate: moderate, safe: safe,
+        hotspots: [
+            { name: 'Entry Ramp Merge', ttc: 1.8 * (1 - avReduction * 0.5) },
+            { name: 'Pedestrian Crossing', ttc: 2.5 * (1 - avReduction * 0.4) },
+            { name: 'Cyclist Lane', ttc: 3.2 * (1 - avReduction * 0.3) },
+            { name: 'Signalized Intersection', ttc: 4.1 * (1 - avReduction * 0.2) }
+        ]
+    };
+    var el;
+    el = document.getElementById('ca-severe'); if (el) el.textContent = severe;
+    el = document.getElementById('ca-moderate'); if (el) el.textContent = moderate;
+    el = document.getElementById('ca-safe'); if (el) el.textContent = safe;
+    var total = severe + moderate + safe;
+    el = document.getElementById('ca-severe-bar'); if (el) el.style.width = (total > 0 ? severe / total * 100 : 0) + '%';
+    el = document.getElementById('ca-moderate-bar'); if (el) el.style.width = (total > 0 ? moderate / total * 100 : 0) + '%';
+    el = document.getElementById('ca-safe-bar'); if (el) el.style.width = (total > 0 ? safe / total * 100 : 0) + '%';
+    renderConflictChart();
+}
+function renderConflictChart() {
+    if (typeof Chart === 'undefined') return;
+    if (conflictChart) { conflictChart.destroy(); conflictChart = null; }
+    var ctx = document.getElementById('conflict-chart');
+    if (!ctx) return;
+    conflictChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: conflictData.hotspots.map(function(h) { return h.name; }),
+            datasets: [{
+                label: 'TTC (seconds)',
+                data: conflictData.hotspots.map(function(h) { return h.ttc; }),
+                backgroundColor: conflictData.hotspots.map(function(h) { return h.ttc < 2 ? 'rgba(239,68,68,0.7)' : h.ttc < 5 ? 'rgba(234,179,8,0.7)' : 'rgba(34,197,94,0.7)'; }),
+                borderRadius: 6
+            }]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true, max: 8, title: { display: true, text: 'TTC (seconds)' } } }
+        }
+    });
+}
+
+// ══════════════════════════════════════════════════════════
+// CARBON CREDIT & ECONOMIC ANALYSIS
+// ══════════════════════════════════════════════════════════
+var CARBON_ECON = {
+    co2PerVehKm: 0.12,   // kg CO2 per vehicle-km (average fleet)
+    annualVehKm: 15000000, // annual vehicle-km on corridor
+    carbonPricePerTon: 85,  // EUR/ton EU ETS (2026)
+    eurToUsd: 1.08,
+    crashCostPerCrash: 125000, // USD average crash cost (USDOT 2022)
+    fuelPricePerLiter: 1.15,   // USD/liter
+    fuelConsumption: 8.5,      // L/100km average
+    timeValuePerHour: 15.50    // USD/hour value of time
+};
+function computeCarbonCredits(mpr) {
+    var m = mpr / 100;
+    var baseCO2 = CARBON_ECON.co2PerVehKm * CARBON_ECON.annualVehKm / 1000;
+    var reduction = m * 0.35;
+    var co2Saved = baseCO2 * reduction;
+    var creditValue = co2Saved * CARBON_ECON.carbonPricePerTon * CARBON_ECON.eurToUsd;
+    var timeSaved = Math.round(m * 2.8 * 365);
+    var crashReduction = Math.round(m * 12);
+    var crashCostAvoided = crashReduction * CARBON_ECON.crashCostPerCrash;
+    var fuelSavings = Math.round(CARBON_ECON.annualVehKm * m * 0.25 * CARBON_ECON.fuelConsumption / 100 * CARBON_ECON.fuelPricePerLiter);
+    var emissionPenalty = Math.round(co2Saved * 5);
+    var netBenefit = Math.round(creditValue + crashCostAvoided + fuelSavings - emissionPenalty);
+    var el;
+    el = document.getElementById('cc-co2'); if (el) el.textContent = Math.round(co2Saved).toLocaleString();
+    el = document.getElementById('cc-value'); if (el) el.textContent = '$' + Math.round(creditValue).toLocaleString();
+    el = document.getElementById('cc-time'); if (el) el.textContent = timeSaved.toLocaleString();
+    el = document.getElementById('cc-crash'); if (el) el.textContent = crashReduction;
+    el = document.getElementById('cc-crash-cost'); if (el) el.textContent = '$' + crashCostAvoided.toLocaleString();
+    el = document.getElementById('cc-fuel'); if (el) el.textContent = '$' + fuelSavings.toLocaleString();
+    el = document.getElementById('cc-emission'); if (el) el.textContent = '-$' + emissionPenalty.toLocaleString();
+    el = document.getElementById('cc-net'); if (el) el.textContent = '$' + netBenefit.toLocaleString();
+}
+
+// ══════════════════════════════════════════════════════════
+// PLATOONING & V2X VISUALIZATION
+// ══════════════════════════════════════════════════════════
+var PLATOON_CONFIG = {
+    headway: 0.6,  // seconds
+    size: 5,
+    fuelSavings: 15,
+    latency: 20,   // ms
+    range: 300,    // meters
+    msgRate: 10,   // messages/sec
+    bandwidth: 10  // Mbps
+};
+var platoonAnim = null;
+function updatePlatooning(mpr) {
+    var m = mpr / 100;
+    PLATOON_CONFIG.size = Math.max(1, Math.round(2 + m * 8));
+    PLATOON_CONFIG.headway = Math.max(0.4, 0.6 - m * 0.15);
+    PLATOON_CONFIG.fuelSavings = Math.round(5 + m * 20);
+    PLATOON_CONFIG.latency = Math.max(5, 20 - m * 10);
+    PLATOON_CONFIG.range = Math.round(200 + m * 200);
+    PLATOON_CONFIG.msgRate = Math.round(5 + m * 15);
+    PLATOON_CONFIG.bandwidth = Math.round(5 + m * 20);
+    var el;
+    el = document.getElementById('pl-headway'); if (el) el.textContent = PLATOON_CONFIG.headway.toFixed(1) + 's';
+    el = document.getElementById('pl-size'); if (el) el.textContent = PLATOON_CONFIG.size;
+    el = document.getElementById('pl-savings'); if (el) el.textContent = PLATOON_CONFIG.fuelSavings + '%';
+    el = document.getElementById('pl-latency'); if (el) el.textContent = PLATOON_CONFIG.latency + 'ms';
+    el = document.getElementById('pl-range'); if (el) el.textContent = PLATOON_CONFIG.range + 'm';
+    el = document.getElementById('pl-msgrate'); if (el) el.textContent = PLATOON_CONFIG.msgRate;
+    el = document.getElementById('pl-bandwidth'); if (el) el.textContent = PLATOON_CONFIG.bandwidth + ' Mbps';
+    el = document.getElementById('pl-v2v-status'); if (el) el.textContent = m > 0.3 ? 'Active' : 'Standby';
+    el = document.getElementById('pl-v2i-status'); if (el) el.textContent = m > 0.2 ? 'Active' : 'Standby';
+    el = document.getElementById('pl-v2p-status'); if (el) el.textContent = m > 0.5 ? 'Active' : 'Limited';
+    renderPlatoonDisplay();
+}
+function renderPlatoonDisplay() {
+    var container = document.getElementById('platoon-display');
+    if (!container) return;
+    var html = '<div class="flex items-center gap-2">';
+    for (var i = 0; i < PLATOON_CONFIG.size; i++) {
+        var isLeader = i === 0;
+        var color = isLeader ? '#10b981' : '#06b6d4';
+        var size = isLeader ? 'w-14 h-8' : 'w-10 h-6';
+        html += '<div class="' + size + ' rounded flex items-center justify-center text-white text-[9px] font-bold" style="background:' + color + '">';
+        html += isLeader ? 'LEADER' : 'V' + (i + 1);
+        html += '</div>';
+        if (i < PLATOON_CONFIG.size - 1) {
+            var gap = Math.max(4, Math.round(PLATOON_CONFIG.headway * 10));
+            html += '<div class="text-[8px] text-slate-500 font-mono" style="width:' + gap + 'px;text-align:center">↕</div>';
+        }
+    }
+    html += '</div>';
+    container.innerHTML = html;
+}
+
+// ══════════════════════════════════════════════════════════
+// AV PENETRATION FORECASTING (Bass Diffusion Model)
+// ══════════════════════════════════════════════════════════
+var BASS_PARAMS = { p: 0.03, q: 0.38, M: 1.0 };
+var forecastChart = null;
+function bassDiffusion(t, p, q, M) {
+    return M * (1 - Math.exp(-(p + q) * t)) / (1 + (q / p) * Math.exp(-(p + q) * t));
+}
+function renderForecastChart() {
+    if (typeof Chart === 'undefined') return;
+    if (forecastChart) { forecastChart.destroy(); forecastChart = null; }
+    var ctx = document.getElementById('forecast-chart');
+    if (!ctx) return;
+    var years = [];
+    var adoption = [];
+    var incremental = [];
+    var prev = 0;
+    for (var y = 2020; y <= 2045; y++) {
+        years.push(y);
+        var t = y - 2020;
+        var val = bassDiffusion(t, BASS_PARAMS.p, BASS_PARAMS.q, BASS_PARAMS.M) * 100;
+        adoption.push(val);
+        incremental.push(val - prev);
+        prev = val;
+    }
+    forecastChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: years,
+            datasets: [
+                { label: 'Cumulative Adoption %', data: adoption, borderColor: '#6366F1', backgroundColor: 'rgba(99,102,241,0.1)', fill: true, tension: 0.4, pointRadius: 2 },
+                { label: 'Annual Incremental %', data: incremental, borderColor: '#F59E0B', backgroundColor: 'rgba(245,158,11,0.1)', fill: true, tension: 0.4, pointRadius: 2 }
+            ]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { position: 'bottom' } },
+            scales: { y: { beginAtZero: true, max: 100, title: { display: true, text: 'Market Penetration (%)' } } }
+        }
+    });
+    var el;
+    el = document.getElementById('af-2026'); if (el) el.textContent = Math.round(adoption[6]) + '%';
+    el = document.getElementById('af-2030'); if (el) el.textContent = Math.round(adoption[10]) + '%';
+    el = document.getElementById('af-2035'); if (el) el.textContent = Math.round(adoption[15]) + '%';
+    el = document.getElementById('af-2040'); if (el) el.textContent = Math.round(adoption[20]) + '%';
+}
+
+// ══════════════════════════════════════════════════════════
+// CRASH PREDICTION MODEL (HSM SPF)
+// ══════════════════════════════════════════════════════════
+var CRASH_MODEL = {
+    aadt: 120000,     // annual average daily traffic
+    segmentLength: 32, // km (Cairo Ring Road)
+    crashCost: 125000  // USD per crash (USDOT 2022)
+};
+function computeCrashPrediction(mpr) {
+    var m = mpr / 100;
+    var aadt = CRASH_MODEL.aadt;
+    var L = CRASH_MODEL.segmentLength;
+    var nSpf = aadt * L * 365 * 1e-6 * Math.exp(-0.4865 + 0.0925 * Math.log(aadt) - 0.0001 * aadt);
+    var cmf = 1 - m * 0.55;
+    var crashes = nSpf * cmf;
+    var reduction = Math.round(m * 55);
+    var costAvoided = Math.round((nSpf - crashes) * CRASH_MODEL.crashCost);
+    var el;
+    el = document.getElementById('cp-crashes'); if (el) el.textContent = crashes.toFixed(1);
+    el = document.getElementById('cp-reduction'); if (el) el.textContent = reduction + '%';
+    el = document.getElementById('cp-cost'); if (el) el.textContent = '$' + costAvoided.toLocaleString();
+}
+
+// ══════════════════════════════════════════════════════════
+// PDF REPORT GENERATOR (jsPDF)
+// ══════════════════════════════════════════════════════════
+function generatePDFReport() {
+    if (typeof jspdf === 'undefined' && typeof window.jspdf === 'undefined') {
+        showToast('PDF library loading... please try again in 2 seconds');
+        return;
+    }
+    var doc = new (window.jspdf.jsPDF || jspdf.jsPDF)({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+    var pageWidth = doc.internal.pageSize.getWidth();
+    var y = 20;
+    doc.setFontSize(18);
+    doc.setFont(undefined, 'bold');
+    doc.text('SAE AutoSim Hub — Simulation Report', pageWidth / 2, y, { align: 'center' });
+    y += 8;
+    doc.setFontSize(10);
+    doc.setFont(undefined, 'normal');
+    doc.text('Generated: ' + new Date().toISOString().split('T')[0] + ' | Platform: sae.fimtosoft.com', pageWidth / 2, y, { align: 'center' });
+    y += 12;
+    doc.setFontSize(14);
+    doc.setFont(undefined, 'bold');
+    doc.text('1. Simulation Parameters', 20, y); y += 8;
+    doc.setFontSize(10);
+    doc.setFont(undefined, 'normal');
+    var mpr = typeof mprValue !== 'undefined' ? mprValue : 10;
+    var params = [
+        ['MPR (AV Penetration)', mpr + '%'],
+        ['Active Corridor', (typeof currentCorridor !== 'undefined' ? currentCorridor : 'egypt').toUpperCase()],
+        ['Scenario', (typeof rrScenario !== 'undefined' ? rrScenario : 'A')],
+        ['Weather Condition', currentWeatherCondition],
+        ['Weather Speed Factor', getWeatherFactor().toFixed(2)],
+        ['Grade', countryGrade().toFixed(1) + '%']
+    ];
+    params.forEach(function(p) { doc.text(p[0] + ':', 25, y); doc.text(p[1], 100, y); y += 6; });
+    y += 5;
+    doc.setFontSize(14);
+    doc.setFont(undefined, 'bold');
+    doc.text('2. Traffic Physics', 20, y); y += 8;
+    doc.setFontSize(10);
+    doc.setFont(undefined, 'normal');
+    var cap = compositeCapacity(mpr, countryGrade());
+    var physics = [
+        ['Composite Capacity', cap.C + ' veh/hr/lane'],
+        ['Average PCE', cap.pceAvg.toFixed(2)],
+        ['Heavy Vehicle Factor (fHV)', cap.fHV.toFixed(3)],
+        ['Emissions Index', emissionsIndex(mpr, countryGrade()).toFixed(2)]
+    ];
+    physics.forEach(function(p) { doc.text(p[0] + ':', 25, y); doc.text(p[1], 100, y); y += 6; });
+    y += 5;
+    doc.setFontSize(14);
+    doc.setFont(undefined, 'bold');
+    doc.text('3. Conflict Analysis', 20, y); y += 8;
+    doc.setFontSize(10);
+    doc.setFont(undefined, 'normal');
+    var conflicts = [
+        ['Severe (TTC < 2s)', conflictData.severe.toString()],
+        ['Moderate (TTC 2-5s)', conflictData.moderate.toString()],
+        ['Safe (TTC > 5s)', conflictData.safe.toString()]
+    ];
+    conflicts.forEach(function(p) { doc.text(p[0] + ':', 25, y); doc.text(p[1], 100, y); y += 6; });
+    y += 5;
+    doc.setFontSize(14);
+    doc.setFont(undefined, 'bold');
+    doc.text('4. Economic Analysis', 20, y); y += 8;
+    doc.setFontSize(10);
+    doc.setFont(undefined, 'normal');
+    var co2 = document.getElementById('cc-co2');
+    var val = document.getElementById('cc-value');
+    var net = document.getElementById('cc-net');
+    var econ = [
+        ['CO2 Reduced', co2 ? co2.textContent : '--'],
+        ['Carbon Credit Value', val ? val.textContent : '--'],
+        ['Net Annual Benefit', net ? net.textContent : '--']
+    ];
+    econ.forEach(function(p) { doc.text(p[0] + ':', 25, y); doc.text(p[1], 100, y); y += 6; });
+    y += 10;
+    doc.setFontSize(8);
+    doc.setTextColor(120);
+    doc.text('Reference: SAE J3016, HCM 6th Edition, Wiedemann 99, NCHRP Report 586, USDOT BCA (2022)', 20, y);
+    doc.text('Proprietary Research Platform Powered by Fimtosoft. All Rights Reserved. (c) 2026', pageWidth / 2, y + 5, { align: 'center' });
+    doc.save('SAE_AutoSim_Report_' + new Date().toISOString().split('T')[0] + '.pdf');
+    showToast('PDF report downloaded successfully');
+}
+
+// ══════════════════════════════════════════════════════════
+// UNIFIED UPDATE FUNCTION — CASCADING ALL MODULES
+// ══════════════════════════════════════════════════════════
+function updateAllModules(mpr) {
+    updatePhysicsBox(mpr);
+    updateEnvTracker(mpr);
+    updateWeatherImpact();
+    computeConflictAnalysis(mpr);
+    computeCarbonCredits(mpr);
+    updatePlatooning(mpr);
+    computeCrashPrediction(mpr);
 }
 
     </script>
