@@ -707,6 +707,12 @@
                     <select id="fleet-sel-b" onchange="fleetRender()" class="border-2 border-slate-200 rounded-lg px-3 py-2 text-sm bg-white cursor-pointer"></select>
                 </div>
             </div>
+            <div class="flex justify-center mb-6">
+                <div class="inline-flex rounded-lg border-2 border-slate-200 overflow-hidden">
+                    <button onclick="fleetSetMode('uf')" id="mode-uf" class="px-5 py-2 text-sm font-semibold bg-slate-800 text-white transition"><i class="fas fa-user mr-1"></i> <span data-key="mode_uf">User-Friendly</span></button>
+                    <button onclick="fleetSetMode('sci')" id="mode-sci" class="px-5 py-2 text-sm font-semibold bg-white text-slate-500 hover:bg-slate-50 transition"><i class="fas fa-flask mr-1"></i> <span data-key="mode_sci">Scientific Academic</span></button>
+                </div>
+            </div>
             <div id="fleet-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto mb-10"></div>
             <div class="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div class="bg-slate-50 rounded-xl p-5 border border-slate-200"><h4 class="font-bold text-slate-800 mb-3"><i class="fas fa-microchip mr-2 text-primary"></i><span data-key="chart_sensor">Sensor Density vs. Cost</span></h4><div style="height:280px"><canvas id="fleet-chart-sensor"></canvas></div></div>
@@ -2348,6 +2354,16 @@
     "fleet_price": "Est. Price / Option",
     "chart_sensor": "Sensor Density vs. Cost",
     "chart_safety": "Safety Intervention Curves",
+
+    "mode_uf": "User-Friendly",
+    "mode_sci": "Scientific Academic",
+    "uf_year": "Production Year",
+    "uf_price": "Est. Price / Option",
+    "uf_benefit": "Consumer Benefit",
+    "uf_avail": "Availability",
+    "sci_liability": "Legal Liability",
+    "sci_maxspeed": "Max Speed",
+    "sci_odd_weather": "Weather Limits",
   },
   "ar": {
     "t": "SAE AutoSim Hub",
@@ -2633,6 +2649,16 @@
     "fleet_price": "السعر التقديري",
     "chart_sensor": "كثافة أجهزة الاستشعار مقابل التكلفة",
     "chart_safety": "منحنى التدخل الأمني",
+
+    "mode_uf": "سهل الاستخدام",
+    "mode_sci": "أكاديمي علمي",
+    "uf_year": "سنة الإنتاج",
+    "uf_price": "السعر التقديري",
+    "uf_benefit": "منفع المستهلك",
+    "uf_avail": "التوفر",
+    "sci_liability": "المسؤولية القانونية",
+    "sci_maxspeed": "السرعة القصى",
+    "sci_odd_weather": "حدود الطقس",
   },
   "ru": {
     "t": "SAE AutoSim Hub",
@@ -2915,6 +2941,16 @@
     "fleet_price": "Otsenochnaya cena",
     "chart_sensor": "Plotnost datchikov k stoimosti",
     "chart_safety": "Krivye bezopasnosti",
+
+    "mode_uf": "Dlya polzovatelya",
+    "mode_sci": "Nauchnyj akademicheskij",
+    "uf_year": "God vypuska",
+    "uf_price": "Otsenochnaya cena",
+    "uf_benefit": "Potrebitel skaya vygoda",
+    "uf_avail": "Dostupnost",
+    "sci_liability": "Yuridicheskaya otvetstvennost",
+    "sci_maxspeed": "Maks. skorost",
+    "sci_odd_weather": "Pogodnye granicy",
   },
   "hi": {
     "t": "SAE AutoSim Hub",
@@ -3173,6 +3209,16 @@
     "fleet_price": "Anumanit Moolya",
     "chart_sensor": "Sensor Ghanta vs. Cost",
     "chart_safety": "Suraksha Dakhal Vartaman",
+
+    "mode_uf": "Upyogkarta-Mitra",
+    "mode_sci": "Vaigyanik Akademik",
+    "uf_year": "Utpadan Varsh",
+    "uf_price": "Anumanit Kimat",
+    "uf_benefit": "Upbhokta Laabh",
+    "uf_avail": "Uplabdhata",
+    "sci_liability": "Kanooni Zimmedari",
+    "sci_maxspeed": "Adhiktam Gati",
+    "sci_odd_weather": "Mausam Seema",
   },
   "de": {
     "t": "SAE AutoSim Hub",
@@ -3455,6 +3501,16 @@
     "fleet_price": "Geschatzter Preis",
     "chart_sensor": "Sensorichte vs. Kosten",
     "chart_safety": "Sicherheitsinterventionskurven",
+
+    "mode_uf": "Benutzerfreundlich",
+    "mode_sci": "Wissenschaftlich Akademisch",
+    "uf_year": "Produktionsjahr",
+    "uf_price": "Geschatzter Preis",
+    "uf_benefit": "Kundenvorteil",
+    "uf_avail": "Verfugbarkeit",
+    "sci_liability": "Haftung",
+    "sci_maxspeed": "Max. Geschwindigkeit",
+    "sci_odd_weather": "Wettergrenzen",
   },
   "zh": {
     "t": "SAE AutoSim Hub",
@@ -3737,6 +3793,16 @@
     "fleet_price": "估价",
     "chart_sensor": "传感器密度 vs. 成本",
     "chart_safety": "安全干预曲线",
+
+    "mode_uf": "用户友好",
+    "mode_sci": "科学学术",
+    "uf_year": "生产年份",
+    "uf_price": "估价",
+    "uf_benefit": "消费者利益",
+    "uf_avail": "可用性",
+    "sci_liability": "法律责任",
+    "sci_maxspeed": "最高速度",
+    "sci_odd_weather": "天气限制",
   },
   "ja": {
     "t": "SAE AutoSim Hub",
@@ -3995,6 +4061,16 @@
     "fleet_price": "推定価格",
     "chart_sensor": "センサー密度 vs. コスト",
     "chart_safety": "安全介入曲線",
+
+    "mode_uf": "ユーザー向け",
+    "mode_sci": "学術科学",
+    "uf_year": "生産年",
+    "uf_price": "推定価格",
+    "uf_benefit": "消費者メリット",
+    "uf_avail": "対応状況",
+    "sci_liability": "法的責任",
+    "sci_maxspeed": "最高速度",
+    "sci_odd_weather": "気象制限",
   },
   "ko": {
     "t": "SAE AutoSim Hub",
@@ -4253,6 +4329,16 @@
     "fleet_price": "예상 가격",
     "chart_sensor": "센서 밀도 vs. 비용",
     "chart_safety": "안전 개입 곡선",
+
+    "mode_uf": "사용자 커화적",
+    "mode_sci": "과학 학술",
+    "uf_year": "생산 연도",
+    "uf_price": "예상 가격",
+    "uf_benefit": "소빌자 협업",
+    "uf_avail": "출시 절리",
+    "sci_liability": "법적 작이",
+    "sci_maxspeed": "최고 속도",
+    "sci_odd_weather": "눌시 제한",
   },
   "fr": {
     "t": "SAE AutoSim Hub",
@@ -4535,6 +4621,16 @@
     "fleet_price": "Prix Estime",
     "chart_sensor": "Densite Capteurs vs. Cout",
     "chart_safety": "Courbes Intervention Securite",
+
+    "mode_uf": "Convivial",
+    "mode_sci": "Scientifique Academique",
+    "uf_year": "Annee de Production",
+    "uf_price": "Prix Estime",
+    "uf_benefit": "Avantage Consommateur",
+    "uf_avail": "Disponibilite",
+    "sci_liability": "Responsabilite Legale",
+    "sci_maxspeed": "Vitesse Max",
+    "sci_odd_weather": "Limites Meteo",
   }
 };
     const LANG_OPTIONS = [];
@@ -4984,29 +5080,59 @@ function setScenario(s) {
 }
 
 // ---- AV Comparison Engine ----
-// ---- Fleet Comparison Engine (SAE Level Tiered) ----
+// ---- Dual-Mode Fleet Comparison Engine ----
 var FLEET_DB = {
   L1: [
-    { key:'toyota_corolla', name:'Toyota Corolla (TSS 2.0)', sensors:{lidar:0,radar:1,cameras:3,ultrasonic:4}, odScope:'Lane-keep assist, adaptive cruise, pre-collision up to 180 km/h; clear weather; any paved road', liability:'OEM', priceEst:28500, intervention:0.15 },
-    { key:'ford_f150', name:'Ford F-150 (Co-Pilot360)', sensors:{lidar:0,radar:1,cameras:4,ultrasonic:4}, odScope:'Adaptive cruise + lane centering; clear weather; highways and urban roads', liability:'OEM', priceEst:52000, intervention:0.14 }
+    { key:'toyota_corolla',
+      uf:{ brand:'Toyota', name:'Corolla (TSS 2.0)', year:2026, price:'$28,500', benefit:'Lane-keep + Adaptive Cruise + Pre-Collision', availability:'Global (160+ countries)' },
+      sci:{ sensors:{lidar:0,radar:1,cameras:3,ultrasonic:4}, liability:'OEM', maxSpeed:180, oddWeather:'Clear / Light rain', odScope:'Any paved road; lane-keep assist, adaptive cruise, pre-collision up to 180 km/h', intervention:0.15 } },
+    { key:'ford_f150',
+      uf:{ brand:'Ford', name:'F-150 (Co-Pilot360)', year:2026, price:'$52,000', benefit:'Hands-on highway driving assist + 360 camera', availability:'North America, Europe, Middle East' },
+      sci:{ sensors:{lidar:0,radar:1,cameras:4,ultrasonic:4}, liability:'OEM', maxSpeed:180, oddWeather:'Clear / Light rain', odScope:'Adaptive cruise + lane centering; highways and urban roads', intervention:0.14 } }
   ],
   L2: [
-    { key:'tesla_m3', name:'Tesla Model 3/Y (Autopilot/FSD)', sensors:{lidar:0,radar:0,cameras:8,ultrasonic:0}, odScope:'Mapped highways + urban; clear weather; driver supervision required', liability:'Driver', priceEst:42000, intervention:0.32 },
-    { key:'cadillac_lyriq', name:'Cadillac Lyriq (Super Cruise)', sensors:{lidar:0,radar:1,cameras:4,ultrasonic:8}, odScope:'Mapped highways with dividers only; clear weather; 200 km/h max', liability:'Driver', priceEst:58000, intervention:0.25 },
-    { key:'bmw_7', name:'BMW 7 Series (Driving Assistant Pro)', sensors:{lidar:0,radar:4,cameras:4,ultrasonic:10}, odScope:'Highways + urban; clear weather; hands-off below 60 km/h', liability:'Driver', priceEst:95000, intervention:0.22 }
+    { key:'tesla_my',
+      uf:{ brand:'Tesla', name:'Model Y (Autopilot/FSD)', year:2026, price:'$42,000', benefit:'Full Self-Driving supervised; city + highway; OTA updates', availability:'Global (50+ countries)' },
+      sci:{ sensors:{lidar:0,radar:0,cameras:8,ultrasonic:0}, liability:'Driver', maxSpeed:150, oddWeather:'Clear / Overcast', odScope:'Mapped highways + urban; driver supervision required', intervention:0.32 } },
+    { key:'cadillac_lyriq',
+      uf:{ brand:'Cadillac', name:'Lyriq (Super Cruise)', year:2026, price:'$58,000', benefit:'Hands-free highway driving on 400,000+ mapped miles', availability:'North America, China' },
+      sci:{ sensors:{lidar:0,radar:1,cameras:4,ultrasonic:8}, liability:'Driver', maxSpeed:200, oddWeather:'Clear', odScope:'Mapped highways with dividers only', intervention:0.25 } },
+    { key:'bmw_7',
+      uf:{ brand:'BMW', name:'7 Series (Driving Assistant Pro)', year:2026, price:'$95,000', benefit:'Highway assistant with traffic jam assist up to 60 km/h', availability:'Global' },
+      sci:{ sensors:{lidar:0,radar:4,cameras:4,ultrasonic:10}, liability:'Driver', maxSpeed:180, oddWeather:'Clear / Light rain', odScope:'Highways + urban; hands-off below 60 km/h', intervention:0.22 } }
   ],
   L3: [
-    { key:'mercedes_s', name:'Mercedes-Benz S-Class (DRIVE PILOT)', sensors:{lidar:1,radar:5,cameras:4,ultrasonic:12}, odScope:'Highways with physical divider; up to 130 km/h; clear weather; day/night', liability:'OEM', priceEst:120000, intervention:0.08 },
-    { key:'honda_legend', name:'Honda Legend (Traffic Jam Pilot)', sensors:{lidar:5,radar:5,cameras:12,ultrasonic:12}, odScope:'Highways; traffic jam below 30 km/h; clear weather; Japan only (limited)', liability:'OEM', priceEst:50000, intervention:0.05 }
+    { key:'mercedes_s',
+      uf:{ brand:'Mercedes-Benz', name:'S-Class (DRIVE PILOT)', year:2026, price:'$120,000', benefit:'Hands-off up to 130 km/h; OEM liability when active', availability:'Germany, USA, UK, China' },
+      sci:{ sensors:{lidar:1,radar:5,cameras:4,ultrasonic:12}, liability:'OEM', maxSpeed:130, oddWeather:'Clear / Day and night', odScope:'Highways with physical divider; up to 130 km/h', intervention:0.08 } },
+    { key:'bmw_l3',
+      uf:{ brand:'BMW', name:'7 Series (Personal Pilot L3)', year:2026, price:'$115,000', benefit:'Hands-off highway driving; OEM liability at 60+ km/h', availability:'Germany, Europe (2026 rollout)' },
+      sci:{ sensors:{lidar:1,radar:5,cameras:5,ultrasonic:12}, liability:'OEM', maxSpeed:130, oddWeather:'Clear / Day and night', odScope:'Highways with physical divider; traffic jam and highway pilot', intervention:0.07 } }
   ],
   L45: [
-    { key:'waymo_one', name:'Waymo One Robotaxi (5th Gen)', sensors:{lidar:5,radar:6,cameras:29,ultrasonic:0}, odScope:'Geofenced urban (Phoenix/SF/LA); day/night; most weather; max 113 km/h', liability:'OEM', priceEst:200000, intervention:0.02 },
-    { key:'zoox', name:'Amazon Zoox Autonomous Platform', sensors:{lidar:6,radar:6,cameras:16,ultrasonic:6}, odScope:'Geofenced urban corridors; bidirectional; max 72 km/h; San Francisco', liability:'OEM', priceEst:250000, intervention:0.01 },
-    { key:'tesla_cybercab', name:'Tesla Cybercab (Robotaxi)', sensors:{lidar:0,radar:0,cameras:8,ultrasonic:0}, odScope:'Mapped urban + highway; vision-only; max 115 km/h; no steering wheel', liability:'OEM', priceEst:30000, intervention:0.03 }
+    { key:'waymo_one',
+      uf:{ brand:'Waymo', name:'One Robotaxi (5th Gen)', year:2026, price:'Per-ride hailing', benefit:'Fully driverless urban ride-hailing; no human needed', availability:'Phoenix, San Francisco, Los Angeles' },
+      sci:{ sensors:{lidar:5,radar:6,cameras:29,ultrasonic:0}, liability:'OEM', maxSpeed:113, oddWeather:'Most weather; day/night', odScope:'Geofenced urban (Phoenix/SF/LA)', intervention:0.02 } },
+    { key:'zoox',
+      uf:{ brand:'Amazon', name:'Zoox Autonomous Platform', year:2026, price:'Per-ride (planned)', benefit:'Bidirectional purpose-built robotaxi; no steering wheel', availability:'San Francisco (geofenced)' },
+      sci:{ sensors:{lidar:6,radar:6,cameras:16,ultrasonic:6}, liability:'OEM', maxSpeed:72, oddWeather:'Clear / Light rain', odScope:'Geofenced urban corridors; bidirectional', intervention:0.01 } },
+    { key:'tesla_cybercab',
+      uf:{ brand:'Tesla', name:'Cybercab (Robotaxi)', year:2026, price:'$30,000 (est.)', benefit:'Vision-only autonomous; no steering wheel; mass-market target', availability:'USA (initial rollout)' },
+      sci:{ sensors:{lidar:0,radar:0,cameras:8,ultrasonic:0}, liability:'OEM', maxSpeed:115, oddWeather:'Clear / Overcast', odScope:'Mapped urban + highway; vision-only', intervention:0.03 } }
   ]
 };
 var fleetLevel = 'L2';
+var fleetMode = 'uf';
 var fleetChartA = null, fleetChartB = null;
+
+function fleetSetMode(mode) {
+  fleetMode = mode;
+  var u = document.getElementById('mode-uf');
+  var s = document.getElementById('mode-sci');
+  if (u) u.className = mode === 'uf' ? 'px-5 py-2 text-sm font-semibold bg-slate-800 text-white transition' : 'px-5 py-2 text-sm font-semibold bg-white text-slate-500 hover:bg-slate-50 transition';
+  if (s) s.className = mode === 'sci' ? 'px-5 py-2 text-sm font-semibold bg-slate-800 text-white transition' : 'px-5 py-2 text-sm font-semibold bg-white text-slate-500 hover:bg-slate-50 transition';
+  fleetRender();
+}
 
 function fleetOnLevel() {
   var el = document.getElementById('fleet-level');
@@ -5014,8 +5140,8 @@ function fleetOnLevel() {
   var selA = document.getElementById('fleet-sel-a');
   var selB = document.getElementById('fleet-sel-b');
   var list = FLEET_DB[fleetLevel] || [];
-  if (selA) { selA.innerHTML = ''; list.forEach(function(v,i){ var o = document.createElement('option'); o.value = i; o.textContent = v.name; selA.appendChild(o); }); }
-  if (selB) { selB.innerHTML = ''; list.forEach(function(v,i){ var o = document.createElement('option'); o.value = i; o.textContent = v.name; if (list.length > 1 && i === 1) o.selected = true; selB.appendChild(o); }); }
+  if (selA) { selA.innerHTML = ''; list.forEach(function(v,i){ var o = document.createElement('option'); o.value = i; o.textContent = v.uf.brand + ' ' + v.uf.name; selA.appendChild(o); }); }
+  if (selB) { selB.innerHTML = ''; list.forEach(function(v,i){ var o = document.createElement('option'); o.value = i; o.textContent = v.uf.brand + ' ' + v.uf.name; if (list.length > 1 && i === 1) o.selected = true; selB.appendChild(o); }); }
   fleetRender();
 }
 
@@ -5028,28 +5154,46 @@ function fleetRender() {
   var vA = list[idxA], vB = list[idxB];
   if (!vA || !vB) return;
   var grid = document.getElementById('fleet-grid');
-  if (grid) grid.innerHTML = fleetCardHTML(vA, 'border-primary') + fleetCardHTML(vB, 'border-secondary');
+  if (!grid) return;
+  if (fleetMode === 'uf') {
+    grid.innerHTML = fleetCardUF(vA, 'border-primary') + fleetCardUF(vB, 'border-secondary');
+  } else {
+    grid.innerHTML = fleetCardSCI(vA, 'border-primary') + fleetCardSCI(vB, 'border-secondary');
+  }
   fleetRenderCharts(vA, vB);
 }
 
-function fleetCardHTML(v, borderCls) {
-  var tot = v.sensors.lidar + v.sensors.radar + v.sensors.cameras + v.sensors.ultrasonic;
-  var cPS = Math.round(v.priceEst / Math.max(1, tot));
+function fleetCardUF(v, borderCls) {
+  var u = v.uf;
   var lvlTag = fleetLevel === 'L45' ? '<span class="text-xs px-2 py-0.5 rounded bg-green-100 text-green-700 font-semibold">L4/L5</span>' : '<span class="text-xs px-2 py-0.5 rounded bg-blue-100 text-blue-700 font-semibold">' + fleetLevel + '</span>';
   return '<div class="bg-white rounded-xl shadow-md border-2 ' + borderCls + ' p-5">'
-    + '<div class="flex items-center justify-between mb-3"><h4 class="font-bold text-slate-800">' + v.name + '</h4>' + lvlTag + '</div>'
+    + '<div class="flex items-center gap-3 mb-4"><div class="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center text-lg font-bold text-slate-400">' + u.brand.charAt(0) + '</div><div><h4 class="font-bold text-slate-800">' + u.brand + ' ' + u.name + '</h4>' + lvlTag + '</div></div>'
+    + '<div class="space-y-2 text-sm">'
+    + '<div class="flex justify-between border-b border-slate-100 pb-1"><span class="text-slate-400"><i class="fas fa-calendar mr-1"></i>' + t('uf_year') + '</span><span class="font-semibold">' + u.year + '</span></div>'
+    + '<div class="flex justify-between border-b border-slate-100 pb-1"><span class="text-slate-400"><i class="fas fa-tag mr-1"></i>' + t('uf_price') + '</span><span class="font-mono font-semibold text-primary">' + u.price + '</span></div>'
+    + '<div class="flex justify-between border-b border-slate-100 pb-1"><span class="text-slate-400"><i class="fas fa-star mr-1"></i>' + t('uf_benefit') + '</span><span class="text-right text-xs max-w-[65%]">' + u.benefit + '</span></div>'
+    + '<div class="flex justify-between pb-1"><span class="text-slate-400"><i class="fas fa-globe mr-1"></i>' + t('uf_avail') + '</span><span class="text-right text-xs max-w-[60%]">' + u.availability + '</span></div>'
+    + '</div></div>';
+}
+
+function fleetCardSCI(v, borderCls) {
+  var s = v.sci;
+  var tot = s.sensors.lidar + s.sensors.radar + s.sensors.cameras + s.sensors.ultrasonic;
+  var lvlTag = fleetLevel === 'L45' ? '<span class="text-xs px-2 py-0.5 rounded bg-green-100 text-green-700 font-semibold">L4/L5</span>' : '<span class="text-xs px-2 py-0.5 rounded bg-blue-100 text-blue-700 font-semibold">' + fleetLevel + '</span>';
+  return '<div class="bg-white rounded-xl shadow-md border-2 ' + borderCls + ' p-5">'
+    + '<div class="flex items-center justify-between mb-3"><h4 class="font-bold text-slate-800">' + v.uf.brand + ' ' + v.uf.name + '</h4>' + lvlTag + '</div>'
     + '<div class="grid grid-cols-2 gap-2 mb-3 text-center">'
-    + '<div class="bg-slate-50 rounded-lg p-2"><div class="text-xl font-bold text-red-500">' + v.sensors.lidar + '</div><div class="text-[10px] text-slate-400 uppercase">LiDAR</div></div>'
-    + '<div class="bg-slate-50 rounded-lg p-2"><div class="text-xl font-bold text-blue-500">' + v.sensors.radar + '</div><div class="text-[10px] text-slate-400 uppercase">Radar</div></div>'
-    + '<div class="bg-slate-50 rounded-lg p-2"><div class="text-xl font-bold text-green-500">' + v.sensors.cameras + '</div><div class="text-[10px] text-slate-400 uppercase">Cameras</div></div>'
-    + '<div class="bg-slate-50 rounded-lg p-2"><div class="text-xl font-bold text-purple-500">' + v.sensors.ultrasonic + '</div><div class="text-[10px] text-slate-400 uppercase">Ultrasonic</div></div>'
+    + '<div class="bg-slate-50 rounded-lg p-2"><div class="text-xl font-bold text-red-500">' + s.sensors.lidar + '</div><div class="text-[10px] text-slate-400 uppercase">LiDAR</div></div>'
+    + '<div class="bg-slate-50 rounded-lg p-2"><div class="text-xl font-bold text-blue-500">' + s.sensors.radar + '</div><div class="text-[10px] text-slate-400 uppercase">Radar</div></div>'
+    + '<div class="bg-slate-50 rounded-lg p-2"><div class="text-xl font-bold text-green-500">' + s.sensors.cameras + '</div><div class="text-[10px] text-slate-400 uppercase">Cameras</div></div>'
+    + '<div class="bg-slate-50 rounded-lg p-2"><div class="text-xl font-bold text-purple-500">' + s.sensors.ultrasonic + '</div><div class="text-[10px] text-slate-400 uppercase">Ultrasonic</div></div>'
     + '</div>'
     + '<div class="space-y-2 text-sm">'
     + '<div class="flex justify-between border-b border-slate-100 pb-1"><span class="text-slate-400">' + t('fleet_sensors') + ':</span><span class="font-mono font-bold">' + tot + '</span></div>'
-    + '<div class="flex justify-between border-b border-slate-100 pb-1"><span class="text-slate-400">' + t('fleet_odd') + ':</span><span class="text-right text-xs max-w-[60%]">' + v.odScope + '</span></div>'
-    + '<div class="flex justify-between border-b border-slate-100 pb-1"><span class="text-slate-400">' + t('fleet_liability') + ':</span><span class="font-semibold ' + (v.liability === 'OEM' ? 'text-green-600' : 'text-amber-600') + '">' + v.liability + '</span></div>'
-    + '<div class="flex justify-between border-b border-slate-100 pb-1"><span class="text-slate-400">' + t('fleet_price') + ':</span><span class="font-mono">$' + v.priceEst.toLocaleString() + '</span></div>'
-    + '<div class="flex justify-between pb-1"><span class="text-slate-400">' + t('chart_sensor') + ':</span><span class="font-mono">$' + cPS.toLocaleString() + '/sensor</span></div>'
+    + '<div class="flex justify-between border-b border-slate-100 pb-1"><span class="text-slate-400">' + t('sci_liability') + ':</span><span class="font-semibold ' + (s.liability === 'OEM' ? 'text-green-600' : 'text-amber-600') + '">' + s.liability + '</span></div>'
+    + '<div class="flex justify-between border-b border-slate-100 pb-1"><span class="text-slate-400">' + t('sci_maxspeed') + ':</span><span class="font-mono">' + s.maxSpeed + ' km/h</span></div>'
+    + '<div class="flex justify-between border-b border-slate-100 pb-1"><span class="text-slate-400">' + t('sci_odd_weather') + ':</span><span class="text-right text-xs max-w-[60%]">' + s.oddWeather + '</span></div>'
+    + '<div class="flex justify-between pb-1"><span class="text-slate-400">' + t('fleet_odd') + ':</span><span class="text-right text-xs max-w-[60%]">' + s.odScope + '</span></div>'
     + '</div></div>';
 }
 
@@ -5063,20 +5207,22 @@ function fleetRenderCharts(vA, vB) {
   var cA = ['rgba(14,165,233,0.85)','rgba(99,102,241,0.85)','rgba(245,158,11,0.85)','rgba(168,162,158,0.7)'];
   var cB = ['rgba(14,165,233,0.45)','rgba(99,102,241,0.45)','rgba(245,158,11,0.45)','rgba(168,162,158,0.35)'];
   var sLabels = ['LiDAR','Radar','Cameras','Ultrasonic'];
+  var sA = vA.sci.sensors, sB = vB.sci.sensors;
   fleetChartA = new Chart(ctxS, { type:'bar', data:{ labels: sLabels, datasets:[
-    { label: vA.name, data:[vA.sensors.lidar,vA.sensors.radar,vA.sensors.cameras,vA.sensors.ultrasonic], backgroundColor: cA, borderRadius: 6 },
-    { label: vB.name, data:[vB.sensors.lidar,vB.sensors.radar,vB.sensors.cameras,vB.sensors.ultrasonic], backgroundColor: cB, borderRadius: 6 }
+    { label: vA.uf.brand + ' ' + vA.uf.name, data:[sA.lidar,sA.radar,sA.cameras,sA.ultrasonic], backgroundColor: cA, borderRadius: 6 },
+    { label: vB.uf.brand + ' ' + vB.uf.name, data:[sB.lidar,sB.radar,sB.cameras,sB.ultrasonic], backgroundColor: cB, borderRadius: 6 }
   ]}, options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ position:'bottom', labels:{ font:{ size:11 } } } }, scales:{ y:{ beginAtZero:true, title:{ display:true, text:'Count', font:{size:11} } } } }});
   var lvls = ['L0','L1','L2','L3','L4/5'];
   var ivA = [0, 0.15, 0.32, 0.08, 0.03];
   var ivB = [0, 0.14, 0.25, 0.05, 0.02];
   fleetChartB = new Chart(ctxI, { type:'line', data:{ labels: lvls, datasets:[
-    { label: vA.name, data: ivA, borderColor:'rgb(14,165,233)', backgroundColor:'rgba(14,165,233,0.1)', fill:true, tension:0.4, pointRadius:4 },
-    { label: vB.name, data: ivB, borderColor:'rgb(99,102,241)', backgroundColor:'rgba(99,102,241,0.1)', fill:true, tension:0.4, pointRadius:4 }
+    { label: vA.uf.brand + ' ' + vA.uf.name, data: ivA, borderColor:'rgb(14,165,233)', backgroundColor:'rgba(14,165,233,0.1)', fill:true, tension:0.4, pointRadius:4 },
+    { label: vB.uf.brand + ' ' + vB.uf.name, data: ivB, borderColor:'rgb(99,102,241)', backgroundColor:'rgba(99,102,241,0.1)', fill:true, tension:0.4, pointRadius:4 }
   ]}, options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{ position:'bottom', labels:{ font:{ size:11 } } } }, scales:{ y:{ beginAtZero:true, max:0.5, title:{ display:true, text:'Interventions/km', font:{size:11} } } } }});
 }
 
 window.addEventListener('load', function () { setTimeout(fleetOnLevel, 500); });
+
 
 // ════════════════════════════════ MULTI-COUNTRY CALIBRATION HUB ════════════════════════════════
 var COUNTRY_DATA = {
