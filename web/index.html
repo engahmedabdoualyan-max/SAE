@@ -161,10 +161,14 @@
                         <p class="text-xs text-slate-500" data-key="m">To assist traffic simulation researchers worldwide.</p>
                     </div>
                 </div>
-                <nav class="hidden md:flex items-center gap-6">
+                <nav class="hidden md:flex items-center gap-4">
                     <a href="#hero" class="nav-link text-sm font-medium" data-key="nav_home">Home</a>
-                    <a href="#fleets" class="nav-link text-sm font-medium" data-key="nav_math">Fleet</a>
+                    <a href="#sim" class="nav-link text-sm font-medium" data-key="nav_sim">Simulation</a>
+                    <a href="#ringroad" class="nav-link text-sm font-medium" data-key="nav_case">Case Study</a>
+                    <a href="#fleets" class="nav-link text-sm font-medium" data-key="nav_fleet">Fleet</a>
+                    <a href="#comparison" class="nav-link text-sm font-medium" data-key="nav_compare">Compare</a>
                     <a href="#math" class="nav-link text-sm font-medium">Math</a>
+                    <a href="#country-hub" class="nav-link text-sm font-medium" data-key="nav_country">Countries</a>
                     <a href="#references" class="nav-link text-sm font-medium" data-key="nav_refs">References</a>
                     <a href="https://github.com" target="_blank" class="nav-link text-sm font-medium" data-key="nav_github">GitHub</a>
                 </nav>
@@ -266,6 +270,32 @@
         </div>
     </section>
 
+        <!-- ========== FUTURE CASE STUDY: CAIRO RING ROAD ========== -->
+    <section id="ringroad" class="py-16 bg-gradient-to-b from-slate-900 to-slate-800 text-white">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-8">
+                <h2 class="text-3xl font-bold mb-3" data-key="rr_title">Future Case Study: Egypt (Cairo Ring Road)</h2>
+                <p class="text-slate-300 max-w-3xl mx-auto text-sm" data-key="rr_desc">28 km longitudinal corridor from Qalyub to Dar Al Salam real inclines, ramps, and live traffic micro-state simulation</p>
+            </div>
+            <div class="flex justify-center gap-4 mb-6">
+                <button id="scenario-a-btn" onclick="setScenario('A')" class="px-6 py-2 rounded-lg font-medium bg-red-500/20 border border-red-400 text-red-300 hover:bg-red-500/30 transition active"><i class="fas fa-exclamation-triangle mr-1"></i> <span data-key="rr_scenA">Scenario A: Current Baseline</span></button>
+                <button id="scenario-b-btn" onclick="setScenario('B')" class="px-6 py-2 rounded-lg font-medium bg-slate-600/20 border border-slate-500 text-slate-400 hover:bg-green-500/30 transition"><i class="fas fa-robot mr-1"></i> <span data-key="rr_scenB">Scenario B: Managed AV Corridor</span></button>
+            </div>
+            <div class="relative bg-black rounded-xl overflow-hidden border border-slate-600">
+                <canvas id="ringroad-canvas"></canvas>
+                <div id="rr-stats" class="absolute top-3 right-3 bg-slate-900/80 rounded-lg p-3 text-xs font-mono"></div>
+            </div>
+            <div class="flex flex-wrap justify-center gap-4 mt-4 text-xs text-slate-300">
+                <span class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-red-500"></span> <span data-key="rr_leg_ramp">Entry Ramp</span></span>
+                <span class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-blue-500"></span> <span data-key="rr_leg_exit">Exit Lane</span></span>
+                <span class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-yellow-500"></span> <span data-key="rr_leg_grade">Grade (Miyool)</span></span>
+                <span class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-green-500"></span> <span data-key="rr_leg_av">AV Lane (Scenario B)</span></span>
+                <span class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-orange-400"></span> Microbus</span>
+                <span class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-blue-400"></span> Mlaiky</span>
+                <span class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-yellow-300"></span> Tuk-Tuk</span>
+            </div>
+        </div>
+    </section>
     <!-- Fleet Documentation — Expanded Granular Matrix -->
     <section id="fleets" class="py-16 bg-white">
         <div class="container mx-auto px-4">
@@ -623,6 +653,32 @@
                     </div>
                 </div> </section>
 
+        <!-- ========== AV COMPARISON ENGINE ========== -->
+    <section id="comparison" class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-8">
+                <h2 class="text-3xl font-bold text-slate-800 mb-3" data-key="cmp_title">Autonomous Vehicle Comparison Engine</h2>
+                <p class="text-slate-600 max-w-3xl mx-auto text-sm" data-key="cmp_desc">Compare real-world commercial autonomous platforms across sensor suites, operational domains, and liability frameworks</p>
+            </div>
+            <div class="flex justify-center gap-3 mb-8 flex-wrap">
+                <button onclick="setComparePlatform('tesla')" id="cmp-tesla" class="cmp-btn active px-5 py-2.5 rounded-lg font-medium text-sm transition bg-slate-800 text-white border-2 border-slate-800"><i class="fas fa-bolt mr-1"></i> Tesla Autopilot/FSD</button>
+                <button onclick="setComparePlatform('mercedes')" id="cmp-mercedes" class="cmp-btn px-5 py-2.5 rounded-lg font-medium text-sm transition bg-white text-slate-600 border-2 border-slate-200 hover:border-slate-400"><i class="fas fa-star mr-1"></i> Mercedes DRIVE PILOT</button>
+                <button onclick="setComparePlatform('waymo')" id="cmp-waymo" class="cmp-btn px-5 py-2.5 rounded-lg font-medium text-sm transition bg-white text-slate-600 border-2 border-slate-200 hover:border-slate-400"><i class="fas fa-route mr-1"></i> Waymo Driver</button>
+            </div>
+            <div id="cmp-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto"></div>
+            <div class="mt-10 max-w-5xl mx-auto overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead><tr class="border-b-2 border-slate-200">
+                        <th class="text-left py-3 px-4 text-slate-500 font-medium" data-key="cmp_spec">Specification</th>
+                        <th class="text-center py-3 px-4 text-slate-800 font-bold">Tesla</th>
+                        <th class="text-center py-3 px-4 text-slate-800 font-bold">Mercedes</th>
+                        <th class="text-center py-3 px-4 text-slate-800 font-bold">Waymo</th>
+                    </tr></thead>
+                    <tbody id="cmp-table-body"></tbody>
+                </table>
+            </div>
+        </div>
+    </section>
     <!-- Math Section -->
     <section id="math" class="py-12 bg-slate-900 text-white">
         <div class="container mx-auto px-4">
@@ -786,6 +842,35 @@
         </div>
     </section>
 
+        <!-- ========== MULTI-COUNTRY CALIBRATION HUB ========== -->
+    <section id="country-hub" class="py-16 bg-gradient-to-b from-indigo-50 to-white">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-8">
+                <h2 class="text-3xl font-bold text-slate-800 mb-3" data-key="ch_title">Multi-Country Regional Calibration Hub</h2>
+                <p class="text-slate-600 max-w-3xl mx-auto text-sm" data-key="ch_desc">Select a country to load localized fleet composition, road parameters, and calibration weights</p>
+            </div>
+            <div class="flex justify-center gap-3 mb-8 flex-wrap">
+                <button onclick="selectCountry('egypt')" id="ch-egypt" class="ch-btn active px-5 py-2.5 rounded-lg font-medium text-sm transition bg-white text-slate-700 border-2 border-primary shadow-md"> Egypt <span data-key="ch_egypt">Egypt</span></button>
+                <button onclick="selectCountry('ksa')" id="ch-ksa" class="ch-btn px-5 py-2.5 rounded-lg font-medium text-sm transition bg-white text-slate-600 border-2 border-slate-200 hover:border-green-400"> KSA <span data-key="ch_ksa">Saudi Arabia</span></button>
+                <button onclick="selectCountry('uae')" id="ch-uae" class="ch-btn px-5 py-2.5 rounded-lg font-medium text-sm transition bg-white text-slate-600 border-2 border-slate-200 hover:border-red-400"> UAE <span data-key="ch_uae">UAE</span></button>
+                <button onclick="selectCountry('jordan')" id="ch-jordan" class="ch-btn px-5 py-2.5 rounded-lg font-medium text-sm transition bg-white text-slate-600 border-2 border-slate-200 hover:border-amber-400"> JO <span data-key="ch_jordan">Jordan</span></button>
+            </div>
+            <div id="ch-panels" class="grid grid-cols-1 lg:grid-cols-2 gap-6 max-w-5xl mx-auto">
+                <div class="bg-white rounded-xl shadow-md border border-slate-200 p-6">
+                    <h3 class="font-bold text-slate-800 mb-4"><i class="fas fa-car mr-2 text-primary"></i><span data-key="ch_fleet">Fleet Composition</span></h3>
+                    <div id="ch-fleet-bars" class="space-y-2"></div>
+                </div>
+                <div class="bg-white rounded-xl shadow-md border border-slate-200 p-6">
+                    <h3 class="font-bold text-slate-800 mb-4"><i class="fas fa-road mr-2 text-secondary"></i><span data-key="ch_road">Road Parameters</span></h3>
+                    <div id="ch-road-params" class="space-y-3"></div>
+                </div>
+            </div>
+            <div id="ch-summary" class="mt-6 max-w-5xl mx-auto bg-white rounded-xl shadow-md border border-slate-200 p-6">
+                <h3 class="font-bold text-slate-800 mb-3"><i class="fas fa-sliders-h mr-2 text-accent"></i><span data-key="ch_calib">Calibration Summary</span></h3>
+                <div id="ch-calib-grid" class="grid grid-cols-2 md:grid-cols-4 gap-4"></div>
+            <div id="ch-notes" class="mt-8"></div>
+        </div>
+    </section>
     <!-- File Hub -->
     <section id="filehub" class="py-16 bg-slate-100">
         <div class="container mx-auto px-4">
@@ -1558,11 +1643,12 @@
     function computeWeightedFleet(mpr) {
         var m = mpr / 100;
         var humanShare = 1 - m;
-        var v = 22.22;
+        var v = (COUNTRY_DATA[currentCountry] ? COUNTRY_DATA[currentCountry].road.speedLimit / 3.6 : 22.22);
+    var tauFactor = (COUNTRY_DATA[currentCountry] ? (COUNTRY_DATA[currentCountry].reactionFactor || 1) : 1);
         var weighted = { tau: 0, safety: 0, accel: 0, decel: 0, sigma: 0, gap: 0, len: 0 };
         L0_ALL.forEach(function(p) {
             var w = humanShare * p.weight;
-            weighted.tau    += w * p.cf.reaction;
+            weighted.tau    += tauFactor * w * p.cf.reaction;
             weighted.safety += w * p.cf.safety;
             weighted.accel  += w * p.cf.accel;
             weighted.decel  += w * p.cf.decel;
@@ -1573,7 +1659,7 @@
         if (m > 0) {
             AV_PROFILES.forEach(function(p) {
                 var w = m * (1 / AV_PROFILES.length);
-                weighted.tau    += w * p.cf.reaction;
+                weighted.tau    += tauFactor * w * p.cf.reaction;
                 weighted.safety += w * p.cf.safety;
                 weighted.accel  += w * p.cf.accel;
                 weighted.decel  += w * p.cf.decel;
@@ -2059,7 +2145,32 @@
     "l4_m5": "Pony.ai Robotaxi",
     "l5_m3": "Nuro Autonomous Delivery",
     "l5_m4": "Motional (Hyundai/Aptiv)",
-    "l5_m5": "WeRide (Multi-Mode)"
+    "l5_m5": "WeRide (Multi-Mode)",
+    "nav_sim": "Simulation",
+    "nav_case": "Case Study",
+    "nav_fleet": "Fleets",
+    "nav_compare": "AV Compare",
+    "nav_country": "Countries",
+    "rr_title": "Cairo Ring Road Live Simulator",
+    "rr_desc": "Interactive geometric cross-section & micro-simulation of the 28 km Qalyub to Dar Al Salam corridor.",
+    "rr_scenA": "Scenario A: Current Baseline",
+    "rr_scenB": "Scenario B: Managed AV Corridor",
+    "rr_leg_ramp": "On-Ramp",
+    "rr_leg_exit": "Exit",
+    "rr_leg_grade": "Upgrade",
+    "rr_leg_av": "AV Platoon Lane",
+    "cmp_title": "Autonomous Vehicle Comparison Engine",
+    "cmp_desc": "Side-by-side technical benchmark of leading SAE Level 2 to 4 driving-automation platforms.",
+    "cmp_spec": "Specification",
+    "ch_title": "Multi-Country Calibration Hub",
+    "ch_desc": "Region-specific fleet mix, road geometry & safety calibration for Arab & developing markets.",
+    "ch_egypt": "Egypt",
+    "ch_ksa": "Saudi Arabia",
+    "ch_uae": "UAE",
+    "ch_jordan": "Jordan",
+    "ch_fleet": "Fleet Mix",
+    "ch_road": "Road Parameters",
+    "ch_calib": "Calibration Summary",
   },
   "ar": {
     "t": "SAE AutoSim Hub",
@@ -2274,7 +2385,32 @@
     "l2_m1": "تسلا موديل 3 (أوتوبيلوت)", "l2_m2": "كاديلاك ليريك (Super Cruise)",
     "l3_m1": "مرسيدس S-Class (DRIVE PILOT)", "l3_m2": "بي إم دبليو 7 (Personal Pilot L3)",
     "l4_m1": "وايمو وان (Jaguar I-PACE)", "l4_m2": "أمازون زوكس روبوتاكسي", "l4_m3": "Baidu Apollo Go (RT6)",
-    "l5_m1": "تسلا Cybercab (هدف)"
+    "l5_m1": "تسلا Cybercab (هدف)",
+    "nav_sim": "المحاكاة",
+    "nav_case": "دراسة حالة",
+    "nav_fleet": "الأساطيل",
+    "nav_compare": "مقارنة المركبات",
+    "nav_country": "الدول",
+    "rr_title": "محاكاة طريق القاهرة الدائري الحية",
+    "rr_desc": "محاكاة هندسية وتقاطع حي للمقطع العرضي على امتداد 28 كم من قليوب إلى دار السلام.",
+    "rr_scenA": "السيناريو أ: الوضع الحالي",
+    "rr_scenB": "السيناريو ب: ممر مُدار للمركبات الذاتية",
+    "rr_leg_ramp": "مخرج صاعد",
+    "rr_leg_exit": "مخرج",
+    "rr_leg_grade": "منحدر مرتفع",
+    "rr_leg_av": "مسار قافلة ذاتية",
+    "cmp_title": "محرك مقارنة المركبات ذاتية القيادة",
+    "cmp_desc": "معيار تقني مقارن للمنصات الرائدة للقيادة الآلية من المستوى 2 إلى 4 حسب SAE.",
+    "cmp_spec": "المواصفات",
+    "ch_title": "مركز المعايرة متعدد الدول",
+    "ch_desc": "مزيج أساطيل وهندسة طرق ومعايرة أمان خاصة بكل منطقة للأسواق العربية والنامية.",
+    "ch_egypt": "مصر",
+    "ch_ksa": "السعودية",
+    "ch_uae": "الإمارات",
+    "ch_jordan": "الأردن",
+    "ch_fleet": "مزيج الأساطيل",
+    "ch_road": "معلمات الطريق",
+    "ch_calib": "ملخص المعايرة",
   },
   "ru": {
     "t": "SAE AutoSim Hub",
@@ -2486,7 +2622,32 @@
     "l2_m1": "Tesla Model 3 (Autopilot)", "l2_m2": "Cadillac Lyriq (Super Cruise)",
     "l3_m1": "Mercedes S-Class (DRIVE PILOT)", "l3_m2": "BMW 7 Series (Personal Pilot L3)",
     "l4_m1": "Waymo One (Jaguar I-PACE)", "l4_m2": "Amazon Zoox Robotaxi", "l4_m3": "Baidu Apollo Go (RT6)",
-    "l5_m1": "Tesla Cybercab (Target)"
+    "l5_m1": "Tesla Cybercab (Target)",
+    "nav_sim": "Симуляция",
+    "nav_case": "Кейс-стади",
+    "nav_fleet": "Автопарки",
+    "nav_compare": "Сравнение ТС",
+    "nav_country": "Страны",
+    "rr_title": "Живая симуляция Каирской кольцевой дороги",
+    "rr_desc": "Интерактивное геометрическое сечение и микромоделирование участка 28 км от Калиуба до Дар Аль-Салам.",
+    "rr_scenA": "Сценарий A: текущая базовая",
+    "rr_scenB": "Сценарий B: управляемый коридор АТС",
+    "rr_leg_ramp": "Съезд на дорогу",
+    "rr_leg_exit": "Съезд",
+    "rr_leg_grade": "Подъём",
+    "rr_leg_av": "Полоса колонны АТС",
+    "cmp_title": "Движок сравнения автономных ТС",
+    "cmp_desc": "Техническое сравнение ведущих платформ автоматизации вождения SAE уровней 2–4.",
+    "cmp_spec": "Характеристики",
+    "ch_title": "Центр калибровки по странам",
+    "ch_desc": "Состав автопарка, геометрия дорог и калибровка безопасности для арабских и развивающихся рынков.",
+    "ch_egypt": "Египет",
+    "ch_ksa": "Саудовская Аравия",
+    "ch_uae": "ОАЭ",
+    "ch_jordan": "Иордания",
+    "ch_fleet": "Состав автопарка",
+    "ch_road": "Параметры дороги",
+    "ch_calib": "Сводка калибровки",
   },
   "hi": {
     "t": "SAE AutoSim Hub",
@@ -2674,7 +2835,32 @@
     "l2_m1": "Tesla Model 3 (Autopilot)", "l2_m2": "Cadillac Lyriq (Super Cruise)",
     "l3_m1": "Mercedes S-Class (DRIVE PILOT)", "l3_m2": "BMW 7 Series (Personal Pilot L3)",
     "l4_m1": "Waymo One (Jaguar I-PACE)", "l4_m2": "Amazon Zoox Robotaxi", "l4_m3": "Baidu Apollo Go (RT6)",
-    "l5_m1": "Tesla Cybercab (Target)"
+    "l5_m1": "Tesla Cybercab (Target)",
+    "nav_sim": "अनुरूपण",
+    "nav_case": "केस स्टडी",
+    "nav_fleet": "बेड़े",
+    "nav_compare": "एवी तुलना",
+    "nav_country": "देश",
+    "rr_title": "काहिरा रिंग रोड लाइव सिमुलेटर",
+    "rr_desc": "कल्यूब से दार अल सालम तक 28 किमी गलियारे का इंटरैक्टिव ज्यामितीय अनुप्रस्थ-काट और सूक्ष्म-अनुरूपण.",
+    "rr_scenA": "परिदृश्य A: वर्तमान आधाररेखा",
+    "rr_scenB": "परिदृश्य B: प्रबंधित AV गलियारा",
+    "rr_leg_ramp": "ऑन-रैंप",
+    "rr_leg_exit": "निकास",
+    "rr_leg_grade": "चढ़ाई",
+    "rr_leg_av": "AV प्लाटून लेन",
+    "cmp_title": "स्वायत्त वाहन तुलना इंजन",
+    "cmp_desc": "अग्रणी SAE स्तर 2 से 4 ड्राइविंग स्वचालन प्लेटफ़ॉर्म का साइड-बाय-साइड तकनीकी बेंचमार्क.",
+    "cmp_spec": "विनिर्देश",
+    "ch_title": "बहु-देश कैलिब्रेशन हब",
+    "ch_desc": "अरब और विकासशील बाज़ारों के लिए क्षेत्र-विशिष्ट बेड़ा मिश्रण, सड़क ज्यामिति और सुरक्षा कैलिब्रेशन.",
+    "ch_egypt": "मिस्र",
+    "ch_ksa": "सऊदी अरब",
+    "ch_uae": "संयुक्त अरब अमीरात",
+    "ch_jordan": "जॉर्डन",
+    "ch_fleet": "बेड़ा मिश्रण",
+    "ch_road": "सड़क पैरामीटर",
+    "ch_calib": "कैलिब्रेशन सारांश",
   },
   "de": {
     "t": "SAE AutoSim Hub",
@@ -2886,7 +3072,32 @@
     "l2_m1": "Tesla Model 3 (Autopilot)", "l2_m2": "Cadillac Lyriq (Super Cruise)",
     "l3_m1": "Mercedes S-Class (DRIVE PILOT)", "l3_m2": "BMW 7 Series (Personal Pilot L3)",
     "l4_m1": "Waymo One (Jaguar I-PACE)", "l4_m2": "Amazon Zoox Robotaxi", "l4_m3": "Baidu Apollo Go (RT6)",
-    "l5_m1": "Tesla Cybercab (Target)"
+    "l5_m1": "Tesla Cybercab (Target)",
+    "nav_sim": "Simulation",
+    "nav_case": "Fallstudie",
+    "nav_fleet": "Flotten",
+    "nav_compare": "AV-Vergleich",
+    "nav_country": "Länder",
+    "rr_title": "Live-Simulator Cairo Ring Road",
+    "rr_desc": "Interaktiver geometrischer Querschnitt & Mikrosimulation des 28 km Korridors von Qalyub nach Dar Al Salam.",
+    "rr_scenA": "Szenario A: Aktueller Basiszustand",
+    "rr_scenB": "Szenario B: Gesteuerter AV-Korridor",
+    "rr_leg_ramp": "Auffahrt",
+    "rr_leg_exit": "Abfahrt",
+    "rr_leg_grade": "Steigung",
+    "rr_leg_av": "AV-Platoon-Spur",
+    "cmp_title": "Vergleichs-Engine für autonome Fahrzeuge",
+    "cmp_desc": "Technischer Seiten-zu-Seiten-Benchmark führender SAE-Stufe-2–4-Plattformen zur Fahrautomatisierung.",
+    "cmp_spec": "Spezifikation",
+    "ch_title": "Kalibrierungs-Hub für mehrere Länder",
+    "ch_desc": "Regionsspezifische Flottenmischung, Straßengeometrie & Sicherheitskalibrierung für arabische & Schwellenmärkte.",
+    "ch_egypt": "Ägypten",
+    "ch_ksa": "Saudi-Arabien",
+    "ch_uae": "VAE",
+    "ch_jordan": "Jordanien",
+    "ch_fleet": "Flottenmischung",
+    "ch_road": "Straßenparameter",
+    "ch_calib": "Kalibrierungsübersicht",
   },
   "zh": {
     "t": "SAE AutoSim Hub",
@@ -3098,7 +3309,32 @@
     "l2_m1": "Tesla Model 3 (Autopilot)", "l2_m2": "Cadillac Lyriq (Super Cruise)",
     "l3_m1": "Mercedes S-Class (DRIVE PILOT)", "l3_m2": "BMW 7 Series (Personal Pilot L3)",
     "l4_m1": "Waymo One (Jaguar I-PACE)", "l4_m2": "Amazon Zoox Robotaxi", "l4_m3": "Baidu Apollo Go (RT6)",
-    "l5_m1": "Tesla Cybercab (Target)"
+    "l5_m1": "Tesla Cybercab (Target)",
+    "nav_sim": "仿真",
+    "nav_case": "案例研究",
+    "nav_fleet": "车队",
+    "nav_compare": "自动驾驶对比",
+    "nav_country": "国家",
+    "rr_title": "开罗环路实时仿真器",
+    "rr_desc": "从 Qalyub 到 Dar Al Salam 的 28 公里走廊的交互式几何横截面与微观仿真.",
+    "rr_scenA": "情景 A:当前基线",
+    "rr_scenB": "情景 B:受管自动驾驶走廊",
+    "rr_leg_ramp": "入口匝道",
+    "rr_leg_exit": "出口",
+    "rr_leg_grade": "坡度",
+    "rr_leg_av": "自动驾驶队列车道",
+    "cmp_title": "自动驾驶车辆对比引擎",
+    "cmp_desc": "主流 SAE 2 至 4 级驾驶自动化平台的技术性并排基准测试.",
+    "cmp_spec": "规格",
+    "ch_title": "多国校准中心",
+    "ch_desc": "面向阿拉伯与发展中市场的区域车队构成,道路几何与安全校准.",
+    "ch_egypt": "埃及",
+    "ch_ksa": "沙特阿拉伯",
+    "ch_uae": "阿联酋",
+    "ch_jordan": "约旦",
+    "ch_fleet": "车队构成",
+    "ch_road": "道路参数",
+    "ch_calib": "校准摘要",
   },
   "ja": {
     "t": "SAE AutoSim Hub",
@@ -3286,7 +3522,32 @@
     "l2_m1": "Tesla Model 3 (Autopilot)", "l2_m2": "Cadillac Lyriq (Super Cruise)",
     "l3_m1": "Mercedes S-Class (DRIVE PILOT)", "l3_m2": "BMW 7 Series (Personal Pilot L3)",
     "l4_m1": "Waymo One (Jaguar I-PACE)", "l4_m2": "Amazon Zoox Robotaxi", "l4_m3": "Baidu Apollo Go (RT6)",
-    "l5_m1": "Tesla Cybercab (Target)"
+    "l5_m1": "Tesla Cybercab (Target)",
+    "nav_sim": "シミュレーション",
+    "nav_case": "ケーススタディ",
+    "nav_fleet": "フリート",
+    "nav_compare": "AV比較",
+    "nav_country": "国",
+    "rr_title": "カイロ環状道路ライブシミュレーター",
+    "rr_desc": "Qalyub から Dar Al Salam までの 28 km 回廊の幾何学的断面とマイクロシミュレーション.",
+    "rr_scenA": "シナリオA:現在のベースライン",
+    "rr_scenB": "シナリオB:管理されたAV専用路",
+    "rr_leg_ramp": "オンランプ",
+    "rr_leg_exit": "出口",
+    "rr_leg_grade": "勾配",
+    "rr_leg_av": "AVプラトーン車線",
+    "cmp_title": "自動運転車比較エンジン",
+    "cmp_desc": "主要な SAE レベル 2 から 4 運転自動化プラットフォームの技術的な比較ベンチマーク.",
+    "cmp_spec": "仕様",
+    "ch_title": "多国間キャリブレーションハブ",
+    "ch_desc": "アラブおよび新興市場向けの地域別フリート構成,道路形状,安全キャリブレーション.",
+    "ch_egypt": "エジプト",
+    "ch_ksa": "サウジアラビア",
+    "ch_uae": "UAE",
+    "ch_jordan": "ヨルダン",
+    "ch_fleet": "フリート構成",
+    "ch_road": "道路パラメータ",
+    "ch_calib": "キャリブレーション概要",
   },
   "ko": {
     "t": "SAE AutoSim Hub",
@@ -3474,7 +3735,32 @@
     "l2_m1": "Tesla Model 3 (Autopilot)", "l2_m2": "Cadillac Lyriq (Super Cruise)",
     "l3_m1": "Mercedes S-Class (DRIVE PILOT)", "l3_m2": "BMW 7 Series (Personal Pilot L3)",
     "l4_m1": "Waymo One (Jaguar I-PACE)", "l4_m2": "Amazon Zoox Robotaxi", "l4_m3": "Baidu Apollo Go (RT6)",
-    "l5_m1": "Tesla Cybercab (Target)"
+    "l5_m1": "Tesla Cybercab (Target)",
+    "nav_sim": "시뮬레이션",
+    "nav_case": "사례 연구",
+    "nav_fleet": "차량 군",
+    "nav_compare": "AV 비교",
+    "nav_country": "국가",
+    "rr_title": "카이로 링 로드 라이브 시뮬레이터",
+    "rr_desc": "Qalyub에서 Dar Al Salam까지 28km 구간의 대화형 기하학적 단면 및 미시 시뮬레이션.",
+    "rr_scenA": "시나리오 A:현재 기준선",
+    "rr_scenB": "시나리오 B:관리형 AV 전용도로",
+    "rr_leg_ramp": "진입 ramp",
+    "rr_leg_exit": "출구",
+    "rr_leg_grade": "경사",
+    "rr_leg_av": "AV 플래투른 차선",
+    "cmp_title": "자율주행 차량 비교 엔진",
+    "cmp_desc": "주요 SAE 레벨 2~4 주행 자동화 플랫폼의 기술 벤치마크 비교.",
+    "cmp_spec": "사양",
+    "ch_title": "다국가 보정 허브",
+    "ch_desc": "아랍 및 신흥 시장을 위한 지역별 차량 구성,도로 형상 및 안전 보정.",
+    "ch_egypt": "이집트",
+    "ch_ksa": "사우지아라비아",
+    "ch_uae": "UAE",
+    "ch_jordan": "요르단",
+    "ch_fleet": "차량 구성",
+    "ch_road": "도로 매개변수",
+    "ch_calib": "보정 요약",
   },
   "fr": {
     "t": "SAE AutoSim Hub",
@@ -3686,7 +3972,32 @@
     "l2_m1": "Tesla Model 3 (Autopilot)", "l2_m2": "Cadillac Lyriq (Super Cruise)",
     "l3_m1": "Mercedes S-Class (DRIVE PILOT)", "l3_m2": "BMW 7 Series (Personal Pilot L3)",
     "l4_m1": "Waymo One (Jaguar I-PACE)", "l4_m2": "Amazon Zoox Robotaxi", "l4_m3": "Baidu Apollo Go (RT6)",
-    "l5_m1": "Tesla Cybercab (Target)"
+    "l5_m1": "Tesla Cybercab (Target)",
+    "nav_sim": "Simulation",
+    "nav_case": "Etude de cas",
+    "nav_fleet": "Flottes",
+    "nav_compare": "Comparaison VA",
+    "nav_country": "Pays",
+    "rr_title": "Simulateur en direct de la rocade du Caire",
+    "rr_desc": "Coupe geometrique interactive et micro-simulation du corridor de 28 km de Qalyub a Dar Al Salam.",
+    "rr_scenA": "Scenario A: reference actuelle",
+    "rr_scenB": "Scenario B: corridor VA gere",
+    "rr_leg_ramp": "Bretelle entree",
+    "rr_leg_exit": "Sortie",
+    "rr_leg_grade": "Rampe",
+    "rr_leg_av": "Voie de convoi VA",
+    "cmp_title": "Moteur de comparaison de vehicules autonomes",
+    "cmp_desc": "Reference technique cote a cote des principales plateformes d'automatisation de conduite SAE niveaux 2 a 4.",
+    "cmp_spec": "Specification",
+    "ch_title": "Centre etalonnage multi-pays",
+    "ch_desc": "Mix de flotte, geometrie routiere et etalonnage de securite regionaux pour les marches arabes et emergents.",
+    "ch_egypt": "Egypte",
+    "ch_ksa": "Arabie saoudite",
+    "ch_uae": "EAU",
+    "ch_jordan": "Jordanie",
+    "ch_fleet": "Mix de flotte",
+    "ch_road": "Parametres routiers",
+    "ch_calib": "Resume etalonnage",
   }
 };
     const LANG_OPTIONS = [];
@@ -3768,7 +4079,320 @@
         });
         updateFleetTable(mprValue);
         setTimeout(initSim, 300);
+        setTimeout(initRingRoad, 200);
+        renderComparison();
+        renderCountryHub();
     });
+
+// ════════════════════════ CAIRO RING ROAD + AV COMPARISON ════════════════════════
+var currentCountry = 'egypt';
+var rrScenario = 'A';
+var rrCanvas = null, rrCtx = null, rrVehicles = [], rrAnimId = null;
+
+var RING_ROAD_PROFILE = [
+    { km: 0,  elev: 22, lanes: 4, feature: 'Qalyub Interchange',      type: 'junction' },
+    { km: 2,  elev: 23, lanes: 4, feature: null,                       type: null },
+    { km: 3.5,elev: 25, lanes: 4, feature: 'Shubra Entry',            type: 'entry' },
+    { km: 5,  elev: 26, lanes: 3, feature: null,                       type: null },
+    { km: 6.5,elev: 28, lanes: 3, feature: 'El Khalafawy Exit',        type: 'exit' },
+    { km: 8,  elev: 30, lanes: 4, feature: 'Rod El Farag Entry',       type: 'entry' },
+    { km: 10, elev: 32, lanes: 4, feature: null,                       type: null },
+    { km: 12, elev: 36, lanes: 4, feature: 'Miyool +4.0%',             type: 'grade' },
+    { km: 14, elev: 40, lanes: 4, feature: 'Al Tersa Interchange',     type: 'junction' },
+    { km: 16, elev: 42, lanes: 3, feature: null,                       type: null },
+    { km: 18, elev: 44, lanes: 3, feature: 'Sayeda Zeinab Exit',       type: 'exit' },
+    { km: 20, elev: 46, lanes: 4, feature: 'Miyool +2.5%',             type: 'grade' },
+    { km: 22, elev: 43, lanes: 4, feature: 'El Maasara Entry',         type: 'entry' },
+    { km: 24, elev: 45, lanes: 4, feature: null,                       type: null },
+    { km: 26, elev: 48, lanes: 4, feature: 'Miyool +3.5%',             type: 'grade' },
+    { km: 27, elev: 49, lanes: 3, feature: 'Dar Al Salam Exit',        type: 'exit' },
+    { km: 28, elev: 50, lanes: 3, feature: 'Dar Al Salam Interchange', type: 'junction' }
+];
+
+function initRingRoad() {
+    rrCanvas = document.getElementById('ringroad-canvas');
+    if (!rrCanvas) return;
+    rrCtx = rrCanvas.getContext('2d');
+    var parent = rrCanvas.parentElement;
+    rrCanvas.width = parent.clientWidth;
+    rrCanvas.height = 480;
+    createRingRoadVehicles();
+    if (rrAnimId) cancelAnimationFrame(rrAnimId);
+    animateRingRoad();
+}
+
+function createRingRoadVehicles() {
+    rrVehicles = [];
+    var palette = [
+        { type: 'mlaijy', color: '#00AAFF', chaotic: false, len: 4.5 },
+        { type: 'microbus', color: '#FF6B21', chaotic: false, len: 5.3 },
+        { type: 'noss_naql', color: '#D97706', chaotic: false, len: 6.5 },
+        { type: 'naql_taqeel', color: '#78350F', chaotic: false, len: 16.5 },
+        { type: 'motorcycle', color: '#DC2626', chaotic: false, len: 2.0 },
+        { type: 'trooscoor', color: '#F97316', chaotic: true, len: 3.2 },
+        { type: 'tuktuk', color: '#FBBF24', chaotic: true, len: 2.6 },
+        { type: 'bicycle', color: '#059669', chaotic: true, len: 1.7 }
+    ];
+    for (var i = 0; i < 70; i++) {
+        var p = palette[Math.floor(Math.random() * palette.length)];
+        rrVehicles.push({ x: Math.random() * 28, lane: Math.floor(Math.random() * 3),
+            speed: (6 + Math.random() * 14) / 3600, type: p.type, color: p.color,
+            chaotic: p.chaotic, len: p.len, targetLane: Math.floor(Math.random() * 3), lct: 0 });
+    }
+    if (rrScenario === 'B') {
+        for (var j = 0; j < 18; j++) {
+            rrVehicles.push({ x: j * 1.6, lane: 0, speed: 22 / 3600, type: 'av',
+                color: '#10B981', chaotic: false, len: 4.8, targetLane: 0, lct: 0 });
+        }
+    }
+}
+
+function setScenario(s) {
+    rrScenario = s;
+    var a = document.getElementById('scenario-a-btn');
+    var b = document.getElementById('scenario-b-btn');
+    if (a) a.className = s === 'A'
+        ? 'px-6 py-2 rounded-lg font-medium bg-red-500/20 border border-red-400 text-red-300 hover:bg-red-500/30 transition active'
+        : 'px-6 py-2 rounded-lg font-medium bg-slate-600/20 border border-slate-500 text-slate-400 hover:bg-red-500/30 transition';
+    if (b) b.className = s === 'B'
+        ? 'px-6 py-2 rounded-lg font-medium bg-green-500/20 border border-green-400 text-green-300 hover:bg-green-500/30 transition active'
+        : 'px-6 py-2 rounded-lg font-medium bg-slate-600/20 border border-slate-500 text-slate-400 hover:bg-green-500/30 transition';
+    createRingRoadVehicles();
+}
+
+function animateRingRoad() {
+    if (!rrCtx) return;
+    var w = rrCanvas.width, h = rrCanvas.height;
+    var profH = 180, top = profH + 30, trafficH = h - top;
+    var kmToPx = w / 28;
+    rrCtx.fillStyle = '#0f172a'; rrCtx.fillRect(0, 0, w, h);
+    rrCtx.fillStyle = '#1e293b'; rrCtx.fillRect(0, 0, w, profH);
+    var minE = 20, maxE = 52, range = maxE - minE;
+    rrCtx.beginPath(); rrCtx.strokeStyle = '#475569'; rrCtx.lineWidth = 3;
+    RING_ROAD_PROFILE.forEach(function(p, i) {
+        var x = p.km * kmToPx;
+        var y = profH - 20 - ((p.elev - minE) / range) * (profH - 40);
+        if (i === 0) rrCtx.moveTo(x, y); else rrCtx.lineTo(x, y);
+    });
+    rrCtx.stroke();
+    RING_ROAD_PROFILE.forEach(function(p) {
+        if (!p.feature) return;
+        var x = p.km * kmToPx;
+        var y = profH - 20 - ((p.elev - minE) / range) * (profH - 40);
+        if (p.type === 'entry') { rrCtx.fillStyle = '#ef4444'; rrCtx.beginPath(); rrCtx.moveTo(x-8,y+15); rrCtx.lineTo(x,y); rrCtx.lineTo(x+8,y+15); rrCtx.fill(); }
+        else if (p.type === 'exit') { rrCtx.fillStyle = '#3b82f6'; rrCtx.beginPath(); rrCtx.moveTo(x-8,y); rrCtx.lineTo(x,y+15); rrCtx.lineTo(x+8,y); rrCtx.fill(); }
+        else if (p.type === 'junction') { rrCtx.fillStyle = '#a855f7'; rrCtx.beginPath(); rrCtx.arc(x,y,5,0,Math.PI*2); rrCtx.fill(); }
+        else if (p.type === 'grade') { rrCtx.fillStyle = '#eab308'; rrCtx.fillRect(x-1, y-6, 2, 12); }
+        rrCtx.fillStyle = '#94a3b8'; rrCtx.font = '9px Inter, sans-serif'; rrCtx.textAlign = 'center';
+        rrCtx.fillText(p.feature, x, y - 12);
+    });
+    rrCtx.fillStyle = '#111827'; rrCtx.fillRect(0, top, w, trafficH);
+    var laneH = trafficH / 3;
+    for (var l = 0; l < 3; l++) {
+        var ly = top + l * laneH;
+        rrCtx.strokeStyle = '#374151'; rrCtx.lineWidth = 1; rrCtx.setLineDash([10,10]);
+        rrCtx.beginPath(); rrCtx.moveTo(0, ly + laneH); rrCtx.lineTo(w, ly + laneH); rrCtx.stroke(); rrCtx.setLineDash([]);
+        rrCtx.fillStyle = '#4b5563'; rrCtx.font = '10px Inter'; rrCtx.textAlign = 'left';
+        rrCtx.fillText('Lane ' + (l+1), 5, ly + laneH/2 + 3);
+    }
+    if (rrScenario === 'B') {
+        rrCtx.fillStyle = 'rgba(16,185,129,0.10)'; rrCtx.fillRect(0, top, w, laneH);
+        rrCtx.strokeStyle = '#10b981'; rrCtx.lineWidth = 2;
+        rrCtx.beginPath(); rrCtx.moveTo(0, top + laneH); rrCtx.lineTo(w, top + laneH); rrCtx.stroke();
+        rrCtx.fillStyle = '#10b981'; rrCtx.font = '10px Inter'; rrCtx.textAlign = 'left';
+        rrCtx.fillText('AV PLATOON LANE', 5, top + 14);
+    }
+    rrVehicles.forEach(function(v) {
+        v.x += v.speed * 60; if (v.x > 28) v.x -= 28;
+        if (v.chaotic) {
+            v.lct++; if (v.lct > 60 + Math.random()*120) { v.targetLane = Math.floor(Math.random()*3); v.lct = 0; }
+            if (v.targetLane !== v.lane) { v.lane += (v.targetLane > v.lane) ? 0.03 : -0.03; if (Math.abs(v.lane - v.targetLane) < 0.05) v.lane = v.targetLane; }
+        }
+        var vx = v.x * kmToPx;
+        var vy = top + v.lane * laneH + laneH/2;
+        var vw = Math.max(6, v.len * 1.6);
+        var vh = Math.max(3, v.type === 'bicycle' ? 2 : 5);
+        if (v.type === 'av') { rrCtx.shadowColor = '#10b981'; rrCtx.shadowBlur = 8; }
+        rrCtx.fillStyle = v.color; rrCtx.fillRect(vx - vw/2, vy - vh/2, vw, vh); rrCtx.shadowBlur = 0;
+    });
+    var stats = document.getElementById('rr-stats');
+    if (stats) {
+        var cong = rrScenario === 'A' ? 'High (Chaotic)' : 'Managed (AV Corridor)';
+        var cc = rrScenario === 'A' ? 'text-red-400' : 'text-green-400';
+        var cap = rrScenario === 'A' ? '1,850' : '2,950';
+        stats.innerHTML = '<div class="text-slate-400">Scenario: ' + (rrScenario==='A'?'Current Baseline':'Managed AV') + '</div>'
+            + '<div class="text-yellow-400">Vehicles: ' + rrVehicles.length + '</div>'
+            + '<div class="' + cc + '">Congestion: ' + cong + '</div>'
+            + '<div class="text-primary">Capacity: ' + cap + ' veh/h/lane</div>';
+    }
+    rrAnimId = requestAnimationFrame(animateRingRoad);
+}
+
+// ---- AV Comparison Engine ----
+var AV_COMPARE = {
+    tesla: { name: 'Tesla Autopilot / FSD', sae: 'L2+ (Supervised) / L3 pending',
+        sensors: { lidar: 0, radar: 0, cameras: 8, ultrasonic: 12, compute: 'HW4 (50 TOPS)' },
+        odd: 'Mapped highways and urban roads; clear weather; driver supervision required',
+        maxSpeed: 135,
+        liability: 'Driver assumes full liability. FSD is a Level 2 driver-assist requiring constant supervision.',
+        footprint: { len: 4.9, width: 1.9, height: 1.44, wheelbase: 2.875 },
+        features: ['Vision-only neural net (no LiDAR)','End-to-end AI driving','OTA software updates','8-camera surround view','Smart Summon / Auto Park','City + highway driving'] },
+    mercedes: { name: 'Mercedes-Benz DRIVE PILOT', sae: 'L3 (Certified, up to 130 km/h)',
+        sensors: { lidar: 1, radar: 5, cameras: 4, ultrasonic: 12, compute: 'NVIDIA DRIVE Orin' },
+        odd: 'Highways with physical divider; up to 130 km/h; no construction; clear weather; day/night',
+        maxSpeed: 130,
+        liability: 'Manufacturer assumes liability when DRIVE PILOT is active. First certified L3 system globally.',
+        footprint: { len: 5.3, width: 1.95, height: 1.50, wheelbase: 3.216 },
+        features: ['First certified Level 3 system','LiDAR + radar + camera fusion','Manufacturer liability when active','Highway-only operational domain','Hands-off up to 130 km/h','Automatic safe stop'] },
+    waymo: { name: 'Waymo Driver (5th Gen)', sae: 'L4 (Full autonomous, no human driver)',
+        sensors: { lidar: 5, radar: 6, cameras: 29, ultrasonic: 0, compute: 'Custom Waymo compute' },
+        odd: 'Geofenced urban areas (Phoenix, SF, LA); day/night; most weather',
+        maxSpeed: 113,
+        liability: 'Waymo assumes full liability when operating autonomously. No human driver required.',
+        footprint: { len: 4.9, width: 1.9, height: 1.6, wheelbase: 2.96 },
+        features: ['Full Level 4 driverless operation','29 cameras + 5 LiDAR + 6 radar','No steering wheel (Zoox variant)','Urban ride-hailing deployed','360-degree sensor coverage','Real-time 3D mapping'] }
+};
+var currentComparePlatform = 'tesla';
+
+function setComparePlatform(platform) {
+    currentComparePlatform = platform;
+    ['tesla','mercedes','waymo'].forEach(function(p) {
+        var btn = document.getElementById('cmp-' + p);
+        if (!btn) return;
+        if (p === platform) btn.className = 'cmp-btn active px-5 py-2.5 rounded-lg font-medium text-sm transition bg-slate-800 text-white border-2 border-slate-800';
+        else btn.className = 'cmp-btn px-5 py-2.5 rounded-lg font-medium text-sm transition bg-white text-slate-600 border-2 border-slate-200 hover:border-slate-400';
+    });
+    renderComparison();
+}
+
+function renderComparison() {
+    var p = AV_COMPARE[currentComparePlatform];
+    if (!p) return;
+    var grid = document.getElementById('cmp-grid');
+    if (!grid) return;
+    var sensorHTML = '<div class="bg-white rounded-xl shadow-md border border-slate-200 p-6"><h4 class="font-bold text-slate-800 mb-3"><i class="fas fa-microchip mr-2 text-primary"></i>Sensor Suite</h4><div class="grid grid-cols-2 gap-3">'
+        + '<div class="text-center p-3 bg-slate-50 rounded-lg"><div class="text-2xl font-bold text-red-500">'+p.sensors.lidar+'</div><div class="text-xs text-slate-500">LiDAR</div></div>'
+        + '<div class="text-center p-3 bg-slate-50 rounded-lg"><div class="text-2xl font-bold text-blue-500">'+p.sensors.radar+'</div><div class="text-xs text-slate-500">Radar</div></div>'
+        + '<div class="text-center p-3 bg-slate-50 rounded-lg"><div class="text-2xl font-bold text-green-500">'+p.sensors.cameras+'</div><div class="text-xs text-slate-500">Cameras</div></div>'
+        + '<div class="text-center p-3 bg-slate-50 rounded-lg"><div class="text-2xl font-bold text-purple-500">'+p.sensors.ultrasonic+'</div><div class="text-xs text-slate-500">Ultrasonic</div></div>'
+        + '</div><div class="mt-3 text-xs text-slate-500"><i class="fas fa-microchip mr-1"></i>'+p.sensors.compute+'</div></div>';
+    var oddHTML = '<div class="bg-white rounded-xl shadow-md border border-slate-200 p-6"><h4 class="font-bold text-slate-800 mb-3"><i class="fas fa-map-marked-alt mr-2 text-secondary"></i>Operational Design Domain</h4><p class="text-sm text-slate-600">'+p.odd+'</p><div class="mt-3 flex items-center gap-2"><span class="text-xs text-slate-400">Max Speed:</span><span class="font-bold text-lg text-primary">'+p.maxSpeed+' km/h</span></div></div>';
+    var liabHTML = '<div class="bg-white rounded-xl shadow-md border border-slate-200 p-6"><h4 class="font-bold text-slate-800 mb-3"><i class="fas fa-gavel mr-2 text-accent"></i>Liability Framework</h4><p class="text-sm text-slate-600">'+p.liability+'</p><div class="mt-3"><span class="text-xs px-2 py-1 rounded-full '+(p.sae.indexOf('L4')>=0?'bg-green-100 text-green-700':p.sae.indexOf('L3')>=0?'bg-blue-100 text-blue-700':'bg-yellow-100 text-yellow-700')+'">'+p.sae+'</span></div></div>';
+    var footHTML = '<div class="bg-white rounded-xl shadow-md border border-slate-200 p-6"><h4 class="font-bold text-slate-800 mb-3"><i class="fas fa-ruler-combined mr-2 text-red-500"></i>Physical Footprint</h4><div class="grid grid-cols-2 gap-2 text-sm">'
+        + '<div><span class="text-slate-400">Length:</span> <span class="font-mono">'+p.footprint.len+' m</span></div>'
+        + '<div><span class="text-slate-400">Width:</span> <span class="font-mono">'+p.footprint.width+' m</span></div>'
+        + '<div><span class="text-slate-400">Height:</span> <span class="font-mono">'+p.footprint.height+' m</span></div>'
+        + '<div><span class="text-slate-400">Wheelbase:</span> <span class="font-mono">'+p.footprint.wheelbase+' m</span></div>'
+        + '</div></div>';
+    var featHTML = '<div class="bg-white rounded-xl shadow-md border border-slate-200 p-6 md:col-span-2 lg:col-span-3"><h4 class="font-bold text-slate-800 mb-3"><i class="fas fa-check-circle mr-2 text-green-500"></i>Key Features</h4><div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">';
+    p.features.forEach(function(f) { featHTML += '<div class="flex items-start gap-2 text-sm text-slate-600"><i class="fas fa-check text-green-500 mt-0.5"></i>'+f+'</div>'; });
+    featHTML += '</div></div>';
+    grid.innerHTML = sensorHTML + oddHTML + liabHTML + footHTML + featHTML;
+    renderComparisonTable();
+}
+
+function renderComparisonTable() {
+    var tbody = document.getElementById('cmp-table-body');
+    if (!tbody) return;
+    var specs = [
+        { label: 'SAE Level', t: 'L2+ (Supervised)', m: 'L3 (Certified)', w: 'L4 (Driverless)' },
+        { label: 'LiDAR Units', t: '0', m: '1', w: '5' },
+        { label: 'Radar Units', t: '0', m: '5', w: '6' },
+        { label: 'Camera Units', t: '8', m: '4', w: '29' },
+        { label: 'Max Speed', t: '135 km/h', m: '130 km/h', w: '113 km/h' },
+        { label: 'Liability', t: 'Driver', m: 'Manufacturer', w: 'Waymo' },
+        { label: 'Length', t: '4.9 m', m: '5.3 m', w: '4.9 m' },
+        { label: 'Width', t: '1.9 m', m: '1.95 m', w: '1.9 m' },
+        { label: 'ODD', t: 'Roads + Weather', m: 'Highways Only', w: 'Urban Geofenced' },
+        { label: 'Driver Required', t: 'Yes (Hands-on)', m: 'No (Hands-off)', w: 'No' }
+    ];
+    var html = '';
+    specs.forEach(function(s) {
+        html += '<tr class="border-b border-slate-100 hover:bg-slate-50"><td class="py-2.5 px-4 text-slate-500 font-medium">'+s.label+'</td>'
+            + '<td class="py-2.5 px-4 text-center font-mono text-sm">'+s.t+'</td>'
+            + '<td class="py-2.5 px-4 text-center font-mono text-sm">'+s.m+'</td>'
+            + '<td class="py-2.5 px-4 text-center font-mono text-sm">'+s.w+'</td></tr>';
+    });
+    tbody.innerHTML = html;
+}
+
+
+// ════════════════════════ MULTI-COUNTRY CALIBRATION HUB ════════════════════════
+var COUNTRY_DATA = {
+    egypt: { name: 'Egypt (Cairo Ring Road)',
+        fleet: { mlaijy: 0.30, microbus: 0.20, noss_naql: 0.08, rob_naql: 0.07, naql_taqeel: 0.05, motorcycle: 0.05, bicycle: 0.02, trooscoor: 0.015, tuktuk: 0.015, av: 0.20 },
+        road: { laneWidth: 3.5, shoulder: 1.5, maxGrade: 6.0, speedLimit: 80 },
+        enforcement: 'Moderate', congestion: 'High', reactionFactor: 1.0,
+        notes: 'Chaotic mixed traffic, non-lane-based movement, frequent roadside stops',
+        avgReaction: 0.85, avgSafety: 0.42, avgSigma: 0.82 },
+    ksa: { name: 'Kingdom of Saudi Arabia',
+        fleet: { mlaijy: 0.25, microbus: 0.08, noss_naql: 0.10, rob_naql: 0.05, naql_taqeel: 0.15, motorcycle: 0.03, bicycle: 0.01, trooscoor: 0.005, tuktuk: 0.005, av: 0.20 },
+        road: { laneWidth: 3.75, shoulder: 3.0, maxGrade: 4.0, speedLimit: 120 },
+        enforcement: 'Strict (Saher)', congestion: 'Moderate', reactionFactor: 0.85,
+        notes: 'High-speed expressways, strict speed enforcement (Saher), luxury vehicle dominance',
+        avgReaction: 0.72, avgSafety: 0.55, avgSigma: 0.65 },
+    uae: { name: 'United Arab Emirates',
+        fleet: { mlaijy: 0.30, microbus: 0.05, noss_naql: 0.06, rob_naql: 0.03, naql_taqeel: 0.10, motorcycle: 0.02, bicycle: 0.01, trooscoor: 0.002, tuktuk: 0.002, av: 0.22 },
+        road: { laneWidth: 3.75, shoulder: 3.5, maxGrade: 3.0, speedLimit: 140 },
+        enforcement: 'Very Strict', congestion: 'Moderate-Low', reactionFactor: 0.80,
+        notes: 'Smart V2I infrastructure, modern corridors, high AV adoption potential',
+        avgReaction: 0.68, avgSafety: 0.60, avgSigma: 0.55 },
+    jordan: { name: 'Jordan (Levant)',
+        fleet: { mlaijy: 0.22, microbus: 0.12, noss_naql: 0.12, rob_naql: 0.08, naql_taqeel: 0.15, motorcycle: 0.08, bicycle: 0.04, trooscoor: 0.01, tuktuk: 0.01, av: 0.08 },
+        road: { laneWidth: 3.5, shoulder: 2.0, maxGrade: 8.0, speedLimit: 90 },
+        enforcement: 'Moderate', congestion: 'Moderate', reactionFactor: 0.95,
+        notes: 'Mountainous terrain, steep grades, challenging geometry, mixed corridors',
+        avgReaction: 0.80, avgSafety: 0.48, avgSigma: 0.75 }
+};
+
+function selectCountry(country) {
+    currentCountry = country;
+    ['egypt','ksa','uae','jordan'].forEach(function(c) {
+        var btn = document.getElementById('ch-' + c);
+        if (!btn) return;
+        if (c === country) btn.className = 'ch-btn active px-5 py-2.5 rounded-lg font-medium text-sm transition bg-white text-slate-700 border-2 border-primary shadow-md';
+        else btn.className = 'ch-btn px-5 py-2.5 rounded-lg font-medium text-sm transition bg-white text-slate-600 border-2 border-slate-200 hover:border-primary';
+    });
+    renderCountryHub();
+    var slider = document.getElementById('mpr-slider');
+    if (slider) updateFleetTable(parseInt(slider.value, 10));
+}
+
+function renderCountryHub() {
+    var c = COUNTRY_DATA[currentCountry];
+    if (!c) return;
+    var fleetDiv = document.getElementById('ch-fleet-bars');
+    if (fleetDiv) {
+        var html = '';
+        Object.keys(c.fleet).forEach(function(k) {
+            var pct = Math.round(c.fleet[k] * 100);
+            var color = k === 'av' ? '#10b981' : '#0ea5e9';
+            html += '<div class="flex items-center gap-2"><span class="text-xs text-slate-500 w-20 truncate">' + k + '</span>'
+                + '<div class="flex-1 bg-slate-100 rounded-full h-4 overflow-hidden"><div class="h-full rounded-full" style="width:' + pct + '%;background:' + color + '"></div></div>'
+                + '<span class="text-xs font-mono text-slate-600 w-10 text-right">' + pct + '%</span></div>';
+        });
+        fleetDiv.innerHTML = html;
+    }
+    var roadDiv = document.getElementById('ch-road-params');
+    if (roadDiv) {
+        roadDiv.innerHTML = '<div class="flex justify-between text-sm"><span class="text-slate-500">Lane Width</span><span class="font-mono">' + c.road.laneWidth + ' m</span></div>'
+            + '<div class="flex justify-between text-sm"><span class="text-slate-500">Shoulder</span><span class="font-mono">' + c.road.shoulder + ' m</span></div>'
+            + '<div class="flex justify-between text-sm"><span class="text-slate-500">Max Grade</span><span class="font-mono">' + c.road.maxGrade + '%</span></div>'
+            + '<div class="flex justify-between text-sm"><span class="text-slate-500">Speed Limit</span><span class="font-mono">' + c.road.speedLimit + ' km/h</span></div>';
+    }
+    var calDiv = document.getElementById('ch-calib-grid');
+    if (calDiv) {
+        calDiv.innerHTML = '<div class="bg-white rounded-xl shadow-md border border-slate-200 p-5"><h4 class="font-bold text-slate-800 mb-2"><i class="fas fa-stopwatch mr-2 text-primary"></i>Reaction Time</h4><div class="text-3xl font-bold text-blue-500">' + (c.avgReaction*1000).toFixed(0) + ' ms</div><p class="text-xs text-slate-500 mt-1">' + (c.reactionFactor>1?'Weaker enforcement, longer gaps':'Strong enforcement, shorter gaps') + '</p></div>'
+            + '<div class="bg-white rounded-xl shadow-md border border-slate-200 p-5"><h4 class="font-bold text-slate-800 mb-2"><i class="fas fa-shield-alt mr-2 text-green-500"></i>Safety Index</h4><div class="text-3xl font-bold text-green-500">' + (c.avgSafety*100).toFixed(0) + '/100</div><p class="text-xs text-slate-500 mt-1">Region-calibrated risk score</p></div>'
+            + '<div class="bg-white rounded-xl shadow-md border border-slate-200 p-5"><h4 class="font-bold text-slate-800 mb-2"><i class="fas fa-chart-area mr-2 text-accent"></i>Behavior Sigma</h4><div class="text-3xl font-bold text-orange-500">' + c.avgSigma.toFixed(2) + '</div><p class="text-xs text-slate-500 mt-1">Lateral deviation std (m)</p></div>'
+            + '<div class="bg-white rounded-xl shadow-md border border-slate-200 p-5"><h4 class="font-bold text-slate-800 mb-2"><i class="fas fa-gavel mr-2 text-purple-500"></i>Enforcement</h4><div class="text-2xl font-bold text-purple-500">' + c.enforcement + '</div><p class="text-xs text-slate-500 mt-1">Congestion: ' + c.congestion + '</p></div>';
+    }
+    var notesDiv = document.getElementById('ch-notes');
+    if (notesDiv) {
+        notesDiv.innerHTML = '<div class="bg-slate-800 rounded-xl p-5 text-sm text-slate-300"><i class="fas fa-info-circle mr-2 text-primary"></i>' + c.notes + '</div>';
+    }
+}
+
     </script>
 </body>
 </html>
