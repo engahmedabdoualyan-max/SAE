@@ -274,7 +274,7 @@
     <section id="ringroad" class="py-16 bg-gradient-to-b from-slate-900 to-slate-800 text-white">
         <div class="container mx-auto px-4">
             <div class="text-center mb-8">
-                <h2 class="text-3xl font-bold mb-3" data-key="rr_title">Future Case Study: Egypt (Cairo Ring Road)</h2>
+                <h2 class="text-3xl font-bold mb-3" data-key="rr_title">Cairo Ring Road — Egypt Case Study</h2>
                 <p class="text-slate-300 max-w-3xl mx-auto text-sm" data-key="rr_desc">28 km longitudinal corridor from Qalyub to Dar Al Salam real inclines, ramps, and live traffic micro-state simulation</p>
             </div>
             <div class="flex justify-center gap-4 mb-6">
@@ -1644,7 +1644,7 @@
         var m = mpr / 100;
         var humanShare = 1 - m;
         var v = (COUNTRY_DATA[currentCountry] ? COUNTRY_DATA[currentCountry].road.speedLimit / 3.6 : 22.22);
-    var tauFactor = (COUNTRY_DATA[currentCountry] ? (COUNTRY_DATA[currentCountry].reactionFactor || 1) : 1);
+    var tauFactor = (COUNTRY_DATA[currentCountry] ? (COUNTRY_DATA[currentCountry].reactionFactor || 1) : 1) * (currentScenario === 'B' ? 0.7 : 1);
         var weighted = { tau: 0, safety: 0, accel: 0, decel: 0, sigma: 0, gap: 0, len: 0 };
         L0_ALL.forEach(function(p) {
             var w = humanShare * p.weight;
@@ -4086,6 +4086,7 @@
 
 // ════════════════════════ CAIRO RING ROAD + AV COMPARISON ════════════════════════
 var currentCountry = 'egypt';
+var currentScenario = 'A';
 var rrScenario = 'A';
 var rrCanvas = null, rrCtx = null, rrVehicles = [], rrAnimId = null;
 
@@ -4149,6 +4150,7 @@ function createRingRoadVehicles() {
 
 function setScenario(s) {
     rrScenario = s;
+    currentScenario = s;
     var a = document.getElementById('scenario-a-btn');
     var b = document.getElementById('scenario-b-btn');
     if (a) a.className = s === 'A'
@@ -4158,6 +4160,8 @@ function setScenario(s) {
         ? 'px-6 py-2 rounded-lg font-medium bg-green-500/20 border border-green-400 text-green-300 hover:bg-green-500/30 transition active'
         : 'px-6 py-2 rounded-lg font-medium bg-slate-600/20 border border-slate-500 text-slate-400 hover:bg-green-500/30 transition';
     createRingRoadVehicles();
+    var sl = document.getElementById('mpr-slider');
+    if (sl) updateFleetTable(parseInt(sl.value, 10));
 }
 
 function animateRingRoad() {
