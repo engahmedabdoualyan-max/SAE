@@ -170,7 +170,6 @@
                     <a href="#math" class="nav-link text-sm font-medium">Math</a>
                     <a href="#country-hub" class="nav-link text-sm font-medium" data-key="nav_country">Countries</a>
                     <a href="#references" class="nav-link text-sm font-medium" data-key="nav_refs">References</a>
-                    <a href="https://github.com" target="_blank" class="nav-link text-sm font-medium" data-key="nav_github">GitHub</a>
                 </nav>
                 <div class="flex items-center gap-2">
                     <label for="lang-select" class="text-sm font-medium hidden sm:block" data-key="ls">Language</label>
@@ -275,7 +274,7 @@
         <div class="container mx-auto px-4">
             <div class="text-center mb-8">
                 <h2 class="text-3xl font-bold mb-3" data-key="rr_title">Cairo Ring Road — Egypt Case Study</h2>
-                <p class="text-slate-300 max-w-3xl mx-auto text-sm" data-key="rr_desc">28 km longitudinal corridor from Qalyub to Dar Al Salam real inclines, ramps, and live traffic micro-state simulation</p>
+                <p class="text-slate-300 max-w-3xl mx-auto text-sm" data-key="rr_desc">32 km two-way corridor from Qalyub Interchange through the Dar Al Salam bottleneck to the Adly Mansour Intermodal Hub, with live Google traffic telemetry and incline-grade micro-simulation</p>
             </div>
             <div class="flex justify-center gap-4 mb-6">
                 <button id="scenario-a-btn" onclick="setScenario('A')" class="px-6 py-2 rounded-lg font-medium bg-red-500/20 border border-red-400 text-red-300 hover:bg-red-500/30 transition active"><i class="fas fa-exclamation-triangle mr-1"></i> <span data-key="rr_scenA">Scenario A: Current Baseline</span></button>
@@ -284,6 +283,16 @@
             <div class="relative bg-black rounded-xl overflow-hidden border border-slate-600">
                 <div id="ringroad-map" class="w-full h-[460px] bg-slate-800"></div>
                 <div id="rr-stats" class="absolute top-3 right-3 bg-slate-900/80 rounded-lg p-3 text-xs font-mono"></div>
+                <div class="absolute top-3 left-3 bg-slate-900/80 rounded-lg p-3 text-xs font-mono text-left space-y-1">
+                    <div><i class="fas fa-road mr-1 text-primary"></i><span data-key="rr_corridor">Qalyub to Adly Mansour Hub</span></div>
+                    <div><i class="fas fa-exchange-alt mr-1 text-green-400"></i><span data-key="rr_twoway">Two-Way Dynamic Flow</span></div>
+                </div>
+            </div>
+            <div class="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 mt-3 text-xs text-slate-300 bg-slate-900/60 rounded-lg p-3">
+                <span><i class="fas fa-broadcast-tower mr-1 text-yellow-300"></i><span data-key="rr_livecat">Live Traffic Categorization</span>: <span id="live-cat" class="font-mono">--</span></span>
+                <span><i class="fas fa-cloud-sun mr-1 text-sky-300"></i><span data-key="rr_weather">Weather</span>: <span id="live-weather" class="font-mono">--</span></span>
+                <span><i class="fas fa-tachometer-alt mr-1 text-orange-300"></i>Volume: <span id="live-vol" class="font-mono">--</span></span>
+                <span><i class="fas fa-truck mr-1 text-red-300"></i>HV: <span id="live-hv" class="font-mono">--</span></span>
             </div>
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4">
                 <div class="bg-slate-800 rounded-xl p-5">
@@ -310,6 +319,7 @@
                 <span class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-blue-500"></span> <span data-key="rr_leg_exit">Exit Lane</span></span>
                 <span class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-yellow-500"></span> <span data-key="rr_leg_grade">Grade (Miyool)</span></span>
                 <span class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-green-500"></span> <span data-key="rr_leg_av">AV Lane (Scenario B)</span></span>
+                <span class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-indigo-400"></span> <span data-key="rr_pce_full">Passenger Car Equivalent (PCE)</span></span>
                 <span class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-orange-400"></span> Microbus</span>
                 <span class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-blue-400"></span> Mlaiky</span>
                 <span class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-yellow-300"></span> Tuk-Tuk</span>
@@ -1068,16 +1078,13 @@
         </div>
     </section>
 
-    <!-- GitHub Banner -->
-    <section class="py-12 bg-gradient-to-r from-indigo-600 to-purple-700 text-white">
+    <!-- Proprietary Platform Notice -->
+    <section class="py-12 bg-gradient-to-r from-slate-800 to-slate-900 text-white border-y border-slate-700">
         <div class="container mx-auto px-4 text-center">
             <div class="max-w-3xl mx-auto">
-                <i class="fas fa-globe-americas text-4xl mb-4"></i>
-                <h2 class="text-2xl font-bold mb-4" data-key="gb">Contribute on GitHub</h2>
-                <p class="text-lg opacity-90 mb-6" data-key="gbd">Are you a researcher from India, Brazil, or another developing market? Upload your local calibration set and help us expand globally!</p>
-                <a href="https://github.com/sae-calibration-hub" target="_blank" class="inline-flex items-center gap-3 bg-white text-indigo-700 font-bold px-8 py-4 rounded-xl hover:bg-yellow-400 transition-all shadow-lg">
-                    <i class="fab fa-github text-2xl"></i><span>github.com/sae-calibration-hub</span>
-                </a>
+                <i class="fas fa-lock text-3xl mb-4 text-primary"></i>
+                <h2 class="text-2xl font-bold mb-4" data-key="prop_band">Proprietary Research Platform</h2>
+                <p class="text-lg opacity-90 mb-2 text-slate-300" data-key="prop_band_d">Powered by Fimtosoft. All empirical data and traffic physics parameters are protected pending official journal publication.</p>
             </div>
         </div>
     </section>
@@ -1149,10 +1156,9 @@
     <footer class="bg-slate-900 text-slate-300 py-8">
         <div class="container mx-auto px-4">
             <div class="flex flex-col md:flex-row justify-between items-center">
-<p class="text-sm" data-key="fc">Copyright 2024 SAE AutoSim Hub. Built for the research community.</p>
+<p class="text-sm" data-key="fc">Copyright 2024 SAE AutoSim Hub. All Rights Reserved.</p>
                 <div class="flex items-center gap-4 mt-4 md:mt-0">
-                    <a href="https://github.com" target="_blank" class="text-slate-400 hover:text-white transition-colors"><i class="fab fa-github text-xl"></i></a>
-                    <span class="text-slate-400 text-sm" data-key="ft">Open-source research tool. MIT License.</span>
+                    <span class="text-slate-400 text-sm" data-key="ft">Proprietary Research Platform Powered by Fimtosoft. All Rights Reserved.</span>
                 </div>
             </div>
         </div>
@@ -1703,6 +1709,12 @@
         var pceAvg = denom > 0 ? numPCE / denom : 1;
         var fHV = 1 / (1 + pHV * (pceAvg - 1));
         var v = (COUNTRY_DATA[currentCountry] ? COUNTRY_DATA[currentCountry].road.speedLimit / 3.6 : 22.22);
+        if (typeof liveTraffic !== 'undefined' && liveTraffic && liveTraffic.volume) {
+            v = v * (1 - 0.4 * Math.max(0, Math.min(1, liveTraffic.volume)));
+        }
+        if (typeof liveTraffic !== 'undefined' && liveTraffic && liveTraffic.hvShare) {
+            pHV = pHV * 0.5 + liveTraffic.hvShare * 0.5;
+        }
         var tauSum = computeWeightedFleet(mpr).weighted.tau;
         var avgLenGap = 6.0;
         var C = Math.round(3600 * fHV / (tauSum + avgLenGap / v));
@@ -1728,6 +1740,9 @@
         el = document.getElementById('env-co2'); if (el) el.textContent = (e * 0.18).toFixed(2) + ' g/km';
         el = document.getElementById('env-nox'); if (el) el.textContent = (e * 0.9).toFixed(2) + ' mg/km';
         var aqi = Math.round(40 + (e - 1) * 60);
+        if (typeof liveTraffic !== 'undefined' && liveTraffic && liveTraffic.volume) {
+            aqi = Math.round(aqi + liveTraffic.volume * 40);
+        }
         el = document.getElementById('env-aqi'); if (el) el.textContent = aqi;
         var banner = document.getElementById('env-banner');
         if (banner) {
@@ -2078,9 +2093,7 @@
     "r4": "PTV Group. (2024). \"VISSIM 2024 User Manual - Wiedemann 99 Car-Following Model.\"",
     "r5": "DLR Institute of Transportation Systems. (2024). \"SUMO Documentation - Car-Following Models.\"",
     "r6": "Aimsun. (2024). \"Aimsun Next 24 User Guide - Microscopic Traffic Simulation.\"",
-    "gb": "Contribute on GitHub",
-    "gbd": "Are you a researcher from India, Brazil, or another developing market? Upload your local calibration set and help us expand globally!",
-    "ft": "Open-source research tool. MIT License.",
+"ft": "Proprietary Research Platform Powered by Fimtosoft. All Rights Reserved.",
     "fc": "Copyright 2024 SAE AutoSim Hub. Built for the research community.",
     "mpr": "AV Market Penetration Rate (MPR)",
     "mprd": "Adjust the slider to set the proportion of autonomous vehicles in the traffic stream.",
@@ -2255,7 +2268,7 @@
     "nav_compare": "AV Compare",
     "nav_country": "Countries",
     "rr_title": "Cairo Ring Road Live Simulator",
-    "rr_desc": "Interactive geometric cross-section & micro-simulation of the 28 km Qalyub to Dar Al Salam corridor.",
+    "rr_desc": "32 km two-way corridor from Qalyub Interchange through the Dar Al Salam bottleneck to the Adly Mansour Intermodal Hub, with live Google traffic telemetry and incline-grade micro-simulation.",
     "rr_scenA": "Scenario A: Current Baseline",
     "rr_scenB": "Scenario B: Managed AV Corridor",
     "rr_leg_ramp": "On-Ramp",
@@ -2281,14 +2294,14 @@
     "rr_incline": "Incline Grade",
     "rr_decline": "Decline Grade",
     "rr_av_lane": "Dedicated AV Lane",
-    "rr_mk_qalyub": "Qalyub Entry Ramp Interconnect",
-    "rr_mk_qalyub_d": "Primary northern interconnect feeding express traffic onto the Ring Road corridor.",
-    "rr_mk_bahtim": "Bahtim / Shubra El-Kheima Junction",
-    "rr_mk_bahtim_d": "Dense mixed-traffic junction with frequent lane encroachment and merging conflicts.",
-    "rr_mk_mostorod": "Mostorod Core Bottleneck Zone",
-    "rr_mk_mostorod_d": "Chronic congestion hotspot where heavy trucks and microbuses compete for limited lane width.",
-    "rr_mk_dar": "Dar Al Salam / Maadi Exit Lane",
-    "rr_mk_dar_d": "Southern terminus exit distributing traffic toward Maadi and Dar Al Salam districts.",
+    "rr_mk_qalyub": "Qalyub Major Entry",
+    "rr_mk_qalyub_d": "Primary northern interchange feeding the corridor with mixed passenger and freight demand.",
+    "rr_mk_bahtim": "Bahtim High-Volume Access",
+    "rr_mk_bahtim_d": "Dense mid-corridor access node with sustained heavy-vehicle ingress.",
+    "rr_mk_mostorod": "Dar Al Salam Lane Bottleneck",
+    "rr_mk_mostorod_d": "Critical grade-constrained bottleneck producing microbus shockwaves on inclines.",
+    "rr_mk_dar": "Adly Mansour Terminal Hub",
+    "rr_mk_dar_d": "Eastern intermodal transit hub terminating the dual-direction corridor.",
     "env_tracker": "Environmental & Air Quality Tracker",
     "env_aqi": "AQI",
     "env_co2": "CO2",
@@ -2304,6 +2317,14 @@
     "carbon_red": "Carbon Emissions Reduction achieved via AV platooning.",
     "ksa_express": "Saudi Arabia Expressways",
     "grade_lbl": "Grade Incline",
+    "prop_band": "Proprietary Research Platform",
+    "prop_band_d": "Powered by Fimtosoft. All empirical data and traffic physics parameters are protected pending official journal publication.",
+    "rr_corridor": "Qalyub to Adly Mansour Hub",
+    "rr_twoway": "Two-Way Dynamic Flow",
+    "rr_livecat": "Live Traffic Categorization",
+    "rr_pce_full": "Passenger Car Equivalent (PCE)",
+    "rr_weather": "Weather",
+
   },
   "ar": {
     "t": "SAE AutoSim Hub",
@@ -2352,9 +2373,7 @@
     "r4": "PTV Group. (2024). \"دليل VISSIM 2024 - نموذج Wiedemann 99.\"",
     "r5": "DLR. (2024). \"وثائق SUMO - نماذج المتابعة.\"",
     "r6": "Aimsun. (2024). \"دليل Aimsun Next 24.\"",
-    "gb": "شارك على GitHub",
-    "gbd": "هل أنت باحث من الهند أو البرازيل؟ شارك ببياناتك المحلية!",
-    "ft": "أداة بحثية مفتوحة المصدر. رخصة MIT.",
+"ft": "منصة بحثية ملكية مدعومة من فيمتوسوفت. جميع الحقوق محفوظة.",
     "fc": "ملكية صحيحة 2024 SAE AutoSim Hub.",
     "mpr": "معدل اختراق المركبات ذاتية القيادة (MPR)",
     "mprd": "اضبط المنزلق لتحديد نسبة المركبات ذاتية القيادة.",
@@ -2525,7 +2544,7 @@
     "nav_compare": "مقارنة المركبات",
     "nav_country": "الدول",
     "rr_title": "محاكاة طريق القاهرة الدائري الحية",
-    "rr_desc": "محاكاة هندسية وتقاطع حي للمقطع العرضي على امتداد 28 كم من قليوب إلى دار السلام.",
+    "rr_desc": "ممر بطول 32 كم باتجاهين من تقاطع قليوب عبر عنق دار السلام إلى محطة عدلي منصور، مع بيانات غوغل الحية ومحاكاة منحدرات.",
     "rr_scenA": "السيناريو أ: الوضع الحالي",
     "rr_scenB": "السيناريو ب: ممر مُدار للمركبات الذاتية",
     "rr_leg_ramp": "مخرج صاعد",
@@ -2551,14 +2570,14 @@
     "rr_incline": "منحدر صاعد",
     "rr_decline": "منحدر هابط",
     "rr_av_lane": "مسار مخصص للمركبات الذاتية",
-    "rr_mk_qalyub": "مخرج صاعد قليوب",
-    "rr_mk_qalyub_d": "نقطة الربط الشمالية الرئيسية التي تغذي حركة المرور السريعة على طريق القاهرة الدائري.",
-    "rr_mk_bahtim": "مفترق بتهيم / شبرا الخيمة",
-    "rr_mk_bahtim_d": "مفترق كثيف بحركة مختلطة واعتداء متكرر على الحارات وتصادمات اندماج.",
-    "rr_mk_mostorod": "منطقة عنق زجاجة مصطرة الرئيسية",
-    "rr_mk_mostorod_d": "نقطة اختناق مزمنة حيث تتنافس الشاحنات الثقيلة والميكروباصات على عرض حارة محدود.",
-    "rr_mk_dar": "مخرج دار السلام / المعادي",
-    "rr_mk_dar_d": "مخرج النهاية الجنوبية الذي يوزع المرور نحو حي المعادي ودار السلام.",
+    "rr_mk_qalyub": "مدخل قليوب الرئيسي",
+    "rr_mk_qalyub_d": "التقاطع الشمالي الرئيسي الذي يغذي الممر بطلب ركاب وشحن مختلط.",
+    "rr_mk_bahtim": "مدخل بَحطيم عالي الكثافة",
+    "rr_mk_bahtim_d": "عقدة وصول وسطية كثيفة بدخول مستمر للمركبات الثقيلة.",
+    "rr_mk_mostorod": "عنق زجاجة دار السلام",
+    "rr_mk_mostorod_d": "عنق زجاجة حرج مقيد بالمنحدر يولد موجات صدمية للميكروباص.",
+    "rr_mk_dar": "محطة عدلي منصور المركزية",
+    "rr_mk_dar_d": "محطة نقل مشترك شرقية تنهي الممر ذا الاتجاهين.",
     "env_tracker": "متتبع البيئة وجودة الهواء",
     "env_aqi": "مؤشر AQI",
     "env_co2": "ثاني أكسيد الكربون",
@@ -2574,6 +2593,14 @@
     "carbon_red": "خفض انبعاثات الكربون عبر القطر الموحد للمركبات الذاتية.",
     "ksa_express": "طرق السعودية السريعة",
     "grade_lbl": "انحدار المرتفع",
+    "prop_band": "منصة بحثية ملكية",
+    "prop_band_d": "مدعومة من فيمتوسوفت. جميع البيانات التجريبية ومعاملات فيزياء المرور محمية حتى النشر العلمي الرسمي.",
+    "rr_corridor": "من قليوب إلى محطة عدلي منصور",
+    "rr_twoway": "تدفق ديناميكي باتجاهين",
+    "rr_livecat": "تصنيف المرور الحي",
+    "rr_pce_full": "مكافئ السيارة الركاب (PCE)",
+    "rr_weather": "الطقس",
+
   },
   "ru": {
     "t": "SAE AutoSim Hub",
@@ -2622,9 +2649,7 @@
     "r4": "PTV Group. (2024). \"Руководство VISSIM 2024 - модель Wiedemann 99.\"",
     "r5": "DLR. (2024). \"Документация SUMO - модели движения.\"",
     "r6": "Aimsun. (2024). \"Руководство Aimsun Next 24.\"",
-    "gb": "Участвовать на GitHub",
-    "gbd": "Вы исследователь из Индии, Бразилии или другой развивающейся страны?",
-    "ft": "Исследовательский инструмент с открытым исходным кодом. MIT License.",
+"ft": "Sobstvennaya issledovatelskaya platforma ot Fimtosoft. Vse prava zaschischeny.",
     "fc": "Авторское право 2024 SAE AutoSim Hub.",
     "mpr": "Уровень автономного пробега (MPR)",
     "mprd": "Регулируйте ползунок для установки доли автономных ТС.",
@@ -2792,7 +2817,7 @@
     "nav_compare": "Сравнение ТС",
     "nav_country": "Страны",
     "rr_title": "Живая симуляция Каирской кольцевой дороги",
-    "rr_desc": "Интерактивное геометрическое сечение и микромоделирование участка 28 км от Калиуба до Дар Аль-Салам.",
+    "rr_desc": "32 km dvunapravlennyj koridor ot razvyazki Kalyub cherez uzhoe goryshko Dar Al Salam do terminala Adly Mansour s zhivoj telemetriej Google i mikromodelirovaniem uklona.",
     "rr_scenA": "Сценарий A: текущая базовая",
     "rr_scenB": "Сценарий B: управляемый коридор АТС",
     "rr_leg_ramp": "Съезд на дорогу",
@@ -2818,14 +2843,14 @@
     "rr_incline": "Подъём",
     "rr_decline": "Спуск",
     "rr_av_lane": "Выделенная полоса АТС",
-    "rr_mk_qalyub": "Развязка Кальюб (въезд)",
-    "rr_mk_qalyub_d": "Основной северный узел, подающий скоростной поток на трассу кольцевой дороги.",
-    "rr_mk_bahtim": "Развязка Бахтим / Шубра Эль-Хейма",
-    "rr_mk_bahtim_d": "Плотный перекрёсток со смешанным движением и частыми нарушениями полос.",
-    "rr_mk_mostorod": "Зона затора Мосторед",
-    "rr_mk_mostorod_d": "Хроническая точка затора, где тяжёлые грузовики и микроавтобусы делят узкую полосу.",
-    "rr_mk_dar": "Съезд Дар Аль-Салам / Маади",
-    "rr_mk_dar_d": "Южный терминальный съезд, распределяющий поток к Маади и Дар Аль-Салам.",
+    "rr_mk_qalyub": "Osnovnoj vyezd Kalyub",
+    "rr_mk_qalyub_d": "Glavnyj severnyj razvyazka, pitayuschij koridor smeshannym passazhirskim i gruzovym sprosom.",
+    "rr_mk_bahtim": "Vysokozagruzhennyj vyezd Bahtim",
+    "rr_mk_bahtim_d": "Plotnyj uzlovoj uz el koridora s postoyannym vyezdom tyazhelyh ATS.",
+    "rr_mk_mostorod": "Uzloe goryshko Dar Al Salam",
+    "rr_mk_mostorod_d": "Kriticheskoe uzloe s ogranichennym uklonom, porozhdayuschee udarnye volny mikroavtobusov.",
+    "rr_mk_dar": "Terminal Adly Mansour",
+    "rr_mk_dar_d": "Vostochnyj intermodalnyj transportnyj centr, zaverhayuschij dvunapravlennyj koridor.",
     "env_tracker": "Мониторинг экологии и качества воздуха",
     "env_aqi": "AQI",
     "env_co2": "CO2",
@@ -2841,6 +2866,14 @@
     "carbon_red": "Снижение выбросов углерода за счёт платонинга АТС.",
     "ksa_express": "Скоростные трассы Саудовской Аравии",
     "grade_lbl": "Наклон подъёма",
+    "prop_band": "Proprietarnaya issledovatelskaya platforma",
+    "prop_band_d": "Na baze Fimtosoft. Vse empiricheskie dannye i parametry fiziki traffika zaschischeny do oficialnoj publikacii.",
+    "rr_corridor": "Kalyub - Terminal Adly Mansour",
+    "rr_twoway": "Dinamicheskoe dvustoronnee dvizhenie",
+    "rr_livecat": "Kategorizaciya zhivogo traffika",
+    "rr_pce_full": "Ekvivalent legkovogo ATS (PCE)",
+    "rr_weather": "Pogoda",
+
   },
   "hi": {
     "t": "SAE AutoSim Hub",
@@ -2889,9 +2922,7 @@
     "r4": "PTV Group. (2024). \"VISSIM 2024 यूज़र मैनुअल - Wiedemann 99।\"",
     "r5": "DLR. (2024). \"SUMO दस्तावेज़ीकरण - कार-फॉलोइंग मॉडल।\"",
     "r6": "Aimsun. (2024). \"Aimsun Next 24 यूज़र गाइड।\"",
-    "gb": "GitHub पर योगदान दें",
-    "gbd": "क्या आप भारत, ब्राज़ील या अन्य विकासशील देश से अनुसंधानक हैं?",
-    "ft": "ओपन-सोर्स अनुसंधान उपकरण। MIT License.",
+"ft": "Fimtosoft dvara sancchalit svayattvik anusandhan platform. Sabhi adhikar surakshit.",
     "fc": "कॉपीराइट 2024 SAE AutoSim Hub.",
     "mpr": "AV बाजार प्रवेश दर (MPR)",
     "mprd": "स्वाइप करके ऑटोनॉमस वाही का प्रतिशत समायोजित करें।",
@@ -3035,7 +3066,7 @@
     "nav_compare": "एवी तुलना",
     "nav_country": "देश",
     "rr_title": "काहिरा रिंग रोड लाइव सिमुलेटर",
-    "rr_desc": "कल्यूब से दार अल सालम तक 28 किमी गलियारे का इंटरैक्टिव ज्यामितीय अनुप्रस्थ-काट और सूक्ष्म-अनुरूपण.",
+    "rr_desc": "Qalyub interchange se Dar Al Salam bottleneck hote hue Adly Mansour hub tak 32 km dwi-disha corridor, live Google traffic telemetry aur incline micro-simulation ke sath.",
     "rr_scenA": "परिदृश्य A: वर्तमान आधाररेखा",
     "rr_scenB": "परिदृश्य B: प्रबंधित AV गलियारा",
     "rr_leg_ramp": "ऑन-रैंप",
@@ -3061,14 +3092,14 @@
     "rr_incline": "चढ़ाव ढाल",
     "rr_decline": "ढलान",
     "rr_av_lane": "समर्पित AV लेन",
-    "rr_mk_qalyub": "कल्यूब प्रवेश रैंप इंटरकनेक्ट",
-    "rr_mk_qalyub_d": "रिंग रोड कॉरिडोर पर एक्सप्रेस ट्रैफिक लाने वाला प्राथमिक उत्तरी इंटरकनेक्ट.",
-    "rr_mk_bahtim": "बहतीम / शुब्रा एल-खैमा जंक्शन",
-    "rr_mk_bahtim_d": "घनी मिश्रित यातायात जंक्शन जहां बार-बार लेन उल्लंघन और मर्जर संघर्ष होते हैं.",
-    "rr_mk_mostorod": "मोस्टोरॉड कोर बॉटलनेक ज़ोन",
-    "rr_mk_mostorod_d": "गंभीर भीड़ हॉटस्पॉट जहां भारी ट्रक और माइक्रोबस सीमित लेन चौड़ाई के लिए प्रतिस्पर्धा करते हैं.",
-    "rr_mk_dar": "दार अल सलाम / मआदी निकास लेन",
-    "rr_mk_dar_d": "दक्षिणी टर्मिनस निकास जो मआदी और दार अल सलाम जिलों की ओर ट्रैफिक वितरित करता है.",
+    "rr_mk_qalyub": "Qalyub Mukhya Pravesh",
+    "rr_mk_qalyub_d": "Uttari mukhya interchange jo corridor ko mila-jula yatri aur maal mang deta hai.",
+    "rr_mk_bahtim": "Bahtim Ucch Volume Pravesh",
+    "rr_mk_bahtim_d": "Nirikshit madhya-corridor node jahan lagatar bhari vahan pravesh karte hain.",
+    "rr_mk_mostorod": "Dar Al Salam Lane Bottleneck",
+    "rr_mk_mostorod_d": "Mahatvapurn grade-constrained bottleneck jo incline par microbus shockwaves utpann karta hai.",
+    "rr_mk_dar": "Adly Mansour Terminal Hub",
+    "rr_mk_dar_d": "Poorvi intermodal transit hub jo dwi-disha corridor samaapt karta hai.",
     "env_tracker": "पर्यावरण और वायु गुणवत्ता ट्रैकर",
     "env_aqi": "AQI",
     "env_co2": "CO2",
@@ -3084,6 +3115,14 @@
     "carbon_red": "AV प्लाटूनिंग से कार्बन उत्सर्जन में कमी.",
     "ksa_express": "सऊदी अरब एक्सप्रेसवे",
     "grade_lbl": "ढाल चढ़ाव",
+    "prop_band": "Svayattvik Anusandhan Platform",
+    "prop_band_d": "Fimtosoft dvara sancchalit. Sabhi prapyogik data aur traffic physics parameters adhikarik prakashan tak surakshit hain.",
+    "rr_corridor": "Qalyub se Adly Mansour Hub",
+    "rr_twoway": "Dwi-Disha Dynamic Flow",
+    "rr_livecat": "Live Traffic Categorization",
+    "rr_pce_full": "Passenger Car Equivalent (PCE)",
+    "rr_weather": "Mausam",
+
   },
   "de": {
     "t": "SAE AutoSim Hub",
@@ -3132,9 +3171,7 @@
     "r4": "PTV Group. (2024). \"VISSIM 2024 Handbuch - Wiedemann 99 Modell.\"",
     "r5": "DLR. (2024). \"SUMO Dokumentation - Fahrzeugfolgemodelle.\"",
     "r6": "Aimsun. (2024). \"Aimsun Next 24 Benutzerhandbuch.\"",
-    "gb": "Auf GitHub mitmachen",
-    "gbd": "Sind Sie Forscher aus Indien, Brasilien oder einem anderen Entwicklungsland?",
-    "ft": "Open-Source-Forschungstool. MIT License.",
+"ft": "Proprietare Forschungsplattform von Fimtosoft. Alle Rechte vorbehalten.",
     "fc": "Urheberrecht 2024 SAE AutoSim Hub.",
     "mpr": "Autonomer Fahrzeug-Anteil (MPR)",
     "mprd": "Schieben Sie, um den Anteil autonomer Fahrzeuge einzustellen.",
@@ -3302,7 +3339,7 @@
     "nav_compare": "AV-Vergleich",
     "nav_country": "Länder",
     "rr_title": "Live-Simulator Cairo Ring Road",
-    "rr_desc": "Interaktiver geometrischer Querschnitt & Mikrosimulation des 28 km Korridors von Qalyub nach Dar Al Salam.",
+    "rr_desc": "32 km zweiseitiger Korridor von der Qalyub-Auffahrt ueber den Dar-Al-Salam-Engpass zum Adly-Mansour-Hub mit Live-Google-Verkehrsdaten und Steigungs-Mikrosimulation.",
     "rr_scenA": "Szenario A: Aktueller Basiszustand",
     "rr_scenB": "Szenario B: Gesteuerter AV-Korridor",
     "rr_leg_ramp": "Auffahrt",
@@ -3328,14 +3365,14 @@
     "rr_incline": "Steigung",
     "rr_decline": "Gefälle",
     "rr_av_lane": "Dedizierte AV-Spur",
-    "rr_mk_qalyub": "Anschluss Kalyub (Einfall)",
-    "rr_mk_qalyub_d": "Primärer nördlicher Knoten, der den Expressverkehr auf den Ringstraßen-Korridor leitet.",
-    "rr_mk_bahtim": "Knoten Bahtim / Shubra El-Kheima",
-    "rr_mk_bahtim_d": "Dichter Mischverkehrsknoten mit häufigem Spurübergriff und Einfädelfkonflikten.",
-    "rr_mk_mostorod": "Kern-Stauzone Mostorod",
-    "rr_mk_mostorod_d": "Chronischer Stau-Hotspot, an dem schwere LKW und Microbusse um begrenzte Spurbreite kämpfen.",
-    "rr_mk_dar": "Ausfahrt Dar Al Salam / Maadi",
-    "rr_mk_dar_d": "Südlicher Endpunkt, der den Verkehr Richtung Maadi und Dar Al Salam verteilt.",
+    "rr_mk_qalyub": "Qalyub Hauptzufahrt",
+    "rr_mk_qalyub_d": "Nordlicher Hauptknoten, der den Korridor mit gemischtem Personen- und Gueterverkehr speist.",
+    "rr_mk_bahtim": "Bahtim Hochleistungszufahrt",
+    "rr_mk_bahtim_d": "Dichter Korridor-Zugangsknoten mit standigem Schwerverkehrszufluss.",
+    "rr_mk_mostorod": "Dar Al Salam Engstelle",
+    "rr_mk_mostorod_d": "Kritische, steigungsbegrenzte Engstelle, die Microbus-Schockwellen erzeugt.",
+    "rr_mk_dar": "Adly Mansour Terminal",
+    "rr_mk_dar_d": "Ostlicher intermodaler Verkehrsknoten am Ende des zweiseitigen Korridors.",
     "env_tracker": "Umwelt- und Luftqualitäts-Tracker",
     "env_aqi": "AQI",
     "env_co2": "CO2",
@@ -3351,6 +3388,14 @@
     "carbon_red": "Kohlenstoffreduktion durch AV-Platooning erreicht.",
     "ksa_express": "Saudi-Arabien Autobahnen",
     "grade_lbl": "Steigungsgefälle",
+    "prop_band": "Proprietare Forschungsplattform",
+    "prop_band_d": "Bereitgestellt von Fimtosoft. Alle empirischen Daten und Verkehrsphysik-Parameter sind bis zur offiziellen Veroeffentlichung geschuetzt.",
+    "rr_corridor": "Qalyub bis Adly Mansour Hub",
+    "rr_twoway": "Zweiseitiger Dynamischer Fluss",
+    "rr_livecat": "Live-Verkehrskategorisierung",
+    "rr_pce_full": "Personenwagen-Aequivalent (PCE)",
+    "rr_weather": "Wetter",
+
   },
   "zh": {
     "t": "SAE AutoSim Hub",
@@ -3399,9 +3444,7 @@
     "r4": "PTV Group. (2024). \"VISSIM 2024 用户手册 - Wiedemann 99。\"",
     "r5": "DLR. (2024). \"SUMO 文档 - 车跟随模型。\"",
     "r6": "Aimsun. (2024). \"Aimsun Next 24 用户指南。\"",
-    "gb": "在 GitHub 上贡献",
-    "gbd": "您是来自印度、巴西或其他发展中国家的研究人员吗？",
-    "ft": "开源研究工具。MIT 许可证。",
+"ft": "由 Fimtosoft 提供的专有研究平台。保留所有权利。",
     "fc": "版权所有 2024 SAE AutoSim Hub。",
     "mpr": "自动驾驶车辆渗透率 (MPR)",
     "mprd": "调整滑块以设置自动驾驶车辆比例。",
@@ -3569,7 +3612,7 @@
     "nav_compare": "自动驾驶对比",
     "nav_country": "国家",
     "rr_title": "开罗环路实时仿真器",
-    "rr_desc": "从 Qalyub 到 Dar Al Salam 的 28 公里走廊的交互式几何横截面与微观仿真.",
+    "rr_desc": "从 Qalyub 互通立交经 Dar Al Salam 瓶颈至 Adly Mansour 枢纽的 32 公里双向走廊，配备 Google 实时交通遥测与坡度微观仿真。",
     "rr_scenA": "情景 A:当前基线",
     "rr_scenB": "情景 B:受管自动驾驶走廊",
     "rr_leg_ramp": "入口匝道",
@@ -3595,14 +3638,14 @@
     "rr_incline": "上坡坡度",
     "rr_decline": "下坡坡度",
     "rr_av_lane": "专用自动驾驶车道",
-    "rr_mk_qalyub": "卡柳布入口匝道互通",
-    "rr_mk_qalyub_d": "将快速交通引入环路走廊的主要北部互通枢纽.",
-    "rr_mk_bahtim": "巴赫提姆 / 舒布拉埃尔海马立交",
-    "rr_mk_bahtim_d": "混合交通密集的立交，频繁出现越线并线与冲突.",
-    "rr_mk_mostorod": "莫斯托罗德核心瓶颈区",
-    "rr_mk_mostorod_d": "重型卡车与面包车争夺有限车道宽度的长期拥堵热点.",
-    "rr_mk_dar": "达拉萨拉姆 / 马阿迪出口车道",
-    "rr_mk_dar_d": "向南端出口分流至马阿迪与达拉萨拉姆片区.",
+    "rr_mk_qalyub": "Qalyub 主要入口",
+    "rr_mk_qalyub_d": "北部主要互通立交，为走廊提供混合客货需求。",
+    "rr_mk_bahtim": "Bahtim 高流量入口",
+    "rr_mk_bahtim_d": "密集的走廊中部接入节点，持续有重型车辆驶入。",
+    "rr_mk_mostorod": "Dar Al Salam 瓶颈路段",
+    "rr_mk_mostorod_d": "受坡度制约的关键瓶颈，在坡道上产生微型巴士冲击波。",
+    "rr_mk_dar": "Adly Mansour 终点枢纽",
+    "rr_mk_dar_d": "东部多模式交通枢纽，终止双向走廊。",
     "env_tracker": "环境与空气质量追踪器",
     "env_aqi": "AQI",
     "env_co2": "CO2",
@@ -3618,6 +3661,14 @@
     "carbon_red": "通过自动驾驶车队实现碳减排.",
     "ksa_express": "沙特阿拉伯高速公路",
     "grade_lbl": "坡度",
+    "prop_band": "专有研究平台",
+    "prop_band_d": "由 Fimtosoft 提供支持。所有经验数据与交通物理参数在正式期刊发表前均受保护。",
+    "rr_corridor": "Qalyub 至 Adly Mansour 枢纽",
+    "rr_twoway": "双向动态车流",
+    "rr_livecat": "实时交通分类",
+    "rr_pce_full": "客车当量 (PCE)",
+    "rr_weather": "天气",
+
   },
   "ja": {
     "t": "SAE AutoSim Hub",
@@ -3666,9 +3717,7 @@
     "r4": "PTV Group. (2024). \"VISSIM 2024 ユーザーマニュアル - Wiedemann 99。\"",
     "r5": "DLR. (2024). \"SUMO ドキュメント - 車両追従モデル。\"",
     "r6": "Aimsun. (2024). \"Aimsun Next 24 ユーザーガイド。\"",
-    "gb": "GitHub に貢献する",
-    "gbd": "インド、ブラジル、その他の開発途上国からの研究者ですか？",
-    "ft": "オープンソース研究ツール。MIT ライセンス。",
+"ft": "Fimtosoft 提供の専有研究プラットフォーム。無断複製を禁じます。",
     "fc": "Copyright 2024 SAE AutoSim Hub。",
     "mpr": "自動運転車両普及率 (MPR)",
     "mprd": "スライダーで自動運転車両の割合を調整します。",
@@ -3812,7 +3861,7 @@
     "nav_compare": "AV比較",
     "nav_country": "国",
     "rr_title": "カイロ環状道路ライブシミュレーター",
-    "rr_desc": "Qalyub から Dar Al Salam までの 28 km 回廊の幾何学的断面とマイクロシミュレーション.",
+    "rr_desc": "Qalyub インターチェンジから Dar Al Salam 隘路を経て Adly Mansour ハブへ至る 32 km 双方向走廊。Google ライブ交通テレメトリと勾配微視シミュレーションを搭載。",
     "rr_scenA": "シナリオA:現在のベースライン",
     "rr_scenB": "シナリオB:管理されたAV専用路",
     "rr_leg_ramp": "オンランプ",
@@ -3838,14 +3887,14 @@
     "rr_incline": "上り勾配",
     "rr_decline": "下り勾配",
     "rr_av_lane": "専用AV車線",
-    "rr_mk_qalyub": "カリュブ入口ランプ接続",
-    "rr_mk_qalyub_d": "環状道路回廊へ高速交通を流し込む主要な北部接続点.",
-    "rr_mk_bahtim": "バフティム / シュブラ・エル・カイマジャンクション",
-    "rr_mk_bahtim_d": "混合交通の稠密なジャンクションで、頻繁に車線侵入と合流衝突が発生.",
-    "rr_mk_mostorod": "モストレッド中心ボトルネックゾーン",
-    "rr_mk_mostorod_d": "重トラックとマイクロバスが限られた車線幅を奪い合う慢性的渋滞ホットスポット.",
-    "rr_mk_dar": "ダルアッサラーム / マアディ出口車線",
-    "rr_mk_dar_d": "マアディとダルアッサラーム地区へ交通を分配する南端出口.",
+    "rr_mk_qalyub": "Qalyub 主要入口",
+    "rr_mk_qalyub_d": "混合旅客・貨物需要を走廊へ供給する北部の主要インターチェンジ。",
+    "rr_mk_bahtim": "Bahtim 高流量アクセス",
+    "rr_mk_bahtim_d": "継続的な重車両流入がある走廊中央の高密度アクセス节点。",
+    "rr_mk_mostorod": "Dar Al Salam 隘路",
+    "rr_mk_mostorod_d": "勾配に制約された重要隘路で、微型バスのショック波を発生。",
+    "rr_mk_dar": "Adly Mansour ターミナル",
+    "rr_mk_dar_d": "双方向走廊を終端する東部複合交通ターミナル。",
     "env_tracker": "環境・大気質トラッカー",
     "env_aqi": "AQI",
     "env_co2": "CO2",
@@ -3861,6 +3910,14 @@
     "carbon_red": "AVプラトーンによる炭素排出削減.",
     "ksa_express": "サウジアラビア高速道路",
     "grade_lbl": "勾配",
+    "prop_band": "専有研究プラットフォーム",
+    "prop_band_d": "Fimtosoft 提供。すべての実証データと交通物理学パラメータは公式学術誌掲載まで保護されます。",
+    "rr_corridor": "Qalyub から Adly Mansour ハブ",
+    "rr_twoway": "双方向動的フロー",
+    "rr_livecat": "ライブ交通分類",
+    "rr_pce_full": "乗用車等価 (PCE)",
+    "rr_weather": "天候",
+
   },
   "ko": {
     "t": "SAE AutoSim Hub",
@@ -3909,9 +3966,7 @@
     "r4": "PTV Group. (2024). \"VISSIM 2024 사용자 매뉴얼 - Wiedemann 99。\"",
     "r5": "DLR. (2024). \"SUMO 문서 - 차량 추종 모델。\"",
     "r6": "Aimsun. (2024). \"Aimsun Next 24 사용자 가이드。\"",
-    "gb": "GitHub에 기여하기",
-    "gbd": "인도, 브라질 또는 기타 개발도상국의 연구자입니까?",
-    "ft": "오픈 소스 연구 도구. MIT License.",
+"ft": "Fimtosoft 제공 독점 연구 플랫폼. 판권 소유.",
     "fc": "Copyright 2024 SAE AutoSim Hub.",
     "mpr": "자율 주행 차량 비중 (MPR)",
     "mprd": "슬라이더를 조정하여 자율 주행 차량 비율을 설정하세요.",
@@ -4055,7 +4110,7 @@
     "nav_compare": "AV 비교",
     "nav_country": "국가",
     "rr_title": "카이로 링 로드 라이브 시뮬레이터",
-    "rr_desc": "Qalyub에서 Dar Al Salam까지 28km 구간의 대화형 기하학적 단면 및 미시 시뮬레이션.",
+    "rr_desc": "Qalyub 분기점에서 Dar Al Salam 병목을 거쳐 Adly Mansour 허브에 이르는 32 km 양방향 회랑. Google 실시간 교통 원격측정 및 경사 미시 시뮬레이션 탑재.",
     "rr_scenA": "시나리오 A:현재 기준선",
     "rr_scenB": "시나리오 B:관리형 AV 전용도로",
     "rr_leg_ramp": "진입 ramp",
@@ -4081,14 +4136,14 @@
     "rr_incline": "오르막 경사",
     "rr_decline": "내리막 경사",
     "rr_av_lane": "전용 AV 차선",
-    "rr_mk_qalyub": "칼류브 진입 ramp 인터커넥트",
-    "rr_mk_qalyub_d": "링 로드 회랑으로 고속 교통을 공급하는 주요 북부 연결 지점.",
-    "rr_mk_bahtim": "바흐팀 / 슈브라 엘 카이마 junction",
-    "rr_mk_bahtim_d": "혼합 교통이 밀집한 분기점으로 차선 침범과 합류 충돌이 잦음.",
-    "rr_mk_mostorod": "모스토레드 핵심 병목 구역",
-    "rr_mk_mostorod_d": "중대형 트럭과 마이크로버스가 좁은 차선 폭을 두고 경쟁하는 만성 정체 지점.",
-    "rr_mk_dar": "다르 알 살람 / 마아디 출구 차선",
-    "rr_mk_dar_d": "마아디와 다르 알 살람 지역으로 교통을 분배하는 남단 출구.",
+    "rr_mk_qalyub": "Qalyub 주요 진입로",
+    "rr_mk_qalyub_d": "혼합 승객·화물 수요를 회랑에 공급하는 북부 주요 분기점.",
+    "rr_mk_bahtim": "Bahtim 고량 진입로",
+    "rr_mk_bahtim_d": "지속적인 중차량 유입이 있는 회랑 중부 고밀도 접근 노드.",
+    "rr_mk_mostorod": "Dar Al Salam 병목 구간",
+    "rr_mk_mostorod_d": "경사 제약을 받는 중요 병목으로 미니버스 충격파를 발생.",
+    "rr_mk_dar": "Adly Mansour 터미널",
+    "rr_mk_dar_d": "양방향 회랑을 종료하는 동부 복합 환승 터미널.",
     "env_tracker": "환경 및 대기질 추적기",
     "env_aqi": "AQI",
     "env_co2": "CO2",
@@ -4104,6 +4159,14 @@
     "carbon_red": "AV 플래투닝을 통한 탄소 배출 감소.",
     "ksa_express": "사우디아라비아 고속도로",
     "grade_lbl": "경사",
+    "prop_band": "독점 연구 플랫폼",
+    "prop_band_d": "Fimtosoft 제공. 모든 실증 데이터와 교통 물리 매개변수는 공식 저널 게재 전까지 보호됩니다.",
+    "rr_corridor": "Qalyub 에서 Adly Mansour 허브",
+    "rr_twoway": "양방향 동적 흐름",
+    "rr_livecat": "실시간 교통 분류",
+    "rr_pce_full": "승용차 등가 (PCE)",
+    "rr_weather": "날씨",
+
   },
   "fr": {
     "t": "SAE AutoSim Hub",
@@ -4152,9 +4215,7 @@
     "r4": "PTV Group. (2024). \"Manuel VISSIM 2024 - Modele Wiedemann 99.\"",
     "r5": "DLR. (2024). \"Documentation SUMO - Modeles de suivi.\"",
     "r6": "Aimsun. (2024). \"Guide utilisateur Aimsun Next 24.\"",
-    "gb": "Contribuer sur GitHub",
-    "gbd": "Etes-vous chercheur de l Inde, du Brésil ou d autres pays en developpement?",
-    "ft": "Outil de recherche open-source. Licence MIT.",
+"ft": "Plateforme de recherche proprietaire propulsee par Fimtosoft. Tous droits reserves.",
     "fc": "Droits d auteur 2024 SAE AutoSim Hub.",
     "mpr": "Taux de penetration AV (MPR)",
     "mprd": "Ajustez le curseur pour definir la proportion de vehicules autonomes.",
@@ -4322,7 +4383,7 @@
     "nav_compare": "Comparaison VA",
     "nav_country": "Pays",
     "rr_title": "Simulateur en direct de la rocade du Caire",
-    "rr_desc": "Coupe geometrique interactive et micro-simulation du corridor de 28 km de Qalyub a Dar Al Salam.",
+    "rr_desc": "Corridor bidirectionnel de 32 km de l echangeur Qalyub via le goulot Dar Al Salam jusqu au hub Adly Mansour, avec telemetrie Google live et micro-simulation de pente.",
     "rr_scenA": "Scenario A: reference actuelle",
     "rr_scenB": "Scenario B: corridor VA gere",
     "rr_leg_ramp": "Bretelle entree",
@@ -4348,14 +4409,14 @@
     "rr_incline": "Rampes montee",
     "rr_decline": "Rampes descente",
     "rr_av_lane": "Voie AV dediee",
-    "rr_mk_qalyub": "Bretelle entree Qalyub Interconnexion",
-    "rr_mk_qalyub_d": "Noeud nord principal alimentant le trafic express sur le corridor de la rocade.",
-    "rr_mk_bahtim": "Carrefour Bahtim / Shubra El-Kheima",
-    "rr_mk_bahtim_d": "Carrefour a trafic melange dense avec empietement frequent de voie et conflits de fusion.",
-    "rr_mk_mostorod": "Zone goulot Mostorod",
-    "rr_mk_mostorod_d": "Point de congestion chronique ou poids lourds et microbus se disputent une largeur de voie limitee.",
-    "rr_mk_dar": "Sortie Dar Al Salam / Maadi",
-    "rr_mk_dar_d": "Terminus sud distribuant le trafic vers les quartiers Maadi et Dar Al Salam.",
+    "rr_mk_qalyub": "Entree Principale Qalyub",
+    "rr_mk_qalyub_d": "Echangeur nord principal alimentant le corridor en demande mixte passagers-fret.",
+    "rr_mk_bahtim": "Acces Bahtim a Haut Volume",
+    "rr_mk_bahtim_d": "Noeud d acces central dense avec afflux soutenu de vehicules lourds.",
+    "rr_mk_mostorod": "Goulot Dar Al Salam",
+    "rr_mk_mostorod_d": "Goulot critique contraint par la pente generant des ondes de choc de microbus.",
+    "rr_mk_dar": "Terminus Adly Mansour",
+    "rr_mk_dar_d": "Hub intermodal est terminant le corridor bidirectionnel.",
     "env_tracker": "Suivi environnement et qualite de l air",
     "env_aqi": "AQI",
     "env_co2": "CO2",
@@ -4371,6 +4432,14 @@
     "carbon_red": "Reduction des emissions de carbone par le platooning AV.",
     "ksa_express": "Autoroutes Arabie saoudite",
     "grade_lbl": "Pente incline",
+    "prop_band": "Plateforme de recherche proprietaire",
+    "prop_band_d": "Propulse par Fimtosoft. Toutes les donnees empiriques et parametres de physique du trafic sont protemes jusqu a la publication officielle.",
+    "rr_corridor": "Qalyub vers Hub Adly Mansour",
+    "rr_twoway": "Flux Dynamique Bidirectionnel",
+    "rr_livecat": "Categorisation du Trafic Live",
+    "rr_pce_full": "Equivalent Voiture (PCE)",
+    "rr_weather": "Meteo",
+
   }
 };
     const LANG_OPTIONS = [];
@@ -4465,45 +4534,58 @@
 var currentCountry = 'egypt';
 var currentScenario = 'A';
 var rrScenario = 'A';
-var rrMap = null, rrPoly = null, rrMarkers = [], rrMPR = 10;
+var rrMap = null, rrPolyA = null, rrPolyB = null, rrMarkers = [], rrMPR = 10;
+var rrOverlay = null, rrAnim = null;
+var liveTraffic = { volume: 0.62, hvShare: 0.22, speed: 45, aqi: 120, co2: 0, nox: 0, weather: 'Clear', ts: 0 };
 
+// True analytical corridor: Qalyub Interchange -> Dar Al Salam bottleneck -> Adly Mansour Intermodal Hub
 var RING_ROAD_COORDS = [
-  { lat: 30.178, lng: 31.252 },
+  { lat: 30.178, lng: 31.252 },   // Qalyub Major Entry
   { lat: 30.140, lng: 31.248 },
-  { lat: 30.105, lng: 31.262 },
-  { lat: 30.060, lng: 31.310 },
-  { lat: 29.990, lng: 31.250 },
-  { lat: 29.991, lng: 31.233 }
+  { lat: 30.105, lng: 31.262 },   // Bahtim High-Volume Access
+  { lat: 30.060, lng: 31.300 },
+  { lat: 29.991, lng: 31.233 },   // Dar Al Salam Lane Bottleneck
+  { lat: 30.060, lng: 31.340 },
+  { lat: 30.100, lng: 31.370 },
+  { lat: 30.141, lng: 31.401 }    // Adly Mansour Terminal Hub
 ];
+
+// Parallel offset polyline = opposing direction (Two-Way Highway Dynamics)
+function offsetPath(path, dLat, dLng) {
+  return path.map(function (p) { return { lat: p.lat + dLat, lng: p.lng + dLng }; });
+}
+var RING_ROAD_COORDS_B = offsetPath(RING_ROAD_COORDS, 0.006, 0.006);
 
 var RING_ROAD_MARKERS = [
   { pos: { lat: 30.178, lng: 31.252 }, t: 'rr_mk_qalyub', d: 'rr_mk_qalyub_d' },
-  { pos: { lat: 30.140, lng: 31.248 }, t: 'rr_mk_bahtim', d: 'rr_mk_bahtim_d' },
-  { pos: { lat: 30.105, lng: 31.262 }, t: 'rr_mk_mostorod', d: 'rr_mk_mostorod_d' },
-  { pos: { lat: 29.991, lng: 31.233 }, t: 'rr_mk_dar', d: 'rr_mk_dar_d' }
+  { pos: { lat: 30.105, lng: 31.262 }, t: 'rr_mk_bahtim', d: 'rr_mk_bahtim_d' },
+  { pos: { lat: 29.991, lng: 31.233 }, t: 'rr_mk_mostorod', d: 'rr_mk_mostorod_d' },
+  { pos: { lat: 30.141, lng: 31.401 }, t: 'rr_mk_dar', d: 'rr_mk_dar_d' }
 ];
 
 function markerContent(mk) {
   var G = countryGrade();
   var microPCE = dynamicPCE('microbus', G, mprValue / 100).toFixed(1);
   var linkSpeed = Math.round(gradeAdjustedSpeed('microbus', G) * 3.6);
-  return '<div style="min-width:210px"><strong>' + t(mk.t) + '</strong><br>'
+  return '<div style="min-width:240px"><strong>' + t(mk.t) + '</strong><br>'
     + '<span style="font-size:12px;color:#334155">' + t(mk.d) + '</span><br>'
-    + '<span style="font-size:11px;color:#0ea5e9">Active Grade Profile: +' + G.toFixed(1) + '% Incline | Adjusted Microbus PCE: ' + microPCE + ' | Current Link Speed: ' + linkSpeed + ' km/h</span></div>';
+    + '<span style="font-size:11px;color:#0ea5e9">Sector Elevation Profile: +' + G.toFixed(1) + '% Incline Grade | Current Link Speed: ' + linkSpeed + ' km/h | Heavy Vehicle Segment PCE: ' + microPCE + '</span></div>';
 }
 
 function ringRoadColorForMPR(mpr) {
   var r1 = 239, g1 = 68, b1 = 68, r2 = 16, g2 = 185, b2 = 129;
   var f = Math.max(0, Math.min(100, mpr)) / 100;
-  var r = Math.round(r1 + (r2 - r1) * f);
-  var g = Math.round(g1 + (g2 - g1) * f);
-  var b = Math.round(b1 + (b2 - b1) * f);
-  return 'rgb(' + r + ',' + g + ',' + b + ')';
+  return 'rgb(' + Math.round(r1 + (r2 - r1) * f) + ',' + Math.round(g1 + (g2 - g1) * f) + ',' + Math.round(b1 + (b2 - b1) * f) + ')';
 }
 
 function updateRingRoadStyle(mpr) {
   rrMPR = mpr;
-  if (rrPoly) rrPoly.setOptions({ strokeColor: ringRoadColorForMPR(mpr), strokeWeight: 4 + mpr / 16 });
+  var col = ringRoadColorForMPR(mpr);
+  if (rrPolyA) rrPolyA.setOptions({ strokeColor: col, strokeWeight: 4 + mpr / 16 });
+  if (rrPolyB) {
+    if (rrScenario === 'B') rrPolyB.setOptions({ strokeColor: '#10b981', strokeWeight: 7 });
+    else rrPolyB.setOptions({ strokeColor: col, strokeWeight: 4 + mpr / 16 });
+  }
   var stats = document.getElementById('rr-stats');
   if (stats) {
     var cc = mpr < 40 ? 'text-red-400' : (mpr < 75 ? 'text-yellow-400' : 'text-green-400');
@@ -4530,7 +4612,7 @@ function initRingRoadMap() {
   }
   try {
     rrMap = new google.maps.Map(el, {
-      center: { lat: 30.08, lng: 31.25 }, zoom: 11,
+      center: { lat: 30.06, lng: 31.32 }, zoom: 10,
       styles: [
         { elementType: 'geometry', stylers: [ { color: '#1e293b' } ] },
         { elementType: 'labels.text.fill', stylers: [ { color: '#94a3b8' } ] },
@@ -4538,14 +4620,20 @@ function initRingRoadMap() {
         { featureType: 'road', stylers: [ { color: '#334155' } ] }
       ]
     });
-    rrPoly = new google.maps.Polyline({ path: RING_ROAD_COORDS, geodesic: true, strokeColor: ringRoadColorForMPR(rrMPR), strokeWeight: 6, map: rrMap });
+    rrPolyA = new google.maps.Polyline({ path: RING_ROAD_COORDS, geodesic: true, strokeColor: ringRoadColorForMPR(rrMPR), strokeWeight: 6, map: rrMap });
+    rrPolyB = new google.maps.Polyline({ path: RING_ROAD_COORDS_B, geodesic: true, strokeColor: ringRoadColorForMPR(rrMPR), strokeWeight: 6, map: rrMap });
+    var traffic = new google.maps.TrafficLayer();
+    traffic.setMap(rrMap);
     RING_ROAD_MARKERS.forEach(function (mk) {
       var m = new google.maps.Marker({ position: mk.pos, map: rrMap, title: t(mk.t) });
       var iw = new google.maps.InfoWindow({ content: markerContent(mk) });
       m.addListener('click', function () { iw.open(rrMap, m); });
       rrMarkers.push({ marker: m, iw: iw, t: mk.t, d: mk.d, mk: mk });
     });
+    rrOverlay = new RingRoadOverlay(rrMap);
     updateRingRoadStyle(rrMPR);
+    startLiveTrafficFeed();
+    if (rrScenario === 'B') respacePlatoon();
     var sl = document.getElementById('mpr-slider');
     if (sl) sl.addEventListener('input', function () {
       var v = parseInt(this.value, 10);
@@ -4554,6 +4642,160 @@ function initRingRoadMap() {
   } catch (e) {
     el.innerHTML = '<div class="h-full flex items-center justify-center text-slate-400 text-sm p-6 text-center">Google Maps failed to initialize.</div>';
   }
+}
+
+// ══════════════════════════════════════════════════════════
+// Live Traffic Telemetry Feed (simulated Cairo density bridge)
+// ══════════════════════════════════════════════════════════
+function startLiveTrafficFeed() {
+  if (window._rrFeed) return;
+  window._rrFeed = setInterval(function () {
+    var tm = Date.now() / 1000;
+    liveTraffic.volume = Math.max(0.15, Math.min(0.98, 0.55 + 0.32 * Math.sin(tm / 12) + 0.12 * Math.random()));
+    liveTraffic.hvShare = Math.max(0.08, Math.min(0.45, 0.18 + 0.07 * Math.sin(tm / 20) + 0.03 * Math.random()));
+    liveTraffic.speed = Math.round(35 + 30 * (1 - liveTraffic.volume));
+    liveTraffic.weather = liveTraffic.volume > 0.72 ? 'Hazy' : 'Clear';
+    liveTraffic.ts = Date.now();
+    updateLiveTelemetry();
+    updatePhysicsBox(rrMPR);
+    updateEnvTracker(rrMPR);
+  }, 2500);
+  updateLiveTelemetry();
+}
+function updateLiveTelemetry() {
+  var vol = document.getElementById('live-vol');
+  var hv = document.getElementById('live-hv');
+  var cat = document.getElementById('live-cat');
+  var wth = document.getElementById('live-weather');
+  var catTxt, catCls;
+  if (liveTraffic.volume > 0.75) { catTxt = 'Severe Congestion'; catCls = 'text-red-300'; }
+  else if (liveTraffic.volume > 0.5) { catTxt = 'Heavy'; catCls = 'text-yellow-300'; }
+  else { catTxt = 'Moderate'; catCls = 'text-green-300'; }
+  if (vol) vol.textContent = Math.round(liveTraffic.volume * 100) + '%';
+  if (hv) hv.textContent = Math.round(liveTraffic.hvShare * 100) + '%';
+  if (wth) wth.textContent = liveTraffic.weather;
+  if (cat) { cat.textContent = catTxt; cat.className = 'font-mono ' + catCls; }
+}
+
+// ══════════════════════════════════════════════════════════
+// Canvas Overlay Vehicle Simulation (Two-Way + Scenario A/B)
+// ══════════════════════════════════════════════════════════
+function routePoint(path, frac) {
+  if (!path._cum) {
+    var cum = [0];
+    for (var i = 1; i < path.length; i++) {
+      var a = path[i - 1], b = path[i];
+      cum.push(cum[i - 1] + Math.hypot(b.lat - a.lat, b.lng - a.lng));
+    }
+    path._cum = cum; path._total = cum[cum.length - 1];
+  }
+  var target = frac * path._total;
+  for (var j = 1; j < path.length; j++) {
+    if (path._cum[j] >= target) {
+      var seg = path._cum[j] - path._cum[j - 1];
+      var r = seg > 0 ? (target - path._cum[j - 1]) / seg : 0;
+      return { lat: path[j - 1].lat + (path[j].lat - path[j - 1].lat) * r, lng: path[j - 1].lng + (path[j].lng - path[j - 1].lng) * r };
+    }
+  }
+  return path[path.length - 1];
+}
+
+function RingRoadOverlay(map) {
+  this.map_ = map; this.div_ = null; this.canvas_ = null;
+  this.vehicles_ = []; this.proj_ = null;
+  this.setMap(map);
+}
+RingRoadOverlay.prototype = new google.maps.OverlayView();
+RingRoadOverlay.prototype.onAdd = function () {
+  var self = this;
+  var div = document.createElement('div');
+  div.style.position = 'absolute'; div.style.top = '0'; div.style.left = '0';
+  div.style.pointerEvents = 'none'; div.style.width = '100%'; div.style.height = '100%';
+  var canvas = document.createElement('canvas');
+  canvas.style.position = 'absolute'; canvas.style.top = '0'; canvas.style.left = '0';
+  canvas.style.pointerEvents = 'none';
+  div.appendChild(canvas);
+  this.div_ = div; this.canvas_ = canvas;
+  this.getPanes().overlayLayer.appendChild(div);
+  this.initVehicles();
+  if (!rrAnim) {
+    var loop = function () { self.tick(0.045); self.drawVehicles(); rrAnim = requestAnimationFrame(loop); };
+    rrAnim = requestAnimationFrame(loop);
+  }
+};
+RingRoadOverlay.prototype.onRemove = function () {
+  if (this.div_ && this.div_.parentNode) this.div_.parentNode.removeChild(this.div_);
+  this.div_ = null; this.canvas_ = null;
+};
+RingRoadOverlay.prototype.draw = function () {
+  var proj = this.getProjection();
+  if (!proj) return;
+  this.proj_ = proj;
+  var container = this.map_.getDiv();
+  var w = container.offsetWidth, h = container.offsetHeight;
+  if (this.canvas_.width !== w) this.canvas_.width = w;
+  if (this.canvas_.height !== h) this.canvas_.height = h;
+  this.canvas_.style.width = w + 'px';
+  this.canvas_.style.height = h + 'px';
+  this.drawVehicles();
+};
+RingRoadOverlay.prototype.initVehicles = function () {
+  this.vehicles_ = [];
+  var types = ['microbus', 'tuktuk', 'mlaiky', 'mlaiky'];
+  for (var i = 0; i < 9; i++) {
+    var ty = types[i % types.length];
+    this.vehicles_.push({ dir: 'A', frac: i / 9 + Math.random() * 0.03, baseSpeed: 0.55 + Math.random() * 0.5, type: ty, weave: (ty === 'microbus' || ty === 'tuktuk'), phase: Math.random() * 6.28, dwell: 0 });
+  }
+  for (var j = 0; j < 9; j++) {
+    this.vehicles_.push({ dir: 'B', frac: j / 9 + Math.random() * 0.03, baseSpeed: 0.85 + Math.random() * 0.3, type: 'av', weave: false, phase: Math.random() * 6.28, dwell: 0 });
+  }
+};
+RingRoadOverlay.prototype.tick = function (dt) {
+  var B = (rrScenario === 'B');
+  var self = this;
+  this.vehicles_.forEach(function (v) {
+    if (v.dwell > 0) { v.dwell -= dt; v.phase += dt * 4; return; }
+    v.frac += v.baseSpeed * dt * 0.02;
+    v.phase += dt * (v.weave ? 3 : 0.6);
+    if (v.frac >= 1) v.frac -= 1;
+    if (!B || v.dir === 'A') {
+      if ((v.frac < 0.05 || (v.frac > 0.55 && v.frac < 0.63)) && (v.type === 'microbus' || v.type === 'tuktuk') && Math.random() < 0.03) {
+        v.dwell = 1.1; // ~25s passenger boarding dwell (scaled loop)
+      }
+    }
+  });
+};
+RingRoadOverlay.prototype.drawVehicles = function () {
+  if (!this.canvas_ || !this.proj_) return;
+  var c = this.canvas_.getContext('2d');
+  var w = this.canvas_.width, h = this.canvas_.height;
+  c.clearRect(0, 0, w, h);
+  var proj = this.proj_;
+  var B = (rrScenario === 'B');
+  var self = this;
+  this.vehicles_.forEach(function (v) {
+    var path = v.dir === 'B' ? RING_ROAD_COORDS_B : RING_ROAD_COORDS;
+    var pt = routePoint(path, v.frac);
+    var px = proj.fromLatLngToDivPixel(new google.maps.LatLng(pt.lat, pt.lng));
+    if (!px) return;
+    var x = px.x, y = px.y;
+    if (v.weave && !(B && v.dir === 'B')) x += Math.sin(v.phase) * 7;
+    var isAV = (B && v.dir === 'B');
+    if (isAV) c.fillStyle = '#10b981';
+    else if (v.type === 'microbus') c.fillStyle = '#ef4444';
+    else if (v.type === 'tuktuk') c.fillStyle = '#f59e0b';
+    else if (v.type === 'av') c.fillStyle = '#38bdf8';
+    else c.fillStyle = '#60a5fa';
+    c.fillRect(x - 5, y - 3, 10, 6);
+  });
+};
+function respacePlatoon() {
+  if (!rrOverlay) return;
+  var avs = rrOverlay.vehicles_.filter(function (v) { return v.dir === 'B'; });
+  avs.forEach(function (v, idx) {
+    v.frac = idx / avs.length;
+    v.baseSpeed = 0.9; v.weave = false; v.dwell = 0;
+  });
 }
 
 function loadGoogleMaps() {
@@ -4582,7 +4824,8 @@ function setScenario(s) {
     : 'px-6 py-2 rounded-lg font-medium bg-slate-600/20 border border-slate-500 text-slate-400 hover:bg-green-500/30 transition';
   var sl = document.getElementById('mpr-slider');
   if (sl) { sl.value = (s === 'B' ? 90 : 10); updateMPR(sl.value); }
-  if (rrPoly) updateRingRoadStyle(parseInt(sl ? sl.value : 10, 10));
+  if (rrPolyA || rrPolyB) updateRingRoadStyle(parseInt(sl ? sl.value : 10, 10));
+  if (s === 'B') respacePlatoon();
 }
 
 // ---- AV Comparison Engine ----
