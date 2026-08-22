@@ -1,0 +1,43 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  syntax:
+    name: JS Syntax Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Validate all inline scripts in index.html
+        run: |
+          node -e "
+          const fs=require('fs'),cp=require('child_process');
+          const html=fs.readFileSync('index.html','utf8');
+          const re=/<script(?![^>]*src=)[^>]*>([\s\S]*?)<\/script>/g;
+          let m,i=0,fails=0;
+          while((m=re.exec(html))){
+            i++;
+            if(/ld\+json/.test(m[0])||!m[1].trim())continue;
+            fs.writeFileSync('/tmp/b.js',m[1]);
+            const r=cp.spawnSync('node',['--check','/tmp/b.js'],{encoding:'utf8'});
+            if(r.status!==0){fails++;console.error('Block '+i+' FAILED:\n'+r.stderr);}
+          }
+          console.error(i+' blocks checked, '+fails+' failures');
+          process.exit(fails?1:0);"
+
+  tests:
+    name: Physics Engine Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install pytest -q && pip install -r requirements.txt -q
+      - run: pytest tests -q
