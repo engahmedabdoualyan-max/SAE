@@ -351,6 +351,7 @@ TRANSLATIONS['ru'] = {
     "exp_sumo": "Экспорт конфига SUMO",
     "exp_vissim": "Экспорт конфига VISSIM",
     "exp_pdf": "Скачать PDF-отчёт",
+    "exp_csv": "Экспорт парка CSV",
 
     "cc_title": "Analiz uglerodnykh kreditov i ekonomiki",
     "cc_desc": "Monetizatsiya snizheniya CO2",

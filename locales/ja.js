@@ -327,6 +327,7 @@ TRANSLATIONS['ja'] = {
     "exp_sumo": "SUMO設定をエクスポート",
     "exp_vissim": "VISSIM設定をエクスポート",
     "exp_pdf": "PDFレポートをダウンロード",
+    "exp_csv": "車両データCSV出力",
 
     "cc_title": "炭素クレジットと経済分析",
     "cc_desc": "AV浸透によるCO2削減の貨幣化",

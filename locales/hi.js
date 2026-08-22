@@ -327,6 +327,7 @@ TRANSLATIONS['hi'] = {
     "exp_sumo": "SUMO कॉन्फ़िग निर्यात करें",
     "exp_vissim": "VISSIM कॉन्फ़िग निर्यात करें",
     "exp_pdf": "PDF रिपोर्ट डाउनलोड करें",
+    "exp_csv": "फ़्लीट CSV निर्यात",
 
     "cc_title": "Carbon Credit aur Arthik Vishleshan",
     "cc_desc": "AV pravesh se CO2 kami ka monetization",

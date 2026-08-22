@@ -307,6 +307,8 @@
                     <button onclick="exportSUMO()" class="px-4 py-2 rounded-lg text-xs font-medium bg-cyan-500/20 border border-cyan-400 text-cyan-300 hover:bg-cyan-500/30 transition"><i class="fas fa-file-export mr-1"></i><span data-key="exp_sumo">Export SUMO Config</span></button>
                     <button onclick="exportVISSIM()" class="px-4 py-2 rounded-lg text-xs font-medium bg-purple-500/20 border border-purple-400 text-purple-300 hover:bg-purple-500/30 transition"><i class="fas fa-file-code mr-1"></i><span data-key="exp_vissim">Export VISSIM Config</span></button>
                     <button onclick="exportReport()" class="px-4 py-2 rounded-lg text-xs font-medium bg-green-500/20 border border-green-400 text-green-300 hover:bg-green-500/30 transition"><i class="fas fa-file-pdf mr-1"></i><span data-key="exp_pdf">Download PDF Report</span></button>
+                    <button onclick="exportFleetCSV()" class="px-4 py-2 rounded-lg text-xs font-medium bg-blue-500/20 border border-blue-400 text-blue-300 hover:bg-blue-500/30 transition"><i class="fas fa-file-csv mr-1"></i><span data-key="exp_csv">Export Fleet CSV</span></button>
+                    <button onclick="toggleUnits()" id="unit-toggle" title="Toggle km/h / mph" class="px-4 py-2 rounded-lg text-xs font-medium bg-slate-500/20 border border-slate-400 text-slate-200 hover:bg-slate-500/30 transition font-mono">km/h</button>
                 </div>
             </div>
             <div class="relative bg-black rounded-xl overflow-hidden border border-slate-600">
@@ -2803,6 +2805,7 @@
     "exp_sumo": "Export SUMO Config",
     "exp_vissim": "Export VISSIM Config",
     "exp_pdf": "Download PDF Report",
+    "exp_csv": "Export Fleet CSV",
 
     "cc_title": "Carbon Credit & Economic Analysis",
     "cc_desc": "Monetize CO2 reduction from AV penetration — EU ETS carbon market pricing",
@@ -3729,7 +3732,7 @@ function fleetCardSCI(v, borderCls) {
     + '<div class="space-y-2 text-sm">'
     + '<div class="flex justify-between border-b border-slate-100 pb-1"><span class="text-slate-400">' + t('fleet_sensors') + ':</span><span class="font-mono font-bold">' + tot + '</span></div>'
     + '<div class="flex justify-between border-b border-slate-100 pb-1"><span class="text-slate-400">' + t('sci_liability') + ':</span><span class="font-semibold ' + (s.liability === 'OEM' ? 'text-green-600' : 'text-amber-600') + '">' + s.liability + '</span></div>'
-    + '<div class="flex justify-between border-b border-slate-100 pb-1"><span class="text-slate-400">' + t('sci_maxspeed') + ':</span><span class="font-mono">' + s.maxSpeed + ' km/h</span></div>'
+    + '<div class="flex justify-between border-b border-slate-100 pb-1"><span class="text-slate-400">' + t('sci_maxspeed') + ':</span><span class="font-mono">' + fmtKmh(s.maxSpeed) + '</span></div>'
     + '<div class="flex justify-between border-b border-slate-100 pb-1"><span class="text-slate-400">' + t('sci_odd_weather') + ':</span><span class="text-right text-xs max-w-[60%]">' + s.oddWeather + '</span></div>'
     + '<div class="flex justify-between pb-1"><span class="text-slate-400">' + t('fleet_odd') + ':</span><span class="text-right text-xs max-w-[60%]">' + s.odScope + '</span></div>'
     + '</div></div>';
@@ -3848,7 +3851,7 @@ function renderCountryHub() {
         roadDiv.innerHTML = '<div class="flex justify-between text-sm"><span class="text-slate-500">Lane Width</span><span class="font-mono">' + c.road.laneWidth + ' m</span></div>'
             + '<div class="flex justify-between text-sm"><span class="text-slate-500">Shoulder</span><span class="font-mono">' + c.road.shoulder + ' m</span></div>'
             + '<div class="flex justify-between text-sm"><span class="text-slate-500">Max Grade</span><span class="font-mono">' + c.road.maxGrade + '%</span></div>'
-            + '<div class="flex justify-between text-sm"><span class="text-slate-500">Speed Limit</span><span class="font-mono">' + c.road.speedLimit + ' km/h</span></div>';
+            + '<div class="flex justify-between text-sm"><span class="text-slate-500">Speed Limit</span><span class="font-mono">' + fmtKmh(c.road.speedLimit) + '</span></div>';
     }
     var calDiv = document.getElementById('ch-calib-grid');
     if (calDiv) {
@@ -4140,7 +4143,29 @@ function renderSSAMHotspots() {
         legendEl.classList.add('block');
     }
     ssamLastRenderTime = Date.now();
+}// ========== UNITS ENGINE (km/h <-> mph) ==========
+function getUnits() {
+    try { return localStorage.getItem('sae-units') || 'metric'; } catch (e) { return 'metric'; }
 }
+function fmtKmh(v) {
+    v = +v;
+    return getUnits() === 'imp' ? (v * 0.621371).toFixed(0) + ' mph' : v + ' km/h';
+}
+function toggleUnits() {
+    var next = getUnits() === 'imp' ? 'metric' : 'imp';
+    try { localStorage.setItem('sae-units', next); } catch (e) {}
+    refreshUnits();
+    updateURL();
+}
+function refreshUnits() {
+    var btn = document.getElementById('unit-toggle');
+    if (btn) btn.textContent = getUnits() === 'imp' ? 'mph' : 'km/h';
+    if (typeof WORKZONE !== 'undefined' && document.getElementById('iw-speed-wz'))
+        document.getElementById('iw-speed-wz').textContent = fmtKmh(WORKZONE.speedLimit);
+    if (window._lastHV && document.getElementById('iw-hv-speed'))
+        document.getElementById('iw-hv-speed').textContent = fmtKmh(window._lastHV);
+}
+
 // ══════════════════ EXPORT & SHARE STATE ENGINE ══════════════════
 function _dl(name, text) {
   var b = new Blob([text], { type: 'text/plain;charset=utf-8' });
@@ -4199,6 +4224,42 @@ function exportReport() {
   doc.text('SSAM thresholds: TTC<1.0 high / <1.5 medium / >=1.5 low severity', 14, y);
   doc.save('sae_report_mpr' + rrMPR + '.pdf');
 }
+function exportFleetCSV() {
+    var rows = [];
+    rows.push('SAE AutoSim Hub - Fleet Calibration Export');
+    rows.push('Country,' + currentCountry);
+    rows.push('MPR %,' + rrMPR);
+    rows.push('Scenario,' + (rrScenario === 'B' ? 'B-ManagedAV' : 'A-Baseline'));
+    rows.push('Generated,' + new Date().toISOString());
+    rows.push('');
+    rows.push('vehicle_type,fleet_share,reaction_factor,safety_index,accel,decel,sigma');
+    var cd = (typeof COUNTRY_DATA !== 'undefined' && COUNTRY_DATA[currentCountry]) ? COUNTRY_DATA[currentCountry] : null;
+    var P = (typeof PHYS !== 'undefined') ? PHYS : { reaction:{}, safety:{}, accel:{}, decel:{}, sigma:{} };
+    if (cd && cd.fleet) {
+        Object.keys(cd.fleet).forEach(function (k) {
+            rows.push([k,
+                (cd.fleet[k] * 100).toFixed(1) + '%',
+                P.reaction[k] != null ? P.reaction[k] : '',
+                P.safety[k] != null ? P.safety[k] : '',
+                P.accel[k] != null ? P.accel[k] : '',
+                P.decel[k] != null ? P.decel[k] : '',
+                P.sigma[k] != null ? P.sigma[k] : ''
+            ].join(','));
+        });
+    }
+    if (typeof computeWeightedFleet === 'function') {
+        var w = computeWeightedFleet(rrMPR).weighted;
+        rows.push('');
+        rows.push('WEIGHTED (Wiedemann/Krauss composite)');
+        rows.push('tau,' + w.tau.toFixed(3));
+        rows.push('safety,' + w.safety.toFixed(3));
+        rows.push('accel,' + w.accel.toFixed(3));
+        rows.push('decel,' + w.decel.toFixed(3));
+        rows.push('sigma,' + w.sigma.toFixed(3));
+        if (w.gap != null) rows.push('gap,' + w.gap.toFixed(3));
+    }
+    _dl('sae_fleet_' + currentCountry + '_mpr' + rrMPR + '.csv', rows.join('\n'));
+}
 function updateURL() {
   try {
     var p = new URLSearchParams(location.search);
@@ -4228,6 +4289,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (mprSlider) {
         initialMPR = parseInt(mprSlider.value, 10);
     }
+    refreshUnits();
     computeSSAMMetrics(initialMPR);
     // Update on MPR slider change
     if (mprSlider) {
@@ -4579,10 +4641,10 @@ function updateIntersectionWorkzone(mpr) {
     el = document.getElementById('iw-delay'); if (el) el.textContent = delay + 's';
     el = document.getElementById('iw-lane-closure'); if (el) el.textContent = WORKZONE.laneClosure + ' of ' + WORKZONE.totalLanes;
     el = document.getElementById('iw-queue'); if (el) el.textContent = queueLen + ' km';
-    el = document.getElementById('iw-speed-wz'); if (el) el.textContent = WORKZONE.speedLimit + ' km/h';
+    el = document.getElementById('iw-speed-wz'); if (el) el.textContent = fmtKmh(WORKZONE.speedLimit);
     el = document.getElementById('iw-ttc-wz'); if (el) el.textContent = ttc + 's';
     el = document.getElementById('iw-grade-seg'); if (el) el.textContent = '+' + CLIMBING.grade + '%';
-    el = document.getElementById('iw-hv-speed'); if (el) el.textContent = hvSpeed + ' km/h';
+    el = document.getElementById('iw-hv-speed'); if (el) { window._lastHV = hvSpeed; el.textContent = fmtKmh(hvSpeed); }
     el = document.getElementById('iw-overtake'); if (el) el.textContent = overtakes + '/hr';
     el = document.getElementById('iw-lane-need'); if (el) { el.textContent = laneNeed; el.className = 'font-mono ' + (laneNeed === 'Yes' ? 'text-green-500' : 'text-slate-500'); }
 }

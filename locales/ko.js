@@ -327,6 +327,7 @@ TRANSLATIONS['ko'] = {
     "exp_sumo": "SUMO 설정 내보내기",
     "exp_vissim": "VISSIM 설정 내보내기",
     "exp_pdf": "PDF 보고서 다운로드",
+    "exp_csv": "플릿 CSV 내보내기",
 
     "cc_title": "탄소 크레딧 및 경제 분석",
     "cc_desc": "AV 보급에 따른 CO2 감축 화폐화",

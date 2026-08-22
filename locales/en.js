@@ -358,6 +358,7 @@ TRANSLATIONS['en'] = {
     "exp_sumo": "Export SUMO Config",
     "exp_vissim": "Export VISSIM Config",
     "exp_pdf": "Download PDF Report",
+    "exp_csv": "Export Fleet CSV",
 
     "cc_title": "Carbon Credit & Economic Analysis",
     "cc_desc": "Monetize CO2 reduction from AV penetration — EU ETS carbon market pricing",

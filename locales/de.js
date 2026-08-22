@@ -351,6 +351,7 @@ TRANSLATIONS['de'] = {
     "exp_sumo": "SUMO-Konfig exportieren",
     "exp_vissim": "VISSIM-Konfig exportieren",
     "exp_pdf": "PDF-Bericht laden",
+    "exp_csv": "Flotte-CSV exportieren",
 
     "cc_title": "CO2-Gutschrift & Wirtschaftsanalyse",
     "cc_desc": "CO2-Reduktion monetarisieren — EU-EHS Kohlenstoffpreis",

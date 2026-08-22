@@ -351,6 +351,7 @@ TRANSLATIONS['fr'] = {
     "exp_sumo": "Exporter config SUMO",
     "exp_vissim": "Exporter config VISSIM",
     "exp_pdf": "Télécharger le rapport PDF",
+    "exp_csv": "Exporter flotte CSV",
 
     "cc_title": "Credit Carbone & Analyse Economique",
     "cc_desc": "Monetisation de la reduction CO2",

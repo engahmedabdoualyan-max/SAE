@@ -351,6 +351,7 @@ TRANSLATIONS['zh'] = {
     "exp_sumo": "导出SUMO配置",
     "exp_vissim": "导出VISSIM配置",
     "exp_pdf": "下载PDF报告",
+    "exp_csv": "导出车队CSV",
 
     "cc_title": "碳信用与经济分析",
     "cc_desc": "AV渗透率CO2减排货币化",
