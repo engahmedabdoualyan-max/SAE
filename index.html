@@ -17,6 +17,19 @@
     <meta name="author" content="SAE AutoSim Hub">
     <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
     <link rel="canonical" href="https://sae.fimtosoft.com/">
+<link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#0f172a">
+    <link rel="icon" type="image/svg+xml" href="/icon.svg">
+    <link rel="alternate" hreflang="en" href="https://sae.fimtosoft.com/?lang=en">
+    <link rel="alternate" hreflang="ar" href="https://sae.fimtosoft.com/?lang=ar">
+    <link rel="alternate" hreflang="ru" href="https://sae.fimtosoft.com/?lang=ru">
+    <link rel="alternate" hreflang="hi" href="https://sae.fimtosoft.com/?lang=hi">
+    <link rel="alternate" hreflang="de" href="https://sae.fimtosoft.com/?lang=de">
+    <link rel="alternate" hreflang="zh" href="https://sae.fimtosoft.com/?lang=zh">
+    <link rel="alternate" hreflang="ja" href="https://sae.fimtosoft.com/?lang=ja">
+    <link rel="alternate" hreflang="ko" href="https://sae.fimtosoft.com/?lang=ko">
+    <link rel="alternate" hreflang="fr" href="https://sae.fimtosoft.com/?lang=fr">
+    <link rel="alternate" hreflang="x-default" href="https://sae.fimtosoft.com/">
 
     <!-- Open Graph -->
     <meta property="og:type" content="website">
@@ -290,6 +303,11 @@
             <div class="flex justify-center gap-4 mb-6">
                 <button id="scenario-a-btn" onclick="setScenario('A')" class="px-6 py-2 rounded-lg font-medium bg-red-500/20 border border-red-400 text-red-300 hover:bg-red-500/30 transition active"><i class="fas fa-exclamation-triangle mr-1"></i> <span data-key="rr_scenA">Scenario A: Current Baseline</span></button>
                 <button id="scenario-b-btn" onclick="setScenario('B')" class="px-6 py-2 rounded-lg font-medium bg-slate-600/20 border border-slate-500 text-slate-400 hover:bg-green-500/30 transition"><i class="fas fa-robot mr-1"></i> <span data-key="rr_scenB">Scenario B: Managed AV Corridor</span></button>
+                <div class="flex flex-wrap justify-center gap-2 mt-4">
+                    <button onclick="exportSUMO()" class="px-4 py-2 rounded-lg text-xs font-medium bg-cyan-500/20 border border-cyan-400 text-cyan-300 hover:bg-cyan-500/30 transition"><i class="fas fa-file-export mr-1"></i><span data-key="exp_sumo">Export SUMO Config</span></button>
+                    <button onclick="exportVISSIM()" class="px-4 py-2 rounded-lg text-xs font-medium bg-purple-500/20 border border-purple-400 text-purple-300 hover:bg-purple-500/30 transition"><i class="fas fa-file-code mr-1"></i><span data-key="exp_vissim">Export VISSIM Config</span></button>
+                    <button onclick="exportReport()" class="px-4 py-2 rounded-lg text-xs font-medium bg-green-500/20 border border-green-400 text-green-300 hover:bg-green-500/30 transition"><i class="fas fa-file-pdf mr-1"></i><span data-key="exp_pdf">Download PDF Report</span></button>
+                </div>
             </div>
             <div class="relative bg-black rounded-xl overflow-hidden border border-slate-600">
                 <div id="ringroad-map" class="w-full h-[460px] bg-slate-800"></div>
@@ -925,7 +943,7 @@
                         <div class="lg:col-span-1">
                             <p class="text-xs font-semibold text-teal-700 mb-2 uppercase tracking-wide" data-key="vid_demo">Official Demo Video</p>
             <div class="relative w-full aspect-video rounded-lg overflow-hidden border border-teal-200 bg-slate-100">
-                <iframe src="https://www.youtube.com/embed/vBB4tW22sX8" title="Mercedes-Benz DRIVE PILOT Level 3 Automated Driving" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen class="absolute inset-0 w-full h-full"></iframe>
+                <iframe loading="lazy" src="https://www.youtube.com/embed/vBB4tW22sX8" title="Mercedes-Benz DRIVE PILOT Level 3 Automated Driving" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen class="absolute inset-0 w-full h-full"></iframe>
                 <div class="absolute inset-0 flex items-center justify-center bg-slate-100 text-slate-400 text-xs text-center p-4" style="display:none" data-key="vid_fallback">Video requires HTTPS connection — deploy to sae.fimtosoft.com for full experience</div>
             </div>
                             <p class="text-[10px] text-slate-500 mt-1 text-center" data-key="l3_vid_cap">Mercedes-Benz DRIVE PILOT &mdash; Level 3 Automated Driving up to 95 km/h (2026)</p>
@@ -975,7 +993,7 @@
                         <div class="lg:col-span-1">
                             <p class="text-xs font-semibold text-emerald-700 mb-2 uppercase tracking-wide" data-key="vid_demo">Official Demo Video</p>
             <div class="relative w-full aspect-video rounded-lg overflow-hidden border border-emerald-200 bg-slate-100">
-                <iframe src="https://www.youtube.com/embed/hA_-MkU0Nfw" title="Inside Waymo's Self-Driving Car Full Autonomous Ride" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen class="absolute inset-0 w-full h-full"></iframe>
+                <iframe loading="lazy" src="https://www.youtube.com/embed/hA_-MkU0Nfw" title="Inside Waymo's Self-Driving Car Full Autonomous Ride" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen class="absolute inset-0 w-full h-full"></iframe>
                 <div class="absolute inset-0 flex items-center justify-center bg-slate-100 text-slate-400 text-xs text-center p-4" style="display:none" data-key="vid_fallback">Video requires HTTPS connection — deploy to sae.fimtosoft.com for full experience</div>
             </div>
                             <p class="text-[10px] text-slate-500 mt-1 text-center" data-key="l4_vid_cap">Inside Waymo's Self-Driving Car &mdash; Full Autonomous Ride Demonstration</p>
@@ -1025,7 +1043,7 @@
                         <div class="lg:col-span-1">
                             <p class="text-xs font-semibold opacity-80 mb-2 uppercase tracking-wide" data-key="vid_demo">Official Design Reveal</p>
             <div class="relative w-full aspect-video rounded-lg overflow-hidden border border-white/30 bg-black/30">
-                <iframe src="https://www.youtube.com/embed/Qfj4urMF8CU" title="Tesla Cybercab Official Design Capabilities and Core Specs" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen class="absolute inset-0 w-full h-full"></iframe>
+                <iframe loading="lazy" src="https://www.youtube.com/embed/Qfj4urMF8CU" title="Tesla Cybercab Official Design Capabilities and Core Specs" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen class="absolute inset-0 w-full h-full"></iframe>
                 <div class="absolute inset-0 flex items-center justify-center text-white/50 text-xs text-center p-4" style="display:none" data-key="vid_fallback">Video requires HTTPS connection — deploy to sae.fimtosoft.com for full experience</div>
             </div>
                             <p class="text-[10px] opacity-70 mt-1 text-center" data-key="l5_vid_cap">Tesla Cybercab &mdash; Official Design, Capabilities &amp; Core Specs</p>
@@ -2782,6 +2800,9 @@
     "ca_unresolved": "Unresolved",
 
     "ca_resolved": "Resolved",
+    "exp_sumo": "Export SUMO Config",
+    "exp_vissim": "Export VISSIM Config",
+    "exp_pdf": "Download PDF Report",
 
     "cc_title": "Carbon Credit & Economic Analysis",
     "cc_desc": "Monetize CO2 reduction from AV penetration — EU ETS carbon market pricing",
@@ -3220,6 +3241,9 @@
     "ca_unresolved": "غير محلول",
 
     "ca_resolved": "محلول",
+    "exp_sumo": "تصدير إعدادات SUMO",
+    "exp_vissim": "تصدير إعدادات VISSIM",
+    "exp_pdf": "تحميل تقرير PDF",
 
     "cc_title": "تحليل ائتمان الكربون والاقتصاد",
     "cc_desc": "تحويل تخفيض CO2 إلى أرباح — سعر سوق الكربون الأوروبي",
@@ -3655,6 +3679,9 @@
     "ca_unresolved": "Не решено",
 
     "ca_resolved": "Решено",
+    "exp_sumo": "Экспорт конфига SUMO",
+    "exp_vissim": "Экспорт конфига VISSIM",
+    "exp_pdf": "Скачать PDF-отчёт",
 
     "cc_title": "Analiz uglerodnykh kreditov i ekonomiki",
     "cc_desc": "Monetizatsiya snizheniya CO2",
@@ -4066,6 +4093,9 @@
     "ca_unresolved": "अनसुलझा",
 
     "ca_resolved": "हल हो गया",
+    "exp_sumo": "SUMO कॉन्फ़िग निर्यात करें",
+    "exp_vissim": "VISSIM कॉन्फ़िग निर्यात करें",
+    "exp_pdf": "PDF रिपोर्ट डाउनलोड करें",
 
     "cc_title": "Carbon Credit aur Arthik Vishleshan",
     "cc_desc": "AV pravesh se CO2 kami ka monetization",
@@ -4501,6 +4531,9 @@
     "ca_unresolved": "Ungelöst",
 
     "ca_resolved": "Gelöst",
+    "exp_sumo": "SUMO-Konfig exportieren",
+    "exp_vissim": "VISSIM-Konfig exportieren",
+    "exp_pdf": "PDF-Bericht laden",
 
     "cc_title": "CO2-Gutschrift & Wirtschaftsanalyse",
     "cc_desc": "CO2-Reduktion monetarisieren — EU-EHS Kohlenstoffpreis",
@@ -4936,6 +4969,9 @@
     "ca_unresolved": "未解决",
 
     "ca_resolved": "已解决",
+    "exp_sumo": "导出SUMO配置",
+    "exp_vissim": "导出VISSIM配置",
+    "exp_pdf": "下载PDF报告",
 
     "cc_title": "碳信用与经济分析",
     "cc_desc": "AV渗透率CO2减排货币化",
@@ -5347,6 +5383,9 @@
     "ca_unresolved": "未解決",
 
     "ca_resolved": "解決済み",
+    "exp_sumo": "SUMO設定をエクスポート",
+    "exp_vissim": "VISSIM設定をエクスポート",
+    "exp_pdf": "PDFレポートをダウンロード",
 
     "cc_title": "炭素クレジットと経済分析",
     "cc_desc": "AV浸透によるCO2削減の貨幣化",
@@ -5758,6 +5797,9 @@
     "ca_unresolved": "미해결",
 
     "ca_resolved": "해결됨",
+    "exp_sumo": "SUMO 설정 내보내기",
+    "exp_vissim": "VISSIM 설정 내보내기",
+    "exp_pdf": "PDF 보고서 다운로드",
 
     "cc_title": "탄소 크레딧 및 경제 분석",
     "cc_desc": "AV 보급에 따른 CO2 감축 화폐화",
@@ -6193,6 +6235,9 @@
     "ca_unresolved": "Non résolu",
 
     "ca_resolved": "Résolu",
+    "exp_sumo": "Exporter config SUMO",
+    "exp_vissim": "Exporter config VISSIM",
+    "exp_pdf": "Télécharger le rapport PDF",
 
     "cc_title": "Credit Carbone & Analyse Economique",
     "cc_desc": "Monetisation de la reduction CO2",
@@ -6460,6 +6505,9 @@ window.addEventListener('load', function() {
             document.body.insertBefore(msg, document.body.firstChild);
         }
         try {
+            window._qs = new URLSearchParams(location.search);
+            var _ql = window._qs.get('lang');
+            if (_ql) { try { localStorage.setItem('sae-lang', _ql); } catch(e) {} }
             var saved = localStorage.getItem('sae-lang') || 'en';
             document.getElementById('lang-select').value = saved;
             setLanguage(saved);
@@ -6475,6 +6523,13 @@ window.addEventListener('load', function() {
                 if (typeof renderForecastChart === 'function') renderForecastChart();
                 if (typeof renderConflictChart === 'function') renderConflictChart();
                 if (typeof updateAllModules === 'function') updateAllModules(mprValue);
+                if (window._qs) { try {
+                    var _c = window._qs.get('corridor');
+                    if (_c && typeof CORRIDORS !== 'undefined' && CORRIDORS[_c] && typeof switchCorridor === 'function') switchCorridor(_c);
+                    var _m = parseInt(window._qs.get('mpr'), 10);
+                    if (!isNaN(_m)) { var _s = document.getElementById('mpr-slider'); if (_s) { _s.value = _m; _s.dispatchEvent(new Event('input')); } }
+                    if (window._qs.get('scenario') === 'B' && typeof setScenario === 'function') setScenario('B');
+                } catch(e) { console.warn('urlState apply:', e); } }
             }, 800);
         } catch(err) {
             console.error('SAE AutoSim Hub initialization error:', err, err.stack);
@@ -7496,6 +7551,85 @@ function renderSSAMHotspots() {
     }
     ssamLastRenderTime = Date.now();
 }
+// ══════════════════ EXPORT & SHARE STATE ENGINE ══════════════════
+function _dl(name, text) {
+  var b = new Blob([text], { type: 'text/plain;charset=utf-8' });
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(b); a.download = name; a.click();
+  setTimeout(function(){ URL.revokeObjectURL(a.href); }, 2000);
+}
+function _tauFromMPR(mpr) { return +(1.2 - mpr * 0.006).toFixed(2); }
+function exportSUMO() {
+  var s = ['<additional xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/additional_file.xsd">'];
+  s.push('  <!-- Generated by SAE AutoSim Hub | MPR ' + rrMPR + '% | ' + new Date().toISOString() + ' -->');
+  s.push('  <vType id="avManaged" vClass="passenger" carFollowModel="Krauss" tau="' + _tauFromMPR(rrMPR) + '" accel="2.60" decel="4.50" sigma="' + (0.5 * (1 - rrMPR / 100)).toFixed(2) + '" maxSpeed="33.33" lcCooperative="' + (rrMPR / 100 * 2).toFixed(2) + '"/>');
+  s.push('  <vType id="chaoticMicrobus" vClass="bus" carFollowModel="Krauss" tau="1.80" accel="1.20" decel="3.40" sigma="0.70" maxSpeed="19.44" lcImpatience="0.85"/>');
+  s.push('  <vType id="mlaiky" vClass="moped" carFollowModel="Krauss" tau="1.10" accel="1.90" decel="4.00" sigma="0.75" maxSpeed="13.89"/>');
+  s.push('</additional>');
+  _dl('sae_fleet_mpr' + rrMPR + '.add.xml', s.join('\n'));
+}
+function exportVISSIM() {
+  var s = [];
+  s.push('-- SAE AutoSim Hub VISSIM calibration snippet | MPR ' + rrMPR + '%');
+  s.push('-- Wiedemann 99 parameters adjusted for AV penetration');
+  s.push('[VEHICLE_CLASSES]');
+  s.push('-- Class      CC0   CC1   CC2  Tau[s]  Accel  Decel');
+  s.push('AV-MANAGED    1.35  0.55  2.40  ' + _tauFromMPR(rrMPR) + '   2.60   4.50');
+  s.push('MICROBUS-L0   1.50  0.90  4.00  1.80    1.20   3.40');
+  s.push('MLAIKY-L0     1.20  0.60  3.10  1.10    1.90   4.00');
+  s.push('');
+  s.push('[DESIRED_SPEED_DECISIONS] -- grade +3.5% incline segment');
+  s.push('InclineFactor = 0.92');
+  s.push('');
+  s.push('[SIMULATION] Resolution=' + Math.max(2, Math.round(rrMPR / 25)) + ' TimeScale=1.0 Seed=2026');
+  _dl('sae_vissim_mpr' + rrMPR + '.inp', s.join('\n'));
+}
+function exportReport() {
+  if (!window.jspdf || !jspdf.jsPDF) { alert('PDF library not loaded'); return; }
+  var doc = new jspdf.jsPDF();
+  var y = 18;
+  doc.setFontSize(16); doc.text('SAE AutoSim Hub - Simulation Report', 14, y); y += 8;
+  doc.setFontSize(9); doc.setTextColor(110);
+  doc.text(new Date().toLocaleString(), 14, y); y += 10; doc.setTextColor(0);
+  doc.setFontSize(11);
+  var rows = [
+    ['Corridor', currentCorridor.toUpperCase()],
+    ['Scenario', (rrScenario === 'B') ? 'B - Managed AV Corridor' : 'A - Current Baseline'],
+    ['MPR', rrMPR + '%'],
+    ['Avg TTC', ssamData.ttcAvg.toFixed(1) + ' s'],
+    ['Avg PET', ssamData.petAvg.toFixed(1) + ' s'],
+    ['Rear-End conflicts', ssamData.rearEnd + ' /h'],
+    ['Lane-Change conflicts', ssamData.laneChange + ' /h'],
+    ['Capacity', (1850 + Math.round(rrMPR * 11)) + ' veh/h/lane'],
+    ['Conflict status', ssamData.ttcAvg >= 2.0 ? 'RESOLVED' : 'UNRESOLVED']
+  ];
+  rows.forEach(function(r){ doc.text(r[0]+':', 14, y); doc.text(String(r[1]), 70, y); y += 7; });
+  y += 4;
+  doc.setFontSize(8); doc.setTextColor(120);
+  doc.text('SSAM thresholds: TTC<1.0 high / <1.5 medium / >=1.5 low severity', 14, y);
+  doc.save('sae_report_mpr' + rrMPR + '.pdf');
+}
+function updateURL() {
+  try {
+    var p = new URLSearchParams(location.search);
+    p.set('corridor', currentCorridor);
+    p.set('mpr', rrMPR);
+    p.set('scenario', rrScenario || 'A');
+    p.set('lang', localStorage.getItem('sae-lang') || 'en');
+    history.replaceState(null, '', location.pathname + '?' + p.toString());
+  } catch (e) {}
+}
+['setScenario','switchCorridor','setLanguage'].forEach(function(fn){
+  var origFn = window[fn];
+  if (typeof origFn === 'function') {
+    window[fn] = function(){
+      var r = origFn.apply(this, arguments);
+      setTimeout(updateURL, 50);
+      return r;
+    };
+  }
+});
+
 // Initialize SSAM metrics when page loads
 document.addEventListener('DOMContentLoaded', function() {
     // Set initial MPR from slider if exists
@@ -7510,6 +7644,7 @@ document.addEventListener('DOMContentLoaded', function() {
         mprSlider.addEventListener('input', function() {
             var v = parseInt(this.value, 10);
             computeSSAMMetrics(v);
+            updateURL();
             // Also update ring road style
             if (typeof updateRingRoadStyle === 'function') {
                 updateRingRoadStyle(v);
@@ -7909,6 +8044,13 @@ function playReplay() {
     }, 500);
 }
 
+    </script>
+<script>
+        if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
+            window.addEventListener('load', function () {
+                navigator.serviceWorker.register('/sw.js').catch(function () {});
+            });
+        }
     </script>
 </body>
 </html>

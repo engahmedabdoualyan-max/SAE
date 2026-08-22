@@ -1,0 +1,19 @@
+{
+  "name": "SAE AutoSim Hub",
+  "short_name": "SAE Hub",
+  "description": "Pre-calibrated traffic simulation fleets for Egypt & the Arab World",
+  "start_url": "/?utm_source=pwa",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#0f172a",
+  "lang": "en",
+  "dir": "auto",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

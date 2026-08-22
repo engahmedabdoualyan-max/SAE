@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://sae.fimtosoft.com/sitemap.xml
