@@ -7,7 +7,7 @@
 
 ---
 
-## PART A: COMPLETED FEATURES (37 items)
+## PART A: COMPLETED FEATURES (51 items)
 
 ### A1. Core Architecture
 | # | Feature | Status | Commit | Reference |
@@ -209,3 +209,32 @@
 ---
 
 *This document serves as the authoritative project status for the SAE AutoSim Hub platform. All features are traceable to their academic references and implementation status.*
+
+
+---
+
+## PART B: PLATFORM UPGRADE SPRINT (2026-08-22) — 14 items
+
+| # | Feature | Commit | Notes |
+|---|---------|--------|-------|
+| 38 | SSAM Conflict Hotspot Analysis (TTC/PET/rear-end/lane-change) | `10400b0` | Bound to MPR slider + Scenario B |
+| 39 | Layout stretching fix — fixed-height containers + canvas clearing | `10400b0` | Infinite growth bug eliminated |
+| 40 | Study-area correction: Nazlet Qalyub → Mostorod → Al-Salam → Mawqif Al-Salam/Adly Mansour | `9c4e86a` | DirectionsService waypoints on NE Ring Road arc |
+| 41 | Real highway route snapping (DirectionsService + parallel carriageways) | `1e432bb` | Replaces straight-line polylines |
+| 42 | Working YouTube embeds (oEmbed-verified IDs) | `1e432bb` | Mercedes L3 / Waymo / Cybercab |
+| 43 | Shareable URL state ?corridor=&mpr=&scenario=&lang= | `e1f86e4` | Read on load, replaceState on change |
+| 44 | Calibration export suite: SUMO .add.xml + VISSIM .inp + PDF report | `e1f86e4` | Krauss/W99 params derived from live MPR |
+| 45 | PWA: manifest + service worker (offline) + installable | `e1f86e4` | Network-first HTML strategy |
+| 46 | SEO: hreflang ×9 + sitemap.xml + robots.txt | `e1f86e4` | xhtml:link alternates |
+| 47 | Monolith split: 9 lazy locale files, index 541KB→335KB (-38%) | `bcf25d7` | ensureLang() loader, EN inline fallback |
+| 48 | Accessibility pass: aria-labels, canvas roles, icon a11y | `bcf25d7` | Slider + 5 canvases labeled |
+| 49 | Dark/Light theme toggle (zero-FOUC, Chart.js recolor) | `6a26879` | CSS override layer, persisted |
+| 50 | Fleet CSV calibration export + km/h⇄mph unit toggle | `d123990` | Wiedemann/Krauss weighted composite sheet |
+| 51 | Corridor side-by-side comparison (dual live maps, MPR sync, lazy init) | `e016935` | IntersectionObserver gated |
+
+### Infrastructure hardening (same sprint)
+- **CI pipeline**: JS syntax gate (all inline blocks + locales) + Jest physics suite — green on every push
+- **vercel.json**: explicit static builds (fixed FUNCTION_INVOCATION_FAILED from Python auto-detect); legacy Streamlit stack archived to `legacy-streamlit/`
+- **Fleet CSV** and **config exports** carry scenario metadata for reproducible research
+
+*Total delivered this sprint: 14 features + 3 infra fixes. Platform: https://sae.fimtosoft.com*
