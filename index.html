@@ -19,6 +19,32 @@
     <link rel="canonical" href="https://sae.fimtosoft.com/">
 <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#0f172a">
+<style id="sae-theme-overrides">
+    html.sae-dark .bg-white { background-color: #101b31 !important; }
+    html.sae-dark .bg-slate-50 { background-color: #0b1424 !important; }
+    html.sae-dark .bg-slate-100 { background-color: #16233c !important; }
+    html.sae-dark .text-slate-800 { color: #e2e8f0 !important; }
+    html.sae-dark .text-slate-700 { color: #cbd5e1 !important; }
+    html.sae-dark .text-slate-600 { color: #94a3b8 !important; }
+    html.sae-dark .text-slate-500 { color: #7c8db0 !important; }
+    html.sae-dark .border-slate-100, html.sae-dark .border-slate-200,
+    html.sae-dark .border-slate-300 { border-color: #24344f !important; }
+    html.sae-dark .divide-slate-200 > :not([hidden]) ~ :not([hidden]) { border-color: #24344f !important; }
+    html.sae-dark [class*="bg-gradient-to"] { background-image: linear-gradient(145deg, #101b31, #0d1830) !important; }
+    html.sae-dark select, html.sae-dark input:not([type="checkbox"]):not([type="radio"]) {
+        background-color: #16233c !important; color: #e2e8f0 !important;
+        border-color: #2d3f5e !important;
+    }
+    html.sae-dark .hover\:bg-white:hover { background-color: #1a2947 !important; }
+</style>
+<script>
+    (function () {
+        try {
+            var t = localStorage.getItem('sae-theme');
+            if (t === 'dark') document.documentElement.classList.add('sae-dark');
+        } catch (e) {}
+    })();
+</script>
     <link rel="icon" type="image/svg+xml" href="/icon.svg">
     <link rel="alternate" hreflang="en" href="https://sae.fimtosoft.com/?lang=en">
     <link rel="alternate" hreflang="ar" href="https://sae.fimtosoft.com/?lang=ar">
@@ -197,6 +223,7 @@
                 </nav>
                 <div class="flex items-center gap-2">
                     <label for="lang-select" class="text-sm font-medium hidden sm:block" data-key="ls">Language</label>
+                    <button id="theme-toggle" onclick="toggleTheme()" aria-label="Toggle dark mode" title="Dark / Light" class="mr-2 w-9 h-9 inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white text-lg hover:bg-slate-100 transition"><span id="theme-icon">🌙</span></button>
                     <select id="lang-select" onchange="setLanguage(this.value)" class="border border-slate-300 rounded-lg px-2 py-1 text-sm bg-white cursor-pointer">
                         <option value="en" selected>🇬🇧 English</option><option value="ar" >🇪🇬 العربية</option><option value="ru" >🇷🇺 Русский</option><option value="hi" >🇮🇳 हिन्दी</option><option value="de" >🇩🇪 Deutsch</option><option value="zh" >🇨🇳 中文</option><option value="ja" >🇯🇵 日本語</option><option value="ko" >🇰🇷 한국어</option><option value="fr" >🇫🇷 Français</option>
                     </select>
@@ -4142,7 +4169,33 @@ function renderSSAMHotspots() {
         legendEl.classList.remove('hidden');
         legendEl.classList.add('block');
     }
-    ssamLastRenderTime = Date.now();
+    ssamLastRenderTime = Date.now();// ========== THEME ENGINE (dark / light) ==========
+function applyTheme(theme) {
+    var root = document.documentElement;
+    if (theme === 'dark') root.classList.add('sae-dark');
+    else root.classList.remove('sae-dark');
+    var ic = document.getElementById('theme-icon');
+    if (ic) ic.textContent = theme === 'dark' ? '\u2600\uFE0F' : '\uD83C\uDF19';
+    try { localStorage.setItem('sae-theme', theme); } catch (e) {}
+    if (typeof Chart !== 'undefined') {
+        Chart.defaults.color = theme === 'dark' ? '#cbd5e1' : '#334155';
+        Chart.defaults.borderColor = theme === 'dark' ? '#24344f' : '#e2e8f0';
+    }
+    setTimeout(function () {
+        ['renderSSAMChart', 'renderForecastChart'].forEach(function (fn) {
+            try { if (typeof window[fn] === 'function') window[fn](); } catch (err) {}
+        });
+    }, 60);
+}
+function toggleTheme() {
+    var dark = document.documentElement.classList.toggle('sae-dark');
+    applyTheme(dark ? 'dark' : 'light');
+    updateURL();
+}
+document.addEventListener('DOMContentLoaded', function () {
+    applyTheme(document.documentElement.classList.contains('sae-dark') ? 'dark' : 'light');
+});
+
 }// ========== UNITS ENGINE (km/h <-> mph) ==========
 function getUnits() {
     try { return localStorage.getItem('sae-units') || 'metric'; } catch (e) { return 'metric'; }
