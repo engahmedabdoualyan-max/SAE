@@ -1,5 +1,5 @@
 const CACHE = 'sae-v1';
-const PRECACHE = ['/', '/index.html', '/manifest.json', '/icon.svg'];
+const PRECACHE = ['/', '/index.html', '/manifest.json', '/icon.svg', '/locales/en.js'];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(PRECACHE)).then(() => self.skipWaiting()));
 });
