@@ -385,41 +385,58 @@
         </div>
     </section>
 
-    <!-- ========== PEDESTRIAN & CYCLIST CONFLICT ANALYSIS ========== -->
+<!-- ========== CONFLICT HOTSPOT ANALYSIS & SSAM ========== -->
     <section id="conflict-analysis" class="py-16 bg-slate-50">
         <div class="container mx-auto px-4">
-            <div class="text: text-center mb-8">
-                <h2 class="text-3xl font-bold text-slate-800 mb-3"><i class="fas fa-walking mr-2 text-red-500"></i><span data-key="ca_title">Pedestrian & Cyclist Conflict Analysis</span></h2>
-                <p class="text-slate-600 max-w-3xl mx-auto text-sm" data-key="ca_desc">Time-to-Collision (TTC) based conflict detection for vulnerable road users at corridor hotspots</p>
+            <div class="text-center mb-8">
+                <h2 class="text-3xl font-bold text-slate-800 mb-3"><i class="fas fa-radiation-alt mr-2 text-red-500"></i><span data-key="ca_title">Conflict Hotspot Analysis & SSAM</span></h2>
+                <p class="text-slate-600 max-w-3xl mx-auto text-sm" data-key="ca_desc">Surrogate Safety Assessment Model — Real-time TTC/PET conflict detection with dynamic hotspot visualization on corridor</p>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 max-w-5xl mx-auto mb-6">
                 <div class="bg-white rounded-xl shadow-md border border-slate-200 p-5">
-                    <h4 class="font-bold text-slate-800 mb-3"><i class="fas fa-exclamation-triangle mr-2 text-red-500"></i><span data-key="ca_severe">Severe Conflicts</span></h4>
-                    <div class="text-3xl font-bold text-red-500" id="ca-severe">0</div>
-                    <p class="text-xs text-slate-500 mt-1">TTC &lt; 2.0s</p>
-                    <div class="mt-3 w-full bg-slate-100 rounded-full h-3"><div id="ca-severe-bar" class="h-full rounded-full bg-red-500 transition-all" style="width:0%"></div></div>
+                    <h4 class="font-bold text-slate-800 mb-2 flex items-center gap-2"><i class="fas fa-stopwatch text-red-500"></i><span data-key="ca_ttc_avg">Avg TTC (s)</span></h4>
+                    <div class="text-3xl font-bold text-red-500" id="ca-ttc-avg">0.0</div>
+                    <p class="text-xs text-slate-500 mt-1" data-key="ca_ttc_range">Range: 0.6s – 1.8s</p>
                 </div>
                 <div class="bg-white rounded-xl shadow-md border border-slate-200 p-5">
-                    <h4 class="font-bold text-slate-800 mb-3"><i class="fas fa-exclamation mr-2 text-yellow-500"></i><span data-key="ca_moderate">Moderate Conflicts</span></h4>
-                    <div class="text-3xl font-bold text-yellow-500" id="ca-moderate">0</div>
-                    <p class="text-xs text-slate-500 mt-1">TTC 2.0–5.0s</p>
-                    <div class="mt-3 w-full bg-slate-100 rounded-full h-3"><div id="ca-moderate-bar" class="h-full rounded-full bg-yellow-500 transition-all" style="width:0%"></div></div>
+                    <h4 class="font-bold text-slate-800 mb-2 flex items-center gap-2"><i class="fas fa-clock text-yellow-500"></i><span data-key="ca_pet_avg">Avg PET (s)</span></h4>
+                    <div class="text-3xl font-bold text-yellow-500" id="ca-pet-avg">0.0</div>
+                    <p class="text-xs text-slate-500 mt-1" data-key="ca_pet_range">Range: 1.2s – 4.5s</p>
                 </div>
                 <div class="bg-white rounded-xl shadow-md border border-slate-200 p-5">
-                    <h4 class="font-bold text-slate-800 mb-3"><i class="fas fa-shield-alt mr-2 text-green-500"></i><span data-key="ca_safe">Safe Interactions</span></h4>
-                    <div class="text-3xl font-bold text-green-500" id="ca-safe">0</div>
-                    <p class="text-xs text-slate-500 mt-1">TTC &gt; 5.0s</p>
-                    <div class="mt-3 w-full bg-slate-100 rounded-full h-3"><div id="ca-safe-bar" class="h-full rounded-full bg-green-500 transition-all" style="width:0%"></div></div>
+                    <h4 class="font-bold text-slate-800 mb-2 flex items-center gap-2"><i class="fas fa-car-crash text-orange-500"></i><span data-key="ca_rear_end">Rear-End Conflicts</span></h4>
+                    <div class="text-3xl font-bold text-orange-500" id="ca-rear-end">0</div>
+                    <p class="text-xs text-slate-500 mt-1" data-key="ca_per_hour">per hour</p>
+                </div>
+                <div class="bg-white rounded-xl shadow-md border border-slate-200 p-5">
+                    <h4 class="font-bold text-slate-800 mb-2 flex items-center gap-2"><i class="fas fa-exchange-alt text-purple-500"></i><span data-key="ca_lane_change">Lane-Change Conflicts</span></h4>
+                    <div class="text-3xl font-bold text-purple-500" id="ca-lane-change">0</div>
+                    <p class="text-xs text-slate-500 mt-1" data-key="ca_per_hour">per hour</p>
                 </div>
             </div>
-            <div class="max-w-3xl mx-auto mt-6 bg-white rounded-xl shadow-md border border-slate-200 p-5">
-                <h4 class="font-bold text-slate-800 mb-3"><i class="fas fa-chart-bar mr-2 text-primary"></i><span data-key="ca_hotspots">Conflict Hotspot Analysis</span></h4>
-                <canvas id="conflict-chart" height="120"></canvas>
-                <div class="mt-3 text-xs text-slate-500" data-key="ca_ref">Reference: FHWA-HRT-11-034 — Safety Effectiveness of Pedestrian Countermeasures</div>
+            <div class="max-w-5xl mx-auto bg-white rounded-xl shadow-md border border-slate-200 overflow-hidden">
+                <div class="p-5 border-b border-slate-200 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+                    <h4 class="font-bold text-slate-800 flex items-center gap-2"><i class="fas fa-map-marked-alt mr-2 text-primary"></i><span data-key="ca_hotspots">Conflict Hotspot Map Overlay</span></h4>
+                    <div class="flex items-center gap-3 text-sm">
+                        <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="ca-show-hotspots" checked class="rounded border-slate-300 text-primary focus:ring-primary"><span data-key="ca_show_hotspots">Show Hotspots</span></label>
+                        <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="ca-show-labels" checked class="rounded border-slate-300 text-primary focus:ring-primary"><span data-key="ca_show_labels">Show Labels</span></label>
+                    </div>
+                </div>
+                <div id="ca-hotspot-container" class="p-5 h-[500px] max-h-[500px] overflow-hidden relative">
+                    <div id="ca-hotspot-legend" class="absolute top-4 right-4 z-10 bg-white/95 backdrop-blur rounded-lg shadow-md border border-slate-200 p-3 text-xs hidden md:block"></div>
+                    <canvas id="ca-hotspot-canvas" class="w-full h-full" width="800" height="500"></canvas>
+                    <div id="ca-hotspot-overlay" class="absolute inset-0 pointer-events-none"></div>
+                </div>
+                <div class="px-5 py-3 border-t border-slate-200 bg-slate-50">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                        <div class="flex justify-between"><span class="text-slate-500" data-key="ca_ttc_incline">TTC @ Incline (+3.5%)</span><span id="ca-ttc-incline" class="font-mono font-bold text-red-500">0.0s</span></div>
+                        <div class="flex justify-between"><span class="text-slate-500" data-key="ca_pet_weaving">PET @ Weaving Zone</span><span id="ca-pet-weaving" class="font-mono font-bold text-yellow-500">0.0s</span></div>
+                        <div class="flex justify-between"><span class="text-slate-500" data-key="ca_resolution">Conflict Resolution</span><span id="ca-resolution" class="font-mono font-bold text-green-500" data-key="ca_unresolved">Unresolved</span></div>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
-
     <!-- ========== CARBON CREDIT & ECONOMIC ANALYSIS ========== -->
     <section id="carbon-credits" class="py-16 bg-white">
         <div class="container mx-auto px-4">
@@ -2730,6 +2747,34 @@
     "ca_safe": "Safe Interactions",
     "ca_hotspots": "Conflict Hotspot Analysis",
     "ca_ref": "Reference: FHWA-HRT-11-034 — Safety Effectiveness of Pedestrian Countermeasures",
+    "ca_ttc_avg": "Avg TTC (s)",
+
+    "ca_ttc_range": "Range: 0.6s – 1.8s",
+
+    "ca_pet_avg": "Avg PET (s)",
+
+    "ca_pet_range": "Range: 1.2s – 4.5s",
+
+    "ca_rear_end": "Rear-End Conflicts",
+
+    "ca_lane_change": "Lane-Change Conflicts",
+
+    "ca_per_hour": "per hour",
+
+    "ca_show_hotspots": "Show Hotspots",
+
+    "ca_show_labels": "Show Labels",
+
+    "ca_ttc_incline": "TTC @ Incline (+3.5%)",
+
+    "ca_pet_weaving": "PET @ Weaving Zone",
+
+    "ca_resolution": "Conflict Resolution",
+
+    "ca_unresolved": "Unresolved",
+
+    "ca_resolved": "Resolved",
+
     "cc_title": "Carbon Credit & Economic Analysis",
     "cc_desc": "Monetize CO2 reduction from AV penetration — EU ETS carbon market pricing",
     "cc_co2_saved": "CO2 Reduced",
@@ -3132,6 +3177,34 @@
     "ca_safe": "تفاعل آمن",
     "ca_hotspots": "تحليل نقاط التضارب الحرجة",
     "ca_ref": "مرجع: FHWA-HRT-11-034",
+    "ca_ttc_avg": "متوسط زمن التصادم (ث)",
+
+    "ca_ttc_range": "النطاق: 0.6 – 1.8 ثانية",
+
+    "ca_pet_avg": "متوسط PET (ث)",
+
+    "ca_pet_range": "النطاق: 1.2 – 4.5 ثانية",
+
+    "ca_rear_end": "تصادمات خلفية",
+
+    "ca_lane_change": "تصادمات تغيير المسار",
+
+    "ca_per_hour": "في الساعة",
+
+    "ca_show_hotspots": "إظهار النقاط الساخنة",
+
+    "ca_show_labels": "إظهار التسميات",
+
+    "ca_ttc_incline": "TTC عند المنحدر (+3.5%)",
+
+    "ca_pet_weaving": "PET في منطقة التشابك",
+
+    "ca_resolution": "حل التضاربات",
+
+    "ca_unresolved": "غير محلول",
+
+    "ca_resolved": "محلول",
+
     "cc_title": "تحليل ائتمان الكربون والاقتصاد",
     "cc_desc": "تحويل تخفيض CO2 إلى أرباح — سعر سوق الكربون الأوروبي",
     "cc_co2_saved": "تخفيض CO2",
@@ -3531,6 +3604,34 @@
     "ca_safe": "Bezopasnye vzaimodeystviya",
     "ca_hotspots": "Analiz tochek konfliktov",
     "ca_ref": "Literatura: FHWA-HRT-11-034",
+    "ca_ttc_avg": "Ср. TTC (с)",
+
+    "ca_ttc_range": "Диапазон: 0,6–1,8 с",
+
+    "ca_pet_avg": "Ср. PET (с)",
+
+    "ca_pet_range": "Диапазон: 1,2–4,5 с",
+
+    "ca_rear_end": "Задние столкновения",
+
+    "ca_lane_change": "Конфликты перестроения",
+
+    "ca_per_hour": "в час",
+
+    "ca_show_hotspots": "Показать точки",
+
+    "ca_show_labels": "Показать подписи",
+
+    "ca_ttc_incline": "TTC на уклоне (+3.5%)",
+
+    "ca_pet_weaving": "PET в зоне переплетения",
+
+    "ca_resolution": "Разрешение конфликтов",
+
+    "ca_unresolved": "Не решено",
+
+    "ca_resolved": "Решено",
+
     "cc_title": "Analiz uglerodnykh kreditov i ekonomiki",
     "cc_desc": "Monetizatsiya snizheniya CO2",
     "cc_co2_saved": "CO2 snizheno",
@@ -3906,6 +4007,34 @@
     "ca_safe": "Surakshit antahkriya",
     "ca_hotspots": "Takrav hotspot vishleshan",
     "ca_ref": "Sandarbh: FHWA-HRT-11-034",
+    "ca_ttc_avg": "औसत TTC (से)",
+
+    "ca_ttc_range": "सीमा: 0.6–1.8 सेकंड",
+
+    "ca_pet_avg": "औसत PET (से)",
+
+    "ca_pet_range": "सीमा: 1.2–4.5 सेकंड",
+
+    "ca_rear_end": "पिछे की टक्कर",
+
+    "ca_lane_change": "लेन-बदल टकराव",
+
+    "ca_per_hour": "प्रति घंटा",
+
+    "ca_show_hotspots": "हॉटस्पॉट दिखाएँ",
+
+    "ca_show_labels": "लेबल दिखाएँ",
+
+    "ca_ttc_incline": "ढलान पर TTC (+3.5%)",
+
+    "ca_pet_weaving": "बुनाई क्षेत्र में PET",
+
+    "ca_resolution": "संघर्ष समाधान",
+
+    "ca_unresolved": "अनसुलझा",
+
+    "ca_resolved": "हल हो गया",
+
     "cc_title": "Carbon Credit aur Arthik Vishleshan",
     "cc_desc": "AV pravesh se CO2 kami ka monetization",
     "cc_co2_saved": "CO2 kami",
@@ -4305,6 +4434,34 @@
     "ca_safe": "Sichere Interaktionen",
     "ca_hotspots": "Konflikt-Hotspot-Analyse",
     "ca_ref": "Referenz: FHWA-HRT-11-034",
+    "ca_ttc_avg": "Ø TTC (s)",
+
+    "ca_ttc_range": "Bereich: 0,6–1,8 s",
+
+    "ca_pet_avg": "Ø PET (s)",
+
+    "ca_pet_range": "Bereich: 1,2–4,5 s",
+
+    "ca_rear_end": "Auffahrkonflikte",
+
+    "ca_lane_change": "Spurwechselkonflikte",
+
+    "ca_per_hour": "pro Stunde",
+
+    "ca_show_hotspots": "Hotspots anzeigen",
+
+    "ca_show_labels": "Beschriftungen anzeigen",
+
+    "ca_ttc_incline": "TTC bei Steigung (+3,5%)",
+
+    "ca_pet_weaving": "PET im Verflechtungsbereich",
+
+    "ca_resolution": "Konfliktlösung",
+
+    "ca_unresolved": "Ungelöst",
+
+    "ca_resolved": "Gelöst",
+
     "cc_title": "CO2-Gutschrift & Wirtschaftsanalyse",
     "cc_desc": "CO2-Reduktion monetarisieren — EU-EHS Kohlenstoffpreis",
     "cc_co2_saved": "CO2 Reduziert",
@@ -4704,6 +4861,34 @@
     "ca_safe": "安全交互",
     "ca_hotspots": "冲突热点分析",
     "ca_ref": "参考：FHWA-HRT-11-034",
+    "ca_ttc_avg": "平均TTC（秒）",
+
+    "ca_ttc_range": "范围：0.6–1.8秒",
+
+    "ca_pet_avg": "平均PET（秒）",
+
+    "ca_pet_range": "范围：1.2–4.5秒",
+
+    "ca_rear_end": "追尾冲突",
+
+    "ca_lane_change": "变道冲突",
+
+    "ca_per_hour": "每小时",
+
+    "ca_show_hotspots": "显示热点",
+
+    "ca_show_labels": "显示标签",
+
+    "ca_ttc_incline": "坡道TTC（+3.5%）",
+
+    "ca_pet_weaving": "交织区PET",
+
+    "ca_resolution": "冲突解决",
+
+    "ca_unresolved": "未解决",
+
+    "ca_resolved": "已解决",
+
     "cc_title": "碳信用与经济分析",
     "cc_desc": "AV渗透率CO2减排货币化",
     "cc_co2_saved": "CO2减少",
@@ -5079,6 +5264,34 @@
     "ca_safe": "安全な相互作用",
     "ca_hotspots": "衝突ホットスポット分析",
     "ca_ref": "参考：FHWA-HRT-11-034",
+    "ca_ttc_avg": "平均TTC（秒）",
+
+    "ca_ttc_range": "範囲：0.6〜1.8秒",
+
+    "ca_pet_avg": "平均PET（秒）",
+
+    "ca_pet_range": "範囲：1.2〜4.5秒",
+
+    "ca_rear_end": "追突コンフリクト",
+
+    "ca_lane_change": "車線変更コンフリクト",
+
+    "ca_per_hour": "1時間あたり",
+
+    "ca_show_hotspots": "ホットスポット表示",
+
+    "ca_show_labels": "ラベル表示",
+
+    "ca_ttc_incline": "坂道TTC（+3.5%）",
+
+    "ca_pet_weaving": "織り込みゾーンPET",
+
+    "ca_resolution": "コンフリクト解決",
+
+    "ca_unresolved": "未解決",
+
+    "ca_resolved": "解決済み",
+
     "cc_title": "炭素クレジットと経済分析",
     "cc_desc": "AV浸透によるCO2削減の貨幣化",
     "cc_co2_saved": "CO2削減",
@@ -5454,6 +5667,34 @@
     "ca_safe": "안전한 상호작용",
     "ca_hotspots": "충돌 핫스팟 분석",
     "ca_ref": "참고: FHWA-HRT-11-034",
+    "ca_ttc_avg": "평균 TTC(초)",
+
+    "ca_ttc_range": "범위: 0.6~1.8초",
+
+    "ca_pet_avg": "평균 PET(초)",
+
+    "ca_pet_range": "범위: 1.2~4.5초",
+
+    "ca_rear_end": "추돌 충돌",
+
+    "ca_lane_change": "차선 변경 충돌",
+
+    "ca_per_hour": "시간당",
+
+    "ca_show_hotspots": "해스폿 표시",
+
+    "ca_show_labels": "라벨 표시",
+
+    "ca_ttc_incline": "경사로 TTC (+3.5%)",
+
+    "ca_pet_weaving": "엮김 구역 PET",
+
+    "ca_resolution": "충돌 해결",
+
+    "ca_unresolved": "미해결",
+
+    "ca_resolved": "해결됨",
+
     "cc_title": "탄소 크레딧 및 경제 분석",
     "cc_desc": "AV 보급에 따른 CO2 감축 화폐화",
     "cc_co2_saved": "CO2 감축",
@@ -5853,6 +6094,34 @@
     "ca_safe": "Interactions Securisees",
     "ca_hotspots": "Analyse des points critiques",
     "ca_ref": "Reference: FHWA-HRT-11-034",
+    "ca_ttc_avg": "TTC moyen (s)",
+
+    "ca_ttc_range": "Plage : 0,6–1,8 s",
+
+    "ca_pet_avg": "PET moyen (s)",
+
+    "ca_pet_range": "Plage : 1,2–4,5 s",
+
+    "ca_rear_end": "Conflits de collision arrière",
+
+    "ca_lane_change": "Conflits de changement de voie",
+
+    "ca_per_hour": "par heure",
+
+    "ca_show_hotspots": "Afficher les points chauds",
+
+    "ca_show_labels": "Afficher les étiquettes",
+
+    "ca_ttc_incline": "TTC en pente (+3,5%)",
+
+    "ca_pet_weaving": "PET en zone d'entrelacement",
+
+    "ca_resolution": "Résolution des conflits",
+
+    "ca_unresolved": "Non résolu",
+
+    "ca_resolved": "Résolu",
+
     "cc_title": "Credit Carbone & Analyse Economique",
     "cc_desc": "Monetisation de la reduction CO2",
     "cc_co2_saved": "CO2 Reduit",
@@ -6807,60 +7076,271 @@ function weatherAdjustedSpeed(baseSpeed) {
     return baseSpeed * getWeatherFactor();
 }
 
-// ══════════════════════════════════════════════════════════
-// PEDESTRIAN / CYCLIST CONFLICT ANALYSIS (TTC)
-// ══════════════════════════════════════════════════════════
-var conflictData = { severe: 0, moderate: 0, safe: 0, hotspots: [] };
-var conflictChart = null;
-function computeConflictAnalysis(mpr) {
-    var baseRate = 12.5;
-    var avReduction = mpr / 100;
-    var severe = Math.round(baseRate * 0.15 * (1 - avReduction * 0.9));
-    var moderate = Math.round(baseRate * 0.35 * (1 - avReduction * 0.7));
-    var safe = Math.round(baseRate * 0.50 * (1 - avReduction * 0.3));
-    conflictData = { severe: severe, moderate: moderate, safe: safe,
-        hotspots: [
-            { name: 'Entry Ramp Merge', ttc: 1.8 * (1 - avReduction * 0.5) },
-            { name: 'Pedestrian Crossing', ttc: 2.5 * (1 - avReduction * 0.4) },
-            { name: 'Cyclist Lane', ttc: 3.2 * (1 - avReduction * 0.3) },
-            { name: 'Signalized Intersection', ttc: 4.1 * (1 - avReduction * 0.2) }
-        ]
-    };
-    var el;
-    el = document.getElementById('ca-severe'); if (el) el.textContent = severe;
-    el = document.getElementById('ca-moderate'); if (el) el.textContent = moderate;
-    el = document.getElementById('ca-safe'); if (el) el.textContent = safe;
-    var total = severe + moderate + safe;
-    el = document.getElementById('ca-severe-bar'); if (el) el.style.width = (total > 0 ? severe / total * 100 : 0) + '%';
-    el = document.getElementById('ca-moderate-bar'); if (el) el.style.width = (total > 0 ? moderate / total * 100 : 0) + '%';
-    el = document.getElementById('ca-safe-bar'); if (el) el.style.width = (total > 0 ? safe / total * 100 : 0) + '%';
-    renderConflictChart();
+
+
+// ═══════════════════════════════════════════════════════════
+// CONFLICT HOTSPOT ANALYSIS & SSAM (Surrogate Safety Assessment Model)
+// ═══════════════════════════════════════════════════════════
+var ssamData = { ttcAvg: 0, petAvg: 0, rearEnd: 0, laneChange: 0, hotspots: [] };
+var ssamChart = null;
+var ssamHotspotMarkers = [];
+var ssamCanvas = null;
+var ssamCtx = null;
+var ssamLastRenderTime = 0;
+function computeSSAMMetrics(mpr) {
+    var m = mpr / 100;
+    // Base rates at 0% MPR (hazardous conditions)
+    var baseTTC = 0.6; // seconds - minimal time-to-collision at low MPR
+    var basePET = 4.5; // seconds
+    var baseRearEnd = 18; // conflicts per hour
+    var baseLaneChange = 12; // conflicts per hour
+    // AV penetration reduces conflict rates
+    var ttcReduction = 1 - m * 0.8; // 80% max reduction at 100% MPR
+    var petIncrease = 1 + m * 0.8; // PET increases with AV penetration
+    var rearEndReduction = m * 0.9; // 90% max reduction
+    var laneChangeReduction = m * 0.7; // 70% max reduction
+    // Calculate metrics
+    var ttcAvg = Math.max(0.6, baseTTC * ttcReduction);
+    var petAvg = Math.max(1.2, basePET * petIncrease);
+    var rearEnd = Math.round(baseRearEnd * (1 - rearEndReduction));
+    var laneChange = Math.round(baseLaneChange * (1 - laneChangeReduction));
+    // Hotspot TTC values (specific ramp locations)
+    var hotspots = [
+        {
+            name: 'Qalyub Merge Inflow',
+            ttc: Math.max(0.6, 1.8 * ttcReduction),
+            pet: Math.max(1.2, 3.5 * petIncrease),
+            type: 'merge',
+            severity: ttcReduction > 0.5 ? 'low' : ttcReduction > 0.2 ? 'medium' : 'high'
+        },
+        {
+            name: 'Mostorod Bridge Bottleneck',
+            ttc: Math.max(0.7, 2.2 * ttcReduction),
+            pet: Math.max(1.5, 4.0 * petIncrease),
+            type: 'bottleneck',
+            severity: ttcReduction > 0.5 ? 'low' : ttcReduction > 0.2 ? 'medium' : 'high'
+        },
+        {
+            name: 'Dar Al Salam Exit Weaving',
+            ttc: Math.max(0.5, 2.5 * ttcReduction),
+            pet: Math.max(1.3, 5.0 * petIncrease),
+            type: 'weaving',
+            severity: ttcReduction > 0.5 ? 'low' : ttcReduction > 0.2 ? 'medium' : 'high'
+        }
+    ];
+    ssamData = { ttcAvg: ttcAvg, petAvg: petAvg, rearEnd: rearEnd, laneChange: laneChange, hotspots: hotspots };
+    updateSSAMDisplay();
+    renderSSAMChart();
+    renderSSAMHotspots();
 }
-function renderConflictChart() {
+function updateSSAMDisplay() {
+    var el;
+    // Update TTC
+    el = document.getElementById('ca-ttc-avg'); if (el) el.textContent = ssamData.ttcAvg.toFixed(1);
+    // Update PET
+    el = document.getElementById('ca-pet-avg'); if (el) el.textContent = ssamData.petAvg.toFixed(1);
+    // Update Rear-End counter
+    el = document.getElementById('ca-rear-end'); if (el) el.textContent = ssamData.rearEnd;
+    // Update Lane-Change counter
+    el = document.getElementById('ca-lane-change'); if (el) el.textContent = ssamData.laneChange;
+    // Update conflict resolution status
+    var resolutionEl = document.getElementById('ca-resolution');
+    if (resolutionEl) {
+        if (ssamData.ttcAvg >= 2.0) {
+            resolutionEl.innerHTML = '<span class="font-mono font-bold text-green-500" data-key="ca_resolved">Resolved</span>';
+        } else {
+            resolutionEl.innerHTML = '<span class="font-mono font-bold text-red-500" data-key="ca_unresolved">Unresolved</span>';
+        }
+    }
+    // Update incline TTC
+    el = document.getElementById('ca-ttc-incline'); if (el) el.textContent = ssamData.hotspots[0].ttc.toFixed(1) + 's';
+    // Update weaving PET
+    el = document.getElementById('ca-pet-weaving'); if (el) el.textContent = ssamData.hotspots[1].pet.toFixed(1) + 's';
+}
+function renderSSAMChart() {
     if (typeof Chart === 'undefined') return;
-    if (conflictChart) { conflictChart.destroy(); conflictChart = null; }
-    var ctx = document.getElementById('conflict-chart');
+    if (ssamChart) { ssamChart.destroy(); ssamChart = null; }
+    var ctx = document.getElementById('ca-hotspot-canvas');
     if (!ctx) return;
-    conflictChart = new Chart(ctx, {
+    // Get canvas dimensions with fixed height constraint
+    var canvasEl = ctx.parentNode;
+    var maxHeight = parseFloat(getComputedStyle(canvasEl).getPropertyValue('max-height')) || 500;
+    var containerHeight = canvasEl.offsetHeight || maxHeight;
+    var chartHeight = Math.min(containerHeight - 40, 300);
+    ssamChart = new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: conflictData.hotspots.map(function(h) { return h.name; }),
+            labels: ssamData.hotspots.map(function(h) { return h.name; }),
             datasets: [{
                 label: 'TTC (seconds)',
-                data: conflictData.hotspots.map(function(h) { return h.ttc; }),
-                backgroundColor: conflictData.hotspots.map(function(h) { return h.ttc < 2 ? 'rgba(239,68,68,0.7)' : h.ttc < 5 ? 'rgba(234,179,8,0.7)' : 'rgba(34,197,94,0.7)'; }),
-                borderRadius: 6
+                data: ssamData.hotspots.map(function(h) { return h.ttc; }),
+                backgroundColor: ssamData.hotspots.map(function(h) {
+                    return h.ttc < 1.0 ? 'rgba(239,68,68,0.8)' :
+                           h.ttc < 1.5 ? 'rgba(234,179,8,0.8)' :
+                           h.ttc < 2.0 ? 'rgba(245,158,11,0.8)' :
+                           'rgba(34,197,94,0.8)';
+                }),
+                borderColor: ssamData.hotspots.map(function(h) {
+                    return h.ttc < 1.0 ? '#ef4444' :
+                           h.ttc < 1.5 ? '#eab308' :
+                           h.ttc < 2.0 ? '#f59e0b' :
+                           '#22c55e';
+                }),
+                borderWidth: 1
             }]
         },
         options: {
-            responsive: true, maintainAspectRatio: false,
-            plugins: { legend: { display: false } },
-            scales: { y: { beginAtZero: true, max: 8, title: { display: true, text: 'TTC (seconds)' } } }
-        }
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false }, tooltip: { enabled: false } },
+            scales: {
+                y: { beginAtZero: true, max: 5, title: { display: true, text: 'TTC (seconds)' } }
+            }
+        },
+        // Preserve canvas context between renders
+        preserveDrawingBuffer: false
     });
 }
+function renderSSAMHotspots() {
+    var container = document.getElementById('ca-hotspot-container');
+    if (!container) return;
+    // Clear previous overlay (prevents infinite growth / layout stretching)
+    var overlay = document.getElementById('ca-hotspot-overlay');
+    if (overlay) {
+        overlay.innerHTML = '';
+        overlay.width = container.offsetWidth;
+        overlay.height = container.offsetHeight;
+    }
+    var canvas = document.getElementById('ca-hotspot-canvas');
+    if (canvas) {
+        canvas.width = container.offsetWidth;
+        canvas.height = 500; // Fixed height with overflow
+    }
+    if (ssamCtx) {
+        ssamCtx.clearRect(0, 0, canvas.width, canvas.height);
+    } else {
+        ssamCtx = canvas.getContext('2d');
+    }
+    // Render pulsing hotspot circles
+    ssamData.hotspots.forEach(function(hotspot, index) {
+        var ttc = hotspot.ttc;
+        var pet = hotspot.pet;
+        var severity = hotspot.severity;
+        var x = 20 + index * 200 + 50;
+        var y = ssamCtx.canvas.height / 2;
+        var radius = 12;
+        var pulsePhase = (Date.now() / 200) % 1;
+        // Color and pulse based on severity and MPR
+        if (ttc < 1.0) {
+            color = 'rgba(239,68,68,' + (0.4 + 0.3 * Math.sin(pulsePhase)) + ')';
+            // Draw red pulsing circle for high severity
+            ssamCtx.fillStyle = color;
+            ssamCtx.beginPath();
+            ssamCtx.arc(x, y, radius, 0, Math.PI * 2);
+            ssamCtx.fill();
+            // Draw inner pulsing dot
+            var innerRadius = radius * (0.4 + 0.3 * Math.sin(pulsePhase * 3));
+            ssamCtx.fillStyle = 'rgba(255,255,255,' + (0.6 + 0.4 * Math.sin(pulsePhase * 3)) + ')';
+            ssamCtx.beginPath();
+            ssamCtx.arc(x, y, innerRadius, 0, Math.PI * 2);
+            ssamCtx.fill();
+            // Add "HOT" label
+            ssamCtx.fillStyle = '#fff';
+            ssamCtx.font = 'bold 11px sans-serif';
+            ssamCtx.textAlign = 'center';
+            ssamCtx.textBaseline = 'middle';
+            ssamCtx.fillText('HOT', x, y);
+        } else if (ttc < 1.5) {
+            color = 'rgba(234,179,8,' + (0.4 + 0.3 * Math.sin(pulsePhase)) + ')';
+            // Draw orange pulsing circle for medium severity
+            ssamCtx.fillStyle = color;
+            ssamCtx.beginPath();
+            ssamCtx.arc(x, y, radius, 0, Math.PI * 2);
+            ssamCtx.fill();
+            ssamCtx.fillStyle = '#fff';
+            ssamCtx.font = 'bold 10px sans-serif';
+            ssamCtx.textAlign = 'center';
+            ssamCtx.textBaseline = 'middle';
+            ssamCtx.fillText('MED', x, y);
+        } else {
+            color = 'rgba(34,197,94,' + (0.4 + 0.3 * Math.sin(pulsePhase)) + ')';
+            // Draw green pulsing circle for low severity
+            ssamCtx.fillStyle = color;
+            ssamCtx.beginPath();
+            ssamCtx.arc(x, y, radius, 0, Math.PI * 2);
+            ssamCtx.fill();
+            ssamCtx.fillStyle = '#fff';
+            ssamCtx.font = 'bold 10px sans-serif';
+            ssamCtx.textAlign = 'center';
+            ssamCtx.textBaseline = 'middle';
+            ssamCtx.fillText('OK', x, y);
+        }
+        // Draw PET value below
+        ssamCtx.fillStyle = color;
+        ssamCtx.font = '9px sans-serif';
+        ssamCtx.textAlign = 'center';
+        ssamCtx.textBaseline = 'bottom';
+        ssamCtx.fillText(hotspot.name.substring(0, 12), x, y + radius + 18);
+        // Draw TTC value
+        ssamCtx.fillStyle = '#fff';
+        ssamCtx.font = '9px bold sans-serif';
+        ssamCtx.textAlign = 'center';
+        ssamCtx.textBaseline = 'top';
+        ssamCtx.fillText(ttc.toFixed(1) + 's', x, y - radius - 4);
+    });
+    // Draw legend
+    var legendEl = document.getElementById('ca-hotspot-legend');
+    if (legendEl) {
+        var legendHTML = '';
+        ssamData.hotspots.forEach(function(h, i) {
+            var c = 'rgba(239,68,68,0.5)';
+            var ttc = h.ttc;
+            if (ttc < 1.5 && ttc >= 1.0) {
+                c = 'rgba(234,179,8,0.5)';
+            } else if (ttc >= 1.5) {
+                c = 'rgba(34,197,94,0.5)';
+            }
+            legendHTML += '<div class="flex items-center gap-2 mb-1"><span class="w-2 h-2 rounded" style="background:' + c + ';"></span>' + h.name + '</div>';
+        });
+        legendEl.innerHTML = legendHTML;
+        legendEl.classList.remove('hidden');
+        legendEl.classList.add('block');
+    }
+    ssamLastRenderTime = Date.now();
+}
+// Initialize SSAM metrics when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    // Set initial MPR from slider if exists
+    var initialMPR = 10; // default
+    var mprSlider = document.getElementById('mpr-slider');
+    if (mprSlider) {
+        initialMPR = parseInt(mprSlider.value, 10);
+    }
+    computeSSAMMetrics(initialMPR);
+    // Update on MPR slider change
+    if (mprSlider) {
+        mprSlider.addEventListener('input', function() {
+            var v = parseInt(this.value, 10);
+            computeSSAMMetrics(v);
+            // Also update ring road style
+            if (typeof updateRingRoadStyle === 'function') {
+                updateRingRoadStyle(v);
+            }
+        });
+    }
+    // Update on Scenario B toggle
+    var scenarioB = document.getElementById('scenario-b') || document.querySelector('input[name="scenario"]');
+    if (scenarioB) {
+        scenarioB.addEventListener('change', function() {
+            var v = parseInt(document.getElementById('mpr-slider').value, 10);
+            computeSSAMMetrics(v);
+            if (typeof updateRingRoadStyle === 'function') {
+                updateRingRoadStyle(v);
+            }
+        });
+    }
+});
 
-// ══════════════════════════════════════════════════════════
 // CARBON CREDIT & ECONOMIC ANALYSIS
 // ══════════════════════════════════════════════════════════
 var CARBON_ECON = {
