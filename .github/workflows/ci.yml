@@ -29,6 +29,7 @@ jobs:
             if(r.status!==0){fails++;console.error('Block '+i+' FAILED:\n'+r.stderr);}
           }
           console.error(i+' blocks checked, '+fails+' failures');
+          const gl=fs.readdirSync('locales');gl.forEach(f=>{const r=cp.spawnSync('node',['--check','locales/'+f],{encoding:'utf8'});if(r.status!==0){fails++;console.error('locale',f,r.stderr);}});console.error(gl.length+' locale files checked');
           process.exit(fails?1:0);"
 
   tests:
