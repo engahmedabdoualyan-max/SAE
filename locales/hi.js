@@ -413,4 +413,4 @@ TRANSLATIONS['hi'] = {
     "rp_status": "Record ke liye taiyar",
 
     "vid_fallback": "Video ke liye HTTPS avashyak — sae.fimtosoft.com par deploy karein",
-  };
+  "cmp_title": "गलियारों की तुलना", "cmp_desc": "उसी MPR पर दो गलियारों की तुलना — मैप, क्षमता और गति सीमा लाइव अपडेट", "cmp_a": "गलियारा A", "cmp_b": "गलियारा B", "cmp_speed": "गति सीमा" };

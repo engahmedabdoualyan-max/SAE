@@ -413,4 +413,4 @@ TRANSLATIONS['ko'] = {
     "rp_status": "녹화 준비 완료",
 
     "vid_fallback": "돔떤뗐는 HTTPS 가가요. sae.fimtosoft.com에 배터뷰",
-  };
+  "cmp_title": "공별 비교", "cmp_desc": "같은 MPR에서 두 공별 비교 — 지도,용량,제한 속도 실시간 업데이트", "cmp_a": "공별 A", "cmp_b": "공별 B", "cmp_speed": "제한 속도" };

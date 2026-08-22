@@ -413,4 +413,4 @@ TRANSLATIONS['ja'] = {
     "rp_status": "録画準備完了",
 
     "vid_fallback": "ビデオにはHTTPSが必要です。 sae.fimtosoft.comに部署",
-  };
+  "cmp_title": "コリドー比較", "cmp_desc": "同じMPRで2コリドーを比較 — 地图・容量・制限速度がリアルタイム更新", "cmp_a": "コリドー A", "cmp_b": "コリドー B", "cmp_speed": "制限速度" };

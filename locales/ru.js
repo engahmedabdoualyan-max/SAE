@@ -437,4 +437,4 @@ TRANSLATIONS['ru'] = {
     "rp_status": "Gotovo k zapisi",
 
     "vid_fallback": "Video trebuet HTTPS — razvertyvt na sae.fimtosoft.com",
-  };
+  "cmp_title": "Сравнение коридоров", "cmp_desc": "Сравните два коридора при одинаковом MPR — карты, пропускная способность и скорость обновляются вживую", "cmp_a": "Коридор A", "cmp_b": "Коридор B", "cmp_speed": "Лимит скорости" };

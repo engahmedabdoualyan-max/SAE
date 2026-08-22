@@ -437,4 +437,4 @@ TRANSLATIONS['de'] = {
     "rp_status": "Bereit zum Aufnehmen",
 
     "vid_fallback": "Video erfordert HTTPS — auf sae.fimtosoft.com bereitstellen",
-  };
+  "cmp_title": "Korridor-Vergleich", "cmp_desc": "Zwei Korridore bei gleichem MPR vergleichen — Karten, Kapazität und Tempo live", "cmp_a": "Korridor A", "cmp_b": "Korridor B", "cmp_speed": "Tempolimit" };

@@ -437,4 +437,4 @@ TRANSLATIONS['zh'] = {
     "rp_status": "准备录制",
 
     "vid_fallback": "视频需要HTTPS：部署到 sae.fimtosoft.com",
-  };
+  "cmp_title": "走廊对比", "cmp_desc": "在相同MPR下对比两个走廊 — 地图、通行能力和限速实时更新", "cmp_a": "走廊 A", "cmp_b": "走廊 B", "cmp_speed": "限速" };

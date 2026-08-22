@@ -437,4 +437,4 @@ TRANSLATIONS['fr'] = {
     "rp_status": "Pret a enregistrer",
 
     "vid_fallback": "Video exige HTTPS — deployer sur sae.fimtosoft.com",
-  };
+  "cmp_title": "Comparaison de couloirs", "cmp_desc": "Comparer deux couloirs au même MPR — cartes, capacité et vitesse en direct", "cmp_a": "Couloir A", "cmp_b": "Couloir B", "cmp_speed": "Limite vitesse" };
