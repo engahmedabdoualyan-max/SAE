@@ -925,7 +925,7 @@
                         <div class="lg:col-span-1">
                             <p class="text-xs font-semibold text-teal-700 mb-2 uppercase tracking-wide" data-key="vid_demo">Official Demo Video</p>
             <div class="relative w-full aspect-video rounded-lg overflow-hidden border border-teal-200 bg-slate-100">
-                <iframe src="https://www.youtube.com/embed/S_8qMh60F_U" title="Mercedes-Benz DRIVE PILOT Level 3 Automated Driving" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen class="absolute inset-0 w-full h-full"></iframe>
+                <iframe src="https://www.youtube.com/embed/vBB4tW22sX8" title="Mercedes-Benz DRIVE PILOT Level 3 Automated Driving" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen class="absolute inset-0 w-full h-full"></iframe>
                 <div class="absolute inset-0 flex items-center justify-center bg-slate-100 text-slate-400 text-xs text-center p-4" style="display:none" data-key="vid_fallback">Video requires HTTPS connection — deploy to sae.fimtosoft.com for full experience</div>
             </div>
                             <p class="text-[10px] text-slate-500 mt-1 text-center" data-key="l3_vid_cap">Mercedes-Benz DRIVE PILOT &mdash; Level 3 Automated Driving up to 95 km/h (2026)</p>
@@ -975,7 +975,7 @@
                         <div class="lg:col-span-1">
                             <p class="text-xs font-semibold text-emerald-700 mb-2 uppercase tracking-wide" data-key="vid_demo">Official Demo Video</p>
             <div class="relative w-full aspect-video rounded-lg overflow-hidden border border-emerald-200 bg-slate-100">
-                <iframe src="https://www.youtube.com/embed/Y0n6wY_nI0g" title="Inside Waymo's Self-Driving Car Full Autonomous Ride" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen class="absolute inset-0 w-full h-full"></iframe>
+                <iframe src="https://www.youtube.com/embed/hA_-MkU0Nfw" title="Inside Waymo's Self-Driving Car Full Autonomous Ride" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen class="absolute inset-0 w-full h-full"></iframe>
                 <div class="absolute inset-0 flex items-center justify-center bg-slate-100 text-slate-400 text-xs text-center p-4" style="display:none" data-key="vid_fallback">Video requires HTTPS connection — deploy to sae.fimtosoft.com for full experience</div>
             </div>
                             <p class="text-[10px] text-slate-500 mt-1 text-center" data-key="l4_vid_cap">Inside Waymo's Self-Driving Car &mdash; Full Autonomous Ride Demonstration</p>
@@ -1025,7 +1025,7 @@
                         <div class="lg:col-span-1">
                             <p class="text-xs font-semibold opacity-80 mb-2 uppercase tracking-wide" data-key="vid_demo">Official Design Reveal</p>
             <div class="relative w-full aspect-video rounded-lg overflow-hidden border border-white/30 bg-black/30">
-                <iframe src="https://www.youtube.com/embed/v9C2CunC7_k" title="Tesla Cybercab Official Design Capabilities and Core Specs" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen class="absolute inset-0 w-full h-full"></iframe>
+                <iframe src="https://www.youtube.com/embed/Qfj4urMF8CU" title="Tesla Cybercab Official Design Capabilities and Core Specs" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen class="absolute inset-0 w-full h-full"></iframe>
                 <div class="absolute inset-0 flex items-center justify-center text-white/50 text-xs text-center p-4" style="display:none" data-key="vid_fallback">Video requires HTTPS connection — deploy to sae.fimtosoft.com for full experience</div>
             </div>
                             <p class="text-[10px] opacity-70 mt-1 text-center" data-key="l5_vid_cap">Tesla Cybercab &mdash; Official Design, Capabilities &amp; Core Specs</p>
@@ -6421,6 +6421,7 @@ var currentScenario = 'A';
 var rrScenario = 'A';
 var rrMap = null, rrPolyA = null, rrPolyB = null, rrMarkers = [], rrMPR = 10;
 var rrOverlay = null, rrAnim = null;
+var rrSnappedPath = null, rrDirectionsRenderer = null, rrSnappedPathB = null;
 var liveTraffic = { volume: 0.62, hvShare: 0.22, speed: 45, aqi: 120, co2: 0, nox: 0, weather: 'Clear', ts: 0 };
 var airQuality = { aqi: null, pm25: null, co: null, no2: null, pm25u: '', cou: '', no2u: '', ts: 0 };
 var airPCEmult = 1;
@@ -6506,10 +6507,11 @@ function ringRoadColorForMPR(mpr) {
 function updateRingRoadStyle(mpr) {
   rrMPR = mpr;
   var col = ringRoadColorForMPR(mpr);
-  if (rrPolyA) rrPolyA.setOptions({ strokeColor: col, strokeWeight: 4 + mpr / 16 });
+  if (rrPolyA) {
+    rrPolyA.setOptions({ strokeColor: (rrScenario === 'B') ? '#10b981' : col, strokeWeight: (rrScenario === 'B') ? 8 : 4 + mpr / 16 });
+  }
   if (rrPolyB) {
-    if (rrScenario === 'B') rrPolyB.setOptions({ strokeColor: '#10b981', strokeWeight: 7 });
-    else rrPolyB.setOptions({ strokeColor: col, strokeWeight: 4 + mpr / 16 });
+    rrPolyB.setOptions({ strokeColor: col, strokeWeight: 4 + mpr / 16 });
   }
   var stats = document.getElementById('rr-stats');
   if (stats) {
@@ -6523,8 +6525,11 @@ function updateRingRoadStyle(mpr) {
 
 function refreshRingRoadLabels() {
   rrMarkers.forEach(function (o) {
-    o.marker.setTitle(t(o.t));
-    o.iw.setContent(markerContent(o.mk));
+    if (o.marker) {
+      o.marker.setTitle(t(o.t));
+      if (o.iw) o.iw.setContent('<div style="min-width:260px"><strong>' + t(o.t) + '</strong><br>'
+        + '<span style="font-size:12px;color:#334155">' + t(o.d) + '</span></div>');
+    }
   });
 }
 
@@ -6540,7 +6545,7 @@ function initRingRoadMap() {
     el.innerHTML = '<div class="h-full flex items-center justify-center text-slate-200 text-sm p-6 text-center">Google Maps could not load. Check that the API key is valid and allowed for this domain.</div>';
     return;
   }
-  try {
+     try {
     var cor = CORRIDORS[currentCorridor] || CORRIDORS.egypt;
     RingRoadOverlay.prototype = new google.maps.OverlayView();
     rrMap = new google.maps.Map(el, {
@@ -6552,24 +6557,19 @@ function initRingRoadMap() {
         { featureType: 'road', stylers: [ { color: '#334155' } ] }
       ]
     });
-    rrPolyA = new google.maps.Polyline({ path: cor.coords, geodesic: true, strokeColor: ringRoadColorForMPR(rrMPR), strokeWeight: 6, map: rrMap });
-    var pathB = offsetPath(cor.coords, 0.006, 0.006);
-    rrPolyB = new google.maps.Polyline({ path: pathB, geodesic: true, strokeColor: ringRoadColorForMPR(rrMPR), strokeWeight: 6, map: rrMap });
+
+    // Use DirectionsService to snap to actual highway geometry
+    initializeHighFidelityRingRoadMap(cor);
+
     var traffic = new google.maps.TrafficLayer();
     traffic.setMap(rrMap);
-    cor.markers.forEach(function (mk) {
-      var m = new google.maps.Marker({ position: mk.pos, map: rrMap, title: t(mk.t) });
-      var iw = new google.maps.InfoWindow({ content: markerContent(mk) });
-      m.addListener('click', function () { iw.open(rrMap, m); });
-      rrMarkers.push({ marker: m, iw: iw, t: mk.t, d: mk.d, mk: mk });
-    });
     rrOverlay = new RingRoadOverlay(rrMap);
     updateRingRoadStyle(rrMPR);
     startLiveTrafficFeed();
     fetchAirQuality();
     fetchWeather();
     if (!window._rrAir) window._rrAir = setInterval(function () { fetchAirQuality(); fetchWeather(); }, 300000);
-    if (rrScenario === 'B') respacePlatoon();
+    if (rrScenario === 'B') { setTimeout(respacePlatoon, 500); }
     var sl = document.getElementById('mpr-slider');
     if (sl) sl.addEventListener('input', function () {
       var v = parseInt(this.value, 10);
@@ -6579,6 +6579,131 @@ function initRingRoadMap() {
   } catch (e) {
     el.innerHTML = '<div class="h-full flex items-center justify-center text-slate-200 text-sm p-6 text-center">Google Maps failed to initialize.</div>';
   }
+}
+
+function initializeHighFidelityRingRoadMap(cor) {
+    var directionsService = new google.maps.DirectionsService();
+    var qalyubOrigin = new google.maps.LatLng(30.1782, 31.2524);
+    var adlyMansourDest = new google.maps.LatLng(30.1419, 31.4012);
+    var darAlSalamWaypoint = {
+        location: new google.maps.LatLng(29.9914, 31.2332),
+        stopover: true
+    };
+    var request = {
+        origin: qalyubOrigin,
+        destination: adlyMansourDest,
+        waypoints: [darAlSalamWaypoint],
+        travelMode: google.maps.TravelMode.DRIVING,
+        provideRouteAlternatives: false
+    };
+    directionsService.route(request, function (response, status) {
+        if (status === google.maps.DirectionsStatus.OK && response && response.routes && response.routes[0]) {
+            var route = response.routes[0];
+            rrSnappedPath = [];
+            response.routes[0].overview_path.forEach(function (p) {
+                rrSnappedPath.push({ lat: p.lat(), lng: p.lng() });
+            });
+            rrSnappedPathB = offsetPath(rrSnappedPath, -0.005, -0.005);
+            if (rrDirectionsRenderer) { rrDirectionsRenderer.setDirections(response); }
+            else {
+                rrDirectionsRenderer = new google.maps.DirectionsRenderer({
+                    map: rrMap,
+                    directions: response,
+                    suppressMarkers: true,
+                    preserveViewport: true,
+                    polylineOptions: {
+                        strokeColor: "#06b6dace",
+                        strokeOpacity: 0.75,
+                        strokeWeight: 6
+                    }
+                });
+            }
+            renderTwoWayParallelCorridor(rrSnappedPath, rrSnappedPathB);
+            renderPreciseRampMarkers();
+        } else {
+            console.warn('DirectionsService failed:', status);
+            rrSnappedPath = cor.coords.slice();
+            rrSnappedPathB = offsetPath(cor.coords, 0.006, 0.006);
+            renderTwoWayParallelCorridor(rrSnappedPath, rrSnappedPathB);
+            renderPreciseRampMarkers();
+        }
+    });
+}
+
+function renderTwoWayParallelCorridor(pathA, pathB) {
+    var color = ringRoadColorForMPR(rrMPR);
+    if (rrPolyA) rrPolyA.setMap(null);
+    if (rrPolyB) rrPolyB.setMap(null);
+    rrPolyA = new google.maps.Polyline({
+        path: pathA, geodesic: true,
+        strokeColor: (rrScenario === 'B') ? '#10b981' : color,
+        strokeOpacity: 0.8, strokeWeight: (rrScenario === 'B') ? 8 : 6,
+        map: rrMap
+    });
+    rrPolyB = new google.maps.Polyline({
+        path: pathB, geodesic: true,
+        strokeColor: color,
+        strokeOpacity: 0.6, strokeWeight: 5,
+        map: rrMap, strokeDashArray: [12, 8]
+    });
+    var bounds = new google.maps.LatLngBounds();
+    [pathA, pathB].forEach(function (path) {
+        path.forEach(function (p) { bounds.extend(p); });
+    });
+    rrMap.fitBounds(bounds, 0.05);
+}
+
+function renderPreciseRampMarkers() {
+    var rampSets = {
+        egypt: [
+            { lat: 30.1782, lng: 31.2524, t: 'ramp_qalyub', d: 'ramp_qalyub_d' },
+            { lat: 30.1345, lng: 31.3122, t: 'ramp_mostorod', d: 'ramp_mostorod_d' },
+            { lat: 29.9914, lng: 31.2332, t: 'ramp_darsalam', d: 'ramp_darsalam_d' },
+            { lat: 30.1419, lng: 31.4012, t: 'ramp_adly', d: 'ramp_adly_d' }
+        ],
+        ksa: [
+            { lat: 24.745, lng: 46.645, t: 'ramp_qalyub', d: 'ramp_qalyub_d' },
+            { lat: 24.620, lng: 46.730, t: 'ramp_mostorod', d: 'ramp_mostorod_d' },
+            { lat: 24.555, lng: 46.680, t: 'ramp_darsalam', d: 'ramp_darsalam_d' },
+            { lat: 24.530, lng: 46.655, t: 'ramp_adly', d: 'ramp_adly_d' }
+        ],
+        uae: [
+            { lat: 25.230, lng: 55.270, t: 'ramp_qalyub', d: 'ramp_qalyub_d' },
+            { lat: 25.150, lng: 55.220, t: 'ramp_mostorod', d: 'ramp_mostorod_d' },
+            { lat: 25.120, lng: 55.195, t: 'ramp_darsalam', d: 'ramp_darsalam_d' },
+            { lat: 25.080, lng: 55.155, t: 'ramp_adly', d: 'ramp_adly_d' }
+        ],
+        jordan: [
+            { lat: 31.970, lng: 35.930, t: 'ramp_qalyub', d: 'ramp_qalyub_d' },
+            { lat: 31.920, lng: 35.965, t: 'ramp_mostorod', d: 'ramp_mostorod_d' },
+            { lat: 31.890, lng: 35.990, t: 'ramp_darsalam', d: 'ramp_darsalam_d' },
+            { lat: 31.840, lng: 36.035, t: 'ramp_adly', d: 'ramp_adly_d' }
+        ]
+    };
+    var rampPoints = rampSets[currentCorridor] || rampSets.egypt;
+    rrMarkers.forEach(function (entry) { if (entry.marker) entry.marker.setMap(null); });
+    rrMarkers = [];
+    rampPoints.forEach(function (rp) {
+        var m = new google.maps.Marker({
+            position: { lat: rp.lat, lng: rp.lng },
+            map: rrMap,
+            title: t(rp.t),
+            icon: {
+                path: google.maps.SymbolPath.CIRCLE,
+                scale: 8,
+                fillColor: '#ef4444',
+                fillOpacity: 0.9,
+                strokeColor: '#fff',
+                strokeWeight: 2,
+                zIndex: 100
+            }
+        });
+        var iwContent = '<div style="min-width:260px"><strong>' + t(rp.t) + '</strong><br>'
+            + '<span style="font-size:12px;color:#334155">' + t(rp.d) + '</span></div>';
+        var iw = new google.maps.InfoWindow({ content: iwContent });
+        m.addListener('click', function () { iw.open(rrMap, m); });
+        rrMarkers.push({ marker: m, iw: iw, t: rp.t, d: rp.d, mk: rp });
+    });
 }
 
 // ══════════════════════════════════════════════════════════
@@ -6711,9 +6836,9 @@ RingRoadOverlay.prototype.drawVehicles = function () {
   var B = (rrScenario === 'B');
   var self = this;
   this.vehicles_.forEach(function (v) {
-    var cor = CORRIDORS[currentCorridor] || CORRIDORS.egypt;
-    var pathB2 = offsetPath(cor.coords, 0.006, 0.006);
-    var path = v.dir === 'B' ? pathB2 : cor.coords;
+    var pathA = (rrSnappedPath && rrSnappedPath.length > 2) ? rrSnappedPath : (CORRIDORS[currentCorridor] || CORRIDORS.egypt).coords;
+    var pathB2 = (rrSnappedPathB && rrSnappedPathB.length > 2) ? rrSnappedPathB : offsetPath(pathA, -0.005, -0.005);
+    var path = v.dir === 'B' ? pathB2 : pathA;
     var pt = routePoint(path, v.frac);
     var px = proj.fromLatLngToDivPixel(new google.maps.LatLng(pt.lat, pt.lng));
     if (!px) return;
@@ -6955,28 +7080,18 @@ function switchCorridor(country) {
   if (rrPolyA) { rrPolyA.setMap(null); rrPolyA = null; }
   if (rrPolyB) { rrPolyB.setMap(null); rrPolyB = null; }
   // Clear existing markers
-  rrMarkers.forEach(function(o) { o.marker.setMap(null); });
+  rrMarkers.forEach(function(o) { if (o.marker) o.marker.setMap(null); });
   rrMarkers = [];
   // Remove old overlay
-  if (rrOverlay) { rrOverlay.setMap(null); rrOverlay = null; }
-  // Pan map
-  rrMap.setCenter(cor.center);
-  rrMap.setZoom(cor.zoom);
-  // Draw new polylines
-  var pathB = offsetPath(cor.coords, 0.006, 0.006);
-  rrPolyA = new google.maps.Polyline({ path: cor.coords, geodesic: true, strokeColor: ringRoadColorForMPR(rrMPR), strokeWeight: 6, map: rrMap });
-  rrPolyB = new google.maps.Polyline({ path: pathB, geodesic: true, strokeColor: ringRoadColorForMPR(rrMPR), strokeWeight: 6, map: rrMap });
-  // Add new markers
-  cor.markers.forEach(function (mk) {
-    var m = new google.maps.Marker({ position: mk.pos, map: rrMap, title: t(mk.t) });
-    var iw = new google.maps.InfoWindow({ content: markerContent(mk) });
-    m.addListener('click', function () { iw.open(rrMap, m); });
-    rrMarkers.push({ marker: m, iw: iw, t: mk.t, d: mk.d, mk: mk });
-  });
+  if (rrOverlay) { rrOverlay.setMap(null); rrOverlay = null; rrOverlay = null; }
+  // Clear directions renderer
+  if (rrDirectionsRenderer) { rrDirectionsRenderer.setMap(null); rrDirectionsRenderer = null; }
+  rrSnappedPath = null; rrSnappedPathB = null;
+  // Re-route with DirectionsService for new corridor
+  initializeHighFidelityRingRoadMap(cor);
   // New overlay
   rrOverlay = new RingRoadOverlay(rrMap);
   updateRingRoadStyle(rrMPR);
-  // Update AQI centroid
   fetchAirQuality();
   fetchWeather();
 }
