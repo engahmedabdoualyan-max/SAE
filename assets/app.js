@@ -1,3 +1,23 @@
+(function () {
+    function argsOf(el) {
+        var raw = el.getAttribute('data-args');
+        if (!raw) return [];
+        try { return JSON.parse(raw); } catch (err) { return []; }
+    }
+    ['click', 'change', 'input'].forEach(function (evt) {
+        document.addEventListener(evt, function (e) {
+            var attr = 'data-call-' + evt;
+            var el = e.target.closest ? e.target.closest('[' + attr + ']') : null;
+            if (!el) return;
+            var fnName = el.getAttribute(attr);
+            var fn = window[fnName];
+            if (typeof fn !== 'function') { console.warn('[delegation] missing fn:', fnName); return; }
+            var args = el.hasAttribute('data-pass-value') ? [el.value] : argsOf(el);
+            fn.apply(el, args);
+        });
+    });
+})();
+
     // ══════════════════════════════════════════════════════════
     // FLEET PROFILES — Expanded Granular Matrix
     // ══════════════════════════════════════════════════════════
@@ -1874,7 +1894,7 @@ function initRingRoadMap() {
   }
      try {
     var cor = CORRIDORS[currentCorridor] || CORRIDORS.egypt;
-    RingRoadOverlay.prototype = new google.maps.OverlayView();
+    RingRoadOverlay.prototype = Object.assign(new google.maps.OverlayView(), RingRoadOverlay.prototype);
     rrMap = new google.maps.Map(el, {
       center: cor.center, zoom: cor.zoom,
       styles: [
@@ -2801,26 +2821,6 @@ function saeScroll(id) {
 function saeCloseSandboxOnOverlay(e, el) {
     if (e.target === el) closeSandbox();
 }
-(function () {
-    function argsOf(el) {
-        var raw = el.getAttribute('data-args');
-        if (!raw) return [];
-        try { return JSON.parse(raw); } catch (err) { return []; }
-    }
-    ['click', 'change', 'input'].forEach(function (evt) {
-        document.addEventListener(evt, function (e) {
-            var attr = 'data-call-' + evt;
-            var el = e.target.closest ? e.target.closest('[' + attr + ']') : null;
-            if (!el) return;
-            var fnName = el.getAttribute(attr);
-            var fn = window[fnName];
-            if (typeof fn !== 'function') { console.warn('[delegation] missing fn:', fnName); return; }
-            var args = el.hasAttribute('data-pass-value') ? [el.value] : argsOf(el);
-            fn.apply(el, args);
-        });
-    });
-})();
-
     ssamLastRenderTime = Date.now();function toggleMoreMenu() {
     var m = document.getElementById('more-menu');
     if (m) m.classList.toggle('hidden');
@@ -2850,9 +2850,15 @@ function applyView(v) {
 }
 function setView(v) {
     applyView(v);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (v === 'case') {
+        var t = document.getElementById('ringroad');
+        setTimeout(function () { if (t) t.scrollIntoView({ behavior: 'smooth' }); }, 120);
+    } else {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
     updateURL();
 }
+function openCaseStudy() { setView('case'); }
 (function () {
     var q = new URLSearchParams(location.search);
     var v = q.get('view') || 'main';
