@@ -19,30 +19,8 @@
     <link rel="canonical" href="https://sae.fimtosoft.com/">
 <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#0f172a">
-    <style>
-        .lg-line-cyan, .lg-line-slate, .lg-dot-orange, .lg-dot-green { display:inline-block; width:18px; height:4px; border-radius:2px; vertical-align:middle; margin-left:6px; }
-        .lg-line-cyan { background:#06b6d4; } .lg-line-slate { background:#64748b; }
-        .lg-dot-orange, .lg-dot-green { width:10px; height:10px; border-radius:50%; }
-        .lg-dot-orange { background:#f97316; } .lg-dot-green { background:#34d399; }
-    </style>
-<style id="sae-theme-overrides">
-    html.sae-dark .bg-white { background-color: #101b31 !important; }
-    html.sae-dark .bg-slate-50 { background-color: #0b1424 !important; }
-    html.sae-dark .bg-slate-100 { background-color: #16233c !important; }
-    html.sae-dark .text-slate-800 { color: #e2e8f0 !important; }
-    html.sae-dark .text-slate-700 { color: #cbd5e1 !important; }
-    html.sae-dark .text-slate-600 { color: #94a3b8 !important; }
-    html.sae-dark .text-slate-500 { color: #7c8db0 !important; }
-    html.sae-dark .border-slate-100, html.sae-dark .border-slate-200,
-    html.sae-dark .border-slate-300 { border-color: #24344f !important; }
-    html.sae-dark .divide-slate-200 > :not([hidden]) ~ :not([hidden]) { border-color: #24344f !important; }
-    html.sae-dark [class*="bg-gradient-to"] { background-image: linear-gradient(145deg, #101b31, #0d1830) !important; }
-    html.sae-dark select, html.sae-dark input:not([type="checkbox"]):not([type="radio"]) {
-        background-color: #16233c !important; color: #e2e8f0 !important;
-        border-color: #2d3f5e !important;
-    }
-    html.sae-dark .hover\:bg-white:hover { background-color: #1a2947 !important; }
-</style>
+    
+
 <script>
     (function () {
         try {
@@ -52,12 +30,7 @@
     })();
 </script>
     <link rel="icon" type="image/svg+xml" href="/icon.svg">
-<style>
-    .case-view { display: none; }
-    body.view-case .case-view { display: block; }
-    body.view-case section:not(.case-view):not(#emissions-matrix):not([data-main-keep]) { display: none; }
-    #view-tabs button { transition: all .2s; }
-</style>
+
     <link rel="alternate" hreflang="en" href="https://sae.fimtosoft.com/?lang=en">
     <link rel="alternate" hreflang="ar" href="https://sae.fimtosoft.com/?lang=ar">
     <link rel="alternate" hreflang="ru" href="https://sae.fimtosoft.com/?lang=ru">
@@ -150,59 +123,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --primary: #0EA5E9;
-            --primary-dark: #028AC4;
-            --secondary: #6366F1;
-            --dark: #1E293B;
-            --light: #F8FAFC;
-            --accent: #F59E0B;
-        }
-        * { scroll-behavior: smooth; }
-        body { font-family: 'Inter', system-ui, sans-serif; }
-        .logo-anim { display: inline-block; animation: pulse 2s infinite; }
-        @keyframes pulse { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.05); opacity: 0.85; } }
-        .gear-rotate { display: inline-block; animation: rotate 8s linear infinite; }
-        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        .vehicle-icon { position: absolute; animation: around 6s linear infinite; opacity: 0.8; }
-        @keyframes around { 0% { transform: rotate(0deg) translateX(20px) rotate(0deg); } 100% { transform: rotate(360deg) translateX(20px) rotate(-360deg); } }
-        .fade-in { animation: fadeIn 0.8s ease-in; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        .card-hover { transition: transform 0.3s ease, box-shadow 0.3s ease; }
-        .card-hover:hover { transform: translateY(-4px); box-shadow: 0 10px 30px rgba(0,0,0,0.12); }
-        .flag { font-size: 1.3em; margin-right: 6px; }
-        .rtl .flag { margin-right: 0; margin-left: 6px; }
-        .download-btn { transition: all 0.3s ease; border: 2px dashed var(--primary); background: white; color: #374151; }
-        .download-btn:hover { background: var(--primary); color: white; transform: scale(1.02); border-color: var(--primary); }
-        .level-badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 0.7em; font-weight: 600; }
-        .lvl0 { background: #FEE2E2; color: #991B2B; }
-        .lvl2 { background: #DBEAFE; color: #1E40AF; }
-        .lvl45 { background: #DCFCE7; color: #166534; }
-        .mpr-knob { -webkit-appearance: none; width: 100%; height: 8px; border-radius: 4px; background: linear-gradient(to right, var(--primary), var(--secondary)); outline: none; }
-        .mpr-knob::-webkit-slider-thumb { -webkit-appearance: none; width: 24px; height: 24px; border-radius: 50%; background: white; border: 2px solid var(--primary); cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.2); }
-        .platform-btn { transition: all 0.2s ease; }
-        .platform-btn.active { background: rgba(255,255,255,0.95) !important; color: #0EA5E9 !important; border-color: white !important; }
-        .nav-link { transition: color 0.2s ease; }
-        .nav-link:hover { color: var(--primary); }
-        .weight-row { background: linear-gradient(90deg, #ECFDF5 0%, #F0FDF4 100%) !important; font-weight: 600; }
-        .weight-row td { border-top: 2px solid #22C55E !important; }
-        #sim-canvas { border-radius: 12px; display: block; width: 100%; }
-        .capacity-bar { transition: width 0.6s cubic-bezier(0.4,0,0.2,1); }
-        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 200; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
-        .modal-overlay.hidden { display: none; }
-        .code-block { background: #1E293B; color: #E2E8F0; border-radius: 10px; padding: 20px; font-family: 'JetBrains Mono', 'Fira Code', monospace; font-size: 13px; line-height: 1.6; overflow-x: auto; white-space: pre; max-height: 60vh; overflow-y: auto; }
-        .code-block .kw { color: #C084FC; }
-        .code-block .fn { color: #67E8F9; }
-        .code-block .st { color: #86EFAC; }
-        .code-block .cm { color: #94A3B8; font-style: italic; }
-        .code-block .num { color: #FCA5A5; }
-        .guide-tab.active { color: #312E81 !important; border-bottom-color: #6366F1 !important; background: white; }
-        .guide-panel { animation: fadeIn 0.3s ease-in; }
-        .toast-msg { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px); background: #059669; color: white; padding: 12px 28px; border-radius: 12px; font-weight: 600; z-index: 300; opacity: 0; transition: all 0.4s cubic-bezier(0.4,0,0.2,1); pointer-events: none; box-shadow: 0 8px 30px rgba(0,0,0,0.2); }
-        .toast-msg.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-        @media (max-width: 768px) { .hero-bg { min-height: 500px; } .flag { font-size: 1.1em; } }
-    </style>
+    
+    <link rel="stylesheet" href="/assets/styles.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
@@ -241,11 +163,11 @@
                 </nav>
                 <div class="flex items-center gap-1.5">
                     <div id="view-tabs" class="flex items-center gap-0.5 p-0.5 rounded-lg bg-slate-100 border border-slate-200">
-                        <button data-call-click="setView" data-args='["main"]' id="tab-main" title="Main reference" class="px-2.5 py-1.5 rounded-md text-xs font-semibold inline-flex items-center gap-1 bg-cyan-500/15 text-cyan-700 border border-cyan-400/40">📚 <span>المرجعية</span></button>📚 <span data-key="tab_main">المرجعية</span></button>
-                        <button data-call-click="setView" data-args='["case"]' id="tab-case" title="Ring Road case study" class="px-2.5 py-1.5 rounded-md text-xs font-semibold inline-flex items-center gap-1 bg-slate-500/10 text-slate-600 border border-slate-400/30">🛗 <span>دراسة الحالة</span></button>🛣️ <span data-key="tab_case">دراسة الحالة</span></button>
+                        <button data-call-click="setView" data-args='["main"]' id="tab-main" title="Main reference" class="px-2.5 py-1.5 rounded-md text-xs font-semibold inline-flex items-center gap-1 bg-cyan-500/15 text-cyan-700 border border-cyan-400/40">📚 <span data-key="tab_main">المرجعية</span></button>
+                        <button data-call-click="setView" data-args='["case"]' id="tab-case" title="Ring Road case study" class="px-2.5 py-1.5 rounded-md text-xs font-semibold inline-flex items-center gap-1 bg-slate-500/10 text-slate-600 border border-slate-400/30">🛣️ <span data-key="tab_case">دراسة الحالة</span></button>
                     </div>
                     
-                    <button id="theme-toggle" data-call-click="toggleTheme" aria-label="Toggle dark mode" title="Dark / Light" class="w-8 h-8 inline-flex items-center justify-center rounded-md border border-slate-200 bg-white text-sm hover:bg-slate-50 transition hover:bg-slate-100 transition"><span id="theme-icon">🌙</span></button>
+                    <button id="theme-toggle" data-call-click="toggleTheme" aria-label="Toggle dark mode" title="Dark / Light" class="w-8 h-8 inline-flex items-center justify-center rounded-md border border-slate-200 bg-white text-sm hover:bg-slate-100 transition"><span id="theme-icon">🌙</span></button>
                     <select id="lang-select" data-call-change="setLanguage" data-pass-value class="border border-slate-200 rounded-md px-0.5 py-1 text-sm bg-white cursor-pointer w-[44px] hover:border-slate-300 transition">
                         <option value="en" selected>🇬🇧</option><option value="ar" >🇪🇬 العربية</option><option value="ru" >🇷🇺 Русский</option><option value="hi" >🇮🇳 हिन्दी</option><option value="de" >🇩🇪 Deutsch</option><option value="zh" >🇨🇳 中文</option><option value="ja" >🇯🇵 日本語</option><option value="ko" >🇰🇷 한국어</option><option value="fr" >🇫🇷 Français</option>
                     </select>
@@ -422,7 +344,6 @@
                 <span class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-blue-400"></span> Mlaiky</span>
                 <span class="flex items-center gap-1"><span class="w-3 h-3 rounded bg-yellow-300"></span> Tuk-Tuk</span>
             </div>
-        </div>
     </section>
     <!-- ========== WEATHER IMPACT MODELING ========== -->
     <section id="weather-impact" class="py-16 bg-white">
@@ -476,42 +397,39 @@
     <section id="emissions-matrix" class="py-16 bg-white">
         <div class="container mx-auto px-4">
             <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-md border border-slate-200 p-5">
-                    <h3 class="text-2xl font-bold text-slate-800 mb-3 text-center"><i class="fas fa-smog mr-2 text-green-600"></i>مصفوفة الانبعاثات الموثقة — تقليدي مقابل ذاتي (SAE 0-5)</h4>
-                    <div class="overflow-x-auto">
-                    <table class="w-full text-sm">
-                        <thead><tr class="text-xs text-slate-500 border-b border-slate-200">
-                            <th class="text-left py-2">المستوى</th>
-                            <th class="py-2">CO₂ g/mile</th><th class="py-2">CO</th><th class="py-2">NOx</th><th class="py-2">PM2.5</th>
-                            <th class="text-right pr-2">الأساس العلمي</th>
-                        </tr></thead>
-                        <tbody>
-                            <tr class="border-b border-slate-100"><td class="py-2 font-medium">Traditional</td>
-                                <td class="text-center font-mono text-red-500">350–450</td><td class="text-center font-mono">2.1–3.4</td>
-                                <td class="text-center font-mono">0.11–0.20</td><td class="text-center font-mono">0.008–0.012</td>
-                                <td class="text-[10px] text-slate-500 text-right pr-2">EPA 2024 — احتراق وقودي + قيادة متذبذبة</td></tr>
-                            <tr class="border-b border-slate-100"><td class="py-2 font-medium">SAE L1–L2</td>
-                                <td class="text-center font-mono text-orange-500">320–380</td><td class="text-center font-mono">1.8–2.5</td>
-                                <td class="text-center font-mono">0.09–0.15</td><td class="text-center font-mono">0.006–0.010</td>
-                                <td class="text-[10px] text-slate-500 text-right pr-2">IEA 2024 — ACC يقلل التذبذب ~10%</td></tr>
-                            <tr class="border-b border-slate-100"><td class="py-2 font-medium">SAE L3</td>
-                                <td class="text-center font-mono text-yellow-600">280–310</td><td class="text-center font-mono">1.2–1.8</td>
-                                <td class="text-center font-mono">0.07–0.11</td><td class="text-center font-mono">0.004–0.007</td>
-                                <td class="text-[10px] text-slate-500 text-right pr-2">ICCT 2024 — إخماد الموجات المرورية</td></tr>
-                            <tr><td class="py-2 font-medium">SAE L4–L5 ⚡</td>
-                                <td class="text-center font-mono text-green-600">10–25*</td><td class="text-center font-mono">&lt;0.05</td>
-                                <td class="text-center font-mono">&lt;0.005</td><td class="text-center font-mono">&lt;0.0008</td>
-                                <td class="text-[10px] text-slate-500 text-right pr-2">IEEE 2024 — صففر عادم* (Lifecycle شبكة)</td></tr>
-                        </tbody>
-                    </table></div>
-                </div>
+                <h3 class="text-xl font-bold text-slate-800 mb-4 text-center"><i class="fas fa-smog mr-2 text-green-600"></i>مصفوفة الانبعاثات الموثقة — تقليدي مقابل ذاتي (SAE 0–5)</h3>
+                <table class="w-full text-sm">
+                    <thead><tr class="text-xs text-slate-500 border-b border-slate-200">
+                        <th class="text-left py-2">المستوى</th>
+                        <th class="py-2">CO₂ g/mile</th><th class="py-2">CO</th>
+                        <th class="py-2">NOx</th><th class="py-2">PM2.5</th>
+                        <th class="text-right pr-2">الأساس العلمي</th>
+                    </tr></thead>
+                    <tbody>
+                        <tr class="border-b border-slate-100"><td class="py-2 font-medium">Traditional</td>
+                            <td class="text-center font-mono text-red-500">350–450</td><td class="text-center font-mono">2.1–3.4</td>
+                            <td class="text-center font-mono">0.11–0.20</td><td class="text-center font-mono">0.008–0.012</td>
+                            <td class="text-[10px] text-slate-500 text-right pr-2">EPA 2024</td></tr>
+                        <tr class="border-b border-slate-100"><td class="py-2 font-medium">SAE L1–L2</td>
+                            <td class="text-center font-mono text-orange-500">320–380</td><td class="text-center font-mono">1.8–2.5</td>
+                            <td class="text-center font-mono">0.09–0.15</td><td class="text-center font-mono">0.006–0.010</td>
+                            <td class="text-[10px] text-slate-500 text-right pr-2">IEA 2024 — ACC ~10%</td></tr>
+                        <tr class="border-b border-slate-100"><td class="py-2 font-medium">SAE L3</td>
+                            <td class="text-center font-mono text-yellow-600">280–310</td><td class="text-center font-mono">1.2–1.8</td>
+                            <td class="text-center font-mono">0.07–0.11</td><td class="text-center font-mono">0.004–0.007</td>
+                            <td class="text-[10px] text-slate-500 text-right pr-2">ICCT 2024 — إخماد الموجات</td></tr>
+                        <tr><td class="py-2 font-medium">SAE L4–L5 ⚡</td>
+                            <td class="text-center font-mono text-green-600">10–25*</td><td class="text-center font-mono">&lt;0.05</td>
+                            <td class="text-center font-mono">&lt;0.005</td><td class="text-center font-mono">&lt;0.0008</td>
+                            <td class="text-[10px] text-slate-500 text-right pr-2">IEEE 2024 — Lifecycle*</td></tr>
+                    </tbody>
+                </table>
+                <p class="text-[11px] text-slate-400 mt-2">* انبعاثات دورة حياة من الشبكة الكهربائية — العادم المباشر صفر.</p>
             </div>
         </div>
     </section>
-                    <p class="text-[11px] text-slate-400 mt-2">* انبعاثات دورة حياة من الشبكة الكهربائية — العادم المباشر صفر. المصدر: شيت الانبعاثات — العملى.xlsx</p>
-                </div>
 
-
-<!-- ========== CONFLICT HOTSPOT ANALYSIS & SSAM ========== -->
+    <!-- ========== CONFLICT HOTSPOT ANALYSIS & SSAM ========== -->
     <section id="conflict-analysis" class="case-view class="py-16 bg-slate-50""
         <div class="container mx-auto px-4">
             <div class="text-center mb-8">
@@ -561,7 +479,6 @@
                     </div>
                 </div>
             </div>
-        </div>
     </section>
 
 
@@ -672,7 +589,6 @@
                     </div>
                 </div>
             </div>
-        </div>
     </section>
 
     <!-- ========== CARBON CREDIT & ECONOMIC ANALYSIS ========== -->
@@ -1283,9 +1199,12 @@
                             <p class="text-[10px] opacity-70 mt-1 text-center" data-key="l5_hw_cap">Tesla FSD Architecture: vision-only, no LiDAR, end-to-end neural net</p>
                         </div>
                     </div>
-                </div> </section>
+                </div>
+            </div>
+            </div>
+    </section>
 
-        <!-- ========== FLEET COMPARISON ENGINE ========== -->
+    <!-- ========== FLEET COMPARISON ENGINE ========== -->
     <section id="comparison" class="py-16 bg-white">
         <div class="container mx-auto px-4">
             <div class="text-center mb-8">
@@ -1512,6 +1431,7 @@
                 <div id="ch-calib-grid" class="grid grid-cols-2 md:grid-cols-4 gap-4"></div>
             <div id="ch-notes" class="mt-8"></div>
         </div>
+</div>
     </section>
     <!-- File Hub -->
     <section id="filehub" class="py-16 bg-slate-100">

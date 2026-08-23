@@ -1,0 +1,79 @@
+/* SAE AutoSim Hub — consolidated styles (extracted from index.html) */
+.lg-line-cyan, .lg-line-slate, .lg-dot-orange, .lg-dot-green { display:inline-block; width:18px; height:4px; border-radius:2px; vertical-align:middle; margin-left:6px; }
+        .lg-line-cyan { background:#06b6d4; } .lg-line-slate { background:#64748b; }
+        .lg-dot-orange, .lg-dot-green { width:10px; height:10px; border-radius:50%; }
+        .lg-dot-orange { background:#f97316; } .lg-dot-green { background:#34d399; }
+
+html.sae-dark .bg-white { background-color: #101b31 !important; }
+    html.sae-dark .bg-slate-50 { background-color: #0b1424 !important; }
+    html.sae-dark .bg-slate-100 { background-color: #16233c !important; }
+    html.sae-dark .text-slate-800 { color: #e2e8f0 !important; }
+    html.sae-dark .text-slate-700 { color: #cbd5e1 !important; }
+    html.sae-dark .text-slate-600 { color: #94a3b8 !important; }
+    html.sae-dark .text-slate-500 { color: #7c8db0 !important; }
+    html.sae-dark .border-slate-100, html.sae-dark .border-slate-200,
+    html.sae-dark .border-slate-300 { border-color: #24344f !important; }
+    html.sae-dark .divide-slate-200 > :not([hidden]) ~ :not([hidden]) { border-color: #24344f !important; }
+    html.sae-dark [class*="bg-gradient-to"] { background-image: linear-gradient(145deg, #101b31, #0d1830) !important; }
+    html.sae-dark select, html.sae-dark input:not([type="checkbox"]):not([type="radio"]) {
+        background-color: #16233c !important; color: #e2e8f0 !important;
+        border-color: #2d3f5e !important;
+    }
+    html.sae-dark .hover\:bg-white:hover { background-color: #1a2947 !important; }
+
+.case-view { display: none; }
+    body.view-case .case-view { display: block; }
+    body.view-case section:not(.case-view):not(#emissions-matrix):not([data-main-keep]) { display: none; }
+    #view-tabs button { transition: all .2s; }
+
+:root {
+            --primary: #0EA5E9;
+            --primary-dark: #028AC4;
+            --secondary: #6366F1;
+            --dark: #1E293B;
+            --light: #F8FAFC;
+            --accent: #F59E0B;
+        }
+        * { scroll-behavior: smooth; }
+        body { font-family: 'Inter', system-ui, sans-serif; }
+        .logo-anim { display: inline-block; animation: pulse 2s infinite; }
+        @keyframes pulse { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.05); opacity: 0.85; } }
+        .gear-rotate { display: inline-block; animation: rotate 8s linear infinite; }
+        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .vehicle-icon { position: absolute; animation: around 6s linear infinite; opacity: 0.8; }
+        @keyframes around { 0% { transform: rotate(0deg) translateX(20px) rotate(0deg); } 100% { transform: rotate(360deg) translateX(20px) rotate(-360deg); } }
+        .fade-in { animation: fadeIn 0.8s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .card-hover { transition: transform 0.3s ease, box-shadow 0.3s ease; }
+        .card-hover:hover { transform: translateY(-4px); box-shadow: 0 10px 30px rgba(0,0,0,0.12); }
+        .flag { font-size: 1.3em; margin-right: 6px; }
+        .rtl .flag { margin-right: 0; margin-left: 6px; }
+        .download-btn { transition: all 0.3s ease; border: 2px dashed var(--primary); background: white; color: #374151; }
+        .download-btn:hover { background: var(--primary); color: white; transform: scale(1.02); border-color: var(--primary); }
+        .level-badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 0.7em; font-weight: 600; }
+        .lvl0 { background: #FEE2E2; color: #991B2B; }
+        .lvl2 { background: #DBEAFE; color: #1E40AF; }
+        .lvl45 { background: #DCFCE7; color: #166534; }
+        .mpr-knob { -webkit-appearance: none; width: 100%; height: 8px; border-radius: 4px; background: linear-gradient(to right, var(--primary), var(--secondary)); outline: none; }
+        .mpr-knob::-webkit-slider-thumb { -webkit-appearance: none; width: 24px; height: 24px; border-radius: 50%; background: white; border: 2px solid var(--primary); cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.2); }
+        .platform-btn { transition: all 0.2s ease; }
+        .platform-btn.active { background: rgba(255,255,255,0.95) !important; color: #0EA5E9 !important; border-color: white !important; }
+        .nav-link { transition: color 0.2s ease; }
+        .nav-link:hover { color: var(--primary); }
+        .weight-row { background: linear-gradient(90deg, #ECFDF5 0%, #F0FDF4 100%) !important; font-weight: 600; }
+        .weight-row td { border-top: 2px solid #22C55E !important; }
+        #sim-canvas { border-radius: 12px; display: block; width: 100%; }
+        .capacity-bar { transition: width 0.6s cubic-bezier(0.4,0,0.2,1); }
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 200; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+        .modal-overlay.hidden { display: none; }
+        .code-block { background: #1E293B; color: #E2E8F0; border-radius: 10px; padding: 20px; font-family: 'JetBrains Mono', 'Fira Code', monospace; font-size: 13px; line-height: 1.6; overflow-x: auto; white-space: pre; max-height: 60vh; overflow-y: auto; }
+        .code-block .kw { color: #C084FC; }
+        .code-block .fn { color: #67E8F9; }
+        .code-block .st { color: #86EFAC; }
+        .code-block .cm { color: #94A3B8; font-style: italic; }
+        .code-block .num { color: #FCA5A5; }
+        .guide-tab.active { color: #312E81 !important; border-bottom-color: #6366F1 !important; background: white; }
+        .guide-panel { animation: fadeIn 0.3s ease-in; }
+        .toast-msg { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px); background: #059669; color: white; padding: 12px 28px; border-radius: 12px; font-weight: 600; z-index: 300; opacity: 0; transition: all 0.4s cubic-bezier(0.4,0,0.2,1); pointer-events: none; box-shadow: 0 8px 30px rgba(0,0,0,0.2); }
+        .toast-msg.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+        @media (max-width: 768px) { .hero-bg { min-height: 500px; } .flag { font-size: 1.1em; } }
