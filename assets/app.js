@@ -1964,67 +1964,7 @@ RingRoadOverlay.prototype.draw = function () {
   this.canvas_.style.height = h + 'px';
   this.drawVehicles();
 };
-RingRoadOverlay.prototype.initVehicles = function () {
-  this.vehicles_ = [];
-  var cor = CORRIDORS[currentCorridor] || CORRIDORS.egypt;
-  var types = cor.vehicleTypes;
-  for (var i = 0; i < 9; i++) {
-    var ty = types[i % types.length];
-    this.vehicles_.push({ dir: 'A', frac: i / 9 + Math.random() * 0.03, baseSpeed: 0.55 + Math.random() * 0.5, type: ty, weave: (ty === 'microbus' || ty === 'tuktuk'), phase: Math.random() * 6.28, dwell: 0 });
-  }
-  for (var j = 0; j < 9; j++) {
-    this.vehicles_.push({ dir: 'B', frac: j / 9 + Math.random() * 0.03, baseSpeed: 0.85 + Math.random() * 0.3, type: 'av', weave: false, phase: Math.random() * 6.28, dwell: 0 });
-  }
-};
-RingRoadOverlay.prototype.tick = function (dt) {
-  var B = (rrScenario === 'B');
-  var self = this;
-  this.vehicles_.forEach(function (v) {
-    if (v.dwell > 0) { v.dwell -= dt; v.phase += dt * 4; return; }
-    v.frac += v.baseSpeed * dt * 0.02;
-    v.phase += dt * (v.weave ? 3 : 0.6);
-    if (v.frac >= 1) v.frac -= 1;
-    if (!B || v.dir === 'A') {
-      if ((v.frac < 0.05 || (v.frac > 0.55 && v.frac < 0.63)) && (v.type === 'microbus' || v.type === 'tuktuk') && Math.random() < 0.03) {
-        v.dwell = 1.1; // ~25s passenger boarding dwell (scaled loop)
-      }
-    }
-  });
-};
-RingRoadOverlay.prototype.drawVehicles = function () {
-  if (!this.canvas_ || !this.proj_) return;
-  var c = this.canvas_.getContext('2d');
-  var w = this.canvas_.width, h = this.canvas_.height;
-  c.clearRect(0, 0, w, h);
-  var proj = this.proj_;
-  var B = (rrScenario === 'B');
-  var self = this;
-  this.vehicles_.forEach(function (v) {
-    var pathA = (rrSnappedPath && rrSnappedPath.length > 2) ? rrSnappedPath : (CORRIDORS[currentCorridor] || CORRIDORS.egypt).coords;
-    var pathB2 = (rrSnappedPathB && rrSnappedPathB.length > 2) ? rrSnappedPathB : offsetPath(pathA, -0.005, -0.005);
-    var path = v.dir === 'B' ? pathB2 : pathA;
-    var pt = routePoint(path, v.frac);
-    var px = proj.fromLatLngToDivPixel(new google.maps.LatLng(pt.lat, pt.lng));
-    if (!px) return;
-    var x = px.x, y = px.y;
-    if (v.weave && !(B && v.dir === 'B')) x += Math.sin(v.phase) * 7;
-    var isAV = (B && v.dir === 'B');
-    if (isAV) c.fillStyle = '#10b981';
-    else if (v.type === 'microbus') c.fillStyle = '#ef4444';
-    else if (v.type === 'tuktuk') c.fillStyle = '#f59e0b';
-    else if (v.type === 'av') c.fillStyle = '#38bdf8';
-    else c.fillStyle = '#60a5fa';
-    c.fillRect(x - 5, y - 3, 10, 6);
-  });
-};
-function respacePlatoon() {
-  if (!rrOverlay) return;
-  var avs = rrOverlay.vehicles_.filter(function (v) { return v.dir === 'B'; });
-  avs.forEach(function (v, idx) {
-    v.frac = idx / avs.length;
-    v.baseSpeed = 0.9; v.weave = false; v.dwell = 0;
-  });
-}
+
 
 function loadGoogleMaps() {
   if (typeof google !== 'undefined' && google.maps) { initRingRoadMap(); return; }
@@ -2370,8 +2310,6 @@ function weatherAdjustedSpeed(baseSpeed) {
 var ssamData = { ttcAvg: 0, petAvg: 0, rearEnd: 0, laneChange: 0, hotspots: [] };
 var ssamChart = null;
 var ssamHotspotMarkers = [];
-var ssamCanvas = null;
-var ssamCtx = null;
 var ssamLastRenderTime = 0;
 function computeSSAMMetrics(mpr) {
     var m = mpr / 100;
@@ -2482,97 +2420,86 @@ function renderSSAMChart() {
             scales: {
                 y: { beginAtZero: true, max: 5, title: { display: true, text: 'TTC (seconds)' } }
             }
-        },
-        // Preserve canvas context between renders
-        preserveDrawingBuffer: false
+        }
     });
 }
 function renderSSAMHotspots() {
     var container = document.getElementById('ca-hotspot-container');
     if (!container) return;
-    // Clear previous overlay (prevents infinite growth / layout stretching)
     var overlay = document.getElementById('ca-hotspot-overlay');
-    if (overlay) {
-        overlay.innerHTML = '';
-        overlay.width = container.offsetWidth;
-        overlay.height = container.offsetHeight;
-    }
-    var canvas = document.getElementById('ca-hotspot-canvas');
-    if (canvas) {
-        canvas.width = container.offsetWidth;
-        canvas.height = 500; // Fixed height with overflow
-    }
-    if (ssamCtx) {
-        ssamCtx.clearRect(0, 0, canvas.width, canvas.height);
-    } else {
-        ssamCtx = canvas.getContext('2d');
-    }
+    if (!overlay) return;
+    overlay.innerHTML = '';
+    var canvas = document.createElement('canvas');
+    canvas.width = container.offsetWidth;
+    canvas.height = container.offsetHeight;
+    canvas.style.width = '100%';
+    canvas.style.height = '100%';
+    overlay.appendChild(canvas);
+    var c = canvas.getContext('2d');
     // Render pulsing hotspot circles
     ssamData.hotspots.forEach(function(hotspot, index) {
         var ttc = hotspot.ttc;
         var pet = hotspot.pet;
         var severity = hotspot.severity;
         var x = 20 + index * 200 + 50;
-        var y = ssamCtx.canvas.height / 2;
+        var y = c.canvas.height / 2;
         var radius = 12;
         var pulsePhase = (Date.now() / 200) % 1;
         // Color and pulse based on severity and MPR
         if (ttc < 1.0) {
             color = 'rgba(239,68,68,' + (0.4 + 0.3 * Math.sin(pulsePhase)) + ')';
             // Draw red pulsing circle for high severity
-            ssamCtx.fillStyle = color;
-            ssamCtx.beginPath();
-            ssamCtx.arc(x, y, radius, 0, Math.PI * 2);
-            ssamCtx.fill();
+            c.fillStyle = color;
+            c.beginPath();
+            c.arc(x, y, radius, 0, Math.PI * 2);
+            c.fill();
             // Draw inner pulsing dot
             var innerRadius = radius * (0.4 + 0.3 * Math.sin(pulsePhase * 3));
-            ssamCtx.fillStyle = 'rgba(255,255,255,' + (0.6 + 0.4 * Math.sin(pulsePhase * 3)) + ')';
-            ssamCtx.beginPath();
-            ssamCtx.arc(x, y, innerRadius, 0, Math.PI * 2);
-            ssamCtx.fill();
+            c.fillStyle = 'rgba(255,255,255,' + (0.6 + 0.4 * Math.sin(pulsePhase * 3)) + ')';
+            c.beginPath();
+            c.arc(x, y, innerRadius, 0, Math.PI * 2);
+            c.fill();
             // Add "HOT" label
-            ssamCtx.fillStyle = '#fff';
-            ssamCtx.font = 'bold 11px sans-serif';
-            ssamCtx.textAlign = 'center';
-            ssamCtx.textBaseline = 'middle';
-            ssamCtx.fillText('HOT', x, y);
+            c.fillStyle = '#fff';
+            c.font = 'bold 11px sans-serif';
+            c.textAlign = 'center';
+            c.textBaseline = 'middle';
+            c.fillText('HOT', x, y);
         } else if (ttc < 1.5) {
             color = 'rgba(234,179,8,' + (0.4 + 0.3 * Math.sin(pulsePhase)) + ')';
             // Draw orange pulsing circle for medium severity
-            ssamCtx.fillStyle = color;
-            ssamCtx.beginPath();
-            ssamCtx.arc(x, y, radius, 0, Math.PI * 2);
-            ssamCtx.fill();
-            ssamCtx.fillStyle = '#fff';
-            ssamCtx.font = 'bold 10px sans-serif';
-            ssamCtx.textAlign = 'center';
-            ssamCtx.textBaseline = 'middle';
-            ssamCtx.fillText('MED', x, y);
+            c.fillStyle = color;
+            c.beginPath();
+            c.arc(x, y, radius, 0, Math.PI * 2);
+            c.fill();
+            c.fillStyle = '#fff';
+            c.font = 'bold 10px sans-serif';
+            c.textAlign = 'center';
+            c.textBaseline = 'middle';
+            c.fillText('MED', x, y);
         } else {
             color = 'rgba(34,197,94,' + (0.4 + 0.3 * Math.sin(pulsePhase)) + ')';
-            // Draw green pulsing circle for low severity
-            ssamCtx.fillStyle = color;
-            ssamCtx.beginPath();
-            ssamCtx.arc(x, y, radius, 0, Math.PI * 2);
-            ssamCtx.fill();
-            ssamCtx.fillStyle = '#fff';
-            ssamCtx.font = 'bold 10px sans-serif';
-            ssamCtx.textAlign = 'center';
-            ssamCtx.textBaseline = 'middle';
-            ssamCtx.fillText('OK', x, y);
+            c.fillStyle = color;
+            c.beginPath();
+            c.arc(x, y, radius, 0, Math.PI * 2);
+            c.fill();
+            c.fillStyle = '#fff';
+            c.font = 'bold 10px sans-serif';
+            c.textAlign = 'center';
+            c.textBaseline = 'middle';
+            c.fillText('OK', x, y);
         }
         // Draw PET value below
-        ssamCtx.fillStyle = color;
-        ssamCtx.font = '9px sans-serif';
-        ssamCtx.textAlign = 'center';
-        ssamCtx.textBaseline = 'bottom';
-        ssamCtx.fillText(hotspot.name.substring(0, 12), x, y + radius + 18);
-        // Draw TTC value
-        ssamCtx.fillStyle = '#fff';
-        ssamCtx.font = '9px bold sans-serif';
-        ssamCtx.textAlign = 'center';
-        ssamCtx.textBaseline = 'top';
-        ssamCtx.fillText(ttc.toFixed(1) + 's', x, y - radius - 4);
+        c.fillStyle = color;
+        c.font = '9px sans-serif';
+        c.textAlign = 'center';
+        c.textBaseline = 'bottom';
+        c.fillText(hotspot.name.substring(0, 12), x, y + radius + 18);
+        c.fillStyle = '#fff';
+        c.font = '9px bold sans-serif';
+        c.textAlign = 'center';
+        c.textBaseline = 'top';
+        c.fillText(ttc.toFixed(1) + 's', x, y - radius - 4);
     });
     // Draw legend
     var legendEl = document.getElementById('ca-hotspot-legend');
