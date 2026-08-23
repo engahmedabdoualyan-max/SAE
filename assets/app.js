@@ -2058,7 +2058,13 @@ function setScenario(s) {
     ? 'px-6 py-2 rounded-lg font-medium bg-green-500/20 border border-green-400 text-green-300 hover:bg-green-500/30 transition active'
     : 'px-6 py-2 rounded-lg font-medium bg-slate-600/20 border border-slate-500 text-slate-400 hover:bg-green-500/30 transition';
   var sl = document.getElementById('mpr-slider');
-  if (sl) { sl.value = (s === 'B' ? 90 : 10); updateMPR(sl.value); }
+  if (sl) { sl.value = (s === 'B' ? 90 : 10); updateMPR(sl.value); 
+    // visual segmented sync
+    var bA = document.getElementById('scenario-a-btn');
+    var bB = document.getElementById('scenario-b-btn');
+    if (bA) { bA.classList.toggle('is-active-a', s === 'A'); bA.classList.toggle('is-active-b', false); }
+    if (bB) { bB.classList.toggle('is-active-b', s === 'B'); bB.classList.toggle('is-active-a', false); }
+}
   if (rrPolyA || rrPolyB) updateRingRoadStyle(parseInt(sl ? sl.value : 10, 10));
   if (s === 'B') respacePlatoon();
 }

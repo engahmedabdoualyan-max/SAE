@@ -77,3 +77,35 @@ html.sae-dark .bg-white { background-color: #101b31 !important; }
         .toast-msg { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px); background: #059669; color: white; padding: 12px 28px; border-radius: 12px; font-weight: 600; z-index: 300; opacity: 0; transition: all 0.4s cubic-bezier(0.4,0,0.2,1); pointer-events: none; box-shadow: 0 8px 30px rgba(0,0,0,0.2); }
         .toast-msg.show { opacity: 1; transform: translateX(-50%) translateY(0); }
         @media (max-width: 768px) { .hero-bg { min-height: 500px; } .flag { font-size: 1.1em; } }
+
+
+/* ─── Case-Study Toolbar (segmented scenario + unified export bar) ─── */
+.scn-btn {
+    display: inline-flex; align-items: center; gap: .5rem;
+    height: 40px; padding: 0 1.15rem;
+    border-radius: .6rem; font-size: .78rem; font-weight: 600;
+    color: #94a3b8; background: transparent; border: 1px solid transparent;
+    transition: all .18s ease; cursor: pointer; white-space: nowrap;
+}
+.scn-btn i { font-size: .85rem; }
+.scn-btn:hover { color: #e2e8f0; background: rgba(148,163,184,.08); }
+.scn-btn.is-active-a { color: #fff; background: linear-gradient(135deg,#dc2626,#b91c1c); border-color:#f87171; box-shadow:0 4px 14px -4px rgba(220,38,38,.55); }
+.scn-btn.is-active-b { color: #fff; background: linear-gradient(135deg,#059669,#047857); border-color:#34d399; box-shadow:0 4px 14px -4px rgba(16,185,129,.55); }
+
+.exp-btn {
+    display: inline-flex; align-items: center; height: 36px;
+    padding: 0 .95rem; border-radius: .55rem;
+    font-size: .74rem; font-weight: 600; letter-spacing:.01em;
+    color: #e2e8f0; background: #16233c;
+    border: 1px solid #2d3f5e; cursor: pointer; white-space: nowrap;
+    transition: all .16s ease;
+}
+.exp-btn:hover { background: #1d2f52; border-color: #3b5280; transform: translateY(-1px); }
+.exp-btn:active { transform: translateY(0); }
+.exp-btn i { font-size: .82rem; margin-right: .45rem; }
+.ic-sumo   { color: #38bdf8; }
+.ic-vissim { color: #a78bfa; }
+.ic-pdf    { color: #fb7185; }
+.ic-csv    { color: #60a5fa; }
+.unit-chip { font-family: ui-monospace, monospace; color: #fbbf24; border-color: #4a5a7a; }
+[dir="rtl"] .exp-btn i { margin-right: 0; margin-left: .45rem; }
