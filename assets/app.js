@@ -677,6 +677,12 @@
         for (var i = 0; i < 40; i++) simVehicles.push(createVehicle());
         if (!simAnimId) animateSim();
     }
+    window.addEventListener('resize', function () {
+        if (!simCanvas) return;
+        CANVAS_W = simCanvas.parentElement.clientWidth - 16;
+        simCanvas.width = CANVAS_W;
+        LANE_W = Math.floor((CANVAS_H - 40) / LANE_COUNT);
+    });
 
     function createVehicle() {
         var isAv = Math.random() * 100 < mprValue;

@@ -265,7 +265,7 @@
     <section id="sim" class="py-16 bg-slate-900">
         <div class="container mx-auto px-4">
             <div class="text-center mb-10">
-                <h2 class="text-3xl font-bold text-white mb-3" data-key="sim_title">Live Traffic Flow Simulation</h2>
+                <h2 class="text-2xl md:text-3xl font-bold text-white mb-3" data-key="sim_title">Live Traffic Flow Simulation</h2>
                 <p class="text-slate-400 max-w-2xl mx-auto" data-key="sim_desc">Visualize how increasing AV penetration smooths chaotic Egyptian Ring Road traffic in real-time.</p>
             </div>
             <div class="max-w-4xl mx-auto">
@@ -303,15 +303,15 @@
     <section id="ringroad" class="case-view py-16 bg-gradient-to-b from-slate-900 to-slate-800 text-white">
         <div class="container mx-auto px-4">
             <div class="text-center mb-8">
-                <h2 class="text-3xl font-bold mb-3" data-key="rr_title">Cairo Ring Road — Egypt Case Study</h2>
+                <h2 class="text-2xl md:text-3xl font-bold mb-3" data-key="rr_title">Cairo Ring Road — Egypt Case Study</h2>
                 <p class="text-slate-300 max-w-3xl mx-auto text-sm" data-key="rr_desc">32 km two-way corridor from Qalyub Interchange through the Dar Al Salam bottleneck to the Adly Mansour Intermodal Hub, with live Google traffic telemetry and incline-grade micro-simulation</p>
             </div>
             <div class="max-w-4xl mx-auto mb-5">
                 <p class="text-[10px] uppercase tracking-widest text-slate-500 text-center mb-2" data-key="rr_mode">Simulation Mode</p>
                 <div class="flex justify-center">
-                    <div class="inline-flex p-1 rounded-xl bg-slate-800 border border-slate-700 shadow-inner">
-                        <button id="scenario-a-btn" data-call-click="setScenario" data-args='["A"]' class="scn-btn is-active-a"><i class="fas fa-exclamation-triangle"></i><span data-key="rr_scenA">Scenario A — Baseline</span></button>
-                        <button id="scenario-b-btn" data-call-click="setScenario" data-args='["B"]' class="scn-btn"><i class="fas fa-robot"></i><span data-key="rr_scenB">Scenario B — AV Corridor</span></button>
+                    <div class="inline-flex flex-wrap justify-center p-1 rounded-xl bg-slate-800 border border-slate-700 shadow-inner gap-1">
+                        <button id="scenario-a-btn" data-call-click="setScenario" data-args='["A"]' class="scn-btn is-active-a text-center justify-center"><i class="fas fa-exclamation-triangle"></i><span data-key="rr_scenA">Scenario A — Baseline</span></button>
+                        <button id="scenario-b-btn" data-call-click="setScenario" data-args='["B"]' class="scn-btn text-center justify-center"><i class="fas fa-robot"></i><span data-key="rr_scenB">Scenario B — AV Corridor</span></button>
                     </div>
                 </div>
                 <p class="text-[10px] uppercase tracking-widest text-slate-500 text-center mt-4 mb-2" data-key="exp_tools">Export & Tools</p>
@@ -325,7 +325,7 @@
                 </div>
             </div>
             <div class="relative bg-black rounded-xl overflow-hidden border border-slate-600">
-                <div id="ringroad-map" class="w-full h-[460px] bg-slate-800"></div>
+                <div id="ringroad-map" class="w-full h-[300px] md:h-[460px] bg-slate-800"></div>
                 <div id="rr-stats" class="absolute top-3 right-3 bg-slate-900/80 rounded-lg p-3 text-xs font-mono"></div>
                 <div class="absolute top-3 left-3 bg-slate-900/80 rounded-lg p-3 text-xs font-mono text-left space-y-1">
                     <div><i class="fas fa-road mr-1 text-primary"></i><span data-key="rr_corridor">Qalyub to Adly Mansour Hub</span></div>
@@ -374,7 +374,7 @@
     <section id="weather-impact" class="py-16 bg-white">
         <div class="container mx-auto px-4">
             <div class="text-center mb-8">
-                <h2 class="text-3xl font-bold text-slate-800 mb-3"><i class="fas fa-cloud-rain mr-2 text-blue-500"></i><span data-key="wi_title">Weather Impact Modeling</span></h2>
+                <h2 class="text-2xl md:text-3xl font-bold text-slate-800 mb-3"><i class="fas fa-cloud-rain mr-2 text-blue-500"></i><span data-key="wi_title">Weather Impact Modeling</span></h2>
                 <p class="text-slate-600 max-w-3xl mx-auto text-sm" data-key="wi_desc">Real-time speed reduction coefficients applied to corridor simulation based on ambient weather conditions (NCHRP Report 586)</p>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4 max-w-5xl mx-auto mb-6">
@@ -423,6 +423,7 @@
         <div class="container mx-auto px-4">
             <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-md border border-slate-200 p-5">
                 <h3 class="text-xl font-bold text-slate-800 mb-4 text-center"><i class="fas fa-smog mr-2 text-green-600"></i>مصفوفة الانبعاثات الموثقة — تقليدي مقابل ذاتي (SAE 0–5)</h3>
+                <div class="overflow-x-auto">
                 <table class="w-full text-sm">
                     <thead><tr class="text-xs text-slate-500 border-b border-slate-200">
                         <th class="text-left py-2">المستوى</th>
@@ -449,6 +450,7 @@
                             <td class="text-[10px] text-slate-500 text-right pr-2">IEEE 2024 — Lifecycle*</td></tr>
                     </tbody>
                 </table>
+                </div>
                 <p class="text-[11px] text-slate-400 mt-2">* انبعاثات دورة حياة من الشبكة الكهربائية — العادم المباشر صفر.</p>
             </div>
         </div>
@@ -458,7 +460,7 @@
     <section id="conflict-analysis" class="case-view py-16 bg-slate-50">
         <div class="container mx-auto px-4">
             <div class="text-center mb-8">
-                <h2 class="text-3xl font-bold text-slate-800 mb-3"><i class="fas fa-radiation-alt mr-2 text-red-500"></i><span data-key="ca_title">Conflict Hotspot Analysis & SSAM</span></h2>
+                <h2 class="text-2xl md:text-3xl font-bold text-slate-800 mb-3"><i class="fas fa-radiation-alt mr-2 text-red-500"></i><span data-key="ca_title">Conflict Hotspot Analysis & SSAM</span></h2>
                 <p class="text-slate-600 max-w-3xl mx-auto text-sm" data-key="ca_desc">Surrogate Safety Assessment Model — Real-time TTC/PET conflict detection with dynamic hotspot visualization on corridor</p>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4 max-w-5xl mx-auto mb-6">
@@ -491,7 +493,7 @@
                         <label class="flex items-center gap-2 cursor-pointer"><input type="checkbox" id="ca-show-labels" checked class="rounded border-slate-300 text-primary focus:ring-primary"><span data-key="ca_show_labels">Show Labels</span></label>
                     </div>
                 </div>
-                <div id="ca-hotspot-container" class="p-5 h-[500px] max-h-[500px] overflow-hidden relative">
+                <div id="ca-hotspot-container" class="p-5 h-[300px] md:h-[500px] max-h-[500px] overflow-hidden relative">
                     <div id="ca-hotspot-legend" class="absolute top-4 right-4 z-10 bg-white/95 backdrop-blur rounded-lg shadow-md border border-slate-200 p-3 text-xs hidden md:block"></div>
                     <canvas id="ca-hotspot-canvas" role="img" aria-label="Conflict hotspot severity visualization" class="w-full h-full" width="800" height="500"></canvas>
                     <div id="ca-hotspot-overlay" class="absolute inset-0 pointer-events-none"></div>
@@ -512,16 +514,16 @@
     <section id="field-data" class="case-view py-16 bg-slate-900 text-white">
         <div class="container mx-auto px-4">
             <div class="text-center mb-6">
-                <h2 class="text-3xl font-bold mb-2"><i class="fas fa-database mr-2 text-emerald-400"></i><span data-key="fd_title">البيانات الميدانية الحقيقية</span></h2>
+                <h2 class="text-2xl md:text-3xl font-bold mb-2"><i class="fas fa-database mr-2 text-emerald-400"></i><span data-key="fd_title">البيانات الميدانية الحقيقية</span></h2>
                 <p class="text-slate-300 max-w-3xl mx-auto text-sm">قطاع السلام ⇄ القليوب • مساحياً 20.01 كم (45+708 → 65+722) • حصر باسوس • محاكاة SUMO 1,962 رحلة • نقط سوداء موثقة</p>
             </div>
             <div id="fd-kpi" class="max-w-6xl mx-auto mb-6"></div>
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 max-w-6xl mx-auto">
                 <div class="bg-slate-800 rounded-xl p-5 border border-slate-700">
                     <h4 class="font-bold mb-3"><i class="fas fa-stopwatch mr-2 text-cyan-400"></i>زمن الرحلة والتوفير <span class="text-xs text-slate-400">(3.05 كم)</span></h4>
-                    <table class="w-full text-sm"><thead><tr class="text-xs text-slate-400 border-b border-slate-600">
+                    <div class="overflow-x-auto"><table class="w-full text-sm"><thead><tr class="text-xs text-slate-400 border-b border-slate-600">
                         <th class="text-left pb-2">المستوى</th><th class="pb-2">رحلات</th><th class="pb-2">زمن</th><th class="pb-2">km/h</th><th class="pb-2">توفير</th>
-                    </tr></thead><tbody id="fd-sim-table"></tbody></table>
+                    </tr></thead><tbody id="fd-sim-table"></tbody></table></div>
                     <div class="grid grid-cols-2 gap-2 mt-3">
                         <div class="bg-slate-900/60 rounded-lg p-2 text-center">
                             <div class="text-[10px] text-slate-400">توفير لكل رحلة (أفضل مستوى)</div>
@@ -540,9 +542,9 @@
                 </div>
                 <div class="bg-slate-800 rounded-xl p-5 border border-slate-700">
                     <h4 class="font-bold mb-3"><i class="fas fa-traffic-light mr-2 text-green-400"></i>الحصر المروري — محطة باسوس</h4>
-                    <table class="w-full text-sm"><thead><tr class="text-xs text-slate-400 border-b border-slate-600">
+                    <div class="overflow-x-auto"><table class="w-full text-sm"><thead><tr class="text-xs text-slate-400 border-b border-slate-600">
                         <th class="text-left pb-2">المركبة</th><th class="pb-2">PCU</th><th class="pb-2">عدلي ↗</th><th class="pb-2">×PCU</th><th class="pb-2">6أoct↘</th>
-                    </tr></thead><tbody id="fd-counts"></tbody></table>
+                    </tr></thead><tbody id="fd-counts"></tbody></table></div>
                 </div>
                 <div class="bg-slate-800 rounded-xl p-5 border border-slate-700 lg:col-span-3">
                     <div class="flex flex-col md:flex-row md:items-center gap-3 mb-3">
@@ -550,13 +552,13 @@
                         <input id="feat-search" placeholder="ابحث: LiDAR / Platooning / V2V..." class="md:mr-auto bg-slate-900 border border-slate-600 rounded-lg px-3 py-1.5 text-sm w-full md:w-72" dir="rtl">
                     </div>
                     <div class="max-h-72 overflow-y-auto">
-                        <table class="w-full text-sm">
+                        <div class="overflow-x-auto"><table class="w-full text-sm">
                             <thead class="sticky top-0 bg-slate-800"><tr class="text-xs text-slate-400 border-b border-slate-600">
                                 <th class="w-10 py-2">#</th><th class="text-left pb-2">الميزة والوصف</th>
                                 <th class="pb-2">SAE</th><th class="pb-2">التقنية</th>
                             </tr></thead>
                             <tbody id="feat-table"></tbody>
-                        </table>
+                        </table></div>
                     </div>
                 </div>
             </div>
@@ -576,7 +578,7 @@
     <section id="compare-section" class="case-view py-16 bg-slate-900 text-white">
         <div class="container mx-auto px-4">
             <div class="text-center mb-8">
-                <h2 class="text-3xl font-bold mb-3"><i class="fas fa-columns mr-2 text-cyan-400"></i><span data-key="cmp_title">Corridor Side-by-Side Comparison</span></h2>
+                <h2 class="text-2xl md:text-3xl font-bold mb-3"><i class="fas fa-columns mr-2 text-cyan-400"></i><span data-key="cmp_title">Corridor Side-by-Side Comparison</span></h2>
                 <p class="text-slate-300 max-w-3xl mx-auto text-sm" data-key="cmp_desc">Compare two corridors under the same AV penetration rate — maps, capacity and speed limits update live with the MPR slider</p>
             </div>
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 max-w-6xl mx-auto">
@@ -622,7 +624,7 @@
     <section id="carbon-credits" class="py-16 bg-white">
         <div class="container mx-auto px-4">
             <div class="text-center mb-8">
-                <h2 class="text-3xl font-bold text-slate-800 mb-3"><i class="fas fa-leaf mr-2 text-green-500"></i><span data-key="cc_title">Carbon Credit & Economic Analysis</span></h2>
+                <h2 class="text-2xl md:text-3xl font-bold text-slate-800 mb-3"><i class="fas fa-leaf mr-2 text-green-500"></i><span data-key="cc_title">Carbon Credit & Economic Analysis</span></h2>
                 <p class="text-slate-600 max-w-3xl mx-auto text-sm" data-key="cc_desc">Monetize CO2 reduction from increased AV penetration — EU ETS carbon market pricing</p>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4 max-w-5xl mx-auto mb-6">
@@ -667,7 +669,7 @@
     <section id="platooning" class="py-16 bg-slate-900 text-white">
         <div class="container mx-auto px-4">
             <div class="text-center mb-8">
-                <h2 class="text-3xl font-bold mb-3"><i class="fas fa-project-diagram mr-2 text-cyan-400"></i><span data-key="pl_title">Platooning & V2X Communication</span></h2>
+                <h2 class="text-2xl md:text-3xl font-bold mb-3"><i class="fas fa-project-diagram mr-2 text-cyan-400"></i><span data-key="pl_title">Platooning & V2X Communication</span></h2>
                 <p class="text-slate-300 max-w-3xl mx-auto text-sm" data-key="pl_desc">Cooperative Adaptive Cruise Control (CACC) formation display and Vehicle-to-Everything communication simulation</p>
             </div>
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 max-w-5xl mx-auto">
@@ -703,7 +705,7 @@
     <section id="av-forecast" class="py-16 bg-white">
         <div class="container mx-auto px-4">
             <div class="text-center mb-8">
-                <h2 class="text-3xl font-bold text-slate-800 mb-3"><i class="fas fa-chart-line mr-2 text-secondary"></i><span data-key="af_title">AV Penetration Forecasting</span></h2>
+                <h2 class="text-2xl md:text-3xl font-bold text-slate-800 mb-3"><i class="fas fa-chart-line mr-2 text-secondary"></i><span data-key="af_title">AV Penetration Forecasting</span></h2>
                 <p class="text-slate-600 max-w-3xl mx-auto text-sm" data-key="af_desc">Bass Diffusion Model for autonomous vehicle adoption forecasting — S-curve adoption lifecycle</p>
             </div>
             <div class="max-w-4xl mx-auto">
@@ -737,7 +739,7 @@
     <section id="crash-prediction" class="py-16 bg-slate-50">
         <div class="container mx-auto px-4">
             <div class="text-center mb-8">
-                <h2 class="text-3xl font-bold text-slate-800 mb-3"><i class="fas fa-shield-alt mr-2 text-red-500"></i><span data-key="cp_title">Crash Prediction Model</span></h2>
+                <h2 class="text-2xl md:text-3xl font-bold text-slate-800 mb-3"><i class="fas fa-shield-alt mr-2 text-red-500"></i><span data-key="cp_title">Crash Prediction Model</span></h2>
                 <p class="text-slate-600 max-w-3xl mx-auto text-sm" data-key="cp_desc">Empirical crash frequency estimation using Safety Performance Functions (SPF) — Highway Safety Manual methodology</p>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
@@ -784,7 +786,7 @@
     <section id="night-surface" class="py-16 bg-slate-900 text-white">
         <div class="container mx-auto px-4">
             <div class="text-center mb-8">
-                <h2 class="text-3xl font-bold mb-3"><i class="fas fa-moon mr-2 text-yellow-300"></i><span data-key="ns_title">Night-Time & Road Surface Conditions</span></h2>
+                <h2 class="text-2xl md:text-3xl font-bold mb-3"><i class="fas fa-moon mr-2 text-yellow-300"></i><span data-key="ns_title">Night-Time & Road Surface Conditions</span></h2>
                 <p class="text-slate-300 max-w-3xl mx-auto text-sm" data-key="ns_desc">Headlight visibility modeling, lane marking detection, and pavement friction coefficients (AASHTO Green Book)</p>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto">
@@ -815,7 +817,7 @@
     <section id="intersection-workzone" class="py-16 bg-white">
         <div class="container mx-auto px-4">
             <div class="text-center mb-8">
-                <h2 class="text-3xl font-bold text-slate-800 mb-3"><i class="fas fa-crosshairs mr-2 text-secondary"></i><span data-key="iw_title">Intersection & Work Zone Analysis</span></h2>
+                <h2 class="text-2xl md:text-3xl font-bold text-slate-800 mb-3"><i class="fas fa-crosshairs mr-2 text-secondary"></i><span data-key="iw_title">Intersection & Work Zone Analysis</span></h2>
                 <p class="text-slate-600 max-w-3xl mx-auto text-sm" data-key="iw_desc">Signalized vs unsignalized conflict analysis, work zone queue modeling, and heavy vehicle climbing lane assessment</p>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
@@ -873,7 +875,7 @@
         <div class="container mx-auto px-4">
             <!-- SAE Level 0: Standard -->
             <div class="text-center mb-10">
-                <h2 class="text-3xl font-bold text-slate-800 mb-3" data-key="f0">SAE Level 0 — Standard Conventional Fleet</h2>
+                <h2 class="text-2xl md:text-3xl font-bold text-slate-800 mb-3" data-key="f0">SAE Level 0 — Standard Conventional Fleet</h2>
                 <p class="text-slate-600 max-w-3xl mx-auto" data-key="f0d">The heterogeneous baseline fleet dominating Egyptian roads. Each vehicle type exhibits unique kinematic signatures critical for valid micro-simulation calibration.</p>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 mb-12">
@@ -1036,7 +1038,7 @@
 
             <!-- SAE Levels 1-5 -->
             <div class="text-center mb-10 mt-16">
-                <h2 class="text-3xl font-bold text-slate-800 mb-3" data-key="av_sec">SAE Levels 1–5 — Autonomous Vehicles</h2>
+                <h2 class="text-2xl md:text-3xl font-bold text-slate-800 mb-3" data-key="av_sec">SAE Levels 1–5 — Autonomous Vehicles</h2>
                 <p class="text-slate-600 max-w-3xl mx-auto" data-key="av_secd">Each isolated SAE automation level with kinematic profiles, core capabilities, and real-world production fleet catalogs.</p>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -1235,7 +1237,7 @@
     <section id="comparison" class="py-16 bg-white">
         <div class="container mx-auto px-4">
             <div class="text-center mb-8">
-                <h2 class="text-3xl font-bold text-slate-800 mb-3" data-key="cmp_title">Autonomous Fleet Comparison Engine</h2>
+                <h2 class="text-2xl md:text-3xl font-bold text-slate-800 mb-3" data-key="cmp_title">Autonomous Fleet Comparison Engine</h2>
                 <p class="text-slate-600 max-w-3xl mx-auto text-sm" data-key="cmp_desc">Select a SAE automation tier, choose vehicles, and perform side-by-side analytical benchmarking with live performance charts</p>
             </div>
             <div class="flex flex-col md:flex-row justify-center gap-3 mb-6">
@@ -1271,7 +1273,7 @@
     <section id="math" class="py-12 bg-slate-900 text-white">
         <div class="container mx-auto px-4">
             <div class="text-center mb-12">
-                <h2 class="text-3xl font-bold mb-4" data-key="math">Mathematical Mappings</h2>
+                <h2 class="text-2xl md:text-3xl font-bold mb-4" data-key="math">Mathematical Mappings</h2>
                 <p class="text-slate-300" data-key="mathd">Wiedemann 99 * SUMO Krauss * IDM - All share the same kinematic base sqrt(a*b)</p>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -1298,7 +1300,7 @@
     <section id="methodology" class="py-16 bg-white">
         <div class="container mx-auto px-4">
             <div class="text-center mb-10">
-                <h2 class="text-3xl font-bold text-slate-800 mb-3" data-key="meth_title">Methodology &amp; Analytical Derivations</h2>
+                <h2 class="text-2xl md:text-3xl font-bold text-slate-800 mb-3" data-key="meth_title">Methodology &amp; Analytical Derivations</h2>
                 <p class="text-slate-600 max-w-3xl mx-auto text-sm" data-key="meth_sub">Transparent documentation of how physical vehicle dimensions and kinematic constants are converted client-side into Weighted Average Reaction Time (&tau;<sub>avg</sub>) and Estimated Roadway Capacity (C)</p>
             </div>
             <div class="max-w-5xl mx-auto space-y-8">
@@ -1365,7 +1367,7 @@
     <section class="py-16 bg-slate-50">>
         <div class="container mx-auto px-4">
             <div class="text-center mb-8">
-                <h2 class="text-3xl font-bold text-slate-800 mb-4" data-key="param_table">Parameter Comparison Matrix</h2>
+                <h2 class="text-2xl md:text-3xl font-bold text-slate-800 mb-4" data-key="param_table">Parameter Comparison Matrix</h2>
                 <p class="text-slate-500 text-sm" data-key="param_sub">All 14 vehicle profiles with kinematic coefficients for micro-simulation calibration</p>
             </div>
             <div class="overflow-x-auto">
@@ -1434,7 +1436,7 @@
     <section id="country-hub" class="py-16 bg-gradient-to-b from-indigo-50 to-white">
         <div class="container mx-auto px-4">
             <div class="text-center mb-8">
-                <h2 class="text-3xl font-bold text-slate-800 mb-3" data-key="ch_title">Multi-Country Regional Calibration Hub</h2>
+                <h2 class="text-2xl md:text-3xl font-bold text-slate-800 mb-3" data-key="ch_title">Multi-Country Regional Calibration Hub</h2>
                 <p class="text-slate-600 max-w-3xl mx-auto text-sm" data-key="ch_desc">Select a country to load localized fleet composition, road parameters, and calibration weights</p>
             </div>
             <div class="flex justify-center gap-3 mb-8 flex-wrap">
@@ -1464,7 +1466,7 @@
     <section id="filehub" class="py-16 bg-slate-100">
         <div class="container mx-auto px-4">
             <div class="text-center mb-12">
-                <h2 class="text-3xl font-bold text-slate-800 mb-4" data-key="fh">Localized File Download Hub</h2>
+                <h2 class="text-2xl md:text-3xl font-bold text-slate-800 mb-4" data-key="fh">Localized File Download Hub</h2>
                 <p class="text-slate-600" data-key="fhd">Download pre-calibrated configuration files mapped to standard directory targets.</p>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
@@ -1497,7 +1499,7 @@
     <section id="guides" class="py-16 bg-white">
         <div class="container mx-auto px-4">
             <div class="text-center mb-10">
-                <h2 class="text-3xl font-bold text-slate-800 mb-3" data-key="guide_title">Software Integration Guides</h2>
+                <h2 class="text-2xl md:text-3xl font-bold text-slate-800 mb-3" data-key="guide_title">Software Integration Guides</h2>
                 <p class="text-slate-600 max-w-2xl mx-auto" data-key="guide_desc">Step-by-step instructions to deploy our pre-calibrated fleets into your simulation environment.</p>
             </div>
             <div class="max-w-4xl mx-auto">
@@ -1652,7 +1654,7 @@
     <section id="references" class="py-16 bg-white">
         <div class="container mx-auto px-4">
             <div class="text-center mb-12">
-                <h2 class="text-3xl font-bold text-slate-800 mb-4" data-key="rf">Academic References</h2>
+                <h2 class="text-2xl md:text-3xl font-bold text-slate-800 mb-4" data-key="rf">Academic References</h2>
                 <p class="text-slate-600 max-w-2xl mx-auto" data-key="rfd">Scientific foundation for all calibrated parameters:</p>
             </div>
             <div class="max-w-4xl mx-auto space-y-6">
