@@ -46,6 +46,12 @@
     })();
 </script>
     <link rel="icon" type="image/svg+xml" href="/icon.svg">
+<style>
+    .case-view { display: none; }
+    body.view-case .case-view { display: block; }
+    body.view-case section:not(.case-view):not(#emissions-matrix):not([data-main-keep]) { display: none; }
+    #view-tabs button { transition: all .2s; }
+</style>
     <link rel="alternate" hreflang="en" href="https://sae.fimtosoft.com/?lang=en">
     <link rel="alternate" hreflang="ar" href="https://sae.fimtosoft.com/?lang=ar">
     <link rel="alternate" hreflang="ru" href="https://sae.fimtosoft.com/?lang=ru">
@@ -223,6 +229,11 @@
                 </nav>
                 <div class="flex items-center gap-2">
                     <label for="lang-select" class="text-sm font-medium hidden sm:block" data-key="ls">Language</label>
+                    <div id="view-tabs" class="flex items-center gap-1 mr-2 text-xs">
+                        <button data-call-click="setView" data-args='["main"]' id="tab-main" class="px-3 py-1.5 rounded-lg font-medium bg-cyan-500/20 text-cyan-300 border border-cyan-400/50">📚 <span data-key="tab_main">المرجعية</span></button>
+                        <button data-call-click="setView" data-args='["case"]' id="tab-case" class="px-3 py-1.5 rounded-lg font-medium bg-slate-600/20 text-slate-300 border border-slate-500/40">🛣️ <span data-key="tab_case">دراسة الحالة</span></button>
+                    </div>
+                    
                     <button id="theme-toggle" data-call-click="toggleTheme" aria-label="Toggle dark mode" title="Dark / Light" class="mr-2 w-9 h-9 inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white text-lg hover:bg-slate-100 transition"><span id="theme-icon">🌙</span></button>
                     <select id="lang-select" data-call-change="setLanguage" data-pass-value class="border border-slate-300 rounded-lg px-2 py-1 text-sm bg-white cursor-pointer">
                         <option value="en" selected>🇬🇧 English</option><option value="ar" >🇪🇬 العربية</option><option value="ru" >🇷🇺 Русский</option><option value="hi" >🇮🇳 हिन्दी</option><option value="de" >🇩🇪 Deutsch</option><option value="zh" >🇨🇳 中文</option><option value="ja" >🇯🇵 日本語</option><option value="ko" >🇰🇷 한국어</option><option value="fr" >🇫🇷 Français</option>
@@ -321,7 +332,7 @@
     </section>
 
         <!-- ========== FUTURE CASE STUDY: CAIRO RING ROAD ========== -->
-    <section id="ringroad" class="py-16 bg-gradient-to-b from-slate-900 to-slate-800 text-white">
+    <section id="ringroad" class="case-view class="py-16 bg-gradient-to-b from-slate-900 to-slate-800 text-white""
         <div class="container mx-auto px-4">
             <div class="text-center mb-8">
                 <h2 class="text-3xl font-bold mb-3" data-key="rr_title">Cairo Ring Road — Egypt Case Study</h2>
@@ -436,8 +447,12 @@
             </div>
         </div>
     
-                <div class="max-w-4xl mx-auto mt-6 bg-white rounded-xl shadow-md border border-slate-200 p-5">
-                    <h4 class="font-bold text-slate-800 mb-3"><i class="fas fa-smog mr-2 text-green-600"></i>مصفوفة الانبعاثات الموثقة — تقليدي مقابل ذاتي (SAE 0-5)</h4>
+                </section>
+
+    <section id="emissions-matrix" class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-md border border-slate-200 p-5">
+                    <h3 class="text-2xl font-bold text-slate-800 mb-3 text-center"><i class="fas fa-smog mr-2 text-green-600"></i>مصفوفة الانبعاثات الموثقة — تقليدي مقابل ذاتي (SAE 0-5)</h4>
                     <div class="overflow-x-auto">
                     <table class="w-full text-sm">
                         <thead><tr class="text-xs text-slate-500 border-b border-slate-200">
@@ -464,12 +479,16 @@
                                 <td class="text-[10px] text-slate-500 text-right pr-2">IEEE 2024 — صففر عادم* (Lifecycle شبكة)</td></tr>
                         </tbody>
                     </table></div>
+                </div>
+            </div>
+        </div>
+    </section>
                     <p class="text-[11px] text-slate-400 mt-2">* انبعاثات دورة حياة من الشبكة الكهربائية — العادم المباشر صفر. المصدر: شيت الانبعاثات — العملى.xlsx</p>
                 </div>
-    </section>
+
 
 <!-- ========== CONFLICT HOTSPOT ANALYSIS & SSAM ========== -->
-    <section id="conflict-analysis" class="py-16 bg-slate-50">
+    <section id="conflict-analysis" class="case-view class="py-16 bg-slate-50""
         <div class="container mx-auto px-4">
             <div class="text-center mb-8">
                 <h2 class="text-3xl font-bold text-slate-800 mb-3"><i class="fas fa-radiation-alt mr-2 text-red-500"></i><span data-key="ca_title">Conflict Hotspot Analysis & SSAM</span></h2>
@@ -585,44 +604,42 @@ document.addEventListener('DOMContentLoaded', function () {
     var inp = document.getElementById('feat-search');
     if (inp) inp.addEventListener('input', function () { renderFeatures(this.value); });
 });
-    <!-- ========== REAL FIELD DATA — SALAM<->QALYUB SECTOR ========== -->
-    <section id="field-data" class="py-16 bg-slate-900 text-white">
+    <!-- ========== REAL FIELD DATA — SALAM<->QALYUB SECTOR (CASE STUDY) ========== -->
+    <section id="field-data" class="case-view py-16 bg-slate-900 text-white">
         <div class="container mx-auto px-4">
-            <div class="text-center mb-8">
-                <h2 class="text-3xl font-bold mb-3"><i class="fas fa-database mr-2 text-emerald-400"></i>البيانات الميدانية الحقيقية — قطاع السلام ⇄ القليوب</h2>
-                <p class="text-slate-300 max-w-3xl mx-auto text-sm">مسار مساحي فعلي 20.01 كم (45+708 → 65+722) • حصر محطة باسوس • نتائج محاكاة SUMO لـ1,962 رحلة • النقط السوداء الموثقة أكاديمياً</p>
+            <div class="text-center mb-6">
+                <h2 class="text-3xl font-bold mb-2"><i class="fas fa-database mr-2 text-emerald-400"></i><span data-key="fd_title">البيانات الميدانية الحقيقية</span></h2>
+                <p class="text-slate-300 max-w-3xl mx-auto text-sm">قطاع السلام ⇄ القليوب • مساحياً 20.01 كم (45+708 → 65+722) • حصر باسوس • محاكاة SUMO 1,962 رحلة • نقط سوداء موثقة</p>
             </div>
             <div id="fd-kpi" class="max-w-6xl mx-auto mb-6"></div>
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 max-w-6xl mx-auto">
-                <div class="bg-slate-800 rounded-xl p-4 lg:col-span-1 cursor-pointer hover:ring-1 ring-slate-600 transition"
-                    <h4 class="font-bold mb-3"><i class="fas fa-stopwatch mr-2 text-cyan-400"></i>زمن الرحلة والتوفير <span class="text-xs text-slate-400">(قطاع 3.05 كم)</span></h4>
+                <div class="bg-slate-800 rounded-xl p-4">
+                    <h4 class="font-bold mb-3"><i class="fas fa-stopwatch mr-2 text-cyan-400"></i>زمن الرحلة والتوفير <span class="text-xs text-slate-400">(3.05 كم)</span></h4>
                     <table class="w-full text-sm"><thead><tr class="text-xs text-slate-400 border-b border-slate-600">
-                        <th class="text-left pb-2">المستوى</th><th class="pb-2">رحلات</th><th class="pb-2">زمن</th><th class="pb-2">سرعة km/h</th><th class="pb-2">توفير</th>
+                        <th class="text-left pb-2">المستوى</th><th class="pb-2">رحلات</th><th class="pb-2">زمن</th><th class="pb-2">km/h</th><th class="pb-2">توفير</th>
                     </tr></thead><tbody id="fd-sim-table"></tbody></table>
                     <div class="grid grid-cols-2 gap-2 mt-3">
                         <div class="bg-slate-900/60 rounded-lg p-2 text-center">
-                            <div class="text-[10px] text-slate-400">قطاعك الفعلي 3.05 كم</div>
+                            <div class="text-[10px] text-slate-400">توفير لكل رحلة (أفضل مستوى)</div>
                             <div id="fd-sector-kpi" class="font-mono text-cyan-300 font-bold text-sm">-</div>
-                            <div class="text-[10px] text-emerald-400">توفير لكل رحلة</div>
                         </div>
                         <div class="bg-slate-900/60 rounded-lg p-2 text-center">
-                            <div class="text-[10px] text-slate-400">لوب الدائري 100 كم</div>
-                            <div class="font-mono text-cyan-300 font-bold text-sm">140-180د ← 60-75د</div>
-                            <div class="text-[10px] text-emerald-400">+55% عند التشغيل الكامل</div>
+                            <div class="text-[10px] text-slate-400">لوب 100 كم</div>
+                            <div class="font-mono text-cyan-300 font-bold text-sm">140–180د ← 60–75د</div>
                         </div>
                     </div>
-                    <p class="text-[11px] text-slate-400 mt-2">المصدر: pure_python_results.csv — متوسط زمن الرحلة للسيارات التقليدية 503 ث مقابل 283 ث للمستوى L4 (-43.8%)</p>
+                    <p class="text-[11px] text-slate-400 mt-2">المصدر: pure_python_results.csv — تقليدي 503ث مقابل L4 283ث (-43.8%)</p>
                 </div>
                 <div class="bg-slate-800 rounded-xl p-4">
-                    <h4 class="font-bold mb-3"><i class="fas fa-exclamation-triangle mr-2 text-orange-400"></i>النقط السوداء <span class="text-xs text-slate-400">(أثر السرعة)</span></h4>
+                    <h4 class="font-bold mb-3"><i class="fas fa-exclamation-triangle mr-2 text-orange-400"></i>النقط السوداء <span class="text-xs text-slate-400">(اضغط للتحديد على الخريطة)</span></h4>
                     <div id="fd-blackspots"></div>
                 </div>
                 <div class="bg-slate-800 rounded-xl p-4">
                     <h4 class="font-bold mb-3"><i class="fas fa-traffic-light mr-2 text-green-400"></i>الحصر المروري — محطة باسوس</h4>
                     <table class="w-full text-sm"><thead><tr class="text-xs text-slate-400 border-b border-slate-600">
-                        <th class="text-left pb-2">المركبة</th><th class="pb-2">PCU</th><th class="pb-2">عدلي ↗</th><th class="pb-2">×PCU</th><th class="pb-2">6 أoct↘</th>
+                        <th class="text-left pb-2">المركبة</th><th class="pb-2">PCU</th><th class="pb-2">عدلي ↗</th><th class="pb-2">×PCU</th><th class="pb-2">6أoct↘</th>
                     </tr></thead><tbody id="fd-counts"></tbody></table>
-
+                </div>
                 <div class="bg-slate-800 rounded-xl p-4 lg:col-span-3">
                     <div class="flex flex-col md:flex-row md:items-center gap-3 mb-3">
                         <h4 class="font-bold"><i class="fas fa-list-check mr-2 text-purple-400"></i>مستكشف تقنيات القيادة الذاتية — 40 ميزة موثقة</h4>
@@ -645,12 +662,14 @@ document.addEventListener('DOMContentLoaded', function () {
                     <div class="bg-slate-900/60 rounded p-2"><div class="text-slate-400 text-xs">2026</div><div class="font-mono text-amber-300 font-bold">6.01M</div></div>
                     <div class="bg-slate-900/60 rounded p-2"><div class="text-slate-400 text-xs">2030</div><div class="font-mono text-amber-300 font-bold">7.44M</div></div>
                     <div class="bg-slate-900/60 rounded p-2"><div class="text-slate-400 text-xs">2035</div><div class="font-mono text-amber-300 font-bold">9.71M</div></div>
-                    <div class="bg-slate-900/60 rounded p-2"><div class="text-slate-400 text-xs">عند MPR 50% (2035)</div><div class="font-mono text-green-400 font-bold">≈4.85M AV</div></div>
+                    <div class="bg-slate-900/60 rounded p-2"><div class="text-slate-400 text-xs">MPR 50% عند 2035</div><div class="font-mono text-green-400 font-bold">≈4.85M ذاتية</div></div>
                 </div>
             </div>
+        </div>
+    </section>
 
     <!-- ========== CORRIDOR SIDE-BY-SIDE COMPARISON ========== -->
-    <section id="compare-section" class="py-16 bg-slate-900 text-white">
+    <section id="compare-section" class="case-view class="py-16 bg-slate-900 text-white""
         <div class="container mx-auto px-4">
             <div class="text-center mb-8">
                 <h2 class="text-3xl font-bold mb-3"><i class="fas fa-columns mr-2 text-cyan-400"></i><span data-key="cmp_title">Corridor Side-by-Side Comparison</span></h2>
@@ -4576,7 +4595,31 @@ function saeCloseSandboxOnOverlay(e, el) {
     });
 })();
 
-    ssamLastRenderTime = Date.now();// ========== THEME ENGINE (dark / light) ==========
+    ssamLastRenderTime = Date.now();// ========== VIEW SWITCHER (Main Reference vs Ring-Road Case Study) ==========
+function applyView(v) {
+    document.body.classList.toggle('view-case', v === 'case');
+    var tm = document.getElementById('tab-main'), tc = document.getElementById('tab-case');
+    var onCls = ['bg-cyan-500/20', 'text-cyan-300', 'border-cyan-400/50'].join(' ');
+    var offCls = ['bg-slate-600/20', 'text-slate-300', 'border-slate-500/40'].join(' ');
+    if (tm) { tm.className = 'px-3 py-1.5 rounded-lg font-medium ' + (v !== 'case' ? onCls : offCls); }
+    if (tc) { tc.className = 'px-3 py-1.5 rounded-lg font-medium ' + (v === 'case' ? onCls : offCls); }
+    try { localStorage.setItem('sae-view', v); } catch (e) {}
+}
+function setView(v) {
+    applyView(v);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    updateURL();
+}
+(function () {
+    var q = new URLSearchParams(location.search);
+    var v = q.get('view') || 'main';
+    document.addEventListener('DOMContentLoaded', function () {
+        if (v === 'case') applyView('case');
+        else applyView('main');
+    });
+})();
+
+// ========== THEME ENGINE (dark / light) ==========
 function applyTheme(theme) {
     var root = document.documentElement;
     if (theme === 'dark') root.classList.add('sae-dark');
@@ -4876,6 +4919,7 @@ function updateURL() {
     p.set('mpr', rrMPR);
     p.set('scenario', rrScenario || 'A');
     p.set('lang', localStorage.getItem('sae-lang') || 'en');
+    p.set('view', document.body.classList.contains('view-case') ? 'case' : 'main');
     history.replaceState(null, '', location.pathname + '?' + p.toString());
   } catch (e) {}
 }
