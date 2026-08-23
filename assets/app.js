@@ -1890,6 +1890,7 @@ function initRingRoadMap() {
 
     var traffic = new google.maps.TrafficLayer();
     traffic.setMap(rrMap);
+    drawCaseInterchanges();
     rrOverlay = new RingRoadOverlay(rrMap);
     updateRingRoadStyle(rrMPR);
     startLiveTrafficFeed();
@@ -1948,6 +1949,7 @@ function initializeHighFidelityRingRoadMap(cor) {
             }
             renderTwoWayParallelCorridor(rrSnappedPath, rrSnappedPathB);
             renderPreciseRampMarkers();
+            drawCaseInterchanges();
         } else {
             console.warn('DirectionsService failed:', status);
             rrSnappedPath = cor.coords.slice();
@@ -2132,60 +2134,102 @@ RingRoadOverlay.prototype.initVehicles = function () {
   this.vehicles_ = [];
   var cor = CORRIDORS[currentCorridor] || CORRIDORS.egypt;
   var types = cor.vehicleTypes;
-  for (var i = 0; i < 9; i++) {
+  var nA = 10 + Math.round(rrMPR / 12);   // denser with MPR (smoother flow attracts demand)
+  for (var i = 0; i < nA; i++) {
     var ty = types[i % types.length];
-    this.vehicles_.push({ dir: 'A', frac: i / 9 + Math.random() * 0.03, baseSpeed: 0.55 + Math.random() * 0.5, type: ty, weave: (ty === 'microbus' || ty === 'tuktuk'), phase: Math.random() * 6.28, dwell: 0 });
+    this.vehicles_.push({ dir: 'A', dist: Math.random() * 20000, spd: 15, type: ty,
+                          rng: Math.random(), weave: (ty === 'microbus' || ty === 'tuktuk'),
+                          phase: Math.random() * 6.28, dwell: 0 });
   }
-  for (var j = 0; j < 9; j++) {
-    this.vehicles_.push({ dir: 'B', frac: j / 9 + Math.random() * 0.03, baseSpeed: 0.85 + Math.random() * 0.3, type: 'av', weave: false, phase: Math.random() * 6.28, dwell: 0 });
+  var nB = 7 + Math.round(rrMPR / 14);
+  for (var j = 0; j < nB; j++) {
+    this.vehicles_.push({ dir: 'B', dist: Math.random() * 20000, spd: 22, type: (rrScenario==='B'?'av':'sedan'),
+                          rng: Math.random(), weave: false, phase: Math.random() * 6.28, dwell: 0 });
   }
-};
+};;
 RingRoadOverlay.prototype.tick = function (dt) {
   var B = (rrScenario === 'B');
-  var self = this;
-  this.vehicles_.forEach(function (v) {
-    if (v.dwell > 0) { v.dwell -= dt; v.phase += dt * 4; return; }
-    v.frac += v.baseSpeed * dt * 0.02;
-    v.phase += dt * (v.weave ? 3 : 0.6);
-    if (v.frac >= 1) v.frac -= 1;
-    if (!B || v.dir === 'A') {
-      if ((v.frac < 0.05 || (v.frac > 0.55 && v.frac < 0.63)) && (v.type === 'microbus' || v.type === 'tuktuk') && Math.random() < 0.03) {
-        v.dwell = 1.1; // ~25s passenger boarding dwell (scaled loop)
+  var mprFrac = rrMPR / 100;
+  var TIME_LAPSE = 6;                 // visual time compression
+  var vs = this.vehicles_;
+  vs.forEach(function (v) {
+    if (v.dwell > 0) { v.dwell -= dt; return; }
+    var tv = targetSpeed(v, mprFrac);
+    if (!B && v.weave) tv *= (0.55 + 0.25 * Math.sin(v.phase));   // chaotic pulsing
+    if (B && v.type === 'av') tv *= 1.05;
+    v.spd += (tv - v.spd) * Math.min(1, dt * 0.8);
+    // blackspot side-stop behaviour (documented dwell narrative)
+    if (currentCorridor === 'egypt' && v.weave) {
+      for (var k = 0; k < BLACKSPOTS.length; k++) {
+        var f = BLACKSPOTS[k].frac == null ? [0.33,0.45,0.80,0.38][k % 4]
+                                           : (BLACKSPOTS[k]._d == null ? (BLACKSPOTS[k]._d = BLACKSPOTS[k].frac * 20014) : BLACKSPOTS[k]._d);
+        var dd = Math.abs(v.dist - f);
+        if (dd < 90 && Math.random() < 0.010) { v.dwell = 1.6 + Math.random() * 1.2; break; }
       }
     }
+    v.dist += v.spd * dt * TIME_LAPSE;
   });
-};
+  // car-following min-gap per direction
+  ['A', 'B'].forEach(function (dir) {
+    var lane = vs.filter(function (v) { return v.dir === dir; })
+                 .sort(function (a, b) { return a.dist - b.dist; });
+    var L = 20014;
+    for (var i = 1; i < lane.length; i++) {
+      var gap = lane[i].dist - lane[i-1].dist;
+      var minGap = (B && lane[i].type === 'av') ? 14 : 22;
+      if (gap < minGap) { lane[i].dist = lane[i-1].dist + minGap; lane[i].spd = Math.min(lane[i].spd, lane[i-1].spd); }
+    }
+    if (lane.length > 1) { // wrap-around gap check
+      var gw = (lane[0].dist + L) - lane[lane.length - 1].dist;
+      if (gw < minGap) lane[0].dist = lane[lane.length - 1].dist + minGap - L;
+    }
+  });
+};;
 RingRoadOverlay.prototype.drawVehicles = function () {
   if (!this.canvas_ || !this.proj_) return;
   var c = this.canvas_.getContext('2d');
-  var w = this.canvas_.width, h = this.canvas_.height;
-  c.clearRect(0, 0, w, h);
-  var proj = this.proj_;
-  var B = (rrScenario === 'B');
-  var self = this;
+  c.clearRect(0, 0, this.canvas_.width, this.canvas_.height);
+  var proj = this.proj_, B = (rrScenario === 'B');
+  var useReal = currentCorridor === 'egypt' && RING_CENTERLINE_REAL && RING_CENTERLINE_REAL.length > 50;
+  var cor = CORRIDORS[currentCorridor] || CORRIDORS.egypt;
+  var pathA = useReal ? RING_CENTERLINE_REAL : cor.coords;
+  var pathB = (rrSnappedPathB && rrSnappedPathB.length > 2) ? rrSnappedPathB
+            : (useReal ? RING_CENTERLINE_REAL.map(function(p){return {lat:p[0]-0.00035, lng:p[1]-0.00035};})
+                       : offsetPath(cor.coords, 0.006, 0.006));
   this.vehicles_.forEach(function (v) {
-    var pathA = (rrSnappedPath && rrSnappedPath.length > 2) ? rrSnappedPath : (CORRIDORS[currentCorridor] || CORRIDORS.egypt).coords;
-    var pathB2 = (rrSnappedPathB && rrSnappedPathB.length > 2) ? rrSnappedPathB : offsetPath(pathA, -0.005, -0.005);
-    var path = v.dir === 'B' ? pathB2 : pathA;
-    var pt = routePoint(path, v.frac);
+    var pt = pointAtDist(v.dir === 'B' ? pathB : pathA, v.dist);
     var px = proj.fromLatLngToDivPixel(new google.maps.LatLng(pt.lat, pt.lng));
     if (!px) return;
     var x = px.x, y = px.y;
-    if (v.weave && !(B && v.dir === 'B')) x += Math.sin(v.phase) * 7;
-    var isAV = (B && v.dir === 'B');
-    if (isAV) c.fillStyle = '#10b981';
+    var isAV = (B && v.dir === 'B') || v.type === 'av';
+    var w = 13, hh = 6.5;
+    if (v.type === 'bus' || v.type === 'naql_taqeel') { w = 17; hh = 8; }
+    if (v.type === 'tuktuk' || v.type === 'bicycle') { w = 9; hh = 5; }
+    c.save();
+    c.translate(x, y);
+    c.rotate(-pt.hdg);
+    if (isAV) c.fillStyle = '#34d399';
     else if (v.type === 'microbus') c.fillStyle = '#ef4444';
     else if (v.type === 'tuktuk') c.fillStyle = '#f59e0b';
-    else if (v.type === 'av') c.fillStyle = '#38bdf8';
+    else if (v.type === 'naql_taqeel' || v.type === 'truck') c.fillStyle = '#94a3b8';
     else c.fillStyle = '#60a5fa';
-    c.fillRect(x - 5, y - 3, 10, 6);
+    if (v.dwell > 0) { c.globalAlpha = 0.45; }
+    c.fillRect(-w/2, -hh/2, w, hh);
+    c.fillStyle = 'rgba(15,23,42,.85)';
+    c.fillRect(w*0.12, -hh/2 + 1, 2.5, hh - 2);           // windshield
+    if (v.dwell > 0) {                                     // hazard blinker
+        c.globalAlpha = 1;
+        c.fillStyle = Math.floor(Date.now()/250)%2 ? '#fbbf24' : 'transparent';
+        c.fillRect(-w/2, -hh/2 - 3, 3, 2); c.fillRect(w/2 - 3, hh/2 + 1, 3, 2);
+    }
+    c.restore();
   });
-};
+};;
 function respacePlatoon() {
   if (!rrOverlay) return;
   var avs = rrOverlay.vehicles_.filter(function (v) { return v.dir === 'B'; });
   avs.forEach(function (v, idx) {
-    v.frac = idx / avs.length;
+    v.dist = idx * 260;
     v.baseSpeed = 0.9; v.weave = false; v.dwell = 0;
   });
 }
@@ -2415,6 +2459,7 @@ function switchCorridor(country) {
   // Clear directions renderer
   if (rrDirectionsRenderer) { rrDirectionsRenderer.setMap(null); rrDirectionsRenderer = null; }
   rrSnappedPath = null; rrSnappedPathB = null;
+  clearCaseInterchanges();
   // Re-route with DirectionsService for new corridor
   initializeHighFidelityRingRoadMap(cor);
   // New overlay
@@ -2776,7 +2821,24 @@ function saeCloseSandboxOnOverlay(e, el) {
     });
 })();
 
-    ssamLastRenderTime = Date.now();// ========== VIEW SWITCHER (Main Reference vs Ring-Road Case Study) ==========
+    ssamLastRenderTime = Date.now();function toggleMoreMenu() {
+    var m = document.getElementById('more-menu');
+    if (m) m.classList.toggle('hidden');
+}
+document.addEventListener('click', function (e) {
+    var more = document.getElementById('more-menu');
+    if (!more || more.classList.contains('hidden')) return;
+    if (!e.target.closest('#more-menu') && !e.target.closest('#more-btn')) more.classList.add('hidden');
+});
+function _go(sel, caseView) {
+    if (caseView && document.body.classList.contains('view-case') === false) setView('case');
+    var el = document.querySelector(sel);
+    if (el) setTimeout(function () { el.scrollIntoView({ behavior: 'smooth' }); }, 120);
+}
+function menuGo(el) { _go(el.getAttribute('href'), false); }
+function menuGoCase(el) { _go(el.getAttribute('href'), true); }
+
+// ========== VIEW SWITCHER (Main Reference vs Ring-Road Case Study) ==========
 function applyView(v) {
     document.body.classList.toggle('view-case', v === 'case');
     var tm = document.getElementById('tab-main'), tc = document.getElementById('tab-case');
@@ -3039,6 +3101,109 @@ document.addEventListener('DOMContentLoaded', function () {
     var inp = document.getElementById('feat-search');
     if (inp) inp.addEventListener('input', function () { renderFeatures(this.value); });
 });
+
+// ========== CASE-STUDY INTERCHANGES (surveyed chainage mapping) ==========
+var CASE_IC = [
+    {frac:0.00, ar:'موقف السلام / عدلي منصور', en:'Salam Terminal',        type:'terminal',    icon:'🚏'},
+    {frac:0.33, ar:'تبادل مؤسسة الزكاة',       en:'El-Zakat Interchange',  type:'interchange', icon:'🔄'},
+    {frac:0.38, ar:'مخرج المرج الجديد',        en:'New El-Marg Exit',      type:'exit',        icon:'↗'},
+    {frac:0.45, ar:'محور الرشاحة (الخصوص)',    en:'El-Rashah Axis',        type:'conflict',    icon:'⚠'},
+    {frac:0.80, ar:'كبري المسترود (+3.5%)',    en:'Mostorod Bridge',       type:'bridge',      icon:'🌉'},
+    {frac:0.93, ar:'ملتقى الإسكندرية الزراعي', en:'Alex Agri Rd Merge',    type:'merge',       icon:'⇄'},
+    {frac:1.00, ar:'نزلة القليوب',             en:'Nazlet Qalyub',         type:'terminal',    icon:'🏁'}
+];
+var IC_COLORS = { terminal:'#06b6d4', interchange:'#8b5cf6', exit:'#10b981',
+                 conflict:'#f97316', bridge:'#ef4444', merge:'#eab308' };
+function icChainage(frac) {
+    var c0 = 45708, c1 = 65722;
+    var v = Math.round(c0 + frac * (c1 - c0));
+    return (Math.floor(v / 1000)) + '+' + String(v % 1000).padStart(3, '0');
+}
+var _icMarkers = [];
+function drawCaseInterchanges() {
+    clearCaseInterchanges();
+    if (currentCorridor !== 'egypt' || !RING_CENTERLINE_REAL || !rrMap) return;
+    CASE_IC.forEach(function (ic, i) {
+        var p = RING_CENTERLINE_REAL[Math.min(RING_CENTERLINE_REAL.length - 1,
+                Math.round(ic.frac * (RING_CENTERLINE_REAL.length - 1)))];
+        var m = new google.maps.Marker({
+            position: { lat: p[0], lng: p[1] }, map: rrMap,
+            label: { text: String(i + 1), color: '#fff', fontWeight: 'bold', fontSize: '11px' },
+            icon: { path: google.maps.SymbolPath.CIRCLE, scale: 12,
+                    fillColor: IC_COLORS[ic.type], fillOpacity: 0.95,
+                    strokeColor: '#fff', strokeWeight: 2 },
+            title: ic.ar + ' — ' + ic.en + ' (' + icChainage(ic.frac) + ')', zIndex: 500
+        });
+        var iw = new google.maps.InfoWindow({ content:
+            '<div style="min-width:230px;font-family:Tahoma">' +
+            '<div style="font-weight:bold;font-size:13px">' + ic.icon + ' ' + (i + 1) + '. ' + ic.ar + '</div>' +
+            '<div style="color:#555;font-size:11px" dir="ltr">' + ic.en + '</div>' +
+            '<div style="margin-top:4px;font-size:11px">المساحة: <b dir="ltr">' + icChainage(ic.frac) + '</b></div>' +
+            '</div>' });
+        m.addListener('click', function () { iw.open(rrMap, m); });
+        _icMarkers.push(m);
+    });
+    drawCaseLegend();
+}
+function clearCaseInterchanges() {
+    _icMarkers.forEach(function (m) { m.setMap(null); });
+    _icMarkers = [];
+    var lg = document.getElementById('case-legend'); if (lg) lg.remove();
+}
+function drawCaseLegend() {
+    var host = document.getElementById('ringroad-map');
+    if (!host) return;
+    var d = document.createElement('div');
+    d.id = 'case-legend';
+    d.style.cssText = 'position:absolute;bottom:10px;left:10px;z-index:20;background:rgba(15,23,42,.88);color:#e2e8f0;padding:8px 12px;border-radius:10px;font-size:11px;line-height:1.7;direction:rtl;backdrop-filter:blur(4px)';
+    var rows = [
+        ['line-cyan','المسار المساحي الرئيسي (اتجاه السلام→القليوب)'],
+        ['line-slate','الاتجاه المعاكس'],
+        ['dot-orange','نقطة سوداء / تصادمي'],
+        ['dot-green','وضع السيناريو B — الحارة الذكية']
+    ];
+    d.innerHTML = rows.map(function(r){
+        return '<div><span class="lg-' + r[0] + '"></span> ' + r[1] + '</div>';
+    }).join('') + '<div style="margin-top:2px;color:#94a3b8">①-⑦ التقاطعات والطلعات — اضغط للتفاصيل</div>';
+    host.parentNode.style.position = 'relative';
+    host.parentNode.appendChild(d);
+}
+// ══════════ REALISTIC TRAFFIC ENGINE ══════════
+var TYPE_SPEED = { microbus:[38,52], tuktuk:[28,40], mlaiky:[35,50], noss_naql:[45,60],
+                   rob_naql:[48,62], naql_taqeel:[50,65], motorcycle:[55,75], bicycle:[15,22],
+                   sedan:[70,95], suv:[70,95], truck:[55,70], bus:[50,65], taxi:[60,85],
+                   luxury:[80,100], av:[85,105] };
+function pathLengths(path) {
+    path._cum = path._cum || (function () {
+        var cum = [0];
+        for (var i = 1; i < path.length; i++) {
+            var dx = (path[i].lng - path[i-1].lng) * 93000 * Math.cos(path[i].lat * Math.PI/180);
+            var dy = (path[i].lat - path[i-1].lat) * 111000;
+            cum.push(cum[i-1] + Math.sqrt(dx*dx + dy*dy));
+        }
+        return cum;
+    })();
+    return path._cum;
+}
+function pointAtDist(path, dist) {
+    var cum = pathLengths(path), L = cum[cum.length - 1];
+    dist = ((dist % L) + L) % L;
+    var lo = 0, hi = cum.length - 1;
+    while (lo < hi - 1) { var mid = (lo + hi) >> 1; (cum[mid] <= dist ? lo = mid : hi = mid); }
+    var t = (dist - cum[lo]) / Math.max(0.001, cum[hi] - cum[lo]);
+    return { lat: path[lo].lat + (path[hi].lat - path[lo].lat) * t,
+             lng: path[lo].lng + (path[hi].lng - path[lo].lng) * t,
+             hdg: Math.atan2(path[hi].lat - path[lo].lat, path[hi].lng - path[lo].lng),
+             total: L };
+}
+function targetSpeed(v, mprFrac) {
+    var band = TYPE_SPEED[v.type] || [60, 85];
+    var base = band[0] + (band[1] - band[0]) * v.rng;
+    // AV penetration lifts whole flow toward higher stable speed
+    var lift = mprFrac * 18;
+    return (base + lift * (v.dir === 'B' ? 1 : 0.6)) / 3.6; // m/s
+}
+
 
 // ========== UNITS ENGINE (km/h <-> mph) ==========
 function getUnits() {

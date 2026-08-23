@@ -19,6 +19,12 @@
     <link rel="canonical" href="https://sae.fimtosoft.com/">
 <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#0f172a">
+    <style>
+        .lg-line-cyan, .lg-line-slate, .lg-dot-orange, .lg-dot-green { display:inline-block; width:18px; height:4px; border-radius:2px; vertical-align:middle; margin-left:6px; }
+        .lg-line-cyan { background:#06b6d4; } .lg-line-slate { background:#64748b; }
+        .lg-dot-orange, .lg-dot-green { width:10px; height:10px; border-radius:50%; }
+        .lg-dot-orange { background:#f97316; } .lg-dot-green { background:#34d399; }
+    </style>
 <style id="sae-theme-overrides">
     html.sae-dark .bg-white { background-color: #101b31 !important; }
     html.sae-dark .bg-slate-50 { background-color: #0b1424 !important; }
@@ -217,26 +223,31 @@
                         <p class="text-xs text-slate-500" data-key="m">To assist traffic simulation researchers worldwide.</p>
                     </div>
                 </div>
-                <nav class="hidden md:flex items-center gap-4">
+                <nav class="hidden lg:flex items-center gap-4">
                     <a href="#hero" class="nav-link text-sm font-medium" data-key="nav_home">Home</a>
                     <a href="#sim" class="nav-link text-sm font-medium" data-key="nav_sim">Simulation</a>
-                    <a href="#ringroad" class="nav-link text-sm font-medium" data-key="nav_case">Case Study</a>
                     <a href="#fleets" class="nav-link text-sm font-medium" data-key="nav_fleet">Fleet</a>
                     <a href="#comparison" class="nav-link text-sm font-medium" data-key="nav_compare">Compare</a>
-                    <a href="#math" class="nav-link text-sm font-medium">Math</a>
-                    <a href="#country-hub" class="nav-link text-sm font-medium" data-key="nav_country">Countries</a>
-                    <a href="#references" class="nav-link text-sm font-medium" data-key="nav_refs">References</a>
+                    <div class="relative">
+                        <button data-call-click="toggleMoreMenu" id="more-btn" class="nav-link text-sm font-medium">More ▾</button>
+                        <div id="more-menu" class="hidden absolute right-0 top-full mt-2 w-44 bg-white rounded-xl shadow-lg border border-slate-200 py-2 z-[60]">
+                            <a href="#math" class="block px-4 py-2 text-sm hover:bg-slate-50" data-call-click="menuGo">🧮 Math Models</a>
+                            <a href="#country-hub" class="block px-4 py-2 text-sm hover:bg-slate-50" data-call-click="menuGo">🌍 Countries</a>
+                            <a href="#references" class="block px-4 py-2 text-sm hover:bg-slate-50" data-call-click="menuGo">📚 References</a>
+                            <hr class="my-1 border-slate-100">
+                            <a href="#field-data" class="block px-4 py-2 text-sm hover:bg-slate-50" data-call-click="menuGoCase">🛣️ Field Data (Case)</a>
+                        </div>
+                    </div>
                 </nav>
                 <div class="flex items-center gap-2">
-                    <label for="lang-select" class="text-sm font-medium hidden sm:block" data-key="ls">Language</label>
                     <div id="view-tabs" class="flex items-center gap-1 mr-2 text-xs">
                         <button data-call-click="setView" data-args='["main"]' id="tab-main" class="px-3 py-1.5 rounded-lg font-medium bg-cyan-500/20 text-cyan-300 border border-cyan-400/50">📚 <span data-key="tab_main">المرجعية</span></button>
                         <button data-call-click="setView" data-args='["case"]' id="tab-case" class="px-3 py-1.5 rounded-lg font-medium bg-slate-600/20 text-slate-300 border border-slate-500/40">🛣️ <span data-key="tab_case">دراسة الحالة</span></button>
                     </div>
                     
-                    <button id="theme-toggle" data-call-click="toggleTheme" aria-label="Toggle dark mode" title="Dark / Light" class="mr-2 w-9 h-9 inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white text-lg hover:bg-slate-100 transition"><span id="theme-icon">🌙</span></button>
-                    <select id="lang-select" data-call-change="setLanguage" data-pass-value class="border border-slate-300 rounded-lg px-2 py-1 text-sm bg-white cursor-pointer">
-                        <option value="en" selected>🇬🇧 English</option><option value="ar" >🇪🇬 العربية</option><option value="ru" >🇷🇺 Русский</option><option value="hi" >🇮🇳 हिन्दी</option><option value="de" >🇩🇪 Deutsch</option><option value="zh" >🇨🇳 中文</option><option value="ja" >🇯🇵 日本語</option><option value="ko" >🇰🇷 한국어</option><option value="fr" >🇫🇷 Français</option>
+                    <button id="theme-toggle" data-call-click="toggleTheme" aria-label="Toggle dark mode" title="Dark / Light" class="w-9 h-9 inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white text-base hover:bg-slate-100 transition"><span id="theme-icon">🌙</span></button>
+                    <select id="lang-select" data-call-change="setLanguage" data-pass-value class="border border-slate-300 rounded-lg px-1 py-1 text-sm bg-white cursor-pointer w-[46px]">
+                        <option value="en" selected>🇬🇧</option><option value="ar" >🇪🇬 العربية</option><option value="ru" >🇷🇺 Русский</option><option value="hi" >🇮🇳 हिन्दी</option><option value="de" >🇩🇪 Deutsch</option><option value="zh" >🇨🇳 中文</option><option value="ja" >🇯🇵 日本語</option><option value="ko" >🇰🇷 한국어</option><option value="fr" >🇫🇷 Français</option>
                     </select>
                 </div>
             </div>
