@@ -19,6 +19,8 @@ jobs:
           node -e "
           const fs=require('fs'),cp=require('child_process');
           const html=fs.readFileSync('index.html','utf8');
+          const ar=cp.spawnSync('node',['--check','assets/app.js'],{encoding:'utf8'});
+          if(ar.status!==0){fails++;console.error('app.js:',ar.stderr);}
           const re=/<script(?![^>]*src=)[^>]*>([\s\S]*?)<\/script>/g;
           let m,i=0,fails=0;
           while((m=re.exec(html))){
