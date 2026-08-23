@@ -137,10 +137,11 @@ html.sae-dark [class*="bg-orange-100"][class*="text-orange-700"] { background: r
     height: 40px; padding: 0 1.15rem;
     border-radius: .6rem; font-size: .78rem; font-weight: 600;
     color: #94a3b8; background: transparent; border: 1px solid transparent;
-    transition: all .18s ease; cursor: pointer; white-space: nowrap;
+    transition: all .2s ease; cursor: pointer; white-space: nowrap;
 }
 .scn-btn i { font-size: .85rem; }
 .scn-btn:hover { color: #e2e8f0; background: rgba(148,163,184,.08); }
+.scn-btn:focus-visible { outline: 2px solid #38bdf8; outline-offset: 2px; }
 .scn-btn.is-active-a { color: #fff; background: linear-gradient(135deg,#dc2626,#b91c1c); border-color:#f87171; box-shadow:0 4px 14px -4px rgba(220,38,38,.55); }
 .scn-btn.is-active-b { color: #fff; background: linear-gradient(135deg,#059669,#047857); border-color:#34d399; box-shadow:0 4px 14px -4px rgba(16,185,129,.55); }
 
@@ -150,10 +151,11 @@ html.sae-dark [class*="bg-orange-100"][class*="text-orange-700"] { background: r
     font-size: .74rem; font-weight: 600; letter-spacing:.01em;
     color: #e2e8f0; background: #16233c;
     border: 1px solid #2d3f5e; cursor: pointer; white-space: nowrap;
-    transition: all .16s ease;
+    transition: all .2s ease;
 }
 .exp-btn:hover { background: #1d2f52; border-color: #3b5280; transform: translateY(-1px); }
 .exp-btn:active { transform: translateY(0); }
+.exp-btn:focus-visible { outline: 2px solid #38bdf8; outline-offset: 2px; }
 .exp-btn i { font-size: .82rem; margin-right: .45rem; }
 .ic-sumo   { color: #38bdf8; }
 .ic-vissim { color: #a78bfa; }
@@ -174,3 +176,15 @@ html.sae-dark [class*="bg-orange-100"][class*="text-orange-700"] { background: r
 #view-tabs button { min-height: 40px; }
 .exp-btn { min-height: 40px; }
 .scn-btn { min-height: 44px; }
+
+/* ─── Focus-Visible: keyboard accessibility ─── */
+a:focus-visible, button:focus-visible, select:focus-visible, input:focus-visible {
+    outline: 2px solid #38bdf8;
+    outline-offset: 2px;
+}
+.nav-link:focus-visible { outline-offset: 4px; }
+.ch-btn:focus-visible { outline: 2px solid #38bdf8; outline-offset: 2px; }
+.download-btn:focus-visible { outline: 2px solid #38bdf8; outline-offset: 2px; }
+
+/* ─── Unified Transition Speed ─── */
+#view-tabs button { transition: all .2s ease; }
