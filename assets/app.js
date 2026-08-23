@@ -3102,6 +3102,28 @@ function toggleMoreMenu() {
     var m = document.getElementById('more-menu');
     if (m) m.classList.toggle('hidden');
 }
+
+// ─── 2b. MOBILE NAVIGATION DRAWER ───
+function toggleMobileNav() {
+    var drawer = document.getElementById('mobile-nav-drawer');
+    var backdrop = document.getElementById('mobile-nav-backdrop');
+    if (!drawer || !backdrop) return;
+    var isOpen = drawer.classList.contains('open');
+    if (isOpen) {
+        drawer.classList.remove('open');
+        backdrop.classList.add('hidden');
+        document.body.style.overflow = '';
+    } else {
+        drawer.classList.add('open');
+        backdrop.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+    }
+}
+function menuGoMobile(href) {
+    toggleMobileNav();
+    var el = document.querySelector(href);
+    if (el) el.scrollIntoView({ behavior: 'smooth' });
+}
 document.addEventListener('click', function (e) {
     var more = document.getElementById('more-menu');
     if (!more || more.classList.contains('hidden')) return;

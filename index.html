@@ -162,19 +162,41 @@
                     </div>
                 </nav>
                 <div class="flex items-center gap-1.5">
+                    <button id="mobile-menu-btn" data-call-click="toggleMobileNav" aria-label="Open menu" class="lg:hidden w-10 h-10 inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white text-slate-600 hover:bg-slate-100 transition"><i class="fas fa-bars"></i></button>
                     <div id="view-tabs" class="flex items-center gap-0.5 p-0.5 rounded-lg bg-slate-100 border border-slate-200">
                         <button data-call-click="setView" data-args='["main"]' id="tab-main" title="Main reference" class="px-2.5 py-1.5 rounded-md text-xs font-semibold inline-flex items-center gap-1 bg-cyan-500/15 text-cyan-700 border border-cyan-400/40">📚 <span data-key="tab_main">المرجعية</span></button>
                         <button data-call-click="setView" data-args='["case"]' id="tab-case" title="Ring Road case study" class="px-2.5 py-1.5 rounded-md text-xs font-semibold inline-flex items-center gap-1 bg-slate-500/10 text-slate-600 border border-slate-400/30">🛣️ <span data-key="tab_case">دراسة الحالة</span></button>
                     </div>
                     
-                    <button id="theme-toggle" data-call-click="toggleTheme" aria-label="Toggle dark mode" title="Dark / Light" class="w-8 h-8 inline-flex items-center justify-center rounded-md border border-slate-200 bg-white text-sm hover:bg-slate-100 transition"><span id="theme-icon">🌙</span></button>
-                    <select id="lang-select" data-call-change="setLanguage" data-pass-value class="border border-slate-200 rounded-md px-0.5 py-1 text-sm bg-white cursor-pointer w-[44px] hover:border-slate-300 transition">
+                    <button id="theme-toggle" data-call-click="toggleTheme" aria-label="Toggle dark mode" title="Dark / Light" class="w-10 h-10 inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white text-sm hover:bg-slate-100 transition"><span id="theme-icon">🌙</span></button>
+                    <select id="lang-select" data-call-change="setLanguage" data-pass-value class="border border-slate-200 rounded-lg px-1.5 py-2 text-sm bg-white cursor-pointer min-w-[48px] hover:border-slate-300 transition">
                         <option value="en" selected>🇬🇧</option><option value="ar" >🇪🇬 العربية</option><option value="ru" >🇷🇺 Русский</option><option value="hi" >🇮🇳 हिन्दी</option><option value="de" >🇩🇪 Deutsch</option><option value="zh" >🇨🇳 中文</option><option value="ja" >🇯🇵 日本語</option><option value="ko" >🇰🇷 한국어</option><option value="fr" >🇫🇷 Français</option>
                     </select>
                 </div>
             </div>
         </div>
     </header>
+
+    <!-- Mobile Drawer -->
+    <div id="mobile-nav-backdrop" class="fixed inset-0 bg-black/50 z-[55] hidden lg:hidden" data-call-click="toggleMobileNav"></div>
+    <div id="mobile-nav-drawer" class="fixed top-0 left-0 h-full w-72 bg-white z-[56] shadow-2xl transform -translate-x-full transition-transform duration-300 lg:hidden">
+        <div class="p-5 border-b border-slate-200 flex items-center justify-between">
+            <span class="font-bold text-slate-800" data-key="m">Navigation</span>
+            <button data-call-click="toggleMobileNav" class="w-10 h-10 inline-flex items-center justify-center rounded-lg hover:bg-slate-100 transition"><i class="fas fa-times text-lg text-slate-600"></i></button>
+        </div>
+        <nav class="p-4 flex flex-col gap-1">
+            <a href="#hero" data-call-click="menuGoMobile" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-100 transition"><i class="fas fa-home w-5 text-center text-slate-400"></i><span data-key="nav_home">Home</span></a>
+            <a href="#sim" data-call-click="menuGoMobile" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-100 transition"><i class="fas fa-play-circle w-5 text-center text-slate-400"></i><span data-key="nav_sim">Simulation</span></a>
+            <a href="#fleets" data-call-click="menuGoMobile" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-100 transition"><i class="fas fa-car w-5 text-center text-slate-400"></i><span data-key="nav_fleet">Fleet</span></a>
+            <a href="#comparison" data-call-click="menuGoMobile" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-100 transition"><i class="fas fa-columns w-5 text-center text-slate-400"></i><span data-key="nav_compare">Compare</span></a>
+            <hr class="my-2 border-slate-200">
+            <a href="#math" data-call-click="menuGoMobile" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-100 transition"><i class="fas fa-calculator w-5 text-center text-slate-400"></i><span data-key="nav_math">Math Models</span></a>
+            <a href="#country-hub" data-call-click="menuGoMobile" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-100 transition"><i class="fas fa-globe w-5 text-center text-slate-400"></i><span data-key="nav_countries">Countries</span></a>
+            <a href="#references" data-call-click="menuGoMobile" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-100 transition"><i class="fas fa-book w-5 text-center text-slate-400"></i><span data-key="nav_refs">References</span></a>
+            <hr class="my-2 border-slate-200">
+            <a href="#field-data" data-call-click="menuGoMobile" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-primary hover:bg-blue-50 transition"><i class="fas fa-road w-5 text-center text-primary"></i><span data-key="nav_field">Field Data (Case)</span></a>
+        </nav>
+    </div>
 
     <!-- Hero -->
     <section id="hero" class="hero-bg min-h-[500px] bg-gradient-to-br from-slate-900 via-slate-800 to-primary-dark text-white flex items-center relative overflow-hidden">

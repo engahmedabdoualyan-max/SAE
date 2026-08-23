@@ -109,3 +109,16 @@ html.sae-dark .bg-white { background-color: #101b31 !important; }
 .ic-csv    { color: #60a5fa; }
 .unit-chip { font-family: ui-monospace, monospace; color: #fbbf24; border-color: #4a5a7a; }
 [dir="rtl"] .exp-btn i { margin-right: 0; margin-left: .45rem; }
+
+/* ─── Mobile Navigation Drawer ─── */
+#mobile-nav-drawer.open { transform: translateX(0); }
+[dir="rtl"] #mobile-nav-drawer { left: auto; right: 0; transform: translateX(100%); }
+[dir="rtl"] #mobile-nav-drawer.open { transform: translateX(0); }
+
+/* ─── Touch Targets: minimum 44px ─── */
+#mobile-menu-btn { min-width: 44px; min-height: 44px; }
+#theme-toggle { min-width: 44px; min-height: 44px; }
+#lang-select { min-height: 44px; }
+#view-tabs button { min-height: 40px; }
+.exp-btn { min-height: 40px; }
+.scn-btn { min-height: 44px; }
