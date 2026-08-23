@@ -490,6 +490,36 @@
         </div>
     </section>
 
+
+    <!-- ========== REAL FIELD DATA — SALAM<->QALYUB SECTOR ========== -->
+    <section id="field-data" class="py-16 bg-slate-900 text-white">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-8">
+                <h2 class="text-3xl font-bold mb-3"><i class="fas fa-database mr-2 text-emerald-400"></i>البيانات الميدانية الحقيقية — قطاع السلام ⇄ القليوب</h2>
+                <p class="text-slate-300 max-w-3xl mx-auto text-sm">مسار مساحي فعلي 20.01 كم (45+708 → 65+722) • حصر محطة باسوس • نتائج محاكاة SUMO لـ1,962 رحلة • النقط السوداء الموثقة أكاديمياً</p>
+            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 max-w-6xl mx-auto">
+                <div class="bg-slate-800 rounded-xl p-4 lg:col-span-1">
+                    <h4 class="font-bold mb-3"><i class="fas fa-stopwatch mr-2 text-cyan-400"></i>زمن الرحلة والتوفير <span class="text-xs text-slate-400">(قطاع 3.05 كم)</span></h4>
+                    <table class="w-full text-sm"><thead><tr class="text-xs text-slate-400 border-b border-slate-600">
+                        <th class="text-left pb-2">المستوى</th><th class="pb-2">رحلات</th><th class="pb-2">زمن</th><th class="pb-2">سرعة km/h</th><th class="pb-2">توفير</th>
+                    </tr></thead><tbody id="fd-sim-table"></tbody></table>
+                    <p class="text-[11px] text-slate-400 mt-2">المصدر: pure_python_results.csv — متوسط زمن الرحلة للسيارات التقليدية 503 ث مقابل 283 ث للمستوى L4 (-43.8%)</p>
+                </div>
+                <div class="bg-slate-800 rounded-xl p-4">
+                    <h4 class="font-bold mb-3"><i class="fas fa-exclamation-triangle mr-2 text-orange-400"></i>النقط السوداء <span class="text-xs text-slate-400">(أثر السرعة)</span></h4>
+                    <div id="fd-blackspots"></div>
+                </div>
+                <div class="bg-slate-800 rounded-xl p-4">
+                    <h4 class="font-bold mb-3"><i class="fas fa-traffic-light mr-2 text-green-400"></i>الحصر المروري — محطة باسوس</h4>
+                    <table class="w-full text-sm"><thead><tr class="text-xs text-slate-400 border-b border-slate-600">
+                        <th class="text-left pb-2">المركبة</th><th class="pb-2">PCU</th><th class="pb-2">عدلي ↗</th><th class="pb-2">×PCU</th><th class="pb-2">6 أoct↘</th>
+                    </tr></thead><tbody id="fd-counts"></tbody></table>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- ========== CORRIDOR SIDE-BY-SIDE COMPARISON ========== -->
     <section id="compare-section" class="py-16 bg-slate-900 text-white">
         <div class="container mx-auto px-4">
@@ -3078,15 +3108,175 @@ function setLanguage(lang) {
 
 // True analytical corridor: Qalyub Interchange -> Dar Al Salam bottleneck -> Adly Mansour Intermodal Hub
 var RING_ROAD_COORDS = [
-  { lat: 30.1755, lng: 31.2545 },   // Nazlet Qalyub - corridor start
-  { lat: 30.1700, lng: 31.2710 },
-  { lat: 30.1660, lng: 31.2880 },   // Mostorod bridge incline +3.5%
-  { lat: 30.1600, lng: 31.3075 },
-  { lat: 30.1550, lng: 31.3280 },
-  { lat: 30.1505, lng: 31.3475 },
-  { lat: 30.1470, lng: 31.3660 },   // Al-Salam interchange weaving
-  { lat: 30.1495, lng: 31.3865 },
-  { lat: 30.1535, lng: 31.4085 }    // Mawqif Al-Salam / Adly Mansour
+  { lat: 30.14948, lng: 31.417706 },
+  { lat: 30.149493, lng: 31.417037 },
+  { lat: 30.150132, lng: 31.416036 },
+  { lat: 30.15074, lng: 31.415007 },
+  { lat: 30.151348, lng: 31.413978 },
+  { lat: 30.152005, lng: 31.412982 },
+  { lat: 30.152671, lng: 31.412 },
+  { lat: 30.153348, lng: 31.411028 },
+  { lat: 30.154025, lng: 31.410056 },
+  { lat: 30.154711, lng: 31.409093 },
+  { lat: 30.1554, lng: 31.40813 },
+  { lat: 30.156131, lng: 31.407208 },
+  { lat: 30.156899, lng: 31.406327 },
+  { lat: 30.157675, lng: 31.405459 },
+  { lat: 30.158419, lng: 31.404561 },
+  { lat: 30.159059, lng: 31.403566 },
+  { lat: 30.159586, lng: 31.402486 },
+  { lat: 30.159991, lng: 31.401338 },
+  { lat: 30.160351, lng: 31.400163 },
+  { lat: 30.160758, lng: 31.399005 },
+  { lat: 30.161222, lng: 31.397878 },
+  { lat: 30.161698, lng: 31.396761 },
+  { lat: 30.162164, lng: 31.395636 },
+  { lat: 30.162614, lng: 31.394505 },
+  { lat: 30.163022, lng: 31.393353 },
+  { lat: 30.163401, lng: 31.392187 },
+  { lat: 30.163757, lng: 31.391012 },
+  { lat: 30.164111, lng: 31.389835 },
+  { lat: 30.164434, lng: 31.388648 },
+  { lat: 30.164719, lng: 31.387449 },
+  { lat: 30.164999, lng: 31.386244 },
+  { lat: 30.165262, lng: 31.385037 },
+  { lat: 30.165496, lng: 31.383822 },
+  { lat: 30.165706, lng: 31.382602 },
+  { lat: 30.165895, lng: 31.381376 },
+  { lat: 30.166061, lng: 31.380146 },
+  { lat: 30.166204, lng: 31.378912 },
+  { lat: 30.166328, lng: 31.377676 },
+  { lat: 30.16643, lng: 31.376436 },
+  { lat: 30.166494, lng: 31.375194 },
+  { lat: 30.16655, lng: 31.373951 },
+  { lat: 30.166583, lng: 31.372707 },
+  { lat: 30.166607, lng: 31.371462 },
+  { lat: 30.166594, lng: 31.370218 },
+  { lat: 30.166559, lng: 31.368974 },
+  { lat: 30.166501, lng: 31.367733 },
+  { lat: 30.166419, lng: 31.366494 },
+  { lat: 30.166315, lng: 31.365253 },
+  { lat: 30.166189, lng: 31.364017 },
+  { lat: 30.166039, lng: 31.362784 },
+  { lat: 30.165877, lng: 31.361553 },
+  { lat: 30.165715, lng: 31.360321 },
+  { lat: 30.165552, lng: 31.359089 },
+  { lat: 30.165389, lng: 31.357856 },
+  { lat: 30.165217, lng: 31.356628 },
+  { lat: 30.165054, lng: 31.355395 },
+  { lat: 30.164902, lng: 31.35416 },
+  { lat: 30.16474, lng: 31.352929 },
+  { lat: 30.164578, lng: 31.351698 },
+  { lat: 30.164416, lng: 31.350466 },
+  { lat: 30.164237, lng: 31.349238 },
+  { lat: 30.164075, lng: 31.348006 },
+  { lat: 30.163918, lng: 31.346772 },
+  { lat: 30.163766, lng: 31.34554 },
+  { lat: 30.163604, lng: 31.344309 },
+  { lat: 30.163447, lng: 31.343075 },
+  { lat: 30.163307, lng: 31.341839 },
+  { lat: 30.163185, lng: 31.340601 },
+  { lat: 30.16308, lng: 31.33936 },
+  { lat: 30.162983, lng: 31.33812 },
+  { lat: 30.162905, lng: 31.336876 },
+  { lat: 30.162838, lng: 31.335634 },
+  { lat: 30.162806, lng: 31.334386 },
+  { lat: 30.162767, lng: 31.333141 },
+  { lat: 30.162747, lng: 31.331894 },
+  { lat: 30.162757, lng: 31.330647 },
+  { lat: 30.162782, lng: 31.329401 },
+  { lat: 30.162836, lng: 31.328156 },
+  { lat: 30.162889, lng: 31.326912 },
+  { lat: 30.162953, lng: 31.32567 },
+  { lat: 30.163017, lng: 31.324424 },
+  { lat: 30.163082, lng: 31.323181 },
+  { lat: 30.163146, lng: 31.321937 },
+  { lat: 30.163211, lng: 31.320694 },
+  { lat: 30.163275, lng: 31.31945 },
+  { lat: 30.163313, lng: 31.318208 },
+  { lat: 30.163282, lng: 31.316966 },
+  { lat: 30.163203, lng: 31.315725 },
+  { lat: 30.163124, lng: 31.314482 },
+  { lat: 30.163031, lng: 31.313241 },
+  { lat: 30.162951, lng: 31.311999 },
+  { lat: 30.162872, lng: 31.310756 },
+  { lat: 30.162804, lng: 31.309513 },
+  { lat: 30.16272, lng: 31.308273 },
+  { lat: 30.162544, lng: 31.307048 },
+  { lat: 30.162516, lng: 31.305793 },
+  { lat: 30.162815, lng: 31.304587 },
+  { lat: 30.16324, lng: 31.303439 },
+  { lat: 30.163663, lng: 31.302293 },
+  { lat: 30.164087, lng: 31.301146 },
+  { lat: 30.164511, lng: 31.3 },
+  { lat: 30.164935, lng: 31.298854 },
+  { lat: 30.165273, lng: 31.29768 },
+  { lat: 30.165446, lng: 31.29646 },
+  { lat: 30.165449, lng: 31.295224 },
+  { lat: 30.165297, lng: 31.293998 },
+  { lat: 30.164985, lng: 31.292814 },
+  { lat: 30.164533, lng: 31.291692 },
+  { lat: 30.163926, lng: 31.290672 },
+  { lat: 30.163179, lng: 31.289786 },
+  { lat: 30.162358, lng: 31.288973 },
+  { lat: 30.161541, lng: 31.288156 },
+  { lat: 30.160731, lng: 31.287326 },
+  { lat: 30.16001, lng: 31.28639 },
+  { lat: 30.159385, lng: 31.285366 },
+  { lat: 30.158848, lng: 31.284282 },
+  { lat: 30.158317, lng: 31.283196 },
+  { lat: 30.157786, lng: 31.282111 },
+  { lat: 30.157255, lng: 31.281025 },
+  { lat: 30.156724, lng: 31.27994 },
+  { lat: 30.156192, lng: 31.278855 },
+  { lat: 30.155662, lng: 31.277771 },
+  { lat: 30.15513, lng: 31.276684 },
+  { lat: 30.154599, lng: 31.275599 },
+  { lat: 30.154053, lng: 31.274523 },
+  { lat: 30.153522, lng: 31.273438 },
+  { lat: 30.15299, lng: 31.272353 },
+  { lat: 30.152474, lng: 31.271258 },
+  { lat: 30.151943, lng: 31.270175 },
+  { lat: 30.151419, lng: 31.269085 },
+  { lat: 30.150928, lng: 31.267971 },
+  { lat: 30.150512, lng: 31.266817 },
+  { lat: 30.150157, lng: 31.265637 },
+  { lat: 30.149881, lng: 31.26443 },
+  { lat: 30.149649, lng: 31.26321 },
+  { lat: 30.149481, lng: 31.261977 },
+  { lat: 30.149377, lng: 31.260735 },
+  { lat: 30.149336, lng: 31.259486 },
+  { lat: 30.149337, lng: 31.258239 },
+  { lat: 30.149337, lng: 31.256996 },
+  { lat: 30.149337, lng: 31.255747 },
+  { lat: 30.14932, lng: 31.254503 },
+  { lat: 30.149393, lng: 31.253257 },
+  { lat: 30.149426, lng: 31.252016 },
+  { lat: 30.149443, lng: 31.250771 },
+  { lat: 30.14946, lng: 31.249525 },
+  { lat: 30.149478, lng: 31.248281 },
+  { lat: 30.1495, lng: 31.247035 },
+  { lat: 30.149499, lng: 31.245789 },
+  { lat: 30.149516, lng: 31.244544 },
+  { lat: 30.149548, lng: 31.243299 },
+  { lat: 30.149565, lng: 31.242054 },
+  { lat: 30.149583, lng: 31.240808 },
+  { lat: 30.149591, lng: 31.239565 },
+  { lat: 30.149557, lng: 31.238322 },
+  { lat: 30.149502, lng: 31.237077 },
+  { lat: 30.149454, lng: 31.235833 },
+  { lat: 30.149368, lng: 31.234593 },
+  { lat: 30.149265, lng: 31.233354 },
+  { lat: 30.14916, lng: 31.232114 },
+  { lat: 30.149048, lng: 31.230876 },
+  { lat: 30.148936, lng: 31.229637 },
+  { lat: 30.148848, lng: 31.228394 },
+  { lat: 30.148796, lng: 31.227148 },
+  { lat: 30.14877, lng: 31.225902 },
+  { lat: 30.148744, lng: 31.224657 },
+  { lat: 30.148718, lng: 31.223412 },
+  { lat: 30.148693, lng: 31.222167 },
+  { lat: 30.149032, lng: 31.221982 }    // Mawqif Al-Salam <-> Nazlet Qalyub (surveyed)
 ];
 
 // Parallel offset polyline = opposing direction (Two-Way Highway Dynamics)
@@ -3099,12 +3289,12 @@ var RING_ROAD_COORDS_B = offsetPath(RING_ROAD_COORDS, 0.006, 0.006);
 var CORRIDORS = {
   egypt: {
     coords: RING_ROAD_COORDS,
-    center: { lat: 30.162, lng: 31.331 }, zoom: 11,
+    center: { lat: 30.163, lng: 31.319 }, zoom: 11,
     markers: [
-      { pos: { lat: 30.1755, lng: 31.2545 }, t: 'rr_mk_qalyub', d: 'rr_mk_qalyub_d' },
-      { pos: { lat: 30.1470, lng: 31.3660 }, t: 'rr_mk_bahtim', d: 'rr_mk_bahtim_d' },
-      { pos: { lat: 30.1660, lng: 31.2880 }, t: 'rr_mk_mostorod', d: 'rr_mk_mostorod_d' },
-      { pos: { lat: 30.1535, lng: 31.4085 }, t: 'rr_mk_dar', d: 'rr_mk_dar_d' }
+      { pos: { lat: 30.149, lng: 31.222 }, t: 'rr_mk_qalyub', d: 'rr_mk_qalyub_d' },
+      { pos: { lat: 30.1637, lng: 31.3447 }, t: 'rr_mk_bahtim', d: 'rr_mk_bahtim_d' },
+      { pos: { lat: 30.1496, lng: 31.2628 }, t: 'rr_mk_mostorod', d: 'rr_mk_mostorod_d' },
+      { pos: { lat: 30.1495, lng: 31.4177 }, t: 'rr_mk_dar', d: 'rr_mk_dar_d' }
     ],
     vehicleTypes: ['microbus', 'tuktuk', 'mlaiky', 'mlaiky']
   },
@@ -3462,10 +3652,10 @@ function renderTwoWayParallelCorridor(pathA, pathB) {
 function renderPreciseRampMarkers() {
     var rampSets = {
         egypt: [
-            { lat: 30.1755, lng: 31.2545, t: 'ramp_qalyub', d: 'ramp_qalyub_d' },
-            { lat: 30.1660, lng: 31.2880, t: 'ramp_mostorod', d: 'ramp_mostorod_d' },
-            { lat: 30.1470, lng: 31.3660, t: 'ramp_darsalam', d: 'ramp_darsalam_d' },
-            { lat: 30.1535, lng: 31.4085, t: 'ramp_adly', d: 'ramp_adly_d' }
+            { lat: 30.149, lng: 31.222, t: 'ramp_qalyub', d: 'ramp_qalyub_d' },
+            { lat: 30.1496, lng: 31.2628, t: 'ramp_mostorod', d: 'ramp_mostorod_d' },
+            { lat: 30.165, lng: 31.355, t: 'ramp_darsalam', d: 'ramp_darsalam_d' },
+            { lat: 30.1495, lng: 31.4177, t: 'ramp_adly', d: 'ramp_adly_d' }
         ],
         ksa: [
             { lat: 24.745, lng: 46.645, t: 'ramp_qalyub', d: 'ramp_qalyub_d' },
@@ -4354,6 +4544,64 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }, { rootMargin: '300px' });
     io.observe(sec);
+});
+// ========== REAL FIELD DATA — Ring Road Sector Salam<->Qalyub ==========
+// Source: surveyed KMZ centerline (chainage 45+708 -> 65+722, 20.01km),
+// Bassou traffic count station (10:00-10:30), SUMO sim results CSV.
+var RING_CENTERLINE_REAL = [[30.14948, 31.417706], [30.149493, 31.417037], [30.150132, 31.416036], [30.15074, 31.415007], [30.151348, 31.413978], [30.152005, 31.412982], [30.152671, 31.412], [30.153348, 31.411028], [30.154025, 31.410056], [30.154711, 31.409093], [30.1554, 31.40813], [30.156131, 31.407208], [30.156899, 31.406327], [30.157675, 31.405459], [30.158419, 31.404561], [30.159059, 31.403566], [30.159586, 31.402486], [30.159991, 31.401338], [30.160351, 31.400163], [30.160758, 31.399005], [30.161222, 31.397878], [30.161698, 31.396761], [30.162164, 31.395636], [30.162614, 31.394505], [30.163022, 31.393353], [30.163401, 31.392187], [30.163757, 31.391012], [30.164111, 31.389835], [30.164434, 31.388648], [30.164719, 31.387449], [30.164999, 31.386244], [30.165262, 31.385037], [30.165496, 31.383822], [30.165706, 31.382602], [30.165895, 31.381376], [30.166061, 31.380146], [30.166204, 31.378912], [30.166328, 31.377676], [30.16643, 31.376436], [30.166494, 31.375194], [30.16655, 31.373951], [30.166583, 31.372707], [30.166607, 31.371462], [30.166594, 31.370218], [30.166559, 31.368974], [30.166501, 31.367733], [30.166419, 31.366494], [30.166315, 31.365253], [30.166189, 31.364017], [30.166039, 31.362784], [30.165877, 31.361553], [30.165715, 31.360321], [30.165552, 31.359089], [30.165389, 31.357856], [30.165217, 31.356628], [30.165054, 31.355395], [30.164902, 31.35416], [30.16474, 31.352929], [30.164578, 31.351698], [30.164416, 31.350466], [30.164237, 31.349238], [30.164075, 31.348006], [30.163918, 31.346772], [30.163766, 31.34554], [30.163604, 31.344309], [30.163447, 31.343075], [30.163307, 31.341839], [30.163185, 31.340601], [30.16308, 31.33936], [30.162983, 31.33812], [30.162905, 31.336876], [30.162838, 31.335634], [30.162806, 31.334386], [30.162767, 31.333141], [30.162747, 31.331894], [30.162757, 31.330647], [30.162782, 31.329401], [30.162836, 31.328156], [30.162889, 31.326912], [30.162953, 31.32567], [30.163017, 31.324424], [30.163082, 31.323181], [30.163146, 31.321937], [30.163211, 31.320694], [30.163275, 31.31945], [30.163313, 31.318208], [30.163282, 31.316966], [30.163203, 31.315725], [30.163124, 31.314482], [30.163031, 31.313241], [30.162951, 31.311999], [30.162872, 31.310756], [30.162804, 31.309513], [30.16272, 31.308273], [30.162544, 31.307048], [30.162516, 31.305793], [30.162815, 31.304587], [30.16324, 31.303439], [30.163663, 31.302293], [30.164087, 31.301146], [30.164511, 31.3], [30.164935, 31.298854], [30.165273, 31.29768], [30.165446, 31.29646], [30.165449, 31.295224], [30.165297, 31.293998], [30.164985, 31.292814], [30.164533, 31.291692], [30.163926, 31.290672], [30.163179, 31.289786], [30.162358, 31.288973], [30.161541, 31.288156], [30.160731, 31.287326], [30.16001, 31.28639], [30.159385, 31.285366], [30.158848, 31.284282], [30.158317, 31.283196], [30.157786, 31.282111], [30.157255, 31.281025], [30.156724, 31.27994], [30.156192, 31.278855], [30.155662, 31.277771], [30.15513, 31.276684], [30.154599, 31.275599], [30.154053, 31.274523], [30.153522, 31.273438], [30.15299, 31.272353], [30.152474, 31.271258], [30.151943, 31.270175], [30.151419, 31.269085], [30.150928, 31.267971], [30.150512, 31.266817], [30.150157, 31.265637], [30.149881, 31.26443], [30.149649, 31.26321], [30.149481, 31.261977], [30.149377, 31.260735], [30.149336, 31.259486], [30.149337, 31.258239], [30.149337, 31.256996], [30.149337, 31.255747], [30.14932, 31.254503], [30.149393, 31.253257], [30.149426, 31.252016], [30.149443, 31.250771], [30.14946, 31.249525], [30.149478, 31.248281], [30.1495, 31.247035], [30.149499, 31.245789], [30.149516, 31.244544], [30.149548, 31.243299], [30.149565, 31.242054], [30.149583, 31.240808], [30.149591, 31.239565], [30.149557, 31.238322], [30.149502, 31.237077], [30.149454, 31.235833], [30.149368, 31.234593], [30.149265, 31.233354], [30.14916, 31.232114], [30.149048, 31.230876], [30.148936, 31.229637], [30.148848, 31.228394], [30.148796, 31.227148], [30.14877, 31.225902], [30.148744, 31.224657], [30.148718, 31.223412], [30.148693, 31.222167], [30.149032, 31.221982]];
+var BLACKSPOTS = [{"n": "تبادل مؤسسة الزكاة", "en": "El-Zakat Foundation Interchange", "imp": -0.65, "cause": "عبور مشاة عشوائي + تجمعات ميكروباص قرب مداخل المرج"}, {"n": "محور الرشاحة (الخصوص)", "en": "El-Rashah Axis (El-Khosous)", "imp": -0.75, "cause": "سلوك الميكروباص يقلل سعة الحارة اليمنى حتى 40%"}, {"n": "كبري المسترود", "en": "Mostorod Bridge", "imp": -0.5, "cause": "اندماج شاحنات ثقيلة من طريق الإسماعيلية القنوية"}, {"n": "مخرج المرج الجديد", "en": "New El-Marg Exit", "imp": -0.8, "cause": "تشبع توكتوك وميكروباص مع تراجع طابور حتى 3 كم على الدائري"}, {"n": "تبادل القليوبية", "en": "Qalyub Interchange (Alex Agri Rd)", "imp": -0.6, "cause": "اختناق إنشائي عند الدمج مع طريق الإسكندرية الزراعي"}];
+var BASSOU_COUNTS = [["ملاكي", 1.0, 814, 586], ["ميكروباص", 1.5, 306, 284], ["أتوبيس", 2.5, 57, 65], ["ربع نقل", 2.0, 344, 312], ["نصف نقل", 2.5, 204, 141], ["موتوسيكل وأخرى", 0.33, 150, 153]];
+var SIM_TRAVELTIME = [["Conventional (SAE 0)", 1155, 503.4, 2.93], ["L1 Assist", 188, 384.6, 4.17], ["L2 Partial", 142, 360.6, 5.89], ["L3 Conditional", 158, 309.8, 7.07], ["L4 High", 163, 282.7, 7.5], ["L5 Full", 156, 314.1, 7.5]];
+
+function renderTravelTimes() {
+    var el = document.getElementById('fd-sim-table'); if (!el) return;
+    var base = SIM_TRAVELTIME[0][2], h = '';
+    SIM_TRAVELTIME.forEach(function (r) {
+        var save = (base - r[2]) / base * 100;
+        var col = save >= 38 ? '#22c55e' : save >= 25 ? '#84cc16' : save > 0 ? '#eab308' : '#ef4444';
+        h += '<tr class="border-b border-slate-700"><td class="py-1.5">' + r[0] + '</td>'
+          + '<td class="text-center font-mono">' + r[1] + '</td>'
+          + '<td class="text-center font-mono">' + r[2].toFixed(0) + 's</td>'
+          + '<td class="text-center font-mono">' + (r[3] * 3.6).toFixed(1) + '</td>'
+          + '<td class="text-center font-bold" style="color:' + col + '">' + (save > 0 ? '-' : '') + save.toFixed(1) + '%</td></tr>';
+    });
+    el.innerHTML = h;
+}
+function renderBlackSpots() {
+    var el = document.getElementById('fd-blackspots'); if (!el) return;
+    var h = '';
+    BLACKSPOTS.forEach(function (b) {
+        var sev = b.imp <= -0.75 ? 'bg-red-500' : b.imp <= -0.6 ? 'bg-orange-500' : 'bg-yellow-500';
+        h += '<div class="flex items-start gap-3 p-2 rounded-lg bg-slate-800/70 mb-2">'
+          + '<span class="' + sev + ' text-white text-xs font-bold px-2 py-1 rounded shrink-0" dir="ltr">' + b.imp.toFixed(2) + '</span>'
+          + '<div><div class="font-semibold text-sm">' + b.n
+          + ' <span class="text-xs text-slate-400" dir="ltr">' + b.en + '</span></div>'
+          + '<div class="text-xs text-slate-300 mt-0.5">' + b.cause + '</div></div></div>';
+    });
+    el.innerHTML = h;
+}
+function renderCounts() {
+    var el = document.getElementById('fd-counts'); if (!el) return;
+    var tot = 0, pcu = 0, tot2 = 0, pcu2 = 0, h = '';
+    BASSOU_COUNTS.forEach(function (r) {
+        tot += r[2]; pcu += r[2] * r[1]; tot2 += r[3]; pcu2 += r[3] * r[1];
+        h += '<tr class="border-b border-slate-700"><td class="py-1.5">' + r[0] + '</td>'
+          + '<td class="text-center font-mono">' + r[1].toFixed(2) + '</td>'
+          + '<td class="text-center font-mono text-cyan-400">' + r[2] + '</td>'
+          + '<td class="text-center font-mono">' + (r[2] * r[1]).toFixed(0) + '</td>'
+          + '<td class="text-center font-mono text-cyan-400">' + r[3] + '</td></tr>';
+    });
+    h += '<tr class="border-t-2 border-slate-500 font-bold"><td class="py-2">الإجمالي</td><td></td>'
+      + '<td class="text-center font-mono">' + tot + '</td>'
+      + '<td class="text-center font-mono text-green-400">' + pcu.toFixed(0) + '</td>'
+      + '<td class="text-center font-mono">' + tot2 + '</td></tr>'
+      + '<tr class="text-xs text-slate-400"><td colspan="5">معدل بالساعة (×4): اتجاه عدلي منصور '
+      + Math.round(pcu * 4) + ' PCU/h | اتجاه 6 أكتوبر ' + Math.round(pcu2 * 4)
+      + ' PCU/h — محطة باسوس 10:00–10:30 صباحاً</td></tr>';
+    el.innerHTML = h;
+}
+document.addEventListener('DOMContentLoaded', function () {
+    renderTravelTimes(); renderBlackSpots(); renderCounts();
 });
 
 }// ========== UNITS ENGINE (km/h <-> mph) ==========
