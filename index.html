@@ -522,6 +522,69 @@
     </section>
 
 
+function renderKPI() {
+    var el = document.getElementById('fd-kpi'); if (!el) return;
+    var cards = [
+        ['Conventional 2024', '#ef4444', '1,800–2,000 veh/h/l', '140–180 min / 100km', 'الحالة الراهنة'],
+        ['Mixed L2/L3', '#f59e0b', '2,200–2,400 (+20%)', '110–130 min (+25%)', 'مختلط'],
+        ['Full Auto L4/L5', '#22c55e', '3,800–4,200 (+110%)', '60–75 min (+55%)', 'المستقبل']
+    ];
+    var h = '<div class="grid grid-cols-1 md:grid-cols-3 gap-3">';
+    cards.forEach(function (cd) {
+        h += '<div class="bg-slate-800 rounded-xl p-4 border-t-4" style="border-color:' + cd[1] + '">'
+          + '<div class="text-xs text-slate-400 mb-1">' + cd[4] + ' <span dir="ltr" class="font-semibold" style="color:' + cd[1] + '">' + cd[0] + '</span></div>'
+          + '<div class="font-mono text-sm">السعة: <b>' + cd[2] + '</b></div>'
+          + '<div class="font-mono text-sm mt-1">زمن اللوب: <b>' + cd[3] + '</b></div>'
+          + '</div>';
+    });
+    h += '</div><p class="text-[11px] text-slate-500 mt-2">التوسعة القومية 4←8 حارات + ITS/V2I تضاعف الأثر (MoT 2023 / GARBLT 2024)</p>';
+    el.innerHTML = h;
+}
+var _bsMarker = null, _bsIW = null;
+function focusBlackSpot(i) {
+    var b = BLACKSPOTS[i]; if (!b || b.frac == null) return;
+    var p = RING_CENTERLINE_REAL[Math.min(RING_CENTERLINE_REAL.length - 1,
+            Math.round(b.frac * (RING_CENTERLINE_REAL.length - 1)))];
+    var ll = new google.maps.LatLng(p[0], p[1]);
+    if (!_bsMarker) {
+        _bsMarker = new google.maps.Marker({ map: rrMap, zIndex: 999,
+            icon: { path: google.maps.SymbolPath.CIRCLE, scale: 11,
+                    fillColor: '#f97316', fillOpacity: .95, strokeColor: '#fff', strokeWeight: 3 } });
+        _bsIW = new google.maps.InfoWindow();
+    }
+    _bsMarker.setPosition(ll);
+    _bsMarker.setTitle(b.en);
+    _bsIW.setContent('<div style="min-width:220px;font-family:Tahoma"><b>' + b.n + '</b><br>'
+        + '<small style="color:#555" dir="ltr">' + b.en + '</small><hr style="margin:4px 0">'
+        + '<span style="font-size:12px">' + b.cause + '</span><br>'
+        + '<span style="color:#ea580c;font-weight:bold">Speed impact: ' + b.imp.toFixed(2) + '</span></div>');
+    _bsIW.open(rrMap, _bsMarker);
+    rrMap.panTo(ll);
+    if (rrMap.getZoom() < 12) rrMap.setZoom(13);
+    var sec = document.getElementById('ringroad');
+    if (sec) sec.scrollIntoView({ behavior: 'smooth' });
+}
+function renderFeatures(q) {
+    var el = document.getElementById('feat-table'); if (!el) return;
+    q = (q || '').toLowerCase();
+    var h = '';
+    FEATURES.forEach(function (f) {
+        var blob = (f.feat + ' ' + f.desc + ' ' + f.level + ' ' + f.tech).toLowerCase();
+        if (q && blob.indexOf(q) === -1) return;
+        h += '<tr class="border-b border-slate-700 hover:bg-slate-800/60">'
+          + '<td class="py-1.5 px-1 font-mono text-slate-500">' + f.no + '</td>'
+          + '<td class="py-1.5 font-medium">' + f.feat
+          + '<div class="text-[10px] text-slate-400 font-normal">' + f.desc + '</div></td>'
+          + '<td class="text-center"><span class="text-[10px] bg-cyan-500/20 text-cyan-300 px-1.5 py-0.5 rounded" dir="ltr">' + f.level + '</span></td>'
+          + '<td class="text-center text-xs text-emerald-300">' + f.tech + '</td></tr>';
+    });
+    el.innerHTML = h || '<tr><td colspan=4 class="text-center text-slate-500 py-3">لا نتائج</td></tr>';
+}
+document.addEventListener('DOMContentLoaded', function () {
+    renderKPI(); renderFeatures('');
+    var inp = document.getElementById('feat-search');
+    if (inp) inp.addEventListener('input', function () { renderFeatures(this.value); });
+});
     <!-- ========== REAL FIELD DATA — SALAM<->QALYUB SECTOR ========== -->
     <section id="field-data" class="py-16 bg-slate-900 text-white">
         <div class="container mx-auto px-4">
@@ -529,8 +592,9 @@
                 <h2 class="text-3xl font-bold mb-3"><i class="fas fa-database mr-2 text-emerald-400"></i>البيانات الميدانية الحقيقية — قطاع السلام ⇄ القليوب</h2>
                 <p class="text-slate-300 max-w-3xl mx-auto text-sm">مسار مساحي فعلي 20.01 كم (45+708 → 65+722) • حصر محطة باسوس • نتائج محاكاة SUMO لـ1,962 رحلة • النقط السوداء الموثقة أكاديمياً</p>
             </div>
+            <div id="fd-kpi" class="max-w-6xl mx-auto mb-6"></div>
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 max-w-6xl mx-auto">
-                <div class="bg-slate-800 rounded-xl p-4 lg:col-span-1">
+                <div class="bg-slate-800 rounded-xl p-4 lg:col-span-1 cursor-pointer hover:ring-1 ring-slate-600 transition"
                     <h4 class="font-bold mb-3"><i class="fas fa-stopwatch mr-2 text-cyan-400"></i>زمن الرحلة والتوفير <span class="text-xs text-slate-400">(قطاع 3.05 كم)</span></h4>
                     <table class="w-full text-sm"><thead><tr class="text-xs text-slate-400 border-b border-slate-600">
                         <th class="text-left pb-2">المستوى</th><th class="pb-2">رحلات</th><th class="pb-2">زمن</th><th class="pb-2">سرعة km/h</th><th class="pb-2">توفير</th>
@@ -558,10 +622,32 @@
                     <table class="w-full text-sm"><thead><tr class="text-xs text-slate-400 border-b border-slate-600">
                         <th class="text-left pb-2">المركبة</th><th class="pb-2">PCU</th><th class="pb-2">عدلي ↗</th><th class="pb-2">×PCU</th><th class="pb-2">6 أoct↘</th>
                     </tr></thead><tbody id="fd-counts"></tbody></table>
+
+                <div class="bg-slate-800 rounded-xl p-4 lg:col-span-3">
+                    <div class="flex flex-col md:flex-row md:items-center gap-3 mb-3">
+                        <h4 class="font-bold"><i class="fas fa-list-check mr-2 text-purple-400"></i>مستكشف تقنيات القيادة الذاتية — 40 ميزة موثقة</h4>
+                        <input id="feat-search" placeholder="ابحث: LiDAR / Platooning / V2V..." class="md:mr-auto bg-slate-900 border border-slate-600 rounded-lg px-3 py-1.5 text-sm w-full md:w-72" dir="rtl">
+                    </div>
+                    <div class="max-h-72 overflow-y-auto">
+                        <table class="w-full text-sm">
+                            <thead class="sticky top-0 bg-slate-800"><tr class="text-xs text-slate-400 border-b border-slate-600">
+                                <th class="w-10 py-2">#</th><th class="text-left pb-2">الميزة والوصف</th>
+                                <th class="pb-2">SAE</th><th class="pb-2">التقنية</th>
+                            </tr></thead>
+                            <tbody id="feat-table"></tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
-        </div>
-    </section>
+            <div class="max-w-6xl mx-auto mt-5 bg-slate-800 rounded-xl p-4">
+                <h4 class="font-bold mb-2"><i class="fas fa-chart-line mr-2 text-amber-400"></i>إسقاط الأسطول (CAPMAS): نمو سيارات خاصة 5.5% سنوياً من قاعدة 5.7M</h4>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-center text-sm">
+                    <div class="bg-slate-900/60 rounded p-2"><div class="text-slate-400 text-xs">2026</div><div class="font-mono text-amber-300 font-bold">6.01M</div></div>
+                    <div class="bg-slate-900/60 rounded p-2"><div class="text-slate-400 text-xs">2030</div><div class="font-mono text-amber-300 font-bold">7.44M</div></div>
+                    <div class="bg-slate-900/60 rounded p-2"><div class="text-slate-400 text-xs">2035</div><div class="font-mono text-amber-300 font-bold">9.71M</div></div>
+                    <div class="bg-slate-900/60 rounded p-2"><div class="text-slate-400 text-xs">عند MPR 50% (2035)</div><div class="font-mono text-green-400 font-bold">≈4.85M AV</div></div>
+                </div>
+            </div>
 
     <!-- ========== CORRIDOR SIDE-BY-SIDE COMPARISON ========== -->
     <section id="compare-section" class="py-16 bg-slate-900 text-white">
@@ -4595,9 +4681,10 @@ document.addEventListener('DOMContentLoaded', function () {
 // Source: surveyed KMZ centerline (chainage 45+708 -> 65+722, 20.01km),
 // Bassou traffic count station (10:00-10:30), SUMO sim results CSV.
 var RING_CENTERLINE_REAL = [[30.14948, 31.417706], [30.149493, 31.417037], [30.150132, 31.416036], [30.15074, 31.415007], [30.151348, 31.413978], [30.152005, 31.412982], [30.152671, 31.412], [30.153348, 31.411028], [30.154025, 31.410056], [30.154711, 31.409093], [30.1554, 31.40813], [30.156131, 31.407208], [30.156899, 31.406327], [30.157675, 31.405459], [30.158419, 31.404561], [30.159059, 31.403566], [30.159586, 31.402486], [30.159991, 31.401338], [30.160351, 31.400163], [30.160758, 31.399005], [30.161222, 31.397878], [30.161698, 31.396761], [30.162164, 31.395636], [30.162614, 31.394505], [30.163022, 31.393353], [30.163401, 31.392187], [30.163757, 31.391012], [30.164111, 31.389835], [30.164434, 31.388648], [30.164719, 31.387449], [30.164999, 31.386244], [30.165262, 31.385037], [30.165496, 31.383822], [30.165706, 31.382602], [30.165895, 31.381376], [30.166061, 31.380146], [30.166204, 31.378912], [30.166328, 31.377676], [30.16643, 31.376436], [30.166494, 31.375194], [30.16655, 31.373951], [30.166583, 31.372707], [30.166607, 31.371462], [30.166594, 31.370218], [30.166559, 31.368974], [30.166501, 31.367733], [30.166419, 31.366494], [30.166315, 31.365253], [30.166189, 31.364017], [30.166039, 31.362784], [30.165877, 31.361553], [30.165715, 31.360321], [30.165552, 31.359089], [30.165389, 31.357856], [30.165217, 31.356628], [30.165054, 31.355395], [30.164902, 31.35416], [30.16474, 31.352929], [30.164578, 31.351698], [30.164416, 31.350466], [30.164237, 31.349238], [30.164075, 31.348006], [30.163918, 31.346772], [30.163766, 31.34554], [30.163604, 31.344309], [30.163447, 31.343075], [30.163307, 31.341839], [30.163185, 31.340601], [30.16308, 31.33936], [30.162983, 31.33812], [30.162905, 31.336876], [30.162838, 31.335634], [30.162806, 31.334386], [30.162767, 31.333141], [30.162747, 31.331894], [30.162757, 31.330647], [30.162782, 31.329401], [30.162836, 31.328156], [30.162889, 31.326912], [30.162953, 31.32567], [30.163017, 31.324424], [30.163082, 31.323181], [30.163146, 31.321937], [30.163211, 31.320694], [30.163275, 31.31945], [30.163313, 31.318208], [30.163282, 31.316966], [30.163203, 31.315725], [30.163124, 31.314482], [30.163031, 31.313241], [30.162951, 31.311999], [30.162872, 31.310756], [30.162804, 31.309513], [30.16272, 31.308273], [30.162544, 31.307048], [30.162516, 31.305793], [30.162815, 31.304587], [30.16324, 31.303439], [30.163663, 31.302293], [30.164087, 31.301146], [30.164511, 31.3], [30.164935, 31.298854], [30.165273, 31.29768], [30.165446, 31.29646], [30.165449, 31.295224], [30.165297, 31.293998], [30.164985, 31.292814], [30.164533, 31.291692], [30.163926, 31.290672], [30.163179, 31.289786], [30.162358, 31.288973], [30.161541, 31.288156], [30.160731, 31.287326], [30.16001, 31.28639], [30.159385, 31.285366], [30.158848, 31.284282], [30.158317, 31.283196], [30.157786, 31.282111], [30.157255, 31.281025], [30.156724, 31.27994], [30.156192, 31.278855], [30.155662, 31.277771], [30.15513, 31.276684], [30.154599, 31.275599], [30.154053, 31.274523], [30.153522, 31.273438], [30.15299, 31.272353], [30.152474, 31.271258], [30.151943, 31.270175], [30.151419, 31.269085], [30.150928, 31.267971], [30.150512, 31.266817], [30.150157, 31.265637], [30.149881, 31.26443], [30.149649, 31.26321], [30.149481, 31.261977], [30.149377, 31.260735], [30.149336, 31.259486], [30.149337, 31.258239], [30.149337, 31.256996], [30.149337, 31.255747], [30.14932, 31.254503], [30.149393, 31.253257], [30.149426, 31.252016], [30.149443, 31.250771], [30.14946, 31.249525], [30.149478, 31.248281], [30.1495, 31.247035], [30.149499, 31.245789], [30.149516, 31.244544], [30.149548, 31.243299], [30.149565, 31.242054], [30.149583, 31.240808], [30.149591, 31.239565], [30.149557, 31.238322], [30.149502, 31.237077], [30.149454, 31.235833], [30.149368, 31.234593], [30.149265, 31.233354], [30.14916, 31.232114], [30.149048, 31.230876], [30.148936, 31.229637], [30.148848, 31.228394], [30.148796, 31.227148], [30.14877, 31.225902], [30.148744, 31.224657], [30.148718, 31.223412], [30.148693, 31.222167], [30.149032, 31.221982]];
-var BLACKSPOTS = [{"n": "تبادل مؤسسة الزكاة", "en": "El-Zakat Foundation Interchange", "imp": -0.65, "cause": "عبور مشاة عشوائي + تجمعات ميكروباص قرب مداخل المرج"}, {"n": "محور الرشاحة (الخصوص)", "en": "El-Rashah Axis (El-Khosous)", "imp": -0.75, "cause": "سلوك الميكروباص يقلل سعة الحارة اليمنى حتى 40%"}, {"n": "كبري المسترود", "en": "Mostorod Bridge", "imp": -0.5, "cause": "اندماج شاحنات ثقيلة من طريق الإسماعيلية القنوية"}, {"n": "مخرج المرج الجديد", "en": "New El-Marg Exit", "imp": -0.8, "cause": "تشبع توكتوك وميكروباص مع تراجع طابور حتى 3 كم على الدائري"}, {"n": "تبادل القليوبية", "en": "Qalyub Interchange (Alex Agri Rd)", "imp": -0.6, "cause": "اختناق إنشائي عند الدمج مع طريق الإسكندرية الزراعي"}];
+var BLACKSPOTS = [{"n": "تبادل مؤسسة الزكاة", "en": "El-Zakat Foundation Interchange", "frac": 0.33, "imp": -0.65, "cause": "عبور مشاة عشوائي + تجمعات ميكروباص قرب مداخل المرج"}, {"n": "محور الرشاحة (الخصوص)", "en": "El-Rashah Axis (El-Khosous)", "frac": 0.45, "imp": -0.75, "cause": "سلوك الميكروباص يقلل سعة الحارة اليمنى حتى 40%"}, {"n": "كبري المسترود", "en": "Mostorod Bridge", "frac": 0.8, "imp": -0.5, "cause": "اندماج شاحنات ثقيلة من طريق الإسماعيلية القنوية"}, {"n": "مخرج المرج الجديد", "en": "New El-Marg Exit", "frac": 0.38, "imp": -0.8, "cause": "تشبع توكتوك وميكروباص مع تراجع طابور حتى 3 كم على الدائري"}, {"n": "تبادل القليوبية", "en": "Qalyub Interchange (Alex Agri Rd)", "frac": 1.0, "imp": -0.6, "cause": "اختناق إنشائي عند الدمج مع طريق الإسكندرية الزراعي"}];
 var BASSOU_COUNTS = [["ملاكي", 1.0, 814, 586], ["ميكروباص", 1.5, 306, 284], ["أتوبيس", 2.5, 57, 65], ["ربع نقل", 2.0, 344, 312], ["نصف نقل", 2.5, 204, 141], ["موتوسيكل وأخرى", 0.33, 150, 153]];
 var SIM_TRAVELTIME = [["Conventional (SAE 0)", 1155, 503.4, 2.93], ["L1 Assist", 188, 384.6, 4.17], ["L2 Partial", 142, 360.6, 5.89], ["L3 Conditional", 158, 309.8, 7.07], ["L4 High", 163, 282.7, 7.5], ["L5 Full", 156, 314.1, 7.5]];
+var FEATURES = [{"no": 1, "feat": "Forward Collision Avoidance", "desc": "Intervenes with automatic braking faster than human reaction.", "level": "2--5", "tech": "AEB & Radar"}, {"no": 2, "feat": "Thermal Night Vision", "desc": "Detects objects in total darkness via thermal emissions.", "level": "3--5", "tech": "FIR Sensors"}, {"no": 3, "feat": "Platooning", "desc": "Vehicles traveling in a synchronized convoy to reduce drag.", "level": "4--5", "tech": "V2V Comms"}, {"no": 4, "feat": "Surround Laser Scanning", "desc": "Real-time 3D mapping of the environment with precision.", "level": "3--5", "tech": "LiDAR 3D"}, {"no": 5, "feat": "Dynamic Energy Efficiency", "desc": "Path and speed optimization based on road topography.", "level": "4--5", "tech": "Eco-Routing"}, {"no": 6, "feat": "Full Automated Valet Parking", "desc": "Vehicle searches for a spot and parks without passengers.", "level": "4", "tech": "Ultrasonic"}, {"no": 7, "feat": "Human Behavior Prediction", "desc": "Predicts pedestrian intent to cross before the action begins.", "level": "4--5", "tech": "Deep Learning"}, {"no": 8, "feat": "Over-the-Air (OTA) Updates", "desc": "Cloud-based software upgrades without physical maintenance.", "level": "2--5", "tech": "OTA / Cloud"}, {"no": 9, "feat": "Disability Independence", "desc": "Enables blind individuals to commute without a human escort.", "level": "5", "tech": "HMI AI"}, {"no": 10, "feat": "Smart Intersection Management", "desc": "Coordination with traffic lights to cross without stopping.", "level": "5", "tech": "V2X Protocols"}, {"no": 11, "feat": "Headway Distance Reduction", "desc": "Increases road capacity by minimizing gaps between vehicles.", "level": "4--5", "tech": "mmWave Radar"}, {"no": 12, "feat": "Live HD Mapping", "desc": "Maps that update instantly to include roadworks and hazards.", "level": "3--4", "tech": "HD Mapping"}, {"no": 13, "feat": "Vital Signs Monitoring", "desc": "Re-routes to a hospital upon detecting a heart attack.", "level": "4--5", "tech": "Bio-Sensors"}, {"no": 14, "feat": "Urban Space Reclamation", "desc": "Converting parking lots into green community spaces.", "level": "4--5", "tech": "Fleet AI"}, {"no": 15, "feat": "Mobile Office Concept", "desc": "Rotating seats and removing controls for a productive cabin.", "level": "4--5", "tech": "Modular Design"}, {"no": 16, "feat": "Fog Penetration Vision", "desc": "Radar waves to provide digital visibility in dense fog.", "level": "4--5", "tech": "GPR / Radar"}, {"no": 17, "feat": "Emergency Vehicle Detection", "desc": "Identifies sirens and clears the path immediately.", "level": "4--5", "tech": "Audio Pattern"}, {"no": 18, "feat": "Intelligent Regen-Braking", "desc": "Captures kinetic energy to charge batteries during slowing.", "level": "4--5", "tech": "Energy Recovery"}, {"no": 19, "feat": "Pedestrian Intent Analysis", "desc": "Reads body language to determine intent to cross.", "level": "4--5", "tech": "Computer Vision"}, {"no": 20, "feat": "Real-time Path Planning", "desc": "Calculates safest path during sudden obstacles instantly.", "level": "4--5", "tech": "Path Planning"}, {"no": 21, "feat": "Insurance Premium Reduction", "desc": "Lower insurance costs due to reliance on reliable software.", "level": "5", "tech": "Actuarial AI"}, {"no": 22, "feat": "Automated Self-Charging", "desc": "Vehicle re-routes to a dock and plugs in robotically.", "level": "4--5", "tech": "Robotic Plug"}, {"no": 23, "feat": "Speed Synchronization", "desc": "Synchronizing fleet speeds to prevent traffic waves.", "level": "3--5", "tech": "Edge Computing"}, {"no": 24, "feat": "Drive-by-Wire Systems", "desc": "Replacing mechanical links with full electronic controls.", "level": "5", "tech": "Drive-by-Wire"}, {"no": 25, "feat": "Autonomous Delivery (Robo-van)", "desc": "Last-mile delivery bots for automated doorstep service.", "level": "4--5", "tech": "Last-mile AI"}, {"no": 26, "feat": "Tire Longevity Optimization", "desc": "Precise torque distribution to prevent uneven wear.", "level": "4--5", "tech": "Torque Vectoring"}, {"no": 27, "feat": "Immersive In-car Entertainment", "desc": "Converting windows into smart AR/VR interactive displays.", "level": "4--5", "tech": "In-car AR/VR"}, {"no": 28, "feat": "Predictive Diagnostics", "desc": "Automated maintenance requests before mechanical failure.", "level": "2--5", "tech": "Predictive Maint"}, {"no": 29, "feat": "Cyber Encryption", "desc": "Protecting passenger data and travel routes from hacking.", "level": "4--5", "tech": "Cybersecurity"}, {"no": 30, "feat": "Moral Logic Algorithms", "desc": "Programmed fair decision-making in moral dilemmas.", "level": "5", "tech": "Moral Logic"}, {"no": 31, "feat": "Travel Time Reduction", "desc": "40% reduction in travel time via dynamic routing.", "level": "4--5", "tech": "Dynamic Routing"}, {"no": 32, "feat": "Rear-End Collision Zeroing", "desc": "Eliminating serial crashes via digital coordination.", "level": "3--5", "tech": "V2V Comms"}, {"no": 33, "feat": "Road Capacity Expansion", "desc": "Doubling lane capacity by reducing digital buffers.", "level": "5", "tech": "CACC Tech"}, {"no": 34, "feat": "Congestion Dissipation", "desc": "Preventing \"phantom traffic\" via steady-flow speeds.", "level": "4--5", "tech": "Flow Control AI"}, {"no": 35, "feat": "Wait Time Reduction", "desc": "Proactive vehicle distribution in high-demand zones.", "level": "5", "tech": "Demand Prediction"}, {"no": 36, "feat": "Carbon Footprint Mitigation", "desc": "60% emission reduction via electric fleet optimization.", "level": "4--5", "tech": "Eco-Driving"}, {"no": 37, "feat": "Intersection Delay Efficiency", "desc": "80% delay reduction via stop-free coordination.", "level": "5", "tech": "V2I Intersection"}, {"no": 38, "feat": "Brake & Tire Emission Savings", "desc": "Reducing particles via smooth electromagnetic braking.", "level": "4--5", "tech": "Regen-Braking"}, {"no": 39, "feat": "\"Dead Space\" Reclamation", "desc": "Converting parking surfaces to green belts.", "level": "5", "tech": "Fleet Management"}, {"no": 40, "feat": "Transit Flow Integration", "desc": "Syncing AV buses with private cars to prevent overlap.", "level": "4--5", "tech": "Multi-Modal Sync"}];
 
 function renderTravelTimes() {
     var el = document.getElementById('fd-sim-table'); if (!el) return;
@@ -4619,9 +4706,9 @@ function renderTravelTimes() {
 function renderBlackSpots() {
     var el = document.getElementById('fd-blackspots'); if (!el) return;
     var h = '';
-    BLACKSPOTS.forEach(function (b) {
+    BLACKSPOTS.forEach(function (b, i) {
         var sev = b.imp <= -0.75 ? 'bg-red-500' : b.imp <= -0.6 ? 'bg-orange-500' : 'bg-yellow-500';
-        h += '<div class="flex items-start gap-3 p-2 rounded-lg bg-slate-800/70 mb-2">'
+        h += "<div class='flex items-start gap-3 p-2 rounded-lg bg-slate-800/70 mb-2 cursor-pointer hover:ring-1 ring-orange-500/50 transition' data-call-click='focusBlackSpot' data-args='" + JSON.stringify([i]) + "'>";
           + '<span class="' + sev + ' text-white text-xs font-bold px-2 py-1 rounded shrink-0" dir="ltr">' + b.imp.toFixed(2) + '</span>'
           + '<div><div class="font-semibold text-sm">' + b.n
           + ' <span class="text-xs text-slate-400" dir="ltr">' + b.en + '</span></div>'
