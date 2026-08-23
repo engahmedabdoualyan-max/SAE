@@ -435,6 +435,37 @@
                 <div class="mt-3 text-xs text-slate-500" data-key="wi_ref">Reference: NCHRP Report 586 — Vehicle Speeds on Wet Pavements</div>
             </div>
         </div>
+    
+                <div class="max-w-4xl mx-auto mt-6 bg-white rounded-xl shadow-md border border-slate-200 p-5">
+                    <h4 class="font-bold text-slate-800 mb-3"><i class="fas fa-smog mr-2 text-green-600"></i>مصفوفة الانبعاثات الموثقة — تقليدي مقابل ذاتي (SAE 0-5)</h4>
+                    <div class="overflow-x-auto">
+                    <table class="w-full text-sm">
+                        <thead><tr class="text-xs text-slate-500 border-b border-slate-200">
+                            <th class="text-left py-2">المستوى</th>
+                            <th class="py-2">CO₂ g/mile</th><th class="py-2">CO</th><th class="py-2">NOx</th><th class="py-2">PM2.5</th>
+                            <th class="text-right pr-2">الأساس العلمي</th>
+                        </tr></thead>
+                        <tbody>
+                            <tr class="border-b border-slate-100"><td class="py-2 font-medium">Traditional</td>
+                                <td class="text-center font-mono text-red-500">350–450</td><td class="text-center font-mono">2.1–3.4</td>
+                                <td class="text-center font-mono">0.11–0.20</td><td class="text-center font-mono">0.008–0.012</td>
+                                <td class="text-[10px] text-slate-500 text-right pr-2">EPA 2024 — احتراق وقودي + قيادة متذبذبة</td></tr>
+                            <tr class="border-b border-slate-100"><td class="py-2 font-medium">SAE L1–L2</td>
+                                <td class="text-center font-mono text-orange-500">320–380</td><td class="text-center font-mono">1.8–2.5</td>
+                                <td class="text-center font-mono">0.09–0.15</td><td class="text-center font-mono">0.006–0.010</td>
+                                <td class="text-[10px] text-slate-500 text-right pr-2">IEA 2024 — ACC يقلل التذبذب ~10%</td></tr>
+                            <tr class="border-b border-slate-100"><td class="py-2 font-medium">SAE L3</td>
+                                <td class="text-center font-mono text-yellow-600">280–310</td><td class="text-center font-mono">1.2–1.8</td>
+                                <td class="text-center font-mono">0.07–0.11</td><td class="text-center font-mono">0.004–0.007</td>
+                                <td class="text-[10px] text-slate-500 text-right pr-2">ICCT 2024 — إخماد الموجات المرورية</td></tr>
+                            <tr><td class="py-2 font-medium">SAE L4–L5 ⚡</td>
+                                <td class="text-center font-mono text-green-600">10–25*</td><td class="text-center font-mono">&lt;0.05</td>
+                                <td class="text-center font-mono">&lt;0.005</td><td class="text-center font-mono">&lt;0.0008</td>
+                                <td class="text-[10px] text-slate-500 text-right pr-2">IEEE 2024 — صففر عادم* (Lifecycle شبكة)</td></tr>
+                        </tbody>
+                    </table></div>
+                    <p class="text-[11px] text-slate-400 mt-2">* انبعاثات دورة حياة من الشبكة الكهربائية — العادم المباشر صفر. المصدر: شيت الانبعاثات — العملى.xlsx</p>
+                </div>
     </section>
 
 <!-- ========== CONFLICT HOTSPOT ANALYSIS & SSAM ========== -->
@@ -504,6 +535,18 @@
                     <table class="w-full text-sm"><thead><tr class="text-xs text-slate-400 border-b border-slate-600">
                         <th class="text-left pb-2">المستوى</th><th class="pb-2">رحلات</th><th class="pb-2">زمن</th><th class="pb-2">سرعة km/h</th><th class="pb-2">توفير</th>
                     </tr></thead><tbody id="fd-sim-table"></tbody></table>
+                    <div class="grid grid-cols-2 gap-2 mt-3">
+                        <div class="bg-slate-900/60 rounded-lg p-2 text-center">
+                            <div class="text-[10px] text-slate-400">قطاعك الفعلي 3.05 كم</div>
+                            <div id="fd-sector-kpi" class="font-mono text-cyan-300 font-bold text-sm">-</div>
+                            <div class="text-[10px] text-emerald-400">توفير لكل رحلة</div>
+                        </div>
+                        <div class="bg-slate-900/60 rounded-lg p-2 text-center">
+                            <div class="text-[10px] text-slate-400">لوب الدائري 100 كم</div>
+                            <div class="font-mono text-cyan-300 font-bold text-sm">140-180د ← 60-75د</div>
+                            <div class="text-[10px] text-emerald-400">+55% عند التشغيل الكامل</div>
+                        </div>
+                    </div>
                     <p class="text-[11px] text-slate-400 mt-2">المصدر: pure_python_results.csv — متوسط زمن الرحلة للسيارات التقليدية 503 ث مقابل 283 ث للمستوى L4 (-43.8%)</p>
                 </div>
                 <div class="bg-slate-800 rounded-xl p-4">
@@ -604,6 +647,9 @@
                     <div class="flex justify-between"><span class="text-slate-500" data-key="cc_net_benefit">Net Annual Benefit</span><span class="font-mono font-bold text-green-600" id="cc-net">$0</span></div>
                 </div>
                 <div class="mt-3 text-xs text-slate-500" data-key="cc_ref">Reference: USDOT Benefit-Cost Analysis Guidance (2022), EU ETS Carbon Market</div>
+                    <div class="mt-2 text-[11px] bg-emerald-50 border border-emerald-200 rounded-lg p-2 text-slate-600" dir="rtl">
+                        📌 <b>التوفير السنوي الموثق:</b> $450–950 /مركبة/سنة (Cairo Ring Road) • $1.8B–$2.4B على مستوى المدينة عند L3 (Riyadh arterials) — العملى.xlsx / التوفير السنوى المتوقع
+                    </div>
             </div>
         </div>
     </section>
@@ -3514,7 +3560,7 @@ function updateRingRoadStyle(mpr) {
     var label = mpr < 40 ? 'Congested' : (mpr < 75 ? 'Transitioning' : 'Fluent Platooning');
     stats.innerHTML = '<div class="text-slate-400">MPR: ' + Math.round(mpr) + '%</div>'
       + '<div class="' + cc + '">Status: ' + label + '</div>'
-      + '<div class="text-primary">Capacity: ' + (1850 + Math.round(mpr * 11)) + ' veh/h/lane</div>';
+      + '<div class="text-primary">Capacity: ' + capacityAtMPR(mpr) + ' veh/h/lane <span class=\'text-[10px] opacity-60\'>documented</span></div>';
   }
 }
 
@@ -4531,7 +4577,7 @@ function refreshCompareColors(mpr) {
     ['A', 'B'].forEach(function (s) {
         if (cmpState[s].poly) cmpState[s].poly.setOptions({ strokeColor: ringRoadColorForMPR(mpr) });
         var capEl = document.getElementById('cmp-cap-' + s.toLowerCase());
-        if (capEl) capEl.textContent = (1850 + Math.round(mpr * 11)) + ' v/h/l';
+        if (capEl) capEl.textContent = capacityAtMPR(mpr) + ' v/h/l';
     });
 }
 document.addEventListener('DOMContentLoaded', function () {
@@ -4566,6 +4612,9 @@ function renderTravelTimes() {
           + '<td class="text-center font-bold" style="color:' + col + '">' + (save > 0 ? '-' : '') + save.toFixed(1) + '%</td></tr>';
     });
     el.innerHTML = h;
+    var best = Math.min.apply(null, SIM_TRAVELTIME.slice(1).map(function (r) { return r[2]; }));
+    var kEl = document.getElementById('fd-sector-kpi');
+    if (kEl) kEl.textContent = '-' + (base - best).toFixed(0) + 's (' + ((base - best) / base * 100).toFixed(1) + '%' + ' / رحلة';
 }
 function renderBlackSpots() {
     var el = document.getElementById('fd-blackspots'); if (!el) return;
@@ -4603,7 +4652,19 @@ function renderCounts() {
 document.addEventListener('DOMContentLoaded', function () {
     renderTravelTimes(); renderBlackSpots(); renderCounts();
 });
-
+// Documented capacity bands: Talebpour&Mahmassani16, Stern18, Shladover12, Ye&Yamamoto18, Lioris17
+// Base 1800-2000 veh/h/lane (Ring Road KPI sheet); gains: <=20%:~0 | 40-50%:+20-30% | 70-90%:+50-80% | 100%:+100%+
+function capacityAtMPR(mpr) {
+    var base = 1900;
+    var gain;
+    if (mpr <= 20) gain = (mpr / 20) * 0.03;
+    else if (mpr <= 30) gain = 0.03 + ((mpr - 20) / 10) * 0.04;
+    else if (mpr <= 50) gain = 0.07 + ((mpr - 30) / 20) * 0.18;
+    else if (mpr <= 70) gain = 0.25 + ((mpr - 50) / 20) * 0.15;
+    else if (mpr <= 90) gain = 0.40 + ((mpr - 70) / 20) * 0.35;
+    else gain = 0.75 + ((mpr - 90) / 10) * 0.45;
+    return Math.round(base * (1 + gain));
+}
 }// ========== UNITS ENGINE (km/h <-> mph) ==========
 function getUnits() {
     try { return localStorage.getItem('sae-units') || 'metric'; } catch (e) { return 'metric'; }
@@ -4676,7 +4737,7 @@ function exportReport() {
     ['Avg PET', ssamData.petAvg.toFixed(1) + ' s'],
     ['Rear-End conflicts', ssamData.rearEnd + ' /h'],
     ['Lane-Change conflicts', ssamData.laneChange + ' /h'],
-    ['Capacity', (1850 + Math.round(rrMPR * 11)) + ' veh/h/lane'],
+    ['Capacity', capacityAtMPR(rrMPR) + ' veh/h/lane (documented bands)'],
     ['Conflict status', ssamData.ttcAvg >= 2.0 ? 'RESOLVED' : 'UNRESOLVED']
   ];
   rows.forEach(function(r){ doc.text(r[0]+':', 14, y); doc.text(String(r[1]), 70, y); y += 7; });
@@ -4799,7 +4860,7 @@ function computeCarbonCredits(mpr) {
     var timeSaved = Math.round(m * 2.8 * 365);
     var crashReduction = Math.round(m * 12);
     var crashCostAvoided = crashReduction * CARBON_ECON.crashCostPerCrash;
-    var fuelSavings = Math.round(CARBON_ECON.annualVehKm * m * 0.25 * CARBON_ECON.fuelConsumption / 100 * CARBON_ECON.fuelPricePerLiter);
+    var fuelSavings = Math.round(CARBON_ECON.annualVehKm * m * 0.08 * CARBON_ECON.fuelConsumption / 100 * CARBON_ECON.fuelPricePerLiter);
     var emissionPenalty = Math.round(co2Saved * 5);
     var netBenefit = Math.round(creditValue + crashCostAvoided + fuelSavings - emissionPenalty);
     var el;
