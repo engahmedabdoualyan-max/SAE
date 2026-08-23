@@ -4948,9 +4948,8 @@ window.addEventListener('load', function() {
             document.body.insertBefore(msg, document.body.firstChild);
         }
         try {
-            window._qs = new URLSearchParams(location.search);
-            var _ql = window._qs.get('lang');
-            if (_ql) { try { localStorage.setItem('sae-lang', _ql); } catch(e) {} }
+            window.__st = parseStateFromURL();
+            if (window.__st.lang) { try { localStorage.setItem('sae-lang', window.__st.lang); } catch(e) {} }
             var saved = localStorage.getItem('sae-lang') || 'en';
             document.getElementById('lang-select').value = saved;
             setLanguage(saved);
@@ -4966,12 +4965,12 @@ window.addEventListener('load', function() {
                 if (typeof renderForecastChart === 'function') renderForecastChart();
                 if (typeof renderConflictChart === 'function') renderConflictChart();
                 if (typeof updateAllModules === 'function') updateAllModules(mprValue);
-                if (window._qs) { try {
-                    var _c = window._qs.get('corridor');
-                    if (_c && typeof CORRIDORS !== 'undefined' && CORRIDORS[_c] && typeof switchCorridor === 'function') switchCorridor(_c);
-                    var _m = parseInt(window._qs.get('mpr'), 10);
-                    if (!isNaN(_m)) { var _s = document.getElementById('mpr-slider'); if (_s) { _s.value = _m; _s.dispatchEvent(new Event('input')); } }
-                    if (window._qs.get('scenario') === 'B' && typeof setScenario === 'function') setScenario('B');
+                if (window.__st) { try {
+                    var st = window.__st;
+                    if (st.corridor && typeof CORRIDORS !== 'undefined' && CORRIDORS[st.corridor] && typeof switchCorridor === 'function') switchCorridor(st.corridor);
+                    if (st.mpr != null) { var _s = document.getElementById('mpr-slider'); if (_s) { _s.value = st.mpr; _s.dispatchEvent(new Event('input')); } }
+                    if (st.scenario === 'B' && typeof setScenario === 'function') setScenario('B');
+                    if (st.view === 'case') applyView('case');
                 } catch(e) { console.warn('urlState apply:', e); } }
             }, 800);
         } catch(err) {
@@ -6054,15 +6053,44 @@ function exportReport() {
   doc.text('SSAM thresholds: TTC<1.0 high / <1.5 medium / >=1.5 low severity', 14, y);
   doc.save('sae_report_mpr' + rrMPR + '.pdf');
 }
-function updateURL() {
-  try {
+var BASE_TITLE = document.title;
+function parseStateFromURL() {
     var p = new URLSearchParams(location.search);
-    p.set('corridor', currentCorridor);
-    p.set('mpr', rrMPR);
-    p.set('scenario', rrScenario || 'A');
-    p.set('lang', localStorage.getItem('sae-lang') || 'en');
-    history.replaceState(null, '', location.pathname + '?' + p.toString());
-  } catch (e) {}
+    var path = location.pathname.toLowerCase();
+    function g(short, legacy) { return p.get(short) || p.get(legacy); }
+    var st = {};
+    var vq = g('v', 'view');
+    st.view = (path.indexOf('case') !== -1 || vq === 'case') ? 'case' : 'main';
+    st.corridor = g('c', 'corridor');
+    if (!CORRIDORS || !CORRIDORS[st.corridor]) st.corridor = null;
+    var m = parseInt(g('m', 'mpr'), 10);
+    st.mpr = isNaN(m) ? null : Math.max(0, Math.min(100, m));
+    var s = g('s', 'scenario');
+    st.scenario = (s === 'B' || s === 'A') ? s : null;
+    st.lang = g('l', 'lang');
+    return st;
+}
+function updateURL() {
+    try {
+        var v = document.body.classList.contains('view-case') ? 'case' : 'main';
+        var cor = (typeof currentCorridor !== 'undefined') ? currentCorridor : 'egypt';
+        var mpr = (typeof rrMPR !== 'undefined') ? rrMPR : 10;
+        var scn = (typeof rrScenario !== 'undefined') ? rrScenario : 'A';
+        var lang = 'en';
+        try { lang = localStorage.getItem('sae-lang') || 'en'; } catch (e) {}
+        var q = [];
+        if (cor !== 'egypt') q.push('c=' + cor);
+        if (mpr !== 10) q.push('m=' + mpr);
+        if (scn !== 'A') q.push('s=' + scn);
+        if (lang !== 'en') q.push('l=' + lang);
+        var url = '/';
+        if (v === 'case') url = '/case' + (q.length ? '?' + q.join('&') : '');
+        else if (q.length) url = '/?' + q.join('&');
+        history.replaceState(null, '', url);
+        document.title = (v === 'case'
+            ? '\u062f\u0631\u0627\u0633\u0629 \u0627\u0644\u062d\u0627\u0644\u0629 \u2014 \u0627\u0644\u0637\u0631\u064a\u0642 \u0627\u0644\u062f\u0627\u0626\u0631\u064a \u2022 SAE AutoSim Hub'
+            : BASE_TITLE);
+    } catch (e) {}
 }
 ['setScenario','switchCorridor','setLanguage'].forEach(function(fn){
   var origFn = window[fn];
@@ -6621,18 +6649,6 @@ function capacityAtMPR(mpr) {
 }
 
 // ─── 6. SHARE STATE ───
-function updateURL() {
-    try {
-        var p = new URLSearchParams(location.search);
-        p.set('corridor', typeof currentCorridor !== 'undefined' ? currentCorridor : 'egypt');
-        p.set('mpr', typeof rrMPR !== 'undefined' ? rrMPR : 10);
-        p.set('scenario', typeof rrScenario !== 'undefined' ? rrScenario : 'A');
-        p.set('view', document.body.classList.contains('view-case') ? 'case' : 'main');
-        try { p.set('lang', localStorage.getItem('sae-lang') || 'en'); } catch (e) {}
-        history.replaceState(null, '', location.pathname + '?' + p.toString());
-    } catch (e) {}
-}
-
 // ─── 7. FIELD-DATA RENDERERS ───
 var RING_CENTERLINE_REAL = [[30.14948, 31.417706], [30.149493, 31.417037], [30.150132, 31.416036], [30.15074, 31.415007], [30.151348, 31.413978], [30.152005, 31.412982], [30.152671, 31.412], [30.153348, 31.411028], [30.154025, 31.410056], [30.154711, 31.409093], [30.1554, 31.40813], [30.156131, 31.407208], [30.156899, 31.406327], [30.157675, 31.405459], [30.158419, 31.404561], [30.159059, 31.403566], [30.159586, 31.402486], [30.159991, 31.401338], [30.160351, 31.400163], [30.160758, 31.399005], [30.161222, 31.397878], [30.161698, 31.396761], [30.162164, 31.395636], [30.162614, 31.394505], [30.163022, 31.393353], [30.163401, 31.392187], [30.163757, 31.391012], [30.164111, 31.389835], [30.164434, 31.388648], [30.164719, 31.387449], [30.164999, 31.386244], [30.165262, 31.385037], [30.165496, 31.383822], [30.165706, 31.382602], [30.165895, 31.381376], [30.166061, 31.380146], [30.166204, 31.378912], [30.166328, 31.377676], [30.16643, 31.376436], [30.166494, 31.375194], [30.16655, 31.373951], [30.166583, 31.372707], [30.166607, 31.371462], [30.166594, 31.370218], [30.166559, 31.368974], [30.166501, 31.367733], [30.166419, 31.366494], [30.166315, 31.365253], [30.166189, 31.364017], [30.166039, 31.362784], [30.165877, 31.361553], [30.165715, 31.360321], [30.165552, 31.359089], [30.165389, 31.357856], [30.165217, 31.356628], [30.165054, 31.355395], [30.164902, 31.35416], [30.16474, 31.352929], [30.164578, 31.351698], [30.164416, 31.350466], [30.164237, 31.349238], [30.164075, 31.348006], [30.163918, 31.346772], [30.163766, 31.34554], [30.163604, 31.344309], [30.163447, 31.343075], [30.163307, 31.341839], [30.163185, 31.340601], [30.16308, 31.33936], [30.162983, 31.33812], [30.162905, 31.336876], [30.162838, 31.335634], [30.162806, 31.334386], [30.162767, 31.333141], [30.162747, 31.331894], [30.162757, 31.330647], [30.162782, 31.329401], [30.162836, 31.328156], [30.162889, 31.326912], [30.162953, 31.32567], [30.163017, 31.324424], [30.163082, 31.323181], [30.163146, 31.321937], [30.163211, 31.320694], [30.163275, 31.31945], [30.163313, 31.318208], [30.163282, 31.316966], [30.163203, 31.315725], [30.163124, 31.314482], [30.163031, 31.313241], [30.162951, 31.311999], [30.162872, 31.310756], [30.162804, 31.309513], [30.16272, 31.308273], [30.162544, 31.307048], [30.162516, 31.305793], [30.162815, 31.304587], [30.16324, 31.303439], [30.163663, 31.302293], [30.164087, 31.301146], [30.164511, 31.3], [30.164935, 31.298854], [30.165273, 31.29768], [30.165446, 31.29646], [30.165449, 31.295224], [30.165297, 31.293998], [30.164985, 31.292814], [30.164533, 31.291692], [30.163926, 31.290672], [30.163179, 31.289786], [30.162358, 31.288973], [30.161541, 31.288156], [30.160731, 31.287326], [30.16001, 31.28639], [30.159385, 31.285366], [30.158848, 31.284282], [30.158317, 31.283196], [30.157786, 31.282111], [30.157255, 31.281025], [30.156724, 31.27994], [30.156192, 31.278855], [30.155662, 31.277771], [30.15513, 31.276684], [30.154599, 31.275599], [30.154053, 31.274523], [30.153522, 31.273438], [30.15299, 31.272353], [30.152474, 31.271258], [30.151943, 31.270175], [30.151419, 31.269085], [30.150928, 31.267971], [30.150512, 31.266817], [30.150157, 31.265637], [30.149881, 31.26443], [30.149649, 31.26321], [30.149481, 31.261977], [30.149377, 31.260735], [30.149336, 31.259486], [30.149337, 31.258239], [30.149337, 31.256996], [30.149337, 31.255747], [30.14932, 31.254503], [30.149393, 31.253257], [30.149426, 31.252016], [30.149443, 31.250771], [30.14946, 31.249525], [30.149478, 31.248281], [30.1495, 31.247035], [30.149499, 31.245789], [30.149516, 31.244544], [30.149548, 31.243299], [30.149565, 31.242054], [30.149583, 31.240808], [30.149591, 31.239565], [30.149557, 31.238322], [30.149502, 31.237077], [30.149454, 31.235833], [30.149368, 31.234593], [30.149265, 31.233354], [30.14916, 31.232114], [30.149048, 31.230876], [30.148936, 31.229637], [30.148848, 31.228394], [30.148796, 31.227148], [30.14877, 31.225902], [30.148744, 31.224657], [30.148718, 31.223412], [30.148693, 31.222167], [30.149032, 31.221982]];
 var BLACKSPOTS = [{"n": "تبادل مؤسسة الزكاة", "en": "El-Zakat Foundation Interchange", "frac": 0.33, "imp": -0.65, "cause": "عبور مشاة عشوائي + تجمعات ميكروباص قرب مداخل المرج"}, {"n": "محور الرشاحة (الخصوص)", "en": "El-Rashah Axis (El-Khosous)", "frac": 0.45, "imp": -0.75, "cause": "سلوك الميكروباص يقلل سعة الحارة اليمنى حتى 40%"}, {"n": "كبري المسترود", "en": "Mostorod Bridge", "frac": 0.8, "imp": -0.5, "cause": "اندماج شاحنات ثقيلة من طريق الإسماعيلية القنوية"}, {"n": "مخرج المرج الجديد", "en": "New El-Marg Exit", "frac": 0.38, "imp": -0.8, "cause": "تشبع توكتوك وميكروباص مع تراجع طابور حتى 3 كم على الدائري"}, {"n": "تبادل القليوبية", "en": "Qalyub Interchange (Alex Agri Rd)", "frac": 1.0, "imp": -0.6, "cause": "اختناق إنشائي عند الدمج مع طريق الإسكندرية الزراعي"}];

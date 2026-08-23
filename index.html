@@ -210,19 +210,19 @@
 <body class="bg-slate-50 text-slate-800">
 
     <!-- Header -->
-    <header class="bg-white shadow-sm sticky top-0 z-50">
-        <div class="container mx-auto px-4 py-3">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center gap-3 fade-in">
-                    <div class="relative w-10 h-10">
-                        <div class="gear-rotate absolute inset-0 flex items-center justify-center"><i class="fas fa-cog text-2xl text-slate-400"></i></div>
-                        <div class="absolute inset-0 flex items-center justify-center"><i class="fas fa-road text-xl text-primary"></i></div>
+    <header class="bg-white/95 backdrop-blur shadow-sm sticky top-0 z-50 border-b border-slate-100">
+        <div class="container mx-auto px-4 py-2">
+            <div class="flex items-center justify-between gap-3">
+                <a href="#hero" class="flex items-center gap-2.5 shrink-0 group">
+                    <div class="relative w-9 h-9 shrink-0">
+                        <div class="gear-rotate absolute inset-0 flex items-center justify-center"><i class="fas fa-cog text-xl text-slate-300 group-hover:text-slate-400 transition"></i></div>
+                        <div class="absolute inset-0 flex items-center justify-center"><i class="fas fa-road text-base text-primary"></i></div>
                     </div>
-                    <div>
-                        <h1 class="text-xl font-bold text-slate-800" data-key="t">SAE AutoSim Hub</h1>
-                        <p class="text-xs text-slate-500" data-key="m">To assist traffic simulation researchers worldwide.</p>
+                    <div class="leading-tight">
+                        <h1 class="text-[17px] font-extrabold tracking-tight text-slate-800">SAE <span class="text-primary">AutoSim</span> Hub</h1>
+                        <p class="text-[10px] text-slate-400 hidden lg:block" data-key="m">Traffic simulation researchers worldwide</p>
                     </div>
-                </div>
+                </a>
                 <nav class="hidden lg:flex items-center gap-4">
                     <a href="#hero" class="nav-link text-sm font-medium" data-key="nav_home">Home</a>
                     <a href="#sim" class="nav-link text-sm font-medium" data-key="nav_sim">Simulation</a>
@@ -239,14 +239,14 @@
                         </div>
                     </div>
                 </nav>
-                <div class="flex items-center gap-2">
-                    <div id="view-tabs" class="flex items-center gap-1 mr-2 text-xs">
-                        <button data-call-click="setView" data-args='["main"]' id="tab-main" class="px-3 py-1.5 rounded-lg font-medium bg-cyan-500/20 text-cyan-300 border border-cyan-400/50">📚 <span data-key="tab_main">المرجعية</span></button>
-                        <button data-call-click="setView" data-args='["case"]' id="tab-case" class="px-3 py-1.5 rounded-lg font-medium bg-slate-600/20 text-slate-300 border border-slate-500/40">🛣️ <span data-key="tab_case">دراسة الحالة</span></button>
+                <div class="flex items-center gap-1.5">
+                    <div id="view-tabs" class="flex items-center gap-0.5 p-0.5 rounded-lg bg-slate-100 border border-slate-200">
+                        <button data-call-click="setView" data-args='["main"]' id="tab-main" title="Main reference" class="px-2.5 py-1.5 rounded-md text-xs font-semibold inline-flex items-center gap-1 bg-cyan-500/15 text-cyan-700 border border-cyan-400/40">📚 <span>المرجعية</span></button>📚 <span data-key="tab_main">المرجعية</span></button>
+                        <button data-call-click="setView" data-args='["case"]' id="tab-case" title="Ring Road case study" class="px-2.5 py-1.5 rounded-md text-xs font-semibold inline-flex items-center gap-1 bg-slate-500/10 text-slate-600 border border-slate-400/30">🛗 <span>دراسة الحالة</span></button>🛣️ <span data-key="tab_case">دراسة الحالة</span></button>
                     </div>
                     
-                    <button id="theme-toggle" data-call-click="toggleTheme" aria-label="Toggle dark mode" title="Dark / Light" class="w-9 h-9 inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white text-base hover:bg-slate-100 transition"><span id="theme-icon">🌙</span></button>
-                    <select id="lang-select" data-call-change="setLanguage" data-pass-value class="border border-slate-300 rounded-lg px-1 py-1 text-sm bg-white cursor-pointer w-[46px]">
+                    <button id="theme-toggle" data-call-click="toggleTheme" aria-label="Toggle dark mode" title="Dark / Light" class="w-8 h-8 inline-flex items-center justify-center rounded-md border border-slate-200 bg-white text-sm hover:bg-slate-50 transition hover:bg-slate-100 transition"><span id="theme-icon">🌙</span></button>
+                    <select id="lang-select" data-call-change="setLanguage" data-pass-value class="border border-slate-200 rounded-md px-0.5 py-1 text-sm bg-white cursor-pointer w-[44px] hover:border-slate-300 transition">
                         <option value="en" selected>🇬🇧</option><option value="ar" >🇪🇬 العربية</option><option value="ru" >🇷🇺 Русский</option><option value="hi" >🇮🇳 हिन्दी</option><option value="de" >🇩🇪 Deutsch</option><option value="zh" >🇨🇳 中文</option><option value="ja" >🇯🇵 日本語</option><option value="ko" >🇰🇷 한국어</option><option value="fr" >🇫🇷 Français</option>
                     </select>
                 </div>
@@ -264,7 +264,7 @@
         </div>
         <div class="container mx-auto px-4 py-16 relative z-10">
             <div class="max-w-4xl">
-                <h2 class="text-4xl md:text-5xl font-bold mb-4 fade-in" style="animation-delay: 0.2s;" data-key="h1">Bridging the Local Calibration Deficit</h2>
+                <h2 class="text-3xl md:text-[2.75rem] leading-tight font-extrabold mb-3 fade-in" style="animation-delay: 0.2s;" data-key="h1">Bridging the <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-emerald-300">Local Calibration</span> Deficit</h2>
                 <p class="text-xl md:text-2xl mb-6 opacity-90 fade-in" style="animation-delay: 0.4s;" data-key="hs">Pre-calibrated vehicle fleets for chaotic, aggressive, non-lane-based traffic environments</p>
                 <div class="prose prose-lg max-w-none fade-in" style="animation-delay: 0.6s;">
                     <p data-key="hd1">Standard simulation defaults <i>(Wiedemann 74/99)</i> collapse in mixed aggressive environments like the Egyptian Ring Road.</p>
