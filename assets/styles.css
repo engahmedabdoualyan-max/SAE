@@ -1,8 +1,4 @@
 /* SAE AutoSim Hub — consolidated styles (extracted from index.html) */
-.lg-line-cyan, .lg-line-slate, .lg-dot-orange, .lg-dot-green { display:inline-block; width:18px; height:4px; border-radius:2px; vertical-align:middle; margin-left:6px; }
-        .lg-line-cyan { background:#06b6d4; } .lg-line-slate { background:#64748b; }
-        .lg-dot-orange, .lg-dot-green { width:10px; height:10px; border-radius:50%; }
-        .lg-dot-orange { background:#f97316; } .lg-dot-green { background:#34d399; }
 
 /* ─── Dark Mode Overrides ─── */
 html.sae-dark .bg-white { background-color: #101b31 !important; }
@@ -88,8 +84,6 @@ html.sae-dark [class*="bg-orange-100"][class*="text-orange-700"] { background: r
         }
         * { scroll-behavior: smooth; }
         body { font-family: 'Inter', system-ui, sans-serif; }
-        .logo-anim { display: inline-block; animation: pulse 2s infinite; }
-        @keyframes pulse { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.05); opacity: 0.85; } }
         .gear-rotate { display: inline-block; animation: rotate 8s linear infinite; }
         @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
         .vehicle-icon { position: absolute; animation: around 6s linear infinite; opacity: 0.8; }
@@ -98,8 +92,6 @@ html.sae-dark [class*="bg-orange-100"][class*="text-orange-700"] { background: r
         @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         .card-hover { transition: transform 0.3s ease, box-shadow 0.3s ease; }
         .card-hover:hover { transform: translateY(-4px); box-shadow: 0 10px 30px rgba(0,0,0,0.12); }
-        .flag { font-size: 1.3em; margin-right: 6px; }
-        .rtl .flag { margin-right: 0; margin-left: 6px; }
         .download-btn { transition: all 0.3s ease; border: 2px dashed var(--primary); background: white; color: #374151; }
         .download-btn:hover { background: var(--primary); color: white; transform: scale(1.02); border-color: var(--primary); }
         .level-badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 0.7em; font-weight: 600; }
@@ -188,3 +180,19 @@ a:focus-visible, button:focus-visible, select:focus-visible, input:focus-visible
 
 /* ─── Unified Transition Speed ─── */
 #view-tabs button { transition: all .2s ease; }
+
+/* ─── Print Styles ─── */
+@media print {
+    header, nav, #mobile-menu-btn, #mobile-nav-drawer, #mobile-nav-backdrop,
+    .exp-btn, .scn-btn, #theme-toggle, #lang-select, #view-tabs,
+    .card-hover, .guide-panel, .modal-overlay, .toast-msg,
+    footer, .more-menu { display: none !important; }
+    body { background: white !important; color: black !important; }
+    .bg-white, .bg-slate-50, .bg-slate-100, .bg-slate-800, .bg-slate-900 {
+        background: white !important; color: black !important;
+    }
+    .text-white, .text-slate-300, .text-slate-400 { color: black !important; }
+    section { page-break-inside: avoid; }
+    a { text-decoration: underline; }
+    canvas, iframe { display: none !important; }
+}

@@ -121,7 +121,6 @@
     }
     </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
     <link rel="stylesheet" href="/assets/styles.css">
@@ -151,7 +150,7 @@
                     <a href="#fleets" class="nav-link text-sm font-medium" data-key="nav_fleet">Fleet</a>
                     <a href="#comparison" class="nav-link text-sm font-medium" data-key="nav_compare">Compare</a>
                     <div class="relative">
-                        <button data-call-click="toggleMoreMenu" id="more-btn" class="nav-link text-sm font-medium">More ▾</button>
+                        <button data-call-click="toggleMoreMenu" id="more-btn" aria-expanded="false" aria-haspopup="true" class="nav-link text-sm font-medium">More ▾</button>
                         <div id="more-menu" class="hidden absolute right-0 top-full mt-2 w-44 bg-white rounded-xl shadow-lg border border-slate-200 py-2 z-[60]">
                             <a href="#math" class="block px-4 py-2 text-sm hover:bg-slate-50" data-call-click="menuGo">🧮 Math Models</a>
                             <a href="#country-hub" class="block px-4 py-2 text-sm hover:bg-slate-50" data-call-click="menuGo">🌍 Countries</a>
