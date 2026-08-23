@@ -3146,11 +3146,14 @@ function applyTheme(theme) {
     if (typeof Chart !== 'undefined') {
         Chart.defaults.color = theme === 'dark' ? '#cbd5e1' : '#334155';
         Chart.defaults.borderColor = theme === 'dark' ? '#24344f' : '#e2e8f0';
+        Chart.defaults.font.family = "'Inter', sans-serif";
     }
     setTimeout(function () {
         ['renderSSAMChart', 'renderForecastChart'].forEach(function (fn) {
             try { if (typeof window[fn] === 'function') window[fn](); } catch (err) {}
         });
+        if (fleetChartA) { fleetChartA.options.scales.x.ticks.color = theme === 'dark' ? '#cbd5e1' : '#334155'; fleetChartA.options.scales.y.ticks.color = theme === 'dark' ? '#cbd5e1' : '#334155'; fleetChartA.options.scales.x.grid.color = theme === 'dark' ? '#24344f' : '#e2e8f0'; fleetChartA.options.scales.y.grid.color = theme === 'dark' ? '#24344f' : '#e2e8f0'; fleetChartA.update(); }
+        if (fleetChartB) { fleetChartB.options.scales.x.ticks.color = theme === 'dark' ? '#cbd5e1' : '#334155'; fleetChartB.options.scales.y.ticks.color = theme === 'dark' ? '#cbd5e1' : '#334155'; fleetChartB.options.scales.x.grid.color = theme === 'dark' ? '#24344f' : '#e2e8f0'; fleetChartB.options.scales.y.grid.color = theme === 'dark' ? '#24344f' : '#e2e8f0'; fleetChartB.update(); }
     }, 60);
 }
 function toggleTheme() {

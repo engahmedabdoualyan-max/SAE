@@ -4,22 +4,74 @@
         .lg-dot-orange, .lg-dot-green { width:10px; height:10px; border-radius:50%; }
         .lg-dot-orange { background:#f97316; } .lg-dot-green { background:#34d399; }
 
+/* ─── Dark Mode Overrides ─── */
 html.sae-dark .bg-white { background-color: #101b31 !important; }
-    html.sae-dark .bg-slate-50 { background-color: #0b1424 !important; }
-    html.sae-dark .bg-slate-100 { background-color: #16233c !important; }
-    html.sae-dark .text-slate-800 { color: #e2e8f0 !important; }
-    html.sae-dark .text-slate-700 { color: #cbd5e1 !important; }
-    html.sae-dark .text-slate-600 { color: #94a3b8 !important; }
-    html.sae-dark .text-slate-500 { color: #7c8db0 !important; }
-    html.sae-dark .border-slate-100, html.sae-dark .border-slate-200,
-    html.sae-dark .border-slate-300 { border-color: #24344f !important; }
-    html.sae-dark .divide-slate-200 > :not([hidden]) ~ :not([hidden]) { border-color: #24344f !important; }
-    html.sae-dark [class*="bg-gradient-to"]:not(.bg-clip-text):not([class*="from-cyan-"]):not([class*="from-emerald-"]):not([class*="from-green-"]) { background-image: linear-gradient(145deg, #101b31, #0d1830) !important; }
-    html.sae-dark select, html.sae-dark input:not([type="checkbox"]):not([type="radio"]) {
-        background-color: #16233c !important; color: #e2e8f0 !important;
-        border-color: #2d3f5e !important;
-    }
-    html.sae-dark .hover\:bg-white:hover { background-color: #1a2947 !important; }
+html.sae-dark .bg-slate-50 { background-color: #0b1424 !important; }
+html.sae-dark .bg-slate-100 { background-color: #16233c !important; }
+html.sae-dark .bg-slate-200 { background-color: #1e2d4a !important; }
+html.sae-dark .text-slate-800 { color: #e2e8f0 !important; }
+html.sae-dark .text-slate-700 { color: #cbd5e1 !important; }
+html.sae-dark .text-slate-600 { color: #94a3b8 !important; }
+html.sae-dark .text-slate-500 { color: #7c8db0 !important; }
+html.sae-dark .border-slate-100, html.sae-dark .border-slate-200,
+html.sae-dark .border-slate-300 { border-color: #24344f !important; }
+html.sae-dark .divide-slate-200 > :not([hidden]) ~ :not([hidden]) { border-color: #24344f !important; }
+html.sae-dark [class*="bg-gradient-to"]:not(.bg-clip-text):not([class*="from-cyan-"]):not([class*="from-emerald-"]):not([class*="from-green-"]):not([class*="from-indigo-"]) { background-image: linear-gradient(145deg, #101b31, #0d1830) !important; }
+html.sae-dark select, html.sae-dark input:not([type="checkbox"]):not([type="radio"]) {
+    background-color: #16233c !important; color: #e2e8f0 !important;
+    border-color: #2d3f5e !important;
+}
+html.sae-dark .hover\:bg-white:hover { background-color: #1a2947 !important; }
+/* Tinted chips & badges */
+html.sae-dark [class*="bg-blue-100"] { background-color: rgba(59,130,246,.15) !important; }
+html.sae-dark [class*="bg-orange-100"] { background-color: rgba(249,115,22,.15) !important; }
+html.sae-dark [class*="bg-amber-100"] { background-color: rgba(245,158,11,.15) !important; }
+html.sae-dark [class*="bg-yellow-100"] { background-color: rgba(234,179,8,.15) !important; }
+html.sae-dark [class*="bg-red-100"] { background-color: rgba(239,68,68,.15) !important; }
+html.sae-dark [class*="bg-green-100"] { background-color: rgba(34,197,94,.15) !important; }
+html.sae-dark [class*="bg-purple-100"] { background-color: rgba(168,85,247,.15) !important; }
+html.sae-dark [class*="bg-teal-100"] { background-color: rgba(20,184,166,.15) !important; }
+html.sae-dark [class*="bg-emerald-100"] { background-color: rgba(16,185,129,.15) !important; }
+html.sae-dark [class*="bg-indigo-100"] { background-color: rgba(99,102,241,.15) !important; }
+/* Light row backgrounds */
+html.sae-dark [class*="hover:bg-blue-50"]:hover { background-color: rgba(59,130,246,.08) !important; }
+html.sae-dark [class*="hover:bg-orange-50"]:hover { background-color: rgba(249,115,22,.08) !important; }
+html.sae-dark [class*="hover:bg-amber-50"]:hover { background-color: rgba(245,158,11,.08) !important; }
+html.sae-dark [class*="hover:bg-red-50"]:hover { background-color: rgba(239,68,68,.08) !important; }
+html.sae-dark [class*="hover:bg-green-50"]:hover { background-color: rgba(34,197,94,.08) !important; }
+html.sae-dark [class*="hover:bg-teal-50"]:hover { background-color: rgba(20,184,166,.08) !important; }
+html.sae-dark [class*="hover:bg-purple-50"]:hover { background-color: rgba(168,85,247,.08) !important; }
+html.sae-dark [class*="hover:bg-emerald-50"]:hover { background-color: rgba(16,185,129,.08) !important; }
+html.sae-dark [class*="bg-red-50"] { background-color: rgba(239,68,68,.1) !important; }
+html.sae-dark [class*="bg-emerald-50"] { background-color: rgba(16,185,129,.1) !important; }
+/* Accent text on dark: boost contrast */
+html.sae-dark .text-teal-700 { color: #5eead4 !important; }
+html.sae-dark .text-emerald-700 { color: #6ee7b7 !important; }
+html.sae-dark .text-purple-700 { color: #c4b5fd !important; }
+html.sae-dark .text-blue-700 { color: #93c5fd !important; }
+html.sae-dark .text-amber-600 { color: #fbbf24 !important; }
+html.sae-dark .text-amber-700 { color: #fcd34d !important; }
+html.sae-dark .text-cyan-700 { color: #67e8f9 !important; }
+html.sae-dark .text-sky-700 { color: #7dd3fc !important; }
+/* Level badges */
+html.sae-dark .lvl0 { background-color: rgba(239,68,68,.15) !important; color: #fca5a5 !important; }
+html.sae-dark .lvl2 { background-color: rgba(59,130,246,.15) !important; color: #93c5fd !important; }
+html.sae-dark .lvl45 { background-color: rgba(34,197,94,.15) !important; color: #86efac !important; }
+/* Weight row */
+html.sae-dark .weight-row { background: linear-gradient(90deg, rgba(34,197,94,.08), rgba(16,185,129,.05)) !important; border-color: rgba(34,197,94,.2) !important; }
+/* Download button */
+html.sae-dark .download-btn { background: #1a2947 !important; color: #cbd5e1 !important; border-color: #2d3f5e !important; }
+/* Guide tab active */
+html.sae-dark .guide-tab.active { background: #1a2947 !important; color: #67e8f9 !important; }
+/* Mobile drawer */
+html.sae-dark #mobile-nav-drawer { background: #101b31 !important; }
+html.sae-dark #mobile-nav-drawer a { color: #cbd5e1 !important; }
+html.sae-dark #mobile-nav-drawer a:hover { background: rgba(255,255,255,.05) !important; }
+html.sae-dark #mobile-nav-drawer hr { border-color: #24344f !important; }
+/* Code chips in guides */
+html.sae-dark [class*="bg-indigo-100"][class*="text-indigo-700"] { background: rgba(99,102,241,.15) !important; color: #a5b4fc !important; }
+html.sae-dark [class*="bg-green-100"][class*="text-green-700"] { background: rgba(34,197,94,.15) !important; color: #86efac !important; }
+html.sae-dark [class*="bg-orange-100"][class*="text-orange-700"] { background: rgba(249,115,22,.15) !important; color: #fdba74 !important; }
 
 .case-view { display: none; }
     body.view-case .case-view { display: block; }
