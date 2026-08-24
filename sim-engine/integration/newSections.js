@@ -193,6 +193,41 @@
     '</section>';
   }
 
+  function createCloudSection() {
+    return '' +
+    '<section id="cloud-run" class="case-view py-16 bg-slate-800 text-white">' +
+    '  <div class="container mx-auto px-4">' +
+    '    <div class="text-center mb-10">' +
+    '      <h2 class="text-2xl md:text-3xl font-bold mb-3" data-key="cl_title">Cloud Simulation</h2>' +
+    '      <p class="text-slate-300 max-w-3xl mx-auto text-sm" data-key="cl_desc">Run your network on the server-side SUMO engine. Streams live progress over WebSocket and returns real trip KPIs.</p>' +
+    '    </div>' +
+    '    <div class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6">' +
+    '      <div class="bg-slate-900 rounded-xl p-6 border border-slate-700 space-y-4">' +
+    '        <h3 class="font-semibold text-sm">1 · Connect</h3>' +
+    '        <input id="cl-email" type="email" value="demo@sae.local" placeholder="email" class="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-sm">' +
+    '        <input id="cl-pass" type="password" value="demo1234" placeholder="password" class="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-sm">' +
+    '        <button onclick="SAE_Cloud && SAE_Cloud.login()" class="w-full px-4 py-2 bg-indigo-600 hover:bg-indigo-700 rounded-lg text-sm font-semibold"><i class="fas fa-plug mr-2"></i>Login</button>' +
+    '        <h3 class="font-semibold text-sm pt-2">2 · Launch</h3>' +
+    '        <div class="flex items-center gap-2 text-xs text-slate-400">' +
+    '          <label for="cl-duration">Duration</label>' +
+    '          <input id="cl-duration" type="number" min="60" max="3600" step="60" value="300" class="w-24 px-2 py-1 bg-slate-800 border border-slate-600 rounded text-white text-xs"> s' +
+    '        </div>' +
+    '        <button onclick="SAE_Cloud && SAE_Cloud.run()" class="w-full px-4 py-2 bg-emerald-600 hover:bg-emerald-700 rounded-lg text-sm font-semibold"><i class="fas fa-cloud-upload-alt mr-2"></i>Run in Cloud</button>' +
+    '        <div id="cl-status" class="text-xs text-slate-400"></div>' +
+    '      </div>' +
+    '      <div class="bg-slate-900 rounded-xl p-6 border border-slate-700">' +
+    '        <h3 class="font-semibold text-sm mb-3">Pipeline & Results</h3>' +
+    '        <div id="cl-steps" class="space-y-1.5 text-xs mb-4"></div>' +
+    '        <div class="w-full bg-slate-700 rounded-full h-2 overflow-hidden mb-4">' +
+    '          <div id="cl-progress" class="h-full bg-emerald-500 transition-all" style="width:0%"></div>' +
+    '        </div>' +
+    '        <div id="cl-results"><div class="text-center text-slate-500 text-sm py-6">No cloud run yet</div></div>' +
+    '      </div>' +
+    '    </div>' +
+    '  </div>' +
+    '</section>';
+  }
+
   window.SAE_Sections = {
     createNetworkEditorSection: createNetworkEditorSection,
     createSignalEditorSection: createSignalEditorSection,
@@ -200,6 +235,7 @@
     createAdvancedAnalysisSection: createAdvancedAnalysisSection,
     createScenarioManagerSection: createScenarioManagerSection,
     createReportsSection: createReportsSection,
+    createCloudSection: createCloudSection,
     injectAll: function () {
       var footer = document.querySelector('footer');
       if (!footer) return;
@@ -209,6 +245,7 @@
       html += createCalibrationSection();
       html += createAdvancedAnalysisSection();
       html += createScenarioManagerSection();
+      html += createCloudSection();
       html += createReportsSection();
       footer.insertAdjacentHTML('beforebegin', html);
     }

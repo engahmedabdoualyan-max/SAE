@@ -14,6 +14,7 @@ const PRECACHE = [
   '/sim-engine/integration/calibrationPanel.js',
   '/sim-engine/integration/bootModules.js',
   '/sim-engine/integration/comparisonPanel.js',
+  '/sim-engine/integration/cloudPanel.js',
   '/sim-engine/integration/dashboardPanel.js',
   '/sim-engine/integration/exportPanel.js',
   '/sim-engine/integration/fullIntegration.js',

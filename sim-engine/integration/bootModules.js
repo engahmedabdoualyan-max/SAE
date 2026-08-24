@@ -101,6 +101,7 @@ function boot() {
     { id: 'calibration-section', label: 'Calibration' },
     { id: 'advanced-analysis', label: 'Analysis' },
     { id: 'scenario-manager', label: 'Scenarios' },
+    { id: 'cloud-run', label: 'Cloud Run' },
     { id: 'reports-section', label: 'Reports' }
   ]);
 

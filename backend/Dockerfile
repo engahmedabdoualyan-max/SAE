@@ -3,6 +3,12 @@ FROM python:3.11-slim
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1
 
+# Runtime shared libraries required by the eclipse-sumo wheel (headless).
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        libx11-6 libxext6 libxrender1 libgl1 libgomp1 fontconfig \
+    && rm -rf /var/lib/apt/lists/*
+
 WORKDIR /app
 
 COPY requirements.txt .

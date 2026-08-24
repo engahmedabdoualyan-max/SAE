@@ -1,0 +1,198 @@
+/**
+ * @file cloudPanel.js — Cloud Simulation pipeline: auth → project → network
+ * upload → scenario → queued run → WebSocket progress → results.
+ *
+ * Talks to the FastAPI backend through the same origin (/api proxy), so it
+ * works identically against the local docker stack and production.
+ */
+(function () {
+  'use strict';
+
+  var API = '/api/v1';
+  var state = { token: null, project: null };
+
+  function $(id) { return document.getElementById(id); }
+
+  function setStatus(msg, isError) {
+    var el = $('cl-status');
+    if (el) {
+      el.textContent = msg;
+      el.className = 'text-xs mt-1 ' + (isError ? 'text-red-400' : 'text-slate-400');
+    }
+  }
+
+  function renderStep(name, state_) {
+    var box = $('cl-steps');
+    if (!box) return;
+    if (!box.dataset.steps) box.dataset.steps = JSON.stringify({});
+    var steps = JSON.parse(box.dataset.steps);
+    steps[name] = state_;
+    box.dataset.steps = JSON.stringify(steps);
+    var order = ['auth', 'project', 'network', 'scenario', 'queued', 'stream', 'results'];
+    box.innerHTML = order.map(function (k) {
+      if (!(k in steps)) return '';
+      var s = steps[k];
+      var icon = s === 'done' ? '✓' : s === 'active' ? '…' : s === 'fail' ? '✗' : '·';
+      var color = s === 'done' ? 'text-emerald-400' : s === 'fail' ? 'text-red-400'
+        : s === 'active' ? 'text-yellow-300' : 'text-slate-500';
+      return '<div class="' + color + '"><span class="font-mono">' + icon +
+        '</span> ' + k + '</div>';
+    }).join('');
+  }
+
+  function setProgress(pct) {
+    var el = $('cl-progress');
+    if (el) el.style.width = Math.max(0, Math.min(100, pct)) + '%';
+  }
+
+  function api(method, path, opts, token) {
+    opts = opts || {};
+    var headers = Object.assign({}, opts.headers || {});
+    if (token) headers['Authorization'] = 'Bearer ' + token;
+    if (opts.json) { headers['Content-Type'] = 'application/json'; opts.body = JSON.stringify(opts.json); }
+    return fetch(API + path, {
+      method: method, headers: headers,
+      body: opts.body, redirect: 'follow',
+    }).then(function (r) {
+      if (!r.ok) {
+        return r.text().then(function (t) {
+          var detail = t; try { detail = JSON.parse(t).detail || t; } catch (e) {}
+          throw new Error(method + ' ' + path + ' → ' + r.status + ': ' + String(detail).slice(0, 160));
+        });
+      }
+      return r.status === 204 ? null : r.json();
+    });
+  }
+
+  /* Build a small default arterial when the editor canvas is empty. */
+  function fallbackNetwork() {
+    var mk = function (id, lat, lng, type) { return { id: id, lat: lat, lng: lng, type: type }; };
+    var e = function (i, f, t) {
+      return { id: 'E' + i, from: f, to: t, lanes: 3, speedLimit: 22.2,
+               length: 600, name: 'Arterial ' + i, bidirectional: true };
+    };
+    return { nodes: [mk('A', 30.0444, 31.2357, 'entry'),
+                     mk('B', 30.0500, 31.2430, 'intersection'),
+                     mk('C', 30.0560, 31.2500, 'exit')],
+             edges: [e(1, 'A', 'B'), e(1, 'B', 'A'), e(2, 'B', 'C'), e(2, 'C', 'B')] };
+  }
+
+  function currentNetworkJson() {
+    try {
+      var ed = window.__saeRealEditor;
+      if (ed && ed.getNetwork) {
+        var net = ed.getNetwork();
+        var j = net && net.toJSON ? net.toJSON() : null;
+        if (j && j.nodes && j.nodes.length >= 2 && j.edges && j.edges.length >= 1) return j;
+      }
+    } catch (e) { /* fall through */ }
+    return fallbackNetwork();
+  }
+
+  window.SAE_Cloud = {
+    login: function () {
+      var email = ($('cl-email') || {}).value || 'demo@sae.local';
+      var pass = ($('cl-pass') || {}).value || 'demo1234';
+      setStatus('Logging in…');
+      renderStep('auth', 'active');
+      var body = new URLSearchParams({ username: email, password: pass });
+      return fetch(API + '/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: body.toString(),
+      }).then(function (r) {
+        if (!r.ok) throw new Error('login failed (' + r.status + ')');
+        return r.json();
+      }).then(function (j) {
+        state.token = j.access_token;
+        renderStep('auth', 'done');
+        setStatus('Authenticated ✓');
+        return true;
+      }).catch(function (e) {
+        renderStep('auth', 'fail');
+        setStatus(e.message, true);
+        return false;
+      });
+    },
+
+    run: function () {
+      var self = this;
+      var duration = parseInt(($('cl-duration') || {}).value || '300', 10);
+      var p = Promise.resolve(state.token ? true : this.login());
+
+      p.then(function (ok) {
+        if (!ok) throw new Error('auth required');
+
+        /* project */
+        renderStep('project', 'active');
+        return api('POST', '/projects/', { json: { name: 'Cloud Run ' + Date.now(), description: '' } }, state.token)
+          .then(function (pr) { state.project = pr.id; renderStep('project', 'done'); });
+
+      }).then(function () {
+        /* network upload (multipart) */
+        renderStep('network', 'active');
+        var net = currentNetworkJson();
+        var fd = new FormData();
+        fd.append('project_id', state.project);
+        fd.append('name', 'Editor network');
+        fd.append('format', 'json');
+        fd.append('file', new Blob([JSON.stringify(net)], { type: 'application/json' }), 'network.json');
+        return api('POST', '/networks/upload', { body: fd }, state.token)
+          .then(function (nw) { renderStep('network', 'done'); return nw.id; });
+
+      }).then(function (networkId) {
+        /* scenario */
+        renderStep('scenario', 'active');
+        var params = { simulation: { duration: duration } };
+        if (window.__saeIdmOverrides) params.idm = window.__saeIdmOverrides;
+        return api('POST', '/scenarios/', {
+          json: { network_id: networkId, name: 'Cloud scenario', params: params },
+        }, state.token).then(function (sc) { renderStep('scenario', 'done'); return sc.id; });
+
+      }).then(function (scenarioId) {
+        /* queue run */
+        renderStep('queued', 'active');
+        return api('POST', '/simulations/run', {
+          json: { scenario_id: scenarioId, config: { duration: duration } },
+        }, state.token).then(function (sim) {
+          renderStep('queued', 'done'); renderStep('stream', 'active');
+          self._stream(sim.id);
+          return sim.id;
+        });
+
+      }).catch(function (e) {
+        setStatus(e.message, true);
+      });
+    },
+
+    _stream: function (simId) {
+      var proto = location.protocol === 'https:' ? 'wss://' : 'ws://';
+      var ws = new WebSocket(proto + location.host + API + '/simulations/' + simId + '/stream');
+      ws.onmessage = function (ev) {
+        var f;
+        try { f = JSON.parse(ev.data); } catch (e) { return; }
+        if (f.error === 'not_found') { setStatus('simulation not found', true); return; }
+        setProgress(Math.round((f.progress || 0) * 100));
+        if (f.results) { renderStep('stream', 'done'); renderStep('results', 'done'); self_renderResults(f.results); }
+        else if (f.status === 'failed') { renderStep('stream', 'fail'); setStatus(f.error_message || 'run failed', true); }
+      };
+      ws.onerror = function () { setStatus('WebSocket error', true); };
+    },
+  };
+
+  function self_renderResults(results) {
+    setProgress(100);
+    var el = $('cl-results');
+    if (!el) return;
+    var rows = '';
+    Object.keys(results || {}).sort().forEach(function (k) {
+      var v = results[k];
+      if (v !== null && typeof v !== 'object') {
+        rows += '<tr class="border-t border-slate-700"><td class="py-1 pr-3 text-slate-400">' +
+                k + '</td><td class="py-1 font-mono text-emerald-400">' + v + '</td></tr>';
+      }
+    });
+    el.innerHTML = '<table class="w-full text-xs"><tbody>' + rows + '</tbody></table>';
+  }
+
+})();

@@ -56,6 +56,40 @@ class NetworkDataOut(BaseModel):
     meta: dict[str, Any] = Field(default_factory=dict)
 
 
+def _normalize_network_payload(parsed: dict[str, Any]) -> dict[str, Any]:
+    """Accept both engine ({lat,lng}) and geo ({x,y}) node/edge dialects.
+
+    Engine toJSON emits nodes as {id, lat, lng} and edges with
+    ``speedLimit``; the canonical storage schema is {id, x, y} with
+    ``speed``. Normalization is additive — original keys are preserved.
+    """
+    out = dict(parsed or {})
+    nodes = []
+    for n in out.get("nodes") or []:
+        if not isinstance(n, dict):
+            continue
+        n = dict(n)
+        lat = n.get("lat")
+        lng = n.get("lng")
+        if "x" not in n and lng is not None:
+            n["x"] = float(lng)
+        if "y" not in n and lat is not None:
+            n["y"] = float(lat)
+        nodes.append(n)
+    out["nodes"] = nodes
+
+    edges = []
+    for e in out.get("edges") or []:
+        if not isinstance(e, dict):
+            continue
+        e = dict(e)
+        if "speed" not in e and e.get("speedLimit") is not None:
+            e["speed"] = float(e["speedLimit"])
+        edges.append(e)
+    out["edges"] = edges
+    return out
+
+
 class NetworkOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
@@ -324,8 +358,9 @@ async def upload_network(
                 detail='JSON network must be an object with "nodes" and "edges" lists',
             )
         meta_extra = parsed.get("meta") if isinstance(parsed.get("meta"), dict) else {}
-        nodes_data = parsed["nodes"]
-        edges_data = parsed["edges"]
+        normalized = _normalize_network_payload(parsed)
+        nodes_data = normalized["nodes"]
+        edges_data = normalized["edges"]
     elif fmt == "opendrive":
         try:
             parsed = parse_opendrive(text)

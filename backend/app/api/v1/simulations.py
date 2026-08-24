@@ -244,24 +244,36 @@ def run_simulation_job(simulation_id: int) -> None:
         duration = float(merged_config.get("duration", 600))
 
         trip_summary: dict[str, Any] = {}
+        engine_name = "builtin-fallback"
+        fallback_reason: str | None = None
         if shutil.which("sumo"):
-            bridge = SUMOBridge(workdir=None)
-            bridge.start()
+            bridge: SUMOBridge | None = None
             try:
+                bridge = SUMOBridge(workdir=None)
+                bridge.start()
                 bridge.load_network(net_data)
                 bridge.load_routes(params.get("demand") or {}, duration=duration, idm_params=params.get("idm"))
                 bridge.run(begin=0.0, end=duration, step_length=float(merged_config.get("step_length", 1.0)))
                 timesteps = bridge.get_vehicle_positions(force_refresh=True)
                 edge_stats = bridge.get_edge_data()
                 trip_summary = bridge.parse_tripinfo(bridge.tripinfo_path)
+                engine_name = "sumo"
+            except SUMOBridgeError as exc:
+                logger.warning("SUMO run failed; falling back to builtin engine: %s", exc)
+                fallback_reason = str(exc)
+                timesteps, edge_stats = _synthetic_run(net_data, params, merged_config)
             finally:
-                bridge.stop()
-            engine_name = "sumo"
+                if bridge is not None:
+                    try:
+                        bridge.stop()
+                    except Exception:  # noqa: BLE001 - teardown best effort
+                        pass
         else:
             timesteps, edge_stats = _synthetic_run(net_data, params, merged_config)
-            engine_name = "builtin-fallback"
 
-        extra = {"engine": engine_name}
+        extra: dict[str, Any] = {"engine": engine_name}
+        if fallback_reason:
+            extra["fallback_reason"] = fallback_reason
         if trip_summary:
             extra.update(trip_summary)
 
