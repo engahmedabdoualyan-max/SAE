@@ -398,6 +398,13 @@
       start: function () { RUNNING = true; paused = false; if (!animId) loop(); },
       pause: function () { paused = true; },
       resume: function () { if (RUNNING) { paused = false; if (!animId) loop(); } },
+      /** Advance n frames synchronously (deterministic tests, throttled rAF). */
+      tick: function (n) {
+        RUNNING = true; paused = false;
+        n = Math.max(1, Math.min(3600, n | 0));
+        for (var i = 0; i < n; i++) { step(); }
+        drawRoad(); drawVehicles(); drawSpeedChart();
+      },
       reset: function () {
         RUNNING = false;
         paused = false;
@@ -445,6 +452,7 @@
     start: function () { if (simInstance) simInstance.start(); },
     pause: function () { if (simInstance) simInstance.pause(); },
     resume: function () { if (simInstance) simInstance.resume(); },
+    tick: function (n) { if (simInstance && simInstance.tick) simInstance.tick(n); },
     reset: function () { if (simInstance) simInstance.reset(); },
     setSpeed: function (s) { if (simInstance) simInstance.setSpeed(s); },
     setMPR: function (m) { if (simInstance) simInstance.setMPR(m); },

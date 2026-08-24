@@ -438,3 +438,29 @@ TRANSLATIONS['fr'] = {
 
     "vid_fallback": "Video exige HTTPS — deployer sur sae.fimtosoft.com",
   "cmp_title": "Comparaison de couloirs", "cmp_desc": "Comparer deux couloirs au même MPR — cartes, capacité et vitesse en direct", "cmp_a": "Couloir A", "cmp_b": "Couloir B", "cmp_speed": "Limite vitesse" };
+
+
+/* Advanced platform sections (appended; EN fallback via t()) */
+Object.assign(TRANSLATIONS['fr'], {
+    "adv_mode": "Mode IDM avancé",
+    "run_sim": "Démarrer",
+    "pause_sim": "Pause",
+    "reset_sim": "Réinitialiser",
+    "ne_title": "Éditeur de réseau",
+    "ne_desc": "Dessinez routes, intersections et feux sur la carte. Importez des réseaux OpenDRIVE, SUMO ou GeoJSON.",
+    "ne_tools": "Outils",
+    "ne_import": "Importer",
+    "ne_export": "Exporter",
+    "se_title": "Éditeur de signaux",
+    "se_desc": "Concevez et optimisez les plans de phases des feux avec un diagramme interactif.",
+    "cal_title": "Assistant de calibration",
+    "cal_desc": "Chargez des données de terrain (CSV) et calibrez automatiquement les paramètres IDM sur les comptages observés.",
+    "cal_upload": "Charger les données de terrain",
+    "cal_results": "Résultats de calibration",
+    "aa_title": "Analyse avancée",
+    "aa_desc": "Analyse des émissions, du bruit, de la sécurité, de l'énergie et du V2X calibrée par données de terrain.",
+    "sm_title": "Gestionnaire de scénarios",
+    "sm_desc": "Enregistrez, chargez, dupliquez et comparez des scénarios avec versionnage complet.",
+    "rp_title": "Rapports & export",
+    "rp_desc": "Générez des rapports PDF avec méthodologie, résultats et données de calibration."
+});

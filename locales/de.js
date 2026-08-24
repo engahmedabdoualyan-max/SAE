@@ -438,3 +438,29 @@ TRANSLATIONS['de'] = {
 
     "vid_fallback": "Video erfordert HTTPS — auf sae.fimtosoft.com bereitstellen",
   "cmp_title": "Korridor-Vergleich", "cmp_desc": "Zwei Korridore bei gleichem MPR vergleichen — Karten, Kapazität und Tempo live", "cmp_a": "Korridor A", "cmp_b": "Korridor B", "cmp_speed": "Tempolimit" };
+
+
+/* Advanced platform sections (appended; EN fallback via t()) */
+Object.assign(TRANSLATIONS['de'], {
+    "adv_mode": "Erweiterter IDM-Modus",
+    "run_sim": "Start",
+    "pause_sim": "Pause",
+    "reset_sim": "Zurücksetzen",
+    "ne_title": "Netzwerk-Editor",
+    "ne_desc": "Zeichnen Sie Straßen, Knoten und Signale auf der Karte. Importieren Sie OpenDRIVE-, SUMO- oder GeoJSON-Netze.",
+    "ne_tools": "Werkzeuge",
+    "ne_import": "Importieren",
+    "ne_export": "Exportieren",
+    "se_title": "Signalzeiten-Editor",
+    "se_desc": "Entwerfen und optimieren Sie Signalphasenpläne mit einem interaktiven Phasendiagramm.",
+    "cal_title": "Kalibrierungsassistent",
+    "cal_desc": "Laden Sie Felddaten (CSV) hoch und kalibrieren Sie IDM-Parameter automatisch auf beobachtete Werte.",
+    "cal_upload": "Felddaten hochladen",
+    "cal_results": "Kalibrierungsergebnisse",
+    "aa_title": "Erweiterte Analyse",
+    "aa_desc": "Analyse von Emissionen, Lärm, Sicherheit, Energie und V2X mit Felddaten-Kalibrierung.",
+    "sm_title": "Szenario-Manager",
+    "sm_desc": "Speichern, laden, verzweigen und vergleichen Sie Szenarien mit voller Versionierung.",
+    "rp_title": "Berichte & Export",
+    "rp_desc": "Erstellen Sie PDF-Berichte mit Methodik, Ergebnissen und Kalibrierungsdaten."
+});

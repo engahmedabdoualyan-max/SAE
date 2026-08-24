@@ -438,3 +438,29 @@ TRANSLATIONS['zh'] = {
 
     "vid_fallback": "视频需要HTTPS：部署到 sae.fimtosoft.com",
   "cmp_title": "走廊对比", "cmp_desc": "在相同MPR下对比两个走廊 — 地图、通行能力和限速实时更新", "cmp_a": "走廊 A", "cmp_b": "走廊 B", "cmp_speed": "限速" };
+
+
+/* Advanced platform sections (appended; EN fallback via t()) */
+Object.assign(TRANSLATIONS['zh'], {
+    "adv_mode": "高级IDM模式",
+    "run_sim": "运行",
+    "pause_sim": "暂停",
+    "reset_sim": "重置",
+    "ne_title": "路网编辑器",
+    "ne_desc": "在地图上绘制道路、交叉口和信号灯。可导入OpenDRIVE、SUMO或GeoJSON路网。",
+    "ne_tools": "工具",
+    "ne_import": "导入",
+    "ne_export": "导出",
+    "se_title": "信号配时编辑器",
+    "se_desc": "通过交互式相位图设计并优化信号相位方案。",
+    "cal_title": "标定向导",
+    "cal_desc": "上传现场数据(CSV)，自动标定IDM参数以拟合观测流量。",
+    "cal_upload": "上传现场数据",
+    "cal_results": "标定结果",
+    "aa_title": "高级分析",
+    "aa_desc": "基于现场数据标定的排放、噪声、安全、能耗与V2X分析。",
+    "sm_title": "场景管理器",
+    "sm_desc": "保存、加载、派生并比较仿真场景，支持完整版本管理。",
+    "rp_title": "报告与导出",
+    "rp_desc": "生成包含方法论、结果与标定数据的PDF报告。"
+});

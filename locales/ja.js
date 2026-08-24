@@ -414,3 +414,29 @@ TRANSLATIONS['ja'] = {
 
     "vid_fallback": "ビデオにはHTTPSが必要です。 sae.fimtosoft.comに部署",
   "cmp_title": "コリドー比較", "cmp_desc": "同じMPRで2コリドーを比較 — 地图・容量・制限速度がリアルタイム更新", "cmp_a": "コリドー A", "cmp_b": "コリドー B", "cmp_speed": "制限速度" };
+
+
+/* Advanced platform sections (appended; EN fallback via t()) */
+Object.assign(TRANSLATIONS['ja'], {
+    "adv_mode": "高度なIDMモード",
+    "run_sim": "実行",
+    "pause_sim": "一時停止",
+    "reset_sim": "リセット",
+    "ne_title": "ネットワークエディタ",
+    "ne_desc": "地図上に道路・交差点・信号を描画。OpenDRIVE / SUMO / GeoJSON ネットワークを取り込みできます。",
+    "ne_tools": "ツール",
+    "ne_import": "インポート",
+    "ne_export": "エクスポート",
+    "se_title": "信号現示エディタ",
+    "se_desc": "インタラクティブな現示図で信号フェーズ計画を設計・最適化します。",
+    "cal_title": "キャリブレーションウィザード",
+    "cal_desc": "現場データ(CSV)をアップロードし、観測交通量に合うようIDMパラメータを自動調整します。",
+    "cal_upload": "現場データをアップロード",
+    "cal_results": "キャリブレーション結果",
+    "aa_title": "高度な分析",
+    "aa_desc": "現場データで較正した排出・騒音・安全・エネルギー・V2Xの分析です。",
+    "sm_title": "シナリオマネージャ",
+    "sm_desc": "完全なバージョン管理付きでシミュレーションシナリオを保存・読込・フォーク・比較します。",
+    "rp_title": "レポートとエクスポート",
+    "rp_desc": "手法・結果・キャリブレーションデータを含むPDFレポートを生成します。"
+});

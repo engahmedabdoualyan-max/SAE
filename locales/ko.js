@@ -414,3 +414,29 @@ TRANSLATIONS['ko'] = {
 
     "vid_fallback": "돔떤뗐는 HTTPS 가가요. sae.fimtosoft.com에 배터뷰",
   "cmp_title": "공별 비교", "cmp_desc": "같은 MPR에서 두 공별 비교 — 지도,용량,제한 속도 실시간 업데이트", "cmp_a": "공별 A", "cmp_b": "공별 B", "cmp_speed": "제한 속도" };
+
+
+/* Advanced platform sections (appended; EN fallback via t()) */
+Object.assign(TRANSLATIONS['ko'], {
+    "adv_mode": "고급 IDM 모드",
+    "run_sim": "실행",
+    "pause_sim": "일시정지",
+    "reset_sim": "초기화",
+    "ne_title": "네트워크 편집기",
+    "ne_desc": "지도 위에 도로·교차로·신호를 그립니다. OpenDRIVE, SUMO, GeoJSON 네트워크를 가져올 수 있습니다.",
+    "ne_tools": "도구",
+    "ne_import": "가져오기",
+    "ne_export": "내보내기",
+    "se_title": "신호 현시 편집기",
+    "se_desc": "대화형 현시 다이어그램으로 신호 위상 계획을 설계하고 최적화합니다.",
+    "cal_title": "보정 마법사",
+    "cal_desc": "현장 데이터(CSV)를 업로드하고 관측 교통량에 맞춰 IDM 매개변수를 자동 보정합니다.",
+    "cal_upload": "현장 데이터 업로드",
+    "cal_results": "보정 결과",
+    "aa_title": "고급 분석",
+    "aa_desc": "현장 데이터 보정 기반의 배출·소음·안전·에너지·V2X 분석입니다.",
+    "sm_title": "시나리오 관리자",
+    "sm_desc": "전체 버전 관리와 함께 시뮬레이션 시나리오를 저장·로드·포크·비교합니다.",
+    "rp_title": "보고서 및 내보내기",
+    "rp_desc": "방법론, 결과, 보정 데이터를 포함한 PDF 보고서를 생성합니다."
+});

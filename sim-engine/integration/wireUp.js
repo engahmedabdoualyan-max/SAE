@@ -74,14 +74,24 @@
     if (el) el.textContent = data.vehicleCount || 0;
   }
 
+  function getFleet() {
+    /* app.js declares FLEET with top-level const → NOT on window; read the
+       global lexical binding when available, else fall back to window. */
+    if (typeof FLEET !== 'undefined' && FLEET) return FLEET;
+    return window.FLEET || {};
+  }
+
+  function getCorridors() {
+    if (typeof CORRIDORS !== 'undefined' && CORRIDORS) return CORRIDORS;
+    return window.CORRIDORS || {};
+  }
+
   function runAdvancedSim() {
     var canvas = document.getElementById('sim-canvas');
     if (!canvas) return;
-    var fleet = window.FLEET || {};
-    var corridors = window.CORRIDORS || {};
     var mpr = window.mprValue !== undefined ? window.mprValue : 30;
 
-    advancedSim = window.SAE_Sim.init(canvas, fleet, corridors, mpr, updateAdvKPIs);
+    advancedSim = window.SAE_Sim.init(canvas, getFleet(), getCorridors(), mpr, updateAdvKPIs);
     advancedSim.start();
     advPaused = false;
     updateAdvKPIs({ los: '-', avgSpeed: 0, vc: '0.00', delay: '0', queue: 0, vehicleCount: 0 });
