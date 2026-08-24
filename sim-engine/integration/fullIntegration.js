@@ -151,6 +151,8 @@
     var dt = 0.045; /* ~60fps → real-time seconds per frame */
     var simSpeed = 1;
     var mpr = (mprValue || 30) / 100;
+    var trailsOn = true;
+    var TRAIL_LEN = 12, TRAIL_ALPHA = 0.25;
 
     var network = buildNetwork(corridors);
     var demand = buildDemand(fleet, network, mprValue);
@@ -193,6 +195,7 @@
         x: -20 - Math.random() * 80,
         lane: lane,
         targetLane: lane,
+        hist: [],
         speed: idm.v0 * (0.4 + Math.random() * 0.3),
         idm: idm,
         type: type,
@@ -277,6 +280,13 @@
         v.speed = clamp(v.speed + acc * simDt * 10, 0, v.idm.v0 * 1.2);
         v.x += v.speed * 0.3 * simSpeed;
 
+        /* trail history */
+        if (trailsOn) {
+          if (!v.hist) v.hist = [];
+          v.hist.push([v.x, v.lane]);
+          if (v.hist.length > TRAIL_LEN) v.hist.shift();
+        }
+
         /* lane change */
         if (v.lane !== v.targetLane) {
           var diff = v.targetLane - v.lane;
@@ -342,6 +352,25 @@
       ctx.strokeRect(0, ROAD_TOP, W, LANE_COUNT * LANE_W);
     }
 
+    function drawTrails() {
+      if (!trailsOn) return;
+      ctx.lineWidth = 2;
+      for (var i = 0; i < vehicles.length; i++) {
+        var v = vehicles[i];
+        var h = v.hist;
+        if (!h || h.length < 3) continue;
+        for (var k = 1; k < h.length; k++) {
+          ctx.globalAlpha = TRAIL_ALPHA * (k / h.length);
+          ctx.strokeStyle = v.type.color || '#00AAFF';
+          ctx.beginPath();
+          ctx.moveTo(h[k - 1][0], ROAD_TOP + h[k - 1][1] * LANE_W + LANE_W * 0.5);
+          ctx.lineTo(h[k][0], ROAD_TOP + h[k][1] * LANE_W + LANE_W * 0.5);
+          ctx.stroke();
+        }
+      }
+      ctx.globalAlpha = 1;
+    }
+
     function drawVehicles() {
       for (var i = 0; i < vehicles.length; i++) {
         var v = vehicles[i];
@@ -395,6 +424,7 @@
       if (!RUNNING || paused) { animId = null; return; }
       step();
       drawRoad();
+      drawTrails();
       drawVehicles();
       drawSpeedChart();
       animId = requestAnimationFrame(loop);
@@ -409,8 +439,9 @@
         RUNNING = true; paused = false;
         n = Math.max(1, Math.min(3600, n | 0));
         for (var i = 0; i < n; i++) { step(); }
-        drawRoad(); drawVehicles(); drawSpeedChart();
+        drawRoad(); drawTrails(); drawVehicles(); drawSpeedChart();
       },
+      setTrails: function (on) { trailsOn = !!on; },
       reset: function () {
         RUNNING = false;
         paused = false;
@@ -460,6 +491,7 @@
     pause: function () { if (simInstance) simInstance.pause(); },
     resume: function () { if (simInstance) simInstance.resume(); },
     tick: function (n) { if (simInstance && simInstance.tick) simInstance.tick(n); },
+    setTrails: function (on) { if (simInstance && simInstance.setTrails) simInstance.setTrails(on); },
     reset: function () { if (simInstance) simInstance.reset(); },
     setSpeed: function (s) { if (simInstance) simInstance.setSpeed(s); },
     setMPR: function (m) { if (simInstance) simInstance.setMPR(m); },

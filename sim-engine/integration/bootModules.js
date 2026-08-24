@@ -10,6 +10,9 @@
  */
 import { initNavigation } from './navigationManager.js';
 import { createNetworkEditor } from '../editor/networkEditor.js';
+import { getEmissionFactors } from '../analysis/emissions.js';
+import { getNoiseLevel } from '../analysis/noise.js';
+import { v2xPenetrationImpact } from '../analysis/v2x.js';
 
 /** Reuse the app-wide Google Maps script (single load policy). */
 function ensureGmaps(cb) {
@@ -85,6 +88,9 @@ function initRealNetworkEditor() {
 function boot() {
   if (window.__saeModulesBooted) return;
   window.__saeModulesBooted = true;
+
+  /* Expose physics-backed analysis functions to the classic-script layer. */
+  window.SAE_AnalysisEngine = { getEmissionFactors, getNoiseLevel, v2xPenetrationImpact };
 
   initNavigation([
     { id: 'hero', label: 'Home' },

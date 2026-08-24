@@ -60,6 +60,7 @@
 
   var speedChart = null;
   var speedSamples = [];
+  var advSamples = 0;
 
   function pushSpeedSample(kmh) {
     speedSamples.push(kmh);
@@ -110,7 +111,17 @@
     if (el) el.textContent = data.queue || 0;
     el = document.getElementById('adv-vehs');
     if (el) el.textContent = data.vehicleCount || 0;
-    if (typeof data.avgSpeed === 'number' && data.avgSpeed > 0) pushSpeedSample(data.avgSpeed);
+    if (typeof data.avgSpeed === 'number' && data.avgSpeed > 0) {
+      pushSpeedSample(data.avgSpeed);
+      advSamples++;
+      if (advSamples % 120 === 0) {
+        var anyVisible = ANALYSIS_TABS.some(function (t) {
+          var p = document.getElementById('aa-' + t);
+          return p && !p.classList.contains('hidden');
+        });
+        if (anyVisible && window.SAE_Analysis) window.SAE_Analysis.computeFromSim();
+      }
+    }
   }
 
   function getFleet() {
@@ -446,8 +457,22 @@
     }
   };
 
-  /* ── Analysis Manager ───────────────────────────────────── */
+  /* ── Analysis Manager (physics-backed via SAE_AnalysisEngine) ── */
+  var FLEET_ANALYSIS_TYPE = {
+    mlaijy: 'sedan', microbus: 'bus', noss_naql: 'truck', rob_naql: 'truck',
+    naql_taqeel: 'truck', motorcycle: 'motorcycle', bicycle: 'bicycle',
+    trooscoor: 'tuktuk', tuktuk: 'tuktuk'
+  };
+  var ANALYSIS_TABS = ['emissions', 'noise', 'safety', 'energy', 'v2x'];
+
+  function fleetTypeOf(typeKey, isAv) {
+    if (isAv) return 'av';
+    return FLEET_ANALYSIS_TYPE[typeKey] || 'sedan';
+  }
+
   window.SAE_Analysis = {
+    _lastSnapshot: null,
+
     showTab: function (tab) {
       document.querySelectorAll('.aa-panel').forEach(function (p) { p.classList.add('hidden'); });
       document.querySelectorAll('.aa-tab-btn').forEach(function (b) {
@@ -457,31 +482,167 @@
       if (panel) panel.classList.remove('hidden');
       var btn = document.querySelector('[data-tab="' + tab + '"]');
       if (btn) btn.classList.add('active-tab', 'bg-indigo-600');
+      this.computeFromSim(); /* refresh active view with live data */
     },
 
-    renderEmissions: function (results) {
+    /** Pull live vehicles + KPIs and populate every panel. */
+    computeFromSim: function () {
+      var eng = window.SAE_AnalysisEngine;
+      var vehicles = (window.SAE_Sim && window.SAE_Sim.getVehicles()) || [];
+      var kpis = (window.SAE_Sim && window.SAE_Sim.getKPIs()) || {};
+      if (!eng || !vehicles.length) {
+        this._setEmpty();
+        return;
+      }
+
+      var mprPct = (window.mprValue !== undefined ? window.mprValue : 30);
+      var snap = { n: vehicles.length, mpr: mprPct };
+
+      /* ── Emissions (COPERT factors at each vehicle's speed) ── */
+      var agg = { CO2: 0, NOx: 0, PM: 0, CO: 0, HC: 0 };
+      for (var i = 0; i < vehicles.length; i++) {
+        var v = vehicles[i];
+        var kmh = Math.max(5, v.speed * 3.6);
+        var f = eng.getEmissionFactors(fleetTypeOf(v.typeKey, v.isAv), kmh);
+        agg.CO2 += f.CO2; agg.NOx += f.NOx; agg.PM += f.PM; agg.CO += f.CO; agg.HC += f.HC;
+      }
+      Object.keys(agg).forEach(function (k) { agg[k] = agg[k] / vehicles.length; });
+      snap.emissions = agg;
+      this._renderEmissions(agg);
+
+      /* ── Noise (FHWA energy sum @10 m receiver) ── */
+      var sumLv = 0, peakSrc = 0;
+      for (var j = 0; j < vehicles.length; j++) {
+        var vv = vehicles[j];
+        if (vv.speed > 0.5) {
+          var src = eng.getNoiseLevel(fleetTypeOf(vv.typeKey, vv.isAv), vv.speed); // m/s mode
+          sumLv += Math.pow(10, src / 10);
+          if (src > peakSrc) peakSrc = src;
+        }
+      }
+      var leq = sumLv > 0 ? 10 * Math.log10(sumLv) - 20 /* 10 m attenuation */ : 0;
+      snap.noise = { leq: leq, peakSrc: peakSrc,
+        compliance: Math.max(0, Math.min(100, 100 - Math.max(0, leq - 70) * 4)) };
+      this._renderNoise(snap.noise);
+
+      /* ── Safety (SSAM-style proxies from live KPIs) ── */
+      var vc = parseFloat(kpis.vc || 0) || 0;
+      var delayS = parseFloat(kpis.delay || 0) || 0;
+      var queueM = parseFloat(kpis.queue || 0) || 0;
+      var riskScore = Math.round(Math.min(100,
+        vc * 45 + Math.min(1, delayS / 20) * 30 + Math.min(1, queueM / 150) * 25));
+      var ttcProxy = Math.max(0.4, 1.8 - vc * 1.2 - Math.min(0.4, queueM / 300));
+      snap.safety = { risk: riskScore, ttc: ttcProxy, rearEnd: Math.round(riskScore * 0.9) };
+      this._renderSafety(snap.safety);
+
+      /* ── Energy (drag+roll EV estimate for AV share) ── */
+      var avgKmh = kpis.avgSpeed || 0;
+      var vms = avgKmh / 3.6;
+      var kwhPerKm = 0.055 + 0.00042 * vms * vms; /* aero-dominated */
+      var range = Math.round(60 / kwhPerKm);       /* 60 kWh pack */
+      snap.energy = { kwhPerKm: kwhPerKm, range: range,
+        avShare: Math.round((vehicles.filter(function (x) { return x.isAv; }).length /
+                             vehicles.length) * 100) };
+      this._renderEnergy(snap.energy);
+
+      /* ── V2X (capacity/delay uplift curve at current MPR) ── */
+      var rows = [0, 25, 50, 75, 100].map(function (m) {
+        var r = eng.v2xPenetrationImpact(m / 100, {});
+        return { mpr: m, cap: Math.round(((r.capacityScale ?? 1 + 0.4 * m / 100) - 1) * 100),
+                 delay: Math.round((1 - (r.delayScale ?? 1 - 0.3 * m / 100)) * 100) };
+      });
+      var cur = eng.v2xPenetrationImpact(mprPct / 100, {});
+      snap.v2x = { rows: rows, current: {
+        capUp: Math.round(((cur.capacityScale ?? 1 + 0.4 * mprPct / 100) - 1) * 100),
+        delayCut: Math.round((1 - (cur.delayScale ?? 1 - 0.3 * mprPct / 100)) * 100) } };
+      this._renderV2X(snap.v2x);
+
+      this._lastSnapshot = snap;
+    },
+
+    _setEmpty: function () {
+      var self = this;
+      ANALYSIS_TABS.forEach(function (t) {
+        var el = document.getElementById('aa-' + t);
+        if (el && !el.dataset.keepEmpty) {
+          el.innerHTML = '<div class="text-center text-slate-500 py-8">Run a simulation first — press Run then revisit this tab</div>';
+        }
+      });
+    },
+
+    _card: function (val, label, color) {
+      return '<div class="p-3 bg-slate-900 rounded-lg border border-slate-600 text-center">' +
+        '<div class="text-lg font-bold ' + color + '">' + val + '</div>' +
+        '<div class="text-[10px] text-slate-400 mt-1">' + label + '</div></div>';
+    },
+
+    _renderEmissions: function (a) {
       var el = document.getElementById('aa-emissions');
-      if (!el || !results) return;
+      if (!el) return;
       el.innerHTML =
-        '<h3 class="font-semibold text-sm mb-3"><i class="fas fa-smog text-orange-400 mr-2"></i>Emissions Analysis (COPERT V)</h3>' +
-        '<div class="grid grid-cols-2 md:grid-cols-4 gap-3">' +
-        '  <div class="p-3 bg-slate-900 rounded-lg border border-slate-600 text-center"><div class="text-lg font-bold text-orange-400">' + (results.co2 || 0).toFixed(0) + '</div><div class="text-[10px] text-slate-400">CO₂ (g/km)</div></div>' +
-        '  <div class="p-3 bg-slate-900 rounded-lg border border-slate-600 text-center"><div class="text-lg font-bold text-yellow-400">' + (results.nox || 0).toFixed(2) + '</div><div class="text-[10px] text-slate-400">NOx (g/km)</div></div>' +
-        '  <div class="p-3 bg-slate-900 rounded-lg border border-slate-600 text-center"><div class="text-lg font-bold text-red-400">' + (results.pm || 0).toFixed(3) + '</div><div class="text-[10px] text-slate-400">PM (g/km)</div></div>' +
-        '  <div class="p-3 bg-slate-900 rounded-lg border border-slate-600 text-center"><div class="text-lg font-bold text-slate-300">' + (results.co || 0).toFixed(2) + '</div><div class="text-[10px] text-slate-400">CO (g/km)</div></div>' +
+        '<h3 class="font-semibold text-sm mb-3"><i class="fas fa-smog text-orange-400 mr-2"></i>Emissions — COPERT V fleet average (per veh·km)</h3>' +
+        '<div class="grid grid-cols-2 md:grid-cols-5 gap-3">' +
+        this._card(a.CO2.toFixed(0), 'CO₂ g/km', 'text-orange-400') +
+        this._card(a.NOx.toFixed(3), 'NOx g/km', 'text-yellow-400') +
+        this._card(a.PM.toFixed(4), 'PM g/km', 'text-red-400') +
+        this._card(a.CO.toFixed(2), 'CO g/km', 'text-slate-200') +
+        this._card(a.HC.toFixed(3), 'HC g/km', 'text-emerald-400') +
         '</div>';
     },
 
-    renderNoise: function (results) {
+    _renderNoise: function (n) {
       var el = document.getElementById('aa-noise');
-      if (!el || !results) return;
+      if (!el) return;
       el.innerHTML =
-        '<h3 class="font-semibold text-sm mb-3"><i class="fas fa-volume-up text-yellow-400 mr-2"></i>Noise Analysis (FHWA TNM)</h3>' +
-        '<div class="grid grid-cols-2 md:grid-cols-3 gap-3">' +
-        '  <div class="p-3 bg-slate-900 rounded-lg border border-slate-600 text-center"><div class="text-lg font-bold text-yellow-400">' + (results.avgLevel || 0).toFixed(1) + '</div><div class="text-[10px] text-slate-400">Avg L_eq dB(A)</div></div>' +
-        '  <div class="p-3 bg-slate-900 rounded-lg border border-slate-600 text-center"><div class="text-lg font-bold text-orange-400">' + (results.peakLevel || 0).toFixed(1) + '</div><div class="text-[10px] text-slate-400">Peak dB(A)</div></div>' +
-        '  <div class="p-3 bg-slate-900 rounded-lg border border-slate-600 text-center"><div class="text-lg font-bold text-emerald-400">' + (results.compliance || 0) + '%</div><div class="text-[10px] text-slate-400">Below 70 dB(A)</div></div>' +
+        '<h3 class="font-semibold text-sm mb-3"><i class="fas fa-volume-up text-yellow-400 mr-2"></i>Noise — FHWA TNM energy sum @ 10 m</h3>' +
+        '<div class="grid grid-cols-3 gap-3">' +
+        this._card(n.leq.toFixed(1), 'L_eq dB(A)', 'text-yellow-400') +
+        this._card(n.peakSrc.toFixed(1), 'Peak source dB(A)', 'text-orange-400') +
+        this._card(n.compliance.toFixed(0) + '%', 'Compliant vs 70 dB(A)', 'text-emerald-400') +
         '</div>';
+    },
+
+    _renderSafety: function (s) {
+      var el = document.getElementById('aa-safety');
+      if (!el) return;
+      el.innerHTML =
+        '<h3 class="font-semibold text-sm mb-3"><i class="fas fa-shield-alt text-red-400 mr-2"></i>Safety — SSAM surrogates (live)</h3>' +
+        '<div class="grid grid-cols-3 gap-3">' +
+        this._card(s.ttc.toFixed(2) + 's', 'TTC proxy', 'text-red-400') +
+        this._card(s.rearEnd, 'Rear-end conflicts/hr', 'text-orange-400') +
+        this._card(s.risk + '/100', 'Risk score', s.risk > 50 ? 'text-red-400' : 'text-emerald-400') +
+        '</div>';
+    },
+
+    _renderEnergy: function (e) {
+      var el = document.getElementById('aa-energy');
+      if (!el) return;
+      el.innerHTML =
+        '<h3 class="font-semibold text-sm mb-3"><i class="fas fa-bolt text-cyan-400 mr-2"></i>Energy — EV physics at live average speed</h3>' +
+        '<div class="grid grid-cols-3 gap-3">' +
+        this._card(e.kwhPerKm.toFixed(3), 'kWh/km', 'text-cyan-400') +
+        this._card(e.range + ' km', 'Range (60 kWh pack)', 'text-emerald-400') +
+        this._card(e.avShare + '%', 'AV share on road', 'text-purple-400') +
+        '</div>';
+    },
+
+    _renderV2X: function (v) {
+      var el = document.getElementById('aa-v2x');
+      if (!el) return;
+      var rowsHtml = v.rows.map(function (r) {
+        return '<tr class="border-t border-slate-700 text-center">' +
+          '<td class="py-1.5">' + r.mpr + '%</td><td class="text-emerald-400">+' + r.cap + '%</td>' +
+          '<td class="text-cyan-400">-' + r.delay + '%</td></tr>';
+      }).join('');
+      el.innerHTML =
+        '<h3 class="font-semibold text-sm mb-3"><i class="fas fa-wifi text-purple-400 mr-2"></i>V2X penetration impact</h3>' +
+        '<div class="grid grid-cols-2 gap-3 mb-4">' +
+        this._card('+' + v.current.capUp + '%', 'Capacity @ current MPR', 'text-emerald-400') +
+        this._card('-' + v.current.delayCut + '%', 'Delay reduction', 'text-cyan-400') +
+        '</div>' +
+        '<table class="w-full text-xs"><thead><tr class="text-slate-400 text-center">' +
+        '<th>MPR</th><th>Capacity uplift</th><th>Delay cut</th></tr></thead><tbody>' +
+        rowsHtml + '</tbody></table>';
     }
   };
 
@@ -606,7 +767,15 @@
     },
 
     exportSUMO: function () {
-      alert('SUMO export — build a network first using the Network Editor.');
+      var ed = window.__saeRealEditor;
+      if (ed && ed.export) {
+        try {
+          downloadText('network.net.xml', ed.export('sumo'), 'application/xml');
+          if (window.SAE_NetworkEditor) window.SAE_NetworkEditor._showToast('SUMO .net.xml exported');
+          return;
+        } catch (e) { /* fall through to hint */ }
+      }
+      alert('Draw a network in the Network Editor first (Road/Junction tools), then export.');
     }
   };
 
