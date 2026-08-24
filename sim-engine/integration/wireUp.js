@@ -13,6 +13,18 @@
     if (window.SAE_Sections) {
       window.SAE_Sections.injectAll();
     }
+    /* Panels create their own containers inside the injected sections
+       (section ids come from newSections.js: #scenario-manager, #reports-section). */
+    if (window.SAE_ExportPanel && typeof window.SAE_ExportPanel.init === 'function') {
+      window.SAE_ExportPanel.init('reports-section');
+    } else if (typeof window.initExportPanel === 'function') {
+      window.initExportPanel('reports-section');
+    }
+    if (window.SAE_ComparisonPanel && typeof window.SAE_ComparisonPanel.init === 'function') {
+      window.SAE_ComparisonPanel.init('scenario-manager');
+    } else if (typeof window.initComparisonPanel === 'function') {
+      window.initComparisonPanel('scenario-manager');
+    }
   }
 
   /* ── Toggle simulation mode ─────────────────────────────── */

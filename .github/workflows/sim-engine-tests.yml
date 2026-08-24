@@ -1,0 +1,38 @@
+name: Sim Engine Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  engine:
+    name: Engine Tests (Node ${{ matrix.node }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node: ['18', '20', '22']
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+
+      - name: Run engine test suite
+        run: node tests/run-all.js
+
+      - name: Syntax check all sim-engine files
+        run: |
+          fails=0
+          count=0
+          while IFS= read -r -d '' f; do
+            count=$((count + 1))
+            if ! node --check "$f"; then
+              fails=$((fails + 1))
+              echo "SYNTAX FAIL: $f"
+            fi
+          done < <(find sim-engine -type f -name '*.js' -print0 | sort -z)
+          echo "node --check passed over $count files, $fails failures"
+          exit "$fails"
