@@ -391,7 +391,7 @@ def get_network(network_id: int, db: DbSession, current_user: CurrentUser) -> Ne
 
 
 @router.delete("/{network_id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_network(network_id: int, db: DbSession, current_user: CurrentUser) -> None:
+def delete_network(network_id: int, db: DbSession, current_user: CurrentUser):
     network = db.get(Network, network_id)
     if network is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Network not found")
