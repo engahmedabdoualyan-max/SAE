@@ -7,6 +7,7 @@
 
   var simMode = 'simple'; /* 'simple' or 'advanced' */
   var advancedSim = null;
+  var advPaused = false;
 
   /* ── Inject new sections ────────────────────────────────── */
   function injectSections() {
@@ -82,17 +83,19 @@
 
     advancedSim = window.SAE_Sim.init(canvas, fleet, corridors, mpr, updateAdvKPIs);
     advancedSim.start();
+    advPaused = false;
     updateAdvKPIs({ los: '-', avgSpeed: 0, vc: '0.00', delay: '0', queue: 0, vehicleCount: 0 });
   }
 
   function pauseAdvancedSim() {
-    if (advancedSim) {
-      if (advancedSim._paused) { advancedSim.resume(); } else { advancedSim.pause(); }
-    }
+    if (!advancedSim) return;
+    if (advPaused) { advancedSim.resume(); advPaused = false; }
+    else { advancedSim.pause(); advPaused = true; }
   }
 
   function resetAdvancedSim() {
     if (advancedSim) { advancedSim.reset(); advancedSim = null; }
+    advPaused = false;
   }
 
   /* ── Network Editor Manager ─────────────────────────────── */

@@ -970,6 +970,27 @@
     "nav_refs": "References",
 "sim_title": "Live Traffic Flow Simulation",
     "sim_desc": "Visualize how increasing AV penetration smooths chaotic Egyptian Ring Road traffic in real-time.",
+    "adv_mode": "Advanced IDM Mode",
+    "run_sim": "Run",
+    "pause_sim": "Pause",
+    "reset_sim": "Reset",
+    "ne_title": "Network Editor",
+    "ne_desc": "Draw roads, junctions and signals on the map. Import OpenDRIVE, SUMO or GeoJSON networks.",
+    "ne_tools": "Tools",
+    "ne_import": "Import",
+    "ne_export": "Export",
+    "se_title": "Signal Timing Editor",
+    "se_desc": "Design and optimize traffic signal phase plans with an interactive phase diagram.",
+    "cal_title": "Calibration Wizard",
+    "cal_desc": "Upload field data (CSV) and auto-calibrate IDM parameters to match observed counts.",
+    "cal_upload": "Upload Field Data",
+    "cal_results": "Calibration Results",
+    "aa_title": "Advanced Analysis",
+    "aa_desc": "Emissions, noise, safety, energy and V2X analysis calibrated with field data.",
+    "sm_title": "Scenario Manager",
+    "sm_desc": "Save, load, fork and compare simulation scenarios with full versioning.",
+    "rp_title": "Reports & Export",
+    "rp_desc": "Generate PDF reports with methodology, results and calibration data.",
     "w_tau": "Weighted Avg tau (s)",
     "w_cap": "Est. Capacity (veh/hr/lane)",
     "w_h": "Human %",
@@ -1351,7 +1372,8 @@
 
     function t(key) {
         const langData = TRANSLATIONS[currentLang] || TRANSLATIONS['en'];
-        return langData ? (langData[key] || key) : key;
+        if (!langData) return key;
+        return langData[key] || (TRANSLATIONS['en'] && TRANSLATIONS['en'][key]) || key;
     }
 
     function _applyLanguageData(lang) {
