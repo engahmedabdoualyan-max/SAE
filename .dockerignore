@@ -1,0 +1,26 @@
+# VCS / CI
+.git
+.github
+.gitignore
+
+# Dependencies
+node_modules
+.venv
+backend/__pycache__
+**/__pycache__
+
+# Legacy / non-deployed code
+legacy-streamlit
+tests
+
+# Docs & local files
+*.md
+docs
+.env
+.env.*
+*.log
+
+# Docker files themselves are copied per-context; root context only needs the site
+backend
+docker-compose.yml
+Dockerfile

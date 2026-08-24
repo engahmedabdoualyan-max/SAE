@@ -1,0 +1,14 @@
+{
+  "name": "sim-engine",
+  "version": "1.0.0",
+  "description": "Micro traffic simulation engine: IDM car-following, MOBIL lane changes, signal control, KPI collection.",
+  "type": "module",
+  "main": "index.js",
+  "exports": {
+    ".": "./index.js"
+  },
+  "engines": {
+    "node": ">=16"
+  },
+  "license": "MIT"
+}

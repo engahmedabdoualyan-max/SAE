@@ -1,0 +1,217 @@
+/**
+ * @file newSections.js — Generates HTML for new advanced sections.
+ * Injected into index.html before the footer.
+ */
+(function () {
+  'use strict';
+
+  function createNetworkEditorSection() {
+    return '' +
+    '<section id="network-editor" class="case-view py-16 bg-slate-800 text-white">' +
+    '  <div class="container mx-auto px-4">' +
+    '    <div class="text-center mb-10">' +
+    '      <h2 class="text-2xl md:text-3xl font-bold mb-3" data-key="ne_title">Network Editor</h2>' +
+    '      <p class="text-slate-300 max-w-3xl mx-auto text-sm" data-key="ne_desc">Draw roads, junctions, and signals on the map. Import OpenDRIVE, SUMO, or GeoJSON networks.</p>' +
+    '    </div>' +
+    '    <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">' +
+    '      <div class="lg:col-span-1">' +
+    '        <div class="bg-slate-900 rounded-xl p-4 border border-slate-700 space-y-3">' +
+    '          <h3 class="font-semibold text-sm text-slate-300" data-key="ne_tools">Tools</h3>' +
+    '          <div class="flex flex-wrap gap-2">' +
+    '            <button onclick="SAE_NetworkEditor && SAE_NetworkEditor.selectTool(\'select\')" class="ne-tool-btn px-3 py-1.5 bg-slate-700 hover:bg-slate-600 rounded-lg text-xs font-semibold transition-all active-tool"><i class="fas fa-mouse-pointer mr-1"></i>Select</button>' +
+    '            <button onclick="SAE_NetworkEditor && SAE_NetworkEditor.selectTool(\'road\')" class="ne-tool-btn px-3 py-1.5 bg-slate-700 hover:bg-slate-600 rounded-lg text-xs font-semibold transition-all"><i class="fas fa-road mr-1"></i>Road</button>' +
+    '            <button onclick="SAE_NetworkEditor && SAE_NetworkEditor.selectTool(\'junction\')" class="ne-tool-btn px-3 py-1.5 bg-slate-700 hover:bg-slate-600 rounded-lg text-xs font-semibold transition-all"><i class="fas fa-project-diagram mr-1"></i>Junction</button>' +
+    '            <button onclick="SAE_NetworkEditor && SAE_NetworkEditor.selectTool(\'signal\')" class="ne-tool-btn px-3 py-1.5 bg-slate-700 hover:bg-slate-600 rounded-lg text-xs font-semibold transition-all"><i class="fas fa-traffic-light mr-1"></i>Signal</button>' +
+    '            <button onclick="SAE_NetworkEditor && SAE_NetworkEditor.selectTool(\'delete\')" class="ne-tool-btn px-3 py-1.5 bg-red-700 hover:bg-red-600 rounded-lg text-xs font-semibold transition-all"><i class="fas fa-trash mr-1"></i>Delete</button>' +
+    '          </div>' +
+    '          <div class="border-t border-slate-700 pt-3 space-y-2">' +
+    '            <button onclick="SAE_NetworkEditor && SAE_NetworkEditor.undo()" class="w-full px-3 py-1.5 bg-slate-700 hover:bg-slate-600 rounded-lg text-xs"><i class="fas fa-undo mr-1"></i>Undo (Ctrl+Z)</button>' +
+    '            <button onclick="SAE_NetworkEditor && SAE_NetworkEditor.redo()" class="w-full px-3 py-1.5 bg-slate-700 hover:bg-slate-600 rounded-lg text-xs"><i class="fas fa-redo mr-1"></i>Redo (Ctrl+Shift+Z)</button>' +
+    '          </div>' +
+    '          <div class="border-t border-slate-700 pt-3 space-y-2">' +
+    '            <h4 class="text-xs text-slate-400" data-key="ne_import">Import</h4>' +
+    '            <input type="file" id="ne-import-file" accept=".xodr,.net.xml,.geojson,.json" class="hidden" onchange="SAE_NetworkEditor && SAE_NetworkEditor.importFile(this.files[0])">' +
+    '            <button onclick="document.getElementById(\'ne-import-file\').click()" class="w-full px-3 py-1.5 bg-indigo-700 hover:bg-indigo-600 rounded-lg text-xs"><i class="fas fa-upload mr-1"></i>Import File</button>' +
+    '            <h4 class="text-xs text-slate-400 mt-2" data-key="ne_export">Export</h4>' +
+    '            <div class="grid grid-cols-2 gap-1">' +
+    '              <button onclick="SAE_NetworkEditor && SAE_NetworkEditor.exportAs(\'json\')" class="px-2 py-1 bg-emerald-700 hover:bg-emerald-600 rounded text-[10px]">JSON</button>' +
+    '              <button onclick="SAE_NetworkEditor && SAE_NetworkEditor.exportAs(\'opendrive\')" class="px-2 py-1 bg-emerald-700 hover:bg-emerald-600 rounded text-[10px]">OpenDRIVE</button>' +
+    '              <button onclick="SAE_NetworkEditor && SAE_NetworkEditor.exportAs(\'sumo\')" class="px-2 py-1 bg-emerald-700 hover:bg-emerald-600 rounded text-[10px]">SUMO</button>' +
+    '              <button onclick="SAE_NetworkEditor && SAE_NetworkEditor.exportAs(\'geojson\')" class="px-2 py-1 bg-emerald-700 hover:bg-emerald-600 rounded text-[10px]">GeoJSON</button>' +
+    '            </div>' +
+    '          </div>' +
+    '          <div id="ne-stats" class="border-t border-slate-700 pt-3 text-xs text-slate-400 space-y-1">' +
+    '            <div>Nodes: <span id="ne-node-count" class="text-white font-semibold">0</span></div>' +
+    '            <div>Edges: <span id="ne-edge-count" class="text-white font-semibold">0</span></div>' +
+    '            <div>Lanes: <span id="ne-lane-count" class="text-white font-semibold">0</span></div>' +
+    '          </div>' +
+    '        </div>' +
+    '      </div>' +
+    '      <div class="lg:col-span-3">' +
+    '        <div id="ne-map" class="bg-slate-700 rounded-xl border border-slate-600" style="height:500px;"></div>' +
+    '        <div id="ne-properties" class="hidden mt-4 bg-slate-900 rounded-xl p-4 border border-slate-700">' +
+    '          <h3 class="font-semibold text-sm text-slate-300 mb-3">Properties</h3>' +
+    '          <div id="ne-props-content" class="space-y-2 text-xs"></div>' +
+    '        </div>' +
+    '      </div>' +
+    '    </div>' +
+    '  </div>' +
+    '</section>';
+  }
+
+  function createSignalEditorSection() {
+    return '' +
+    '<section id="signal-editor" class="case-view py-16 bg-slate-900 text-white">' +
+    '  <div class="container mx-auto px-4">' +
+    '    <div class="text-center mb-10">' +
+    '      <h2 class="text-2xl md:text-3xl font-bold mb-3" data-key="se_title">Signal Timing Editor</h2>' +
+    '      <p class="text-slate-300 max-w-3xl mx-auto text-sm" data-key="se_desc">Design and optimize traffic signal phase plans with visual drag-to-edit phase diagrams.</p>' +
+    '    </div>' +
+    '    <div class="max-w-4xl mx-auto">' +
+    '      <div class="bg-slate-800 rounded-xl p-6 border border-slate-700">' +
+    '        <div class="flex justify-between items-center mb-4">' +
+    '          <div class="flex gap-2">' +
+    '            <button onclick="SAE_SignalEditor && SAE_SignalEditor.addPhase()" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 rounded-lg text-xs font-semibold"><i class="fas fa-plus mr-1"></i>Add Phase</button>' +
+    '            <button onclick="SAE_SignalEditor && SAE_SignalEditor.removePhase()" class="px-3 py-1.5 bg-red-600 hover:bg-red-700 rounded-lg text-xs font-semibold"><i class="fas fa-minus mr-1"></i>Remove Phase</button>' +
+    '          </div>' +
+    '          <div class="text-xs text-slate-400">Cycle: <span id="se-cycle-time" class="text-white font-semibold">90s</span></div>' +
+    '        </div>' +
+    '        <div id="se-phase-diagram" class="space-y-3"></div>' +
+    '        <div class="mt-4 grid grid-cols-3 gap-4 text-xs text-slate-400">' +
+    '          <div class="flex items-center gap-2"><span class="w-3 h-3 bg-emerald-500 rounded"></span> Green</div>' +
+    '          <div class="flex items-center gap-2"><span class="w-3 h-3 bg-yellow-500 rounded"></span> Yellow</div>' +
+    '          <div class="flex items-center gap-2"><span class="w-3 h-3 bg-red-500 rounded"></span> Red</div>' +
+    '        </div>' +
+    '      </div>' +
+    '    </div>' +
+    '  </div>' +
+    '</section>';
+  }
+
+  function createCalibrationSection() {
+    return '' +
+    '<section id="calibration-section" class="case-view py-16 bg-slate-800 text-white">' +
+    '  <div class="container mx-auto px-4">' +
+    '    <div class="text-center mb-10">' +
+    '      <h2 class="text-2xl md:text-3xl font-bold mb-3" data-key="cal_title">Calibration Wizard</h2>' +
+    '      <p class="text-slate-300 max-w-3xl mx-auto text-sm" data-key="cal_desc">Upload field data (CSV) and auto-calibrate IDM parameters to match observed traffic counts.</p>' +
+    '    </div>' +
+    '    <div class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6">' +
+    '      <div class="bg-slate-900 rounded-xl p-6 border border-slate-700">' +
+    '        <h3 class="font-semibold text-sm mb-3" data-key="cal_upload">Upload Field Data</h3>' +
+    '        <p class="text-xs text-slate-400 mb-3">CSV format: edgeId, observedFlow (veh/hr)</p>' +
+    '        <input type="file" id="cal-csv-upload" accept=".csv" class="hidden" onchange="SAE_Calibration && SAE_Calibration.uploadCSV(this.files[0])">' +
+    '        <button onclick="document.getElementById(\'cal-csv-upload\').click()" class="w-full px-4 py-2 bg-indigo-600 hover:bg-indigo-700 rounded-lg text-sm font-semibold"><i class="fas fa-file-csv mr-2"></i>Choose CSV File</button>' +
+    '        <div id="cal-upload-status" class="mt-3 text-xs text-slate-400"></div>' +
+    '        <div class="mt-4">' +
+    '          <button onclick="SAE_Calibration && SAE_Calibration.run()" class="w-full px-4 py-2 bg-emerald-600 hover:bg-emerald-700 rounded-lg text-sm font-semibold"><i class="fas fa-play mr-2"></i>Run Calibration</button>' +
+    '        </div>' +
+    '        <div id="cal-progress" class="hidden mt-4">' +
+    '          <div class="w-full bg-slate-700 rounded-full h-2 overflow-hidden">' +
+    '            <div id="cal-progress-bar" class="h-full bg-emerald-500 transition-all" style="width:0%"></div>' +
+    '          </div>' +
+    '          <div id="cal-progress-text" class="text-xs text-slate-400 mt-1">Running...</div>' +
+    '        </div>' +
+    '      </div>' +
+    '      <div class="bg-slate-900 rounded-xl p-6 border border-slate-700">' +
+    '        <h3 class="font-semibold text-sm mb-3" data-key="cal_results">Calibration Results</h3>' +
+    '        <div id="cal-results" class="space-y-3">' +
+    '          <div class="text-center text-slate-500 text-sm py-8">Upload data and run calibration to see results</div>' +
+    '        </div>' +
+    '      </div>' +
+    '    </div>' +
+    '  </div>' +
+    '</section>';
+  }
+
+  function createAdvancedAnalysisSection() {
+    return '' +
+    '<section id="advanced-analysis" class="case-view py-16 bg-slate-900 text-white">' +
+    '  <div class="container mx-auto px-4">' +
+    '    <div class="text-center mb-10">' +
+    '      <h2 class="text-2xl md:text-3xl font-bold mb-3" data-key="aa_title">Advanced Analysis</h2>' +
+    '      <p class="text-slate-300 max-w-3xl mx-auto text-sm" data-key="aa_desc">Emissions, noise, safety, energy, and V2X analysis with field-data calibration.</p>' +
+    '    </div>' +
+    '    <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">' +
+    '      <button onclick="SAE_Analysis && SAE_Analysis.showTab(\'emissions\')" class="aa-tab-btn px-4 py-3 bg-slate-800 hover:bg-slate-700 rounded-xl border border-slate-600 transition-all active-tab" data-tab="emissions"><i class="fas fa-smog text-orange-400 text-xl mb-1"></i><div class="text-xs font-semibold">Emissions</div></button>' +
+    '      <button onclick="SAE_Analysis && SAE_Analysis.showTab(\'noise\')" class="aa-tab-btn px-4 py-3 bg-slate-800 hover:bg-slate-700 rounded-xl border border-slate-600 transition-all" data-tab="noise"><i class="fas fa-volume-up text-yellow-400 text-xl mb-1"></i><div class="text-xs font-semibold">Noise</div></button>' +
+    '      <button onclick="SAE_Analysis && SAE_Analysis.showTab(\'safety\')" class="aa-tab-btn px-4 py-3 bg-slate-800 hover:bg-slate-700 rounded-xl border border-slate-600 transition-all" data-tab="safety"><i class="fas fa-shield-alt text-red-400 text-xl mb-1"></i><div class="text-xs font-semibold">Safety</div></button>' +
+    '      <button onclick="SAE_Analysis && SAE_Analysis.showTab(\'energy\')" class="aa-tab-btn px-4 py-3 bg-slate-800 hover:bg-slate-700 rounded-xl border border-slate-600 transition-all" data-tab="energy"><i class="fas fa-bolt text-cyan-400 text-xl mb-1"></i><div class="text-xs font-semibold">Energy</div></button>' +
+    '      <button onclick="SAE_Analysis && SAE_Analysis.showTab(\'v2x\')" class="aa-tab-btn px-4 py-3 bg-slate-800 hover:bg-slate-700 rounded-xl border border-slate-600 transition-all" data-tab="v2x"><i class="fas fa-wifi text-purple-400 text-xl mb-1"></i><div class="text-xs font-semibold">V2X</div></button>' +
+    '    </div>' +
+    '    <div id="aa-content" class="max-w-4xl mx-auto bg-slate-800 rounded-xl p-6 border border-slate-700">' +
+    '      <div id="aa-emissions" class="aa-panel"><div class="text-center text-slate-500 py-8">Run a simulation first to see emissions analysis</div></div>' +
+    '      <div id="aa-noise" class="aa-panel hidden"><div class="text-center text-slate-500 py-8">Run a simulation first to see noise analysis</div></div>' +
+    '      <div id="aa-safety" class="aa-panel hidden"><div class="text-center text-slate-500 py-8">Run a simulation first to see safety analysis</div></div>' +
+    '      <div id="aa-energy" class="aa-panel hidden"><div class="text-center text-slate-500 py-8">Run a simulation first to see energy analysis</div></div>' +
+    '      <div id="aa-v2x" class="aa-panel hidden"><div class="text-center text-slate-500 py-8">Run a simulation first to see V2X analysis</div></div>' +
+    '    </div>' +
+    '  </div>' +
+    '</section>';
+  }
+
+  function createScenarioManagerSection() {
+    return '' +
+    '<section id="scenario-manager" class="case-view py-16 bg-slate-800 text-white">' +
+    '  <div class="container mx-auto px-4">' +
+    '    <div class="text-center mb-10">' +
+    '      <h2 class="text-2xl md:text-3xl font-bold mb-3" data-key="sm_title">Scenario Manager</h2>' +
+    '      <p class="text-slate-300 max-w-3xl mx-auto text-sm" data-key="sm_desc">Save, load, fork, and compare simulation scenarios with full versioning.</p>' +
+    '    </div>' +
+    '    <div class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">' +
+    '      <div class="bg-slate-900 rounded-xl p-6 border border-slate-700">' +
+    '        <h3 class="font-semibold text-sm mb-3">Save Scenario</h3>' +
+    '        <input id="sm-name" type="text" placeholder="Scenario name" class="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-sm mb-3">' +
+    '        <button onclick="SAE_Scenarios && SAE_Scenarios.save()" class="w-full px-4 py-2 bg-emerald-600 hover:bg-emerald-700 rounded-lg text-sm font-semibold"><i class="fas fa-save mr-2"></i>Save</button>' +
+    '      </div>' +
+    '      <div class="md:col-span-2 bg-slate-900 rounded-xl p-6 border border-slate-700">' +
+    '        <h3 class="font-semibold text-sm mb-3">Saved Scenarios</h3>' +
+    '        <div id="sm-list" class="space-y-2 max-h-64 overflow-y-auto">' +
+    '          <div class="text-center text-slate-500 text-sm py-4">No saved scenarios</div>' +
+    '        </div>' +
+    '      </div>' +
+    '    </div>' +
+    '  </div>' +
+    '</section>';
+  }
+
+  function createReportsSection() {
+    return '' +
+    '<section id="reports-section" class="case-view py-16 bg-slate-900 text-white">' +
+    '  <div class="container mx-auto px-4">' +
+    '    <div class="text-center mb-10">' +
+    '      <h2 class="text-2xl md:text-3xl font-bold mb-3" data-key="rp_title">Reports & Export</h2>' +
+    '      <p class="text-slate-300 max-w-3xl mx-auto text-sm" data-key="rp_desc">Generate PDF reports with methodology, results, and calibration data.</p>' +
+    '    </div>' +
+    '    <div class="max-w-2xl mx-auto bg-slate-800 rounded-xl p-6 border border-slate-700 space-y-4">' +
+    '      <button onclick="SAE_Reports && SAE_Reports.generatePDF()" class="w-full px-4 py-3 bg-red-600 hover:bg-red-700 rounded-lg text-sm font-semibold flex items-center justify-center gap-2"><i class="fas fa-file-pdf"></i>Generate PDF Report</button>' +
+    '      <button onclick="SAE_Reports && SAE_Reports.generateBibTeX()" class="w-full px-4 py-3 bg-blue-600 hover:bg-blue-700 rounded-lg text-sm font-semibold flex items-center justify-center gap-2"><i class="fas fa-quote-right"></i>Copy BibTeX Citation</button>' +
+    '      <button onclick="SAE_Reports && SAE_Reports.exportCSV()" class="w-full px-4 py-3 bg-emerald-600 hover:bg-emerald-700 rounded-lg text-sm font-semibold flex items-center justify-center gap-2"><i class="fas fa-file-csv"></i>Export KPIs as CSV</button>' +
+    '      <button onclick="SAE_Reports && SAE_Reports.exportSUMO()" class="w-full px-4 py-3 bg-indigo-600 hover:bg-indigo-700 rounded-lg text-sm font-semibold flex items-center justify-center gap-2"><i class="fas fa-download"></i>Export SUMO Package</button>' +
+    '    </div>' +
+    '  </div>' +
+    '</section>';
+  }
+
+  window.SAE_Sections = {
+    createNetworkEditorSection: createNetworkEditorSection,
+    createSignalEditorSection: createSignalEditorSection,
+    createCalibrationSection: createCalibrationSection,
+    createAdvancedAnalysisSection: createAdvancedAnalysisSection,
+    createScenarioManagerSection: createScenarioManagerSection,
+    createReportsSection: createReportsSection,
+    injectAll: function () {
+      var footer = document.querySelector('footer');
+      if (!footer) return;
+      var html = '';
+      html += createNetworkEditorSection();
+      html += createSignalEditorSection();
+      html += createCalibrationSection();
+      html += createAdvancedAnalysisSection();
+      html += createScenarioManagerSection();
+      html += createReportsSection();
+      footer.insertAdjacentHTML('beforebegin', html);
+    }
+  };
+
+})();

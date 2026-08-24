@@ -1,0 +1,22 @@
+fastapi==0.115.0
+uvicorn==0.30.0
+sqlalchemy==2.0.35
+alembic==1.13.0
+pydantic==2.9.0
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+python-multipart==0.0.9
+httpx==0.27.0
+websockets==12.0
+
+# --- Additional runtime dependencies required by this scaffold ---
+# passlib 1.7.4 is incompatible with bcrypt >= 4.1 / 5.x — pin a working release
+bcrypt==4.0.1
+# BaseSettings lives in pydantic-settings on Pydantic v2 (config.py)
+pydantic-settings==2.5.2
+# PDF report generation (app/services/report.py)
+reportlab==4.2.2
+# PostgreSQL driver used by docker-compose DATABASE_URL
+psycopg2-binary==2.9.9
+# Eclipse SUMO binaries (sumo / netconvert on PATH) + traci for interactive mode
+eclipse-sumo==1.20.0

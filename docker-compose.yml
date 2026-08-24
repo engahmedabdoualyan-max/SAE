@@ -1,0 +1,72 @@
+version: '3.8'
+
+# SAE AutoSim Hub — full stack
+#   frontend : nginx serving the static SPA + reverse proxy /api -> backend
+#   backend  : FastAPI (uvicorn) application
+#   db       : PostgreSQL 16 with persistent volume + healthcheck
+#   sumo     : long-lived SUMO worker (NDJSON CLI over stdin/stdout)
+
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql+psycopg2://sae:sae_secret@db:5432/sae_hub
+      SECRET_KEY: change-me-in-production
+      SUMO_HOME: /usr/share/sumo
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request;urllib.request.urlopen('http://localhost:8000/health')\" || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: sae
+      POSTGRES_PASSWORD: sae_secret
+      POSTGRES_DB: sae_hub
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sae -d sae_hub"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  sumo:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql+psycopg2://sae:sae_secret@db:5432/sae_hub
+      SUMO_HOME: /usr/share/sumo
+    depends_on:
+      db:
+        condition: service_healthy
+    command: ["python", "-m", "app.services.sumo_bridge", "--worker"]
+
+volumes:
+  pgdata:
