@@ -134,7 +134,8 @@
   }
 
   /* ── Simple IDM on main thread (no worker needed) ───────── */
-  function createMainSim(canvas, fleet, corridors, mprValue, onKPI) {
+  function createMainSim(canvas, fleet, corridors, mprValue, onKPI, idmOverrides) {
+    var overrides = idmOverrides || null;
     var ctx = canvas.getContext('2d');
     var W = canvas.width = canvas.parentElement.clientWidth - 16;
     var H = canvas.height = 320;
@@ -181,6 +182,11 @@
       var type = fleet[typeKey];
       if (!type) return null;
       var idm = fleetToIDM(type.cf);
+      if (overrides) {
+        for (var k in overrides) {
+          if (Object.prototype.hasOwnProperty.call(overrides, k)) idm[k] = overrides[k];
+        }
+      }
       var lane = Math.floor(Math.random() * LANE_COUNT);
 
       return {
@@ -443,9 +449,10 @@
     buildDemand: buildDemand,
     fleetToIDM: fleetToIDM,
 
-    init: function (canvas, fleet, corridors, mprValue, onKPI) {
+    init: function (canvas, fleet, corridors, mprValue, onKPI, idmOverrides) {
       if (simInstance) simInstance.destroy();
-      simInstance = createMainSim(canvas, fleet, corridors, mprValue, onKPI);
+      simInstance = createMainSim(canvas, fleet, corridors, mprValue, onKPI,
+        idmOverrides || window.__saeIdmOverrides || null);
       return simInstance;
     },
 

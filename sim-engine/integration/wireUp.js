@@ -58,6 +58,44 @@
     }
   }
 
+  var speedChart = null;
+  var speedSamples = [];
+
+  function pushSpeedSample(kmh) {
+    speedSamples.push(kmh);
+    if (speedSamples.length > 120) speedSamples.shift();
+    var cv = document.getElementById('adv-speed-chart');
+    if (!cv || typeof Chart === 'undefined') return;
+    if (!speedChart) {
+      speedChart = new Chart(cv.getContext('2d'), {
+        type: 'line',
+        data: {
+          labels: speedSamples.map(function (_, i) { return i; }),
+          datasets: [{
+            label: 'Avg Speed (km/h)',
+            data: speedSamples,
+            borderColor: '#22D3EE',
+            backgroundColor: 'rgba(34,211,238,0.12)',
+            fill: true, tension: 0.3,
+            pointRadius: 0, borderWidth: 2
+          }]
+        },
+        options: {
+          animation: false, responsive: true, maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { display: false },
+            y: { beginAtZero: true, suggestedMax: 120, ticks: { color: '#94A3B8', font: { size: 9 } }, grid: { color: 'rgba(148,163,184,0.12)' } }
+          }
+        }
+      });
+    } else {
+      speedChart.data.labels = speedSamples.map(function (_, i) { return i; });
+      speedChart.data.datasets[0].data = speedSamples.slice();
+      speedChart.update('none');
+    }
+  }
+
   function updateAdvKPIs(data) {
     var el;
     el = document.getElementById('adv-los');
@@ -72,6 +110,7 @@
     if (el) el.textContent = data.queue || 0;
     el = document.getElementById('adv-vehs');
     if (el) el.textContent = data.vehicleCount || 0;
+    if (typeof data.avgSpeed === 'number' && data.avgSpeed > 0) pushSpeedSample(data.avgSpeed);
   }
 
   function getFleet() {
@@ -108,16 +147,31 @@
     advPaused = false;
   }
 
-  /* ── Network Editor Manager ─────────────────────────────── */
+  /* ── Network Editor Manager (delegates to real ES-module editor) ── */
+  var EXPORT_EXT = { json: '.json', opendrive: '.xodr', sumo: '.net.xml', geojson: '.geojson' };
+
+  function downloadText(name, text, mime) {
+    var blob = new Blob([text], { type: mime || 'text/plain' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = name;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function () { URL.revokeObjectURL(url); }, 2000);
+  }
+
   window.SAE_NetworkEditor = {
     _tool: 'select',
-    _nodes: [],
-    _edges: [],
     _undoStack: [],
     _redoStack: [],
 
+    _real: function () { return window.__saeRealEditor || null; },
+
     selectTool: function (tool) {
       this._tool = tool;
+      var ed = this._real();
+      if (ed && ed.setTool) {
+        try { ed.setTool(tool); } catch (e) { /* unknown tool */ }
+      }
       document.querySelectorAll('.ne-tool-btn').forEach(function (btn) {
         btn.classList.remove('active-tool', 'bg-indigo-600');
       });
@@ -129,66 +183,97 @@
 
     importFile: function (file) {
       if (!file) return;
-      var reader = new FileReader();
-      var self = this;
-      reader.onload = function (e) {
-        var content = e.target.result;
-        var ext = file.name.split('.').pop().toLowerCase();
-        try {
-          var data;
-          if (ext === 'json' || ext === 'geojson') {
-            data = JSON.parse(content);
-            if (data.nodes) {
-              self._nodes = data.nodes;
-              self._edges = data.edges || [];
-            }
-          }
+      var ed = this._real();
+      if (ed && ed.import) {
+        var self = this;
+        ed.import(file).then(function () {
           self._updateStats();
           self._showToast('Imported ' + file.name);
-        } catch (err) {
-          self._showToast('Import error: ' + err.message);
-        }
+        }).catch(function (err) {
+          self._showToast('Import error: ' + (err && err.message ? err.message : err));
+        });
+        return;
+      }
+      /* Fallback: model-only JSON */
+      var reader = new FileReader();
+      var self2 = this;
+      reader.onload = function (e) {
+        try {
+          var data = JSON.parse(e.target.result);
+          if (data.nodes) { self2._nodes = data.nodes; self2._edges = data.edges || []; }
+          self2._updateStats();
+          self2._showToast('Imported ' + file.name);
+        } catch (err) { self2._showToast('Import error: ' + err.message); }
       };
       reader.readAsText(file);
     },
 
     exportAs: function (format) {
-      var data = JSON.stringify({ nodes: this._nodes, edges: this._edges }, null, 2);
-      var blob = new Blob([data], { type: 'application/json' });
-      var url = URL.createObjectURL(blob);
-      var a = document.createElement('a');
-      a.href = url;
-      a.download = 'network.' + (format === 'json' ? 'json' : format);
-      a.click();
-      URL.revokeObjectURL(url);
+      var ed = this._real();
+      var text, fname = 'network' + (EXPORT_EXT[format] || '.json');
+      try {
+        if (ed && ed.export) {
+          text = ed.export(format === 'geojson' ? 'geojson' : format);
+        } else {
+          text = JSON.stringify({ nodes: this._nodes || [], edges: this._edges || [] }, null, 2);
+        }
+        downloadText(fname, text,
+          format === 'geojson' || format === 'json' ? 'application/json' : 'application/xml');
+        this._showToast('Exported ' + format);
+      } catch (err) {
+        this._showToast('Export error: ' + (err && err.message ? err.message : err));
+      }
     },
 
     undo: function () {
+      var ed = this._real();
+      if (ed && ed.undo) { ed.undo(); this._updateStats(); return; }
       if (this._undoStack.length === 0) return;
       this._redoStack.push({ nodes: this._nodes.slice(), edges: this._edges.slice() });
       var state = this._undoStack.pop();
-      this._nodes = state.nodes;
-      this._edges = state.edges;
+      this._nodes = state.nodes; this._edges = state.edges;
       this._updateStats();
     },
 
     redo: function () {
+      var ed = this._real();
+      if (ed && ed.redo) { ed.redo(); this._updateStats(); return; }
       if (this._redoStack.length === 0) return;
       this._undoStack.push({ nodes: this._nodes.slice(), edges: this._edges.slice() });
       var state = this._redoStack.pop();
-      this._nodes = state.nodes;
-      this._edges = state.edges;
+      this._nodes = state.nodes; this._edges = state.edges;
       this._updateStats();
     },
 
     _updateStats: function () {
+      var nodes = 0, edges = 0, lanes = 0;
+      var ed = this._real();
+      try {
+        if (ed && ed.getNetwork) {
+          var net = ed.getNetwork();
+          var j = net && net.toJSON ? net.toJSON() : null;
+          if (j && Array.isArray(j.nodes)) {
+            nodes = j.nodes.length;
+          } else if (net && net.nodes && typeof net.nodes.size === 'number') {
+            nodes = net.nodes.size; /* raw Network: Map internals */
+          }
+          if (j && Array.isArray(j.edges)) {
+            edges = j.edges.length;
+            j.edges.forEach(function (e) { lanes += e.lanes || 1; });
+          } else if (net && net.edges && typeof net.edges.size === 'number') {
+            edges = net.edges.size;
+            net.edges.forEach(function (e) { lanes += (e.lanes || 1); });
+          }
+        } else if (this._nodes) {
+          nodes = this._nodes.length;
+          edges = (this._edges || []).length;
+          lanes = (this._edges || []).reduce(function (a, e) { return a + (e.lanes || 3); }, 0);
+        }
+      } catch (e) { /* stats are best-effort */ }
       var el;
-      el = document.getElementById('ne-node-count');
-      if (el) el.textContent = this._nodes.length;
-      el = document.getElementById('ne-edge-count');
-      if (el) el.textContent = this._edges.length;
-      el = document.getElementById('ne-lane-count');
-      if (el) el.textContent = this._edges.reduce(function (a, e) { return a + (e.lanes || 3); }, 0);
+      el = document.getElementById('ne-node-count'); if (el) el.textContent = nodes;
+      el = document.getElementById('ne-edge-count'); if (el) el.textContent = edges;
+      el = document.getElementById('ne-lane-count'); if (el) el.textContent = lanes;
     },
 
     _showToast: function (msg) {
@@ -326,6 +411,7 @@
     },
 
     _showResults: function (params, geh) {
+      this._lastParams = Object.assign({}, params);
       var el = document.getElementById('cal-results');
       if (!el) return;
       var pass = geh < 5;
@@ -346,9 +432,17 @@
     },
 
     applyParams: function () {
-      if (window.SAE_Sim && window.SAE_Sim._lastParams) {
-        /* apply to next simulation run */
+      if (!this._lastParams) return;
+      window.__saeIdmOverrides = Object.assign({}, this._lastParams);
+      var btn = document.querySelector('#cal-results button');
+      if (btn) {
+        btn.innerHTML = '<i class="fas fa-check mr-2"></i>Applied — next Run uses these';
+        btn.classList.remove('bg-emerald-600');
+        btn.classList.add('bg-slate-600');
       }
+      if (window.SAE_NetworkEditor) window.SAE_NetworkEditor._showToast(
+        'IDM overrides applied: v0=' + this._lastParams.v0.toFixed(1) +
+        ' T=' + this._lastParams.T.toFixed(2));
     }
   };
 
