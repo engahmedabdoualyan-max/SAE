@@ -70,6 +70,7 @@ def app_errors(errors: list[str]) -> list[str]:
 
 def phase1_page(page, res: Result) -> None:
     print("── Phase 1: page integrity")
+    page.add_init_script("try{localStorage.setItem('sae-lang','ar')}catch(e){}")
     resp = page.goto(BASE_URL + "/", wait_until="domcontentloaded", timeout=60_000)
     res.check("HTTP 200", bool(resp and resp.status == 200), f"got {resp.status if resp else '?'}")
     page.wait_for_timeout(2500)
@@ -79,6 +80,18 @@ def phase1_page(page, res: Result) -> None:
 
     nav_btns = page.evaluate("() => document.querySelectorAll('.sae-subnav-btn').length")
     res.check("sub-navigation bar rendered", nav_btns >= len(SECTIONS), f"buttons={nav_btns}")
+
+    # i18n regression guard: no element may render its own raw key name.
+    # Runs under Arabic (pre-set) so both the lazy locale path and the EN
+    # fallback chain are exercised together.
+    leaks = page.evaluate("""() => {
+        const leaks = [];
+        document.querySelectorAll('[data-key]').forEach(el => {
+            if (el.textContent.trim() === el.getAttribute('data-key')) leaks.push(el.getAttribute('data-key'));
+        });
+        return [...new Set(leaks)].slice(0, 10);
+    }""")
+    res.check("no raw i18n keys rendered (AR + fallback chain)", not leaks, str(leaks))
 
 
 def phase2_local_sim(page, res: Result) -> None:

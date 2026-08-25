@@ -454,3 +454,22 @@ Object.assign(TRANSLATIONS['ar'], {
     "sm_title": "مدير السيناريوهات", "sm_desc": "احفظ وحمّل وانسخ وقارن سيناريوهات المحاكاة بإصدارات كاملة.",
     "rp_title": "التقارير والتصدير", "rp_desc": "أنشئ تقارير PDF بالمنهجية والنتائج وبيانات المعايرة."
 });
+
+/* Lab + Cloud section titles */
+Object.assign(TRANSLATIONS['ar'], {
+    "lab_title": "مختبر المحاكاة",
+    "lab_desc": "قوالب مشاهد، منزلقات معاملات السائق الحية، كواشف حلقات، مخطط زمن–مكان والمخطط الأساسي للتدفق–الكثافة.",
+    "cl_title": "المحاكاة السحابية",
+    "cl_desc": "شغّل شبكتك على محرك SUMO على الخادم مع تقدم حي عبر WebSocket ونتائج رحلات حقيقية."
+});
+
+/* Legacy header/section keys (were leaking raw key names) */
+Object.assign(TRANSLATIONS['ar'], {
+    "tab_main": "المرجعية",
+    "tab_case": "دراسة الحالة",
+    "nav_countries": "الدول",
+    "nav_field": "البيانات الميدانية (حالة)",
+    "rr_mode": "وضع المحاكاة",
+    "exp_tools": "التصدير والأدوات",
+    "fd_title": "البيانات الميدانية الحقيقية"
+});

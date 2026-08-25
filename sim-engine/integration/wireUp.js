@@ -385,6 +385,7 @@
 
       var self = this;
       var bestGEH = Infinity;
+      var bestMeasured = 0;
       var bestParams = null;
       /* ── REAL calibration: each candidate runs the actual engine and
          GEH is measured from loop-detector flows, normalized per lane. ── */
@@ -430,7 +431,8 @@
 
       function runCandidate() {
         if (done >= iterations) {
-          self._showResults(bestParams, bestGEH);
+          self._showResults(bestParams, bestGEH,
+            { target: target, measured: self._bestMeasured || bestMeasured });
           if (progressEl) progressEl.classList.add('hidden');
           toast(bestGEH < 5 ? 'Calibration PASS — GEH ' + bestGEH.toFixed(2)
                             : 'Best GEH ' + bestGEH.toFixed(2));
@@ -448,6 +450,7 @@
         var geh = standardGEH(target, measured);
         if (geh < bestGEH) {
           bestGEH = geh;
+          bestMeasured = measured;
           bestParams = { v0: v0, T: T, a: aFixed, b: bFixed };
         }
 
@@ -461,13 +464,20 @@
 
       runCandidate();    },
 
-    _showResults: function (params, geh) {
+    _showResults: function (params, geh, ctx) {
+      ctx = ctx || {};
       this._lastParams = Object.assign({}, params);
+      this._lastContext = ctx;
       var el = document.getElementById('cal-results');
       if (!el) return;
       var pass = geh < 5;
+      var targetLine = (ctx.target != null)
+        ? '<div class="text-[10px] text-slate-400 -mt-2 mb-2">' +
+          'Target ' + Math.round(ctx.target) + ' veh/h/lane · best measured ' +
+          Math.round(ctx.measured) + ' · loops read one lane each</div>'
+        : '';
       el.innerHTML =
-        '<div class="space-y-3">' +
+        '<div class="space-y-3">' + targetLine +
         '<div class="flex items-center justify-between p-3 bg-slate-800 rounded-lg border border-slate-600">' +
         '  <span class="text-sm">GEH Score</span>' +
         '  <span class="font-bold ' + (pass ? 'text-emerald-400' : 'text-red-400') + '">' + geh.toFixed(2) + (pass ? ' ✓ PASS' : ' ✗ FAIL') + '</span>' +

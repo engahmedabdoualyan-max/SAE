@@ -464,3 +464,11 @@ Object.assign(TRANSLATIONS['zh'], {
     "rp_title": "报告与导出",
     "rp_desc": "生成包含方法论、结果与标定数据的PDF报告。"
 });
+
+/* Lab + Cloud section titles */
+Object.assign(TRANSLATIONS['zh'], {
+    "lab_title": "仿真实验室",
+    "lab_desc": "场景模板、实时驾驶员参数、环形检测器、时空图与基本流量-密度图。",
+    "cl_title": "云端仿真",
+    "cl_desc": "在服务端 SUMO 引擎上运行您的路网，通过WebSocket实时推送进度。"
+});

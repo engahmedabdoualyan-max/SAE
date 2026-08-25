@@ -46,7 +46,7 @@ back over WebSocket.
 ```bash
 docker compose up --build
 # frontend  → http://localhost
-# API docs  → http://localhost/api/v1/docs  (demo login: demo@sae.local / demo1234)
+# API docs  → http://localhost:8000/docs  (demo login: demo@sae.local / demo1234)
 ```
 
 ## Development

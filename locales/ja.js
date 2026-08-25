@@ -440,3 +440,11 @@ Object.assign(TRANSLATIONS['ja'], {
     "rp_title": "レポートとエクスポート",
     "rp_desc": "手法・結果・キャリブレーションデータを含むPDFレポートを生成します。"
 });
+
+/* Lab + Cloud section titles */
+Object.assign(TRANSLATIONS['ja'], {
+    "lab_title": "シミュレーションラボ",
+    "lab_desc": "シナリオテンプレート、ライブ運転パラメータ、ループ検知器、時間空間図と基本図（流量−密度）。",
+    "cl_title": "クラウドシミュレーション",
+    "cl_desc": "サーバー側SUMOエンジンでネットワークを実行。WebSocketで進捗をライブ配信します。"
+});

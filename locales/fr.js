@@ -464,3 +464,11 @@ Object.assign(TRANSLATIONS['fr'], {
     "rp_title": "Rapports & export",
     "rp_desc": "Générez des rapports PDF avec méthodologie, résultats et données de calibration."
 });
+
+/* Lab + Cloud section titles */
+Object.assign(TRANSLATIONS['fr'], {
+    "lab_title": "Laboratoire de simulation",
+    "lab_desc": "Modèles de scénarios, curseurs de paramètres conducteur en direct, boucles détectrices, diagramme espace-temps et diagramme fondamental.",
+    "cl_title": "Simulation cloud",
+    "cl_desc": "Exécutez votre réseau sur le moteur SUMO côté serveur, avec progression WebSocket en direct."
+});

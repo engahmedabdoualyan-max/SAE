@@ -440,3 +440,11 @@ Object.assign(TRANSLATIONS['ko'], {
     "rp_title": "보고서 및 내보내기",
     "rp_desc": "방법론, 결과, 보정 데이터를 포함한 PDF 보고서를 생성합니다."
 });
+
+/* Lab + Cloud section titles */
+Object.assign(TRANSLATIONS['ko'], {
+    "lab_title": "시뮬레이션 랩",
+    "lab_desc": "시나리오 템플릿, 실시간 운전자 매개변수, 루프 검지기, 시간-공간 다이어그램과 기본 흐름-밀도 다이어그램.",
+    "cl_title": "클라우드 시뮬레이션",
+    "cl_desc": "서버 측 SUMO 엔진에서 네트워크를 실행하고 WebSocket으로 실시간 진행률을 스트리밍합니다."
+});

@@ -662,8 +662,13 @@
       },
       getDetectorStats: function () {
         return detectors.map(function (d, i) {
-          var last = d.hist[d.hist.length - 1] || { flow: 0, hmean: 0 };
-          return { id: i + 1, flow: last.flow, hmean: last.hmean,
+          /* cumulative rates are burst-stable; last-bin flow is kept for the
+             sparkline series but must not headline the card under tick
+             bursts where partial-bin extrapolation explodes */
+          var stableFlow = d.time > 0 ? Math.round(d.total * 3600 / d.time) : 0;
+          var last = d.hist[d.hist.length - 1] || { flow: stableFlow, hmean: 0 };
+          return { id: i + 1, flow: stableFlow || last.flow,
+                   hmean: last.hmean,
                    bins: d.hist.length,
                    hist: d.hist.map(function (h) {
                      return { flow: h.flow, hmean: h.hmean };
