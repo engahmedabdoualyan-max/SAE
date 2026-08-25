@@ -30,8 +30,8 @@
     '          </div>' +
     '          <div class="border-t border-slate-700 pt-3 space-y-2">' +
     '            <h4 class="text-xs text-slate-400" data-key="ne_import">Import</h4>' +
-    '            <input type="file" id="ne-import-file" accept=".xodr,.net.xml,.geojson,.json" class="hidden" onchange="SAE_NetworkEditor && SAE_NetworkEditor.importFile(this.files[0])">' +
-    '            <button onclick="document.getElementById(\'ne-import-file\').click()" class="w-full px-3 py-1.5 bg-indigo-700 hover:bg-indigo-600 rounded-lg text-xs"><i class="fas fa-upload mr-1"></i>Import File</button>' +
+    '            <input type="file" id="ne-import-file" accept=".osm,.xodr,.net.xml,.geojson,.json" class="hidden" onchange="SAE_NetworkEditor && SAE_NetworkEditor.importFile(this.files[0])">' +
+    '            <button onclick="document.getElementById(\'ne-import-file\').click()" class="w-full px-3 py-1.5 bg-indigo-700 hover:bg-indigo-600 rounded-lg text-xs"><i class="fas fa-upload mr-1"></i><i class="fas fa-upload mr-1"></i>Import OSM / SUMO / xodr</button>' +
     '            <h4 class="text-xs text-slate-400 mt-2" data-key="ne_export">Export</h4>' +
     '            <div class="grid grid-cols-2 gap-1">' +
     '              <button onclick="SAE_NetworkEditor && SAE_NetworkEditor.exportAs(\'json\')" class="px-2 py-1 bg-emerald-700 hover:bg-emerald-600 rounded text-[10px]">JSON</button>' +
@@ -204,9 +204,12 @@
     '    <div class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6">' +
     '      <div class="bg-slate-900 rounded-xl p-6 border border-slate-700 space-y-4">' +
     '        <h3 class="font-semibold text-sm">1 · Connect</h3>' +
-    '        <input id="cl-email" type="email" value="demo@sae.local" placeholder="email" class="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-sm">' +
+    '          <input id="cl-email" type="email" value="demo@sae.local" placeholder="email" class="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-sm">' +
     '        <input id="cl-pass" type="password" value="demo1234" placeholder="password" class="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-sm">' +
-    '        <button onclick="SAE_Cloud && SAE_Cloud.login()" class="w-full px-4 py-2 bg-indigo-600 hover:bg-indigo-700 rounded-lg text-sm font-semibold"><i class="fas fa-plug mr-2"></i>Login</button>' +
+    '        <div class="grid grid-cols-3 gap-2">' +
+    '          <button onclick="SAE_Cloud && SAE_Cloud.login()" class="px-3 py-2 bg-indigo-600 hover:bg-indigo-700 rounded-lg text-sm font-semibold col-span-2"><i class="fas fa-plug mr-1"></i>Login</button>' +
+    '          <button onclick="SAE_Cloud && SAE_Cloud.signup()" title="Create account with the email/password above" class="px-3 py-2 bg-slate-600 hover:bg-slate-500 rounded-lg text-sm font-semibold">Sign up</button>' +
+    '        </div>' +
     '        <h3 class="font-semibold text-sm pt-2">2 · Launch</h3>' +
     '        <div class="flex items-center gap-2 text-xs text-slate-400">' +
     '          <label for="cl-duration">Duration</label>' +
@@ -222,6 +225,15 @@
     '          <div id="cl-progress" class="h-full bg-emerald-500 transition-all" style="width:0%"></div>' +
     '        </div>' +
     '        <div id="cl-results"><div class="text-center text-slate-500 text-sm py-6">No cloud run yet</div></div>' +
+    '        <div class="mt-5 pt-4 border-t border-slate-700">' +
+    '          <div class="flex items-center justify-between mb-2">' +
+    '            <h4 class="font-semibold text-xs text-slate-300"><i class="fas fa-history mr-1 text-cyan-400"></i>Past runs</h4>' +
+    '            <button onclick="SAE_Cloud && SAE_Cloud.loadHistory()" class="text-[10px] px-2 py-1 bg-slate-700 hover:bg-slate-600 rounded">Refresh</button>' +
+    '          </div>' +
+    '          <div id="cl-history" class="space-y-1.5 max-h-48 overflow-y-auto text-xs">' +
+    '            <div class="text-center text-slate-500 py-3">Login to see your run history</div>' +
+    '          </div>' +
+    '        </div>' +
     '      </div>' +
     '    </div>' +
     '  </div>' +

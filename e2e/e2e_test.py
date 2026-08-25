@@ -288,6 +288,64 @@ def phase2d_osm_share_adaptive(page, res: Result) -> None:
     except Exception as exc:  # noqa: BLE001
         res.check("canvas snapshot downloads PNG", False, repr(exc)[:120])
 
+    # ── surfaced backend features: signup + run history browser
+    acc = page.evaluate("() => document.getElementById('ne-import-file')?.accept || ''")
+    res.check("editor import accepts .osm files", ".osm" in acc, acc)
+
+    hist = page.evaluate("""async () => {
+        await window.SAE_Cloud.login();
+        window.SAE_Cloud.loadHistory();
+        for (let i = 0; i < 20; i++) {
+            await new Promise(r => setTimeout(r, 250));
+            const n = document.querySelectorAll('#cl-history .cl-view').length;
+            if (n > 0) return { rows: n };
+        }
+        return { rows: document.querySelectorAll('#cl-history .cl-view').length,
+                 text: document.getElementById('cl-history').innerText.slice(0, 80) };
+    }""")
+    res.check("run-history browser lists past cloud runs", hist["rows"] >= 1, str(hist))
+
+    view_click = page.evaluate("""async () => {
+        const rows = [...document.querySelectorAll('#cl-history .cl-view')];
+        const tryRow = async (btn) => {
+            btn.click();
+            for (let i = 0; i < 20; i++) {
+                await new Promise(r => setTimeout(r, 250));
+                const txt = document.getElementById('cl-results').innerText || '';
+                if (document.querySelector('#cl-results table') &&
+                    /arrived_vehicles|avg_speed_kmh/.test(txt)) {
+                    return true;
+                }
+            }
+            return false;
+        };
+        if (!rows.length) return { clicked: false };
+        if (await tryRow(rows[0])) return { clicked: true, ready: true, tried: 'first' };
+        if (rows[1] && await tryRow(rows[1])) return { clicked: true, ready: true, tried: 'second' };
+        return { clicked: true, ready: false,
+                 html: document.getElementById('cl-results').innerHTML.slice(0, 100) };
+    }""")
+    res.check("clicking a history row restores full results view",
+              bool(view_click.get("ready")), str(view_click))
+
+    reg = page.evaluate("""async () => {
+        const email = `e2e_${Date.now()}@sae.test`;
+        const r = await fetch('/api/v1/auth/register', {
+            method: 'POST', headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({email, name: 'e2e', password: 'regtest123'})
+        });
+        if (![200, 201].includes(r.status)) return { status: r.status };
+        const login = await fetch('/api/v1/auth/login', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+            body: new URLSearchParams({username: email, password: 'regtest123'})
+        });
+        if (![200, 201].includes(login.status)) return { status: login.status, token: false };
+        return { status: login.status,
+                 token: !!(await login.json()).access_token };
+    }""")
+    res.check("signup endpoint creates working accounts", reg.get("status") == 200 and reg.get("token"), str(reg))
+
 
 def phase3_cloud_sumo(page, res: Result) -> None:
     print("── Phase 3: cloud SUMO pipeline")
@@ -296,6 +354,7 @@ def phase3_cloud_sumo(page, res: Result) -> None:
         const ed = window.__saeRealEditor;
         if (!ed) return 'no-editor';
         try {
+            if (ed.clear) ed.clear();   /* drop any OSM/imported graph first */
             ed.addJunction({lat: 30.0444, lng: 31.2357});
             ed.addJunction({lat: 30.0500, lng: 31.2430});
             ed.addJunction({lat: 30.0560, lng: 31.2500});
@@ -316,16 +375,51 @@ def phase3_cloud_sumo(page, res: Result) -> None:
         window.SAE_Cloud.run();
     }""")
 
-    steps_text, results_text = "", ""
-    deadline = time.time() + 120
-    while time.time() < deadline:
-        page.wait_for_timeout(1000)
-        steps_text = page.evaluate(
-            "() => [...document.querySelectorAll('#cl-steps div')].map(d => d.textContent.trim()).join(',')")
-        done = page.evaluate("() => !!document.querySelector('#cl-results table')")
-        if done:
-            results_text = page.evaluate("() => document.getElementById('cl-results').innerText.replace(/\\n/g, ' ')")
+    # Deterministic wait: poll the REST API for terminal status (the
+    # background job's wall-time varies), then let ONE websocket frame
+    # render the results instantly through the normal UI path.
+    sim_id = None
+    for _ in range(20):
+        sim_id = page.evaluate("() => window.SAE_Cloud && window.SAE_Cloud._lastId")
+        if sim_id:
             break
+        page.wait_for_timeout(500)
+    res.check("run queued (simulation id issued)", bool(sim_id), f"id={sim_id}")
+
+    status_text, results_text, steps_text = "", "", ""
+    api_deadline = time.time() + 300
+    while time.time() < api_deadline:
+        page.wait_for_timeout(3000)
+        st = page.evaluate(
+            """async () => {
+                const c = window.SAE_Cloud;
+                if (!c || !c._tokenState || !c._lastId) return null;
+                const r = await fetch('/api/v1/simulations/' + c._lastId, {
+                    headers: { Authorization: 'Bearer ' + c._tokenState }
+                });
+                if (!r.ok) return null;
+                const j = await r.json();
+                return { status: j.status, error: j.error_message };
+            }"""
+        )
+        if st and st.get("status") in ("completed", "failed"):
+            status_text = st["status"]
+            break
+
+    # attach a fresh viewer so the terminal frame populates the UI
+    if status_text == "completed":
+        page.evaluate(
+            "() => { const c = window.SAE_Cloud;"
+            " if (c && c._lastId && c._stream) c._stream(c._lastId); }")
+        ui_deadline = time.time() + 15
+        while time.time() < ui_deadline:
+            page.wait_for_timeout(500)
+            if page.evaluate("() => !!document.querySelector('#cl-results table')"):
+                results_text = page.evaluate(
+                    "() => document.getElementById('cl-results').innerText.replace(/\\n/g, ' ')")
+                break
+    steps_text = page.evaluate(
+        "() => [...document.querySelectorAll('#cl-steps div')].map(d => d.textContent.trim()).join(',')")
 
     res.check("pipeline reached results table", bool(results_text),
               f"last steps: {steps_text}")

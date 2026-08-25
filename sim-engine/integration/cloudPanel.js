@@ -132,6 +132,61 @@
   }
 
   window.SAE_Cloud = {
+    /* read-only token mirror so external tooling (tests) can poll the API
+       with the same identity without touching internal state */
+    get _tokenState() { return state.token; },
+    get _lastRunId() { return state.lastSimId; },
+    signup: function () {
+      var email = ($('cl-email') || {}).value || '';
+      var pass = ($('cl-pass') || {}).value || '';
+      if (!email || !pass) { setStatus('Email and password required', true); return Promise.resolve(false); }
+      setStatus('Creating account…');
+      return fetch(API + '/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email, name: email.split('@')[0], password: pass }),
+      }).then(function (r) {
+        if (r.status === 400) throw new Error('email already registered — just Login');
+        if (!r.ok) throw new Error('signup failed (' + r.status + ')');
+        return self_login();
+      }).catch(function (e) { setStatus(e.message, true); return false; });
+
+      function self_login() { return window.SAE_Cloud.login(); }
+    },
+
+    loadHistory: function () {
+      if (!state.token) { setStatus('Login first to load history', true); return; }
+      var box = $('cl-history');
+      if (box) box.innerHTML = '<div class="text-center text-slate-500 py-3">Loading…</div>';
+      api('GET', '/simulations/', {}, state.token).then(function (list) {
+        if (!box) return;
+        if (!list.length) {
+          box.innerHTML = '<div class="text-center text-slate-500 py-3">No runs yet</div>';
+          return;
+        }
+        box.innerHTML = list.slice(0, 25).map(function (s) {
+          var color = s.status === 'completed' ? 'text-emerald-400'
+            : s.status === 'failed' ? 'text-red-400' : 'text-yellow-300';
+          var eng = (s.results && s.results.engine) || '—';
+          return '<div class="flex items-center justify-between p-2 bg-slate-800 rounded border border-slate-600">' +
+            '<span class="font-mono text-slate-300">#' + s.id + '</span>' +
+            '<span class="' + color + '">' + s.status + '</span>' +
+            '<span class="text-[10px] text-slate-500">' + eng + '</span>' +
+            '<button data-simid="' + s.id + '" class="cl-view px-2 py-0.5 bg-cyan-700 hover:bg-cyan-600 rounded text-[10px]">view</button>' +
+            '</div>';
+        }).join('');
+        box.querySelectorAll('.cl-view').forEach(function (btn) {
+          btn.addEventListener('click', function () {
+            state.lastSimId = parseInt(btn.dataset.simid, 10);
+            api('GET', '/simulations/' + state.lastSimId, {}, state.token)
+              .then(function (full) { self_renderResults(full.results || {}, state.lastSimId); });
+          });
+        });
+      }).catch(function (e) {
+        if (box) box.innerHTML = '<div class="text-red-400 py-2">' + e.message + '</div>';
+      });
+    },
+
     login: function () {
       var email = ($('cl-email') || {}).value || 'demo@sae.local';
       var pass = ($('cl-pass') || {}).value || 'demo1234';
@@ -149,6 +204,7 @@
         state.token = j.access_token;
         renderStep('auth', 'done');
         setStatus('Authenticated ✓');
+        if (window.SAE_Cloud && window.SAE_Cloud.loadHistory) window.SAE_Cloud.loadHistory();
         return true;
       }).catch(function (e) {
         renderStep('auth', 'fail');
@@ -210,6 +266,7 @@
           json: { scenario_id: scenarioId, config: { duration: duration } },
         }, state.token).then(function (sim) {
           renderStep('queued', 'done'); renderStep('stream', 'active');
+          window.SAE_Cloud._lastId = sim.id;
           self._stream(sim.id);
           return sim.id;
         });
@@ -254,7 +311,8 @@
         try { f = JSON.parse(ev.data); } catch (e) { return; }
         if (f.error === 'not_found') { setStatus('simulation not found', true); return; }
         setProgress(Math.round((f.progress || 0) * 100));
-        if (f.results) { renderStep('stream', 'done'); renderStep('results', 'done'); self_renderResults(f.results, simId); }
+        if (f.results) { renderStep('stream', 'done'); renderStep('results', 'done'); self_renderResults(f.results, simId);
+          if (window.SAE_Cloud && window.SAE_Cloud.loadHistory) window.SAE_Cloud.loadHistory(); }
         else if (f.status === 'failed') { renderStep('stream', 'fail'); setStatus(f.error_message || 'run failed', true); }
       };
       ws.onerror = function () { setStatus('WebSocket error', true); };
