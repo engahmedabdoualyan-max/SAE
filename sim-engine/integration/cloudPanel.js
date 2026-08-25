@@ -219,6 +219,33 @@
       });
     },
 
+    download: function (kind) {
+      var simId = state.lastSimId;
+      if (!simId || !state.token) { setStatus('Run a cloud simulation first', true); return; }
+      var path = kind === 'report'
+        ? API + '/simulations/' + simId + '/report'
+        : API + '/simulations/' + simId + '/trajectories';
+      fetch(path, { headers: { Authorization: 'Bearer ' + state.token } })
+        .then(function (r) {
+          if (!r.ok) throw new Error('download failed (' + r.status + ')');
+          return kind === 'report' ? r.blob() : r.text();
+        })
+        .then(function (payload) {
+          var blob = payload instanceof Blob
+            ? payload
+            : new Blob([payload], { type: 'application/json' });
+          var url = URL.createObjectURL(blob);
+          var a = document.createElement('a');
+          a.href = url;
+          a.download = kind === 'report'
+            ? 'SAE_simulation_' + simId + '.pdf'
+            : 'SAE_trajectories_' + simId + '.json';
+          document.body.appendChild(a); a.click(); a.remove();
+          setTimeout(function () { URL.revokeObjectURL(url); }, 2000);
+        })
+        .catch(function (e) { setStatus(e.message, true); });
+    },
+
     _stream: function (simId) {
       var proto = location.protocol === 'https:' ? 'wss://' : 'ws://';
       var ws = new WebSocket(proto + location.host + API + '/simulations/' + simId + '/stream');
@@ -227,15 +254,16 @@
         try { f = JSON.parse(ev.data); } catch (e) { return; }
         if (f.error === 'not_found') { setStatus('simulation not found', true); return; }
         setProgress(Math.round((f.progress || 0) * 100));
-        if (f.results) { renderStep('stream', 'done'); renderStep('results', 'done'); self_renderResults(f.results); }
+        if (f.results) { renderStep('stream', 'done'); renderStep('results', 'done'); self_renderResults(f.results, simId); }
         else if (f.status === 'failed') { renderStep('stream', 'fail'); setStatus(f.error_message || 'run failed', true); }
       };
       ws.onerror = function () { setStatus('WebSocket error', true); };
     },
   };
 
-  function self_renderResults(results) {
+  function self_renderResults(results, simId) {
     setProgress(100);
+    state.lastSimId = simId;
     var el = $('cl-results');
     if (!el) return;
     var rows = '';
@@ -246,7 +274,13 @@
                 k + '</td><td class="py-1 font-mono text-emerald-400">' + v + '</td></tr>';
       }
     });
-    el.innerHTML = '<table class="w-full text-xs"><tbody>' + rows + '</tbody></table>';
+    var actions = simId
+      ? '<div class="grid grid-cols-2 gap-2 mt-4">' +
+        '<button onclick="SAE_Cloud.download(\'report\')" class="px-3 py-2 bg-red-600 hover:bg-red-700 rounded-lg text-xs font-semibold"><i class="fas fa-file-pdf mr-1"></i>PDF report</button>' +
+        '<button onclick="SAE_Cloud.download(\'trajectories\')" class="px-3 py-2 bg-cyan-600 hover:bg-cyan-700 rounded-lg text-xs font-semibold"><i class="fas fa-route mr-1"></i>Trajectories</button>' +
+        '</div>'
+      : '';
+    el.innerHTML = '<table class="w-full text-xs"><tbody>' + rows + '</tbody></table>' + actions;
   }
 
 })();

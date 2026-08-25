@@ -157,7 +157,8 @@ def phase3_cloud_sumo(page, res: Result) -> None:
 
     def num(key: str) -> float:
         import re
-        m = re.search(key + r"([\d.]+)", results_text.replace(" ", ""))
+        pattern = r"(?<![a-z_])" + key + r"([\d.]+)"
+        m = re.search(pattern, results_text.replace(" ", ""))
         return float(m.group(1)) if m else 0.0
 
     arrived = int(num("arrived_vehicles"))
@@ -166,6 +167,23 @@ def phase3_cloud_sumo(page, res: Result) -> None:
     res.check("trips have substantive length (≥200 m)", route_m >= 200, f"route={route_m} m")
     progress = page.evaluate("() => document.getElementById('cl-progress')?.style.width || ''")
     res.check("progress reached 100%", progress.strip() == "100%", progress)
+
+    # Post-run artifacts: PDF report + trajectories downloads wired to sim id.
+    btns = page.evaluate("""() => ({
+        pdf: !!document.querySelector('#cl-results button[onclick*="report"]'),
+        traj: !!document.querySelector('#cl-results button[onclick*="trajectories"]'),
+    })""")
+    res.check("download action buttons rendered", btns["pdf"] and btns["traj"], str(btns))
+    try:
+        with page.expect_download(timeout=15000) as dl_info:
+            page.evaluate("() => window.SAE_Cloud.download('report')")
+        fname = dl_info.value.suggested_filename
+        res.check("PDF report downloads", fname.endswith(".pdf"), fname)
+    except Exception as exc:  # noqa: BLE001
+        res.check("PDF report downloads", False, repr(exc)[:120])
+    duration_s = num("duration_s")
+    res.check("FCD timestamps fixed (duration_s ≈ horizon)", 100 <= duration_s <= 200,
+              f"duration_s={duration_s}")
     page.screenshot(path=str(ARTIFACTS / "phase3_cloud.png"))
 
 

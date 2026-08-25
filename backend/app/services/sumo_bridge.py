@@ -475,7 +475,10 @@ class SUMOBridge:
                         "lane": lane,
                     }
                 )
-            timesteps.append({"time": round(float(element.get("t", 0)), 3), "vehicles": vehicles})
+            # SUMO 1.20 FCD writes <timestep time="179.00">; older variants
+            # used "value" or "t".
+            raw_t = element.get("time") or element.get("value") or element.get("t") or 0
+            timesteps.append({"time": round(float(raw_t), 3), "vehicles": vehicles})
             element.clear()
         return timesteps
 
