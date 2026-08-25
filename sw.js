@@ -1,8 +1,8 @@
-/* SAE AutoSim Hub service worker — v2
- * Bumped from 'sae-v1': adds the sim-engine/integration panel bundle to the
- * precache and gates fetch handling to GET requests only.
+/* SAE AutoSim Hub service worker — v3
+ * v3: precache grew to include bootModules/cloudPanel/comparison+export
+ * panels; bump forces returning clients to refresh stale cached assets.
  */
-const CACHE = 'sae-autosim-v2';
+const CACHE = 'sae-autosim-v3';
 const PRECACHE = [
   '/',
   '/index.html',

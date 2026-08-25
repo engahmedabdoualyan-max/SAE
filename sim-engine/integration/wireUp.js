@@ -372,7 +372,7 @@
 
     run: function () {
       if (!this._data || this._data.length === 0) {
-        alert('Please upload a CSV file first');
+        toast('Upload a field-data CSV first');
         return;
       }
       var progressEl = document.getElementById('cal-progress');
@@ -720,35 +720,59 @@
     }
   };
 
+  function toast(msg) {
+    var el = document.getElementById('toast');
+    var txt = document.getElementById('toast-text');
+    if (!el || !txt) return;
+    txt.textContent = msg;
+    el.classList.add('show');
+    clearTimeout(toast._t);
+    toast._t = setTimeout(function () { el.classList.remove('show'); }, 2600);
+  }
+
   /* ── Reports Manager ────────────────────────────────────── */
   window.SAE_Reports = {
     generatePDF: function () {
-      if (typeof jsPDF === 'undefined') {
-        alert('jsPDF not loaded. Add <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script> to your page.');
+      /* UMD builds expose window.jspdf.jsPDF, not a bare jsPDF global. */
+      var JsPDF = (window.jspdf && window.jspdf.jsPDF) || window.jsPDF;
+      if (!JsPDF) {
+        toast('PDF engine not loaded — check your connection and reload');
         return;
       }
-      var doc = new jspdf.jsPDF();
+      var doc = new JsPDF();
       doc.setFontSize(20);
       doc.text('SAE AutoSim Hub — Simulation Report', 20, 20);
       doc.setFontSize(12);
       doc.text('Generated: ' + new Date().toLocaleString(), 20, 30);
       doc.text('MPR: ' + (window.mprValue || 30) + '%', 20, 38);
       doc.text('Mode: ' + simMode, 20, 46);
+      var adv = ['los', 'speed', 'vc', 'delay', 'queue', 'vehs'];
+      var labels = { los: 'LOS', speed: 'Avg speed (km/h)', vc: 'V/C', delay: 'Delay (s)', queue: 'Queue (m)', vehs: 'Active vehicles' };
+      var y = 58;
+      adv.forEach(function (k) {
+        var el = document.getElementById('adv-' + k);
+        if (el && simMode === 'advanced') {
+          doc.setFontSize(10);
+          doc.text(labels[k] + ':', 25, y);
+          doc.text(String(el.textContent || '-'), 100, y);
+          y += 6;
+        }
+      });
       doc.save('SAE_Report_' + Date.now() + '.pdf');
+      toast('PDF report downloaded');
     },
 
     generateBibTeX: function () {
       var bib = '@misc{sae_autosim_hub_2026,\n  title        = {SAE AutoSim Hub: Pre-calibrated Vehicle Fleets},\n  author       = {{SAE AutoSim Hub}},\n  year         = {2026},\n  url          = {https://sae.fimtosoft.com},\n  note         = {Accessed: ' + new Date().toISOString().slice(0, 10) + '}\n}';
-      navigator.clipboard.writeText(bib).then(function () {
-        alert('BibTeX copied to clipboard!');
-      }).catch(function () {
+      var done = function () { toast('BibTeX copied to clipboard'); };
+      navigator.clipboard.writeText(bib).then(done).catch(function () {
         var ta = document.createElement('textarea');
         ta.value = bib;
         document.body.appendChild(ta);
         ta.select();
         document.execCommand('copy');
         document.body.removeChild(ta);
-        alert('BibTeX copied!');
+        done();
       });
     },
 
@@ -775,7 +799,7 @@
           return;
         } catch (e) { /* fall through to hint */ }
       }
-      alert('Draw a network in the Network Editor first (Road/Junction tools), then export.');
+      toast('Draw a network in the Network Editor first (Road/Junction tools)');
     }
   };
 

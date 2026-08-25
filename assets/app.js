@@ -2583,7 +2583,7 @@ function exportVISSIM() {
   _dl('sae_vissim_mpr' + rrMPR + '.inp', s.join('\n'));
 }
 function exportReport() {
-  if (!window.jspdf || !jspdf.jsPDF) { alert('PDF library not loaded'); return; }
+  if (!window.jspdf || !jspdf.jsPDF) { showToast('PDF library not loaded'); return; }
   var doc = new jspdf.jsPDF();
   var y = 18;
   doc.setFontSize(16); doc.text('SAE AutoSim Hub - Simulation Report', 14, y); y += 8;
