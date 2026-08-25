@@ -295,38 +295,16 @@ def phase2d_osm_share_adaptive(page, res: Result) -> None:
     hist = page.evaluate("""async () => {
         await window.SAE_Cloud.login();
         window.SAE_Cloud.loadHistory();
-        for (let i = 0; i < 20; i++) {
+        for (let i = 0; i < 12; i++) {
             await new Promise(r => setTimeout(r, 250));
-            const n = document.querySelectorAll('#cl-history .cl-view').length;
-            if (n > 0) return { rows: n };
+            if (document.querySelector('#cl-history .cl-view')) break;
         }
         return { rows: document.querySelectorAll('#cl-history .cl-view').length,
-                 text: document.getElementById('cl-history').innerText.slice(0, 80) };
+                 text: document.getElementById('cl-history').innerText.slice(0, 60) };
     }""")
-    res.check("run-history browser lists past cloud runs", hist["rows"] >= 1, str(hist))
-
-    view_click = page.evaluate("""async () => {
-        const rows = [...document.querySelectorAll('#cl-history .cl-view')];
-        const tryRow = async (btn) => {
-            btn.click();
-            for (let i = 0; i < 20; i++) {
-                await new Promise(r => setTimeout(r, 250));
-                const txt = document.getElementById('cl-results').innerText || '';
-                if (document.querySelector('#cl-results table') &&
-                    /arrived_vehicles|avg_speed_kmh/.test(txt)) {
-                    return true;
-                }
-            }
-            return false;
-        };
-        if (!rows.length) return { clicked: false };
-        if (await tryRow(rows[0])) return { clicked: true, ready: true, tried: 'first' };
-        if (rows[1] && await tryRow(rows[1])) return { clicked: true, ready: true, tried: 'second' };
-        return { clicked: true, ready: false,
-                 html: document.getElementById('cl-results').innerHTML.slice(0, 100) };
-    }""")
-    res.check("clicking a history row restores full results view",
-              bool(view_click.get("ready")), str(view_click))
+    # On a fresh CI database this legitimately shows the empty state.
+    res.check("history browser responds (rows or clean empty-state)",
+              hist["rows"] >= 1 or "No runs yet" in hist["text"], str(hist))
 
     reg = page.evaluate("""async () => {
         const email = `e2e_${Date.now()}@sae.test`;
@@ -459,6 +437,40 @@ def phase3_cloud_sumo(page, res: Result) -> None:
     duration_s = num("duration_s")
     res.check("FCD timestamps fixed (duration_s ≈ horizon)", 100 <= duration_s <= 200,
               f"duration_s={duration_s}")
+
+    # History now MUST contain the run we just finished (fresh DB or not).
+    hist_after = page.evaluate("""async () => {
+        window.SAE_Cloud.loadHistory();
+        for (let i = 0; i < 16; i++) {
+            await new Promise(r => setTimeout(r, 250));
+            if (document.querySelectorAll('#cl-history .cl-view').length >= 1) break;
+        }
+        return document.querySelectorAll('#cl-history .cl-view').length;
+    }""")
+    res.check("history lists the just-finished run", hist_after >= 1, f"rows={hist_after}")
+
+    view_click = page.evaluate("""async () => {
+        const rows = [...document.querySelectorAll('#cl-history .cl-view')];
+        const tryRow = async (btn) => {
+            btn.click();
+            for (let i = 0; i < 20; i++) {
+                await new Promise(r => setTimeout(r, 250));
+                const txt = document.getElementById('cl-results').innerText || '';
+                if (document.querySelector('#cl-results table') &&
+                    /arrived_vehicles|avg_speed_kmh/.test(txt)) {
+                    return true;
+                }
+            }
+            return false;
+        };
+        if (!rows.length) return { clicked: false };
+        if (await tryRow(rows[0])) return { clicked: true, ready: true, tried: 'first' };
+        if (rows[1] && await tryRow(rows[1])) return { clicked: true, ready: true, tried: 'second' };
+        return { clicked: true, ready: false,
+                 html: document.getElementById('cl-results').innerHTML.slice(0, 100) };
+    }""")
+    res.check("clicking a history row restores full results view",
+              bool(view_click.get("ready")), str(view_click))
     page.screenshot(path=str(ARTIFACTS / "phase3_cloud.png"))
 
 
