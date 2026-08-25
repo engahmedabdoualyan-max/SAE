@@ -386,41 +386,80 @@
       var self = this;
       var bestGEH = Infinity;
       var bestParams = null;
-      var iterations = 36;
+      /* ── REAL calibration: each candidate runs the actual engine and
+         GEH is measured from loop-detector flows, normalized per lane. ── */
+      if (!window.SAE_Sim || !window.SAE_Sim.isRunning()) {
+        toast('Starting engine for calibration…');
+        if (typeof runAdvancedSim === 'function') runAdvancedSim();
+      }
+
+      function measuredFlow() {
+        var stats = window.SAE_Sim.getDetectorStats() || [];
+        if (!stats.length) return 0;
+        var lanes = window.SAE_Sim.getLaneCount() || 1;
+        var rates = stats.map(function (d) { return d.totalRateVehH || 0; });
+        if (rates.every(function (r) { return r === 0; })) {
+          rates = stats.map(function (d) { return d.flow; }); /* fallback */
+        }
+        var avg = rates.reduce(function (a, r) { return a + r; }, 0) / rates.length;
+        return avg / lanes; /* loop detectors read one lane each */
+      }
+
+      var hasCSV = this._data && this._data.length > 0;
+      var target;
+      if (hasCSV) {
+        target = this._data.reduce(function (a, d) { return a + d.observedFlow; }, 0)
+                 / this._data.length;
+      } else {
+        window.SAE_Sim.loadTemplate('ring');
+        window.SAE_Sim.restart();
+        window.SAE_Sim.tick(700);
+        target = Math.round(measuredFlow());
+        toast('No CSV — using engine baseline ' + target + ' veh/h/lane as target');
+      }
+
+      var gridV0 = [18, 22, 26, 30];
+      var gridT  = [1.0, 1.4, 1.8];
+      var iterations = gridV0.length * gridT.length; /* 12 real runs */
       var done = 0;
+      var aFixed = 2.2, bFixed = 2.6;
 
-      function runIteration() {
-        var v0 = 15 + Math.random() * 20;
-        var T = 0.8 + Math.random() * 1.5;
-        var a = 0.5 + Math.random() * 2;
-        var b = 1 + Math.random() * 3;
+      function standardGEH(observed, modelled) {
+        return Math.sqrt(2 * Math.pow(observed - modelled, 2) / (observed + modelled || 1));
+      }
 
-        var gehs = self._data.map(function (d) {
-          var simulated = v0 * 0.6 * (1 - Math.random() * 0.3);
-          var geh = Math.abs(d.observedFlow - simulated) / Math.sqrt((d.observedFlow + simulated) / 2);
-          return geh;
-        });
-        var avgGEH = gehs.reduce(function (a, b) { return a + b; }, 0) / gehs.length;
+      function runCandidate() {
+        if (done >= iterations) {
+          self._showResults(bestParams, bestGEH);
+          if (progressEl) progressEl.classList.add('hidden');
+          toast(bestGEH < 5 ? 'Calibration PASS — GEH ' + bestGEH.toFixed(2)
+                            : 'Best GEH ' + bestGEH.toFixed(2));
+          return;
+        }
+        var v0 = gridV0[Math.floor(done / gridT.length)];
+        var T  = gridT[done % gridT.length];
 
-        if (avgGEH < bestGEH) {
-          bestGEH = avgGEH;
-          bestParams = { v0: v0, T: T, a: a, b: b };
+        window.SAE_Sim.applyIDM({ v0: v0, T: T, a: aFixed, b: bFixed });
+        window.SAE_Sim.loadTemplate('ring');     /* resets detectors + buffers */
+        window.SAE_Sim.restart();                /* deterministic seed */
+        window.SAE_Sim.tick(700);                /* ~31 sim-seconds, fast */
+
+        var measured = measuredFlow();
+        var geh = standardGEH(target, measured);
+        if (geh < bestGEH) {
+          bestGEH = geh;
+          bestParams = { v0: v0, T: T, a: aFixed, b: bFixed };
         }
 
         done++;
         if (barEl) barEl.style.width = (done / iterations * 100) + '%';
-        if (textEl) textEl.textContent = 'Iteration ' + done + '/' + iterations;
-
-        if (done < iterations) {
-          setTimeout(runIteration, 50);
-        } else {
-          self._showResults(bestParams, bestGEH);
-          if (progressEl) progressEl.classList.add('hidden');
-        }
+        if (textEl) textEl.textContent =
+          'Run ' + done + '/' + iterations + ' — v0=' + v0 + ' T=' + T +
+          ' → flow ' + Math.round(measured) + ' veh/h (GEH ' + geh.toFixed(2) + ')';
+        setTimeout(runCandidate, 10); /* yield to keep UI responsive */
       }
 
-      runIteration();
-    },
+      runCandidate();    },
 
     _showResults: function (params, geh) {
       this._lastParams = Object.assign({}, params);

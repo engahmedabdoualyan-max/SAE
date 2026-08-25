@@ -247,13 +247,28 @@
     '            <option value="lane_closure">Lane closure / work zone</option>' +
     '            <option value="uphill">Uphill gradient (+3.5%)</option>' +
     '            <option value="signal_arterial">Signalized arterial</option>' +
+    '            <option value="green_wave">Green wave (3 coordinated signals)</option>' +
     '          </select>' +
-    '          <button onclick="SAE_Lab && SAE_Lab.loadTemplate()" class="w-full px-4 py-2 bg-cyan-600 hover:bg-cyan-700 rounded-lg text-sm font-semibold"><i class="fas fa-play mr-2"></i>Apply & Run</button>' +
+    '          <div class="grid grid-cols-2 gap-2">' +
+    '            <button onclick="SAE_Lab && SAE_Lab.loadTemplate()" class="px-4 py-2 bg-cyan-600 hover:bg-cyan-700 rounded-lg text-sm font-semibold"><i class="fas fa-play mr-1"></i>Apply & Run</button>' +
+    '            <button onclick="SAE_Lab && SAE_Lab.restart()" title="Same seed → identical run" class="px-4 py-2 bg-slate-600 hover:bg-slate-500 rounded-lg text-sm font-semibold"><i class="fas fa-redo mr-1"></i>Restart ⟳</button>' +
+    '          </div>' +
     '          <div id="lab-detectors" class="grid grid-cols-2 gap-3 mt-4"></div>' +
+    '          <div id="lab-sparks" class="grid grid-cols-2 gap-3 mt-3">' +
+    '            <canvas id="lab-spark-1" width="200" height="46" class="w-full rounded bg-slate-950"></canvas>' +
+    '            <canvas id="lab-spark-2" width="200" height="46" class="w-full rounded bg-slate-950"></canvas>' +
+    '          </div>' +
     '        </div>' +
     '        <div class="bg-slate-800 rounded-xl p-5 border border-slate-700">' +
     '          <h3 class="font-semibold text-sm mb-3"><i class="fas fa-sliders-h text-emerald-400 mr-2"></i>Live IDM Parameters</h3>' +
     '          <div id="lab-sliders" class="space-y-3 text-xs"></div>' +
+    '          <div class="mt-4 pt-3 border-t border-slate-700">' +
+    '            <div class="flex items-center gap-3 text-xs">' +
+    '              <span class="w-44 text-slate-400">Heavy vehicles — % of human fleet</span>' +
+    '              <input id="lab-sl-heavy" type="range" min="0" max="45" step="5" value="20" class="flex-1 accent-emerald-500">' +
+    '              <span id="lab-val-heavy" class="w-10 text-right font-mono text-emerald-400">20</span>' +
+    '            </div>' +
+    '          </div>' +
     '          <button onclick="SAE_Lab && SAE_Lab.applySliders()" class="mt-3 w-full px-4 py-2 bg-emerald-600 hover:bg-emerald-700 rounded-lg text-sm font-semibold"><i class="fas fa-bolt mr-2"></i>Apply Live</button>' +
     '        </div>' +
     '      </div>' +

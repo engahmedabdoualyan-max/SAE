@@ -44,7 +44,7 @@
     });
   }
 
-  /* ── detector cards ── */
+  /* ── detector cards + sparklines ── */
   function renderDetectors() {
     var box = $('lab-detectors');
     if (!box) return;
@@ -59,6 +59,33 @@
         '<div class="text-lg font-bold text-cyan-400">' + d.flow + '</div>' +
         '<div class="text-[10px] text-slate-400">veh/h · ' + d.hmean + ' km/h h.mean</div></div>';
     }).join('');
+  }
+
+  function drawSparklines() {
+    var stats = (window.SAE_Sim && window.SAE_Sim.getDetectorStats()) || [];
+    for (var i = 0; i < stats.length; i++) {
+      var cv = $('lab-spark-' + (i + 1));
+      if (!cv) continue;
+      var ctx = cv.getContext('2d');
+      ctx.fillStyle = '#020617';
+      ctx.fillRect(0, 0, cv.width, cv.height);
+      var hist = stats[i].hist || [];
+      if (hist.length < 2) continue;
+      var fMax = Math.max.apply(null, hist.map(function (h) { return h.flow; })) || 1;
+      ctx.strokeStyle = '#22d3ee';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      for (var k = 0; k < hist.length; k++) {
+        var x = 4 + (k / (hist.length - 1)) * (cv.width - 8);
+        var y = cv.height - 5 - (hist[k].flow / fMax) * (cv.height - 12);
+        if (k === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+      ctx.fillStyle = '#475569';
+      ctx.font = '8px sans-serif';
+      ctx.textAlign = 'left';
+      ctx.fillText('D' + (i + 1) + ' flow/10s', 4, 10);
+    }
   }
 
   /* ── time–space diagram ── */
@@ -187,17 +214,45 @@
       window.SAE_Sim.applyIDM(ov);
     },
 
+    setHeavy: function (pct) {
+      if (!window.SAE_Sim) return;
+      window.SAE_Sim.setFleetMix(parseFloat(pct));
+    },
+
+    restart: function () {
+      if (!window.SAE_Sim) return;
+      window.SAE_Sim.restart(); /* same seed → identical run */
+      window.SAE_Sim.start();
+      renderDetectors();
+      drawSparklines();
+    },
+
     _tick: function () {
       renderDetectors();
+      drawSparklines();
       drawTS();
       drawFD();
     }
   };
 
+  /* heavy-share slider wiring */
+  function wireHeavySlider() {
+    var inp = $('lab-sl-heavy');
+    if (!inp || inp.dataset.wired) return;
+    inp.dataset.wired = '1';
+    inp.addEventListener('input', function () {
+      $('lab-val-heavy').textContent = inp.value;
+      window.SAE_Lab.setHeavy(parseFloat(inp.value));
+    });
+  }
+
   /* throttled repaint of lab visuals (~6 fps) */
   setInterval(function () {
     var sec = document.getElementById('sim-lab');
-    if (sec && window.SAE_Lab) window.SAE_Lab._tick();
+    if (sec && window.SAE_Lab) {
+      wireHeavySlider();
+      window.SAE_Lab._tick();
+    }
   }, 160);
 
 })();

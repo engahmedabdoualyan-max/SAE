@@ -17,8 +17,13 @@ All notable changes to SAE AutoSim Hub.
 - **Calibration wizard**: GEH/RMSE/R² grid search over IDM parameters with
   one-click apply-to-engine.
 - **Simulation Lab**: scenario templates (bottleneck, lane closure, uphill,
-  signalized arterial), live IDM parameter sliders, loop detectors with
-  true harmonic-mean speeds, time–space diagram and fundamental q–k diagram.
+  signalized arterial, three-signal green wave), live IDM parameter sliders,
+  heavy-vehicle fleet-mix control, seeded deterministic restarts, loop
+  detectors with true harmonic-mean speeds and flow sparklines, time–space
+  diagram and fundamental q–k diagram.
+- **Engine-driven calibration**: the wizard's grid search now runs the real
+  simulation per candidate (12 seeded runs) and scores GEH against loop
+  detector flows normalized per lane — replacing a mocked search.
 - **Cloud Simulation panel**: editor network → FastAPI → netconvert →
   headless SUMO → trip KPIs streamed over WebSocket, with PDF report and
   trajectory JSON downloads from the results panel.

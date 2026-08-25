@@ -146,6 +146,77 @@ def phase2b_lab(page, res: Result) -> None:
     res.check("time-space canvas painted", painted > 50, f"samples={painted}")
 
 
+def phase2c_determinism_mix_calib(page, res: Result) -> None:
+    print("── Phase 2c: determinism · green wave · fleet mix · real calibration")
+
+    det = page.evaluate("""() => {
+        window.SAE_Sim.restart(777);
+        window.SAE_Sim.tick(250);
+        const a = window.SAE_Sim.getVehicles().length;
+        window.SAE_Sim.restart(777);
+        window.SAE_Sim.tick(250);
+        return { a, b: window.SAE_Sim.getVehicles().length };
+    }""")
+    res.check("seeded restart is deterministic", det["a"] == det["b"] and det["a"] > 0, str(det))
+
+    gw = page.evaluate("""() => {
+        document.getElementById('lab-template').value = 'green_wave';
+        const cfg = window.SAE_Lab.loadTemplate();
+        window.SAE_Sim.tick(300);
+        const seen = new Set();
+        for (let i = 0; i < 300; i++) {
+            window.SAE_Sim.tick(3);
+            (window.SAE_Sim.getSignalPhase() || '').split(',').forEach(p => seen.add(p));
+        }
+        return { n: cfg ? cfg.signals : 0, phases: [...seen].filter(Boolean) };
+    }""")
+    res.check("green wave runs ≥3 coordinated signals", gw["n"] >= 3, str(gw))
+    res.check("coordinated signals cycle phases", len(gw["phases"]) >= 2, str(gw["phases"]))
+
+    mix = page.evaluate("""() => {
+        document.getElementById('lab-template').value = 'ring';
+        window.SAE_Lab.loadTemplate();
+        document.getElementById('lab-sl-heavy').value = '45';
+        document.getElementById('lab-val-heavy').textContent = '45';
+        window.SAE_Lab.setHeavy(45);
+        window.SAE_Sim.restart(9001);
+        window.SAE_Sim.tick(700);
+        return window.SAE_Sim.getSpawnMix();
+    }""")
+    res.check("heavy-mix slider reaches ~45% of spawned human fleet (±15)",
+              mix["human"] > 50 and 30 <= mix["heavyPct"] <= 60, str(mix))
+
+    page.evaluate("""() => {
+        SAE_Calibration._data = [{edgeId: 'D1', observedFlow: 850}];
+        SAE_Calibration.run();
+    }""")
+    geh = None
+    for _ in range(40):
+        page.wait_for_timeout(500)
+        if page.evaluate("() => !!document.querySelector('#cal-results button')"):
+            import re
+            txt = page.evaluate("() => document.getElementById('cal-results').innerText")
+            m = re.search(r"GEH Score\s*([\d.]+)", txt)
+            geh = float(m.group(1)) if m else None
+            break
+    res.check("engine-driven calibration completes with finite GEH",
+              geh is not None and 0 < geh < 200, f"geh={geh}")
+    page.evaluate("() => SAE_Calibration.applyParams()")
+    stored = page.evaluate("() => !!(window.__saeIdmOverrides && window.__saeIdmOverrides.v0)")
+    res.check("calibration Apply persists IDM overrides", stored)
+
+    spark = page.evaluate("""() => {
+        window.SAE_Sim.loadTemplate('signal_arterial');
+        window.SAE_Sim.tick(600);
+        window.SAE_Lab._tick();
+        const c = document.getElementById('lab-spark-1');
+        const d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data;
+        let n = 0; for (let i = 3; i < d.length; i += 40) if (d[i] > 0) n++;
+        return n;
+    }""")
+    res.check("detector sparkline painted", spark > 50, f"samples={spark}")
+
+
 def phase3_cloud_sumo(page, res: Result) -> None:
     print("── Phase 3: cloud SUMO pipeline")
     # Draw a deterministic network through the real editor API.
@@ -251,6 +322,7 @@ def main() -> int:
             phase1_page(page, res)
             phase2_local_sim(page, res)
             phase2b_lab(page, res)
+            phase2c_determinism_mix_calib(page, res)
             phase3_cloud_sumo(page, res)
         except Exception as exc:  # noqa: BLE001 — report and screenshot
             res.check("suite completed without crash", False, repr(exc)[:300])

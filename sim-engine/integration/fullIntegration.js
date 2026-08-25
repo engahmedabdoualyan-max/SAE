@@ -156,7 +156,7 @@
 
     /* ── Simulation Lab state: signals, detectors, TS/FD recorders ── */
     var PX_M = 0.5;                       /* canvas px → metres */
-    var labSignal = null;                 /* {xFrac, g, y, r, t} */
+    var labSignals = [];                  /* [{xFrac,g,y,r,offset,t,phase}] */
     var labSlowZone = null;               /* {x0,x1 (frac), factor} */
     var labDemandRate = 1;                /* spawn multiplier */
     var labV0Factor = 1;                  /* free-speed multiplier */
@@ -168,27 +168,63 @@
     var network = buildNetwork(corridors);
     var demand = buildDemand(fleet, network, mprValue);
 
+    /* ── deterministic RNG (mulberry32) — reproducible restarts ── */
+    var labSeed = 20260824;
+    var rng = mulberry32(labSeed);
+
+    function mulberry32(a) {
+      return function () {
+        a |= 0; a = (a + 0x6D2B79F5) | 0;
+        var t = Math.imul(a ^ (a >>> 15), 1 | a);
+        t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+        return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+      };
+    }
+
+    /* fleet-mix override: heavy-vehicle share (%) rebalances weights live */
+    var HEAVY_KEYS = { naql_taqeel: 1, noss_naql: 1, rob_naql: 1 };
+    var labHeavyPct = null; /* null → use FLEET weights as-is */
+    var labIdmOverride = null; /* persists across respawn/restart (calibration) */
+    var spawnedTypes = {};   /* cumulative mix of generated fleet */
+
+    function currentWeights() {
+      if (labHeavyPct == null) return fleetWeights;
+      var baseHeavy = 0;
+      fleetKeys.forEach(function (k, i) {
+        if (HEAVY_KEYS[k]) baseHeavy += fleetWeights[i];
+      });
+      if (baseHeavy <= 0) return fleetWeights;
+      var factor = labHeavyPct / (baseHeavy * 100);
+      var w = fleetWeights.map(function (wi, i) {
+        return HEAVY_KEYS[fleetKeys[i]] ? wi * factor : wi;
+      });
+      var tot = w.reduce(function (a, b) { return a + b; }, 0);
+      return tot > 0 ? w.map(function (x) { return x / tot; }) : w;
+    }
+
     /* pick fleet type weighted by weight */
     var fleetKeys = Object.keys(fleet).filter(function (k) { return fleet[k] && fleet[k].cf; });
     var fleetWeights = fleetKeys.map(function (k) { return fleet[k].weight || 0.1; });
     var totalWeight = fleetWeights.reduce(function (a, b) { return a + b; }, 0);
 
     function pickFleetType() {
-      var r = Math.random() * totalWeight;
+      var w = currentWeights();
+      var tot = w.reduce(function (a, b) { return a + b; }, 0);
+      var r = rng() * tot;
       var acc = 0;
       for (var i = 0; i < fleetKeys.length; i++) {
-        acc += fleetWeights[i];
+        acc += w[i];
         if (r <= acc) return fleetKeys[i];
       }
       return fleetKeys[0];
     }
 
     function spawnVehicle() {
-      var isAv = Math.random() < mpr;
+      var isAv = rng() < mpr;
       var typeKey;
       if (isAv) {
         var avKeys = ['av_l1', 'av_l2', 'av_l3', 'av_l4', 'av_l5'];
-        typeKey = avKeys[Math.floor(Math.random() * avKeys.length)];
+        typeKey = avKeys[Math.floor(rng() * avKeys.length)];
       } else {
         typeKey = pickFleetType();
       }
@@ -200,14 +236,20 @@
           if (Object.prototype.hasOwnProperty.call(overrides, k)) idm[k] = overrides[k];
         }
       }
-      var lane = Math.floor(Math.random() * LANE_COUNT);
+      if (labIdmOverride) {
+        for (var k2 in labIdmOverride) {
+          if (Object.prototype.hasOwnProperty.call(labIdmOverride, k2)) idm[k2] = labIdmOverride[k2];
+        }
+      }
+      spawnedTypes[typeKey] = (spawnedTypes[typeKey] || 0) + 1;
+      var lane = Math.floor(rng() * LANE_COUNT);
 
       return {
-        x: -20 - Math.random() * 80,
+        x: -20 - rng() * 80,
         lane: lane,
         targetLane: lane,
         hist: [],
-        speed: idm.v0 * (0.4 + Math.random() * 0.3),
+        speed: idm.v0 * (0.4 + rng() * 0.3),
         idm: idm,
         type: type,
         typeKey: typeKey,
@@ -256,27 +298,38 @@
       var t = stepCount * simDt;
       frameInTick++;
 
-      /* ── signal controller tick ── */
-      var sigPhase = 'green';
-      if (labSignal) {
-        labSignal.t += simDt;
-        var cyc = (labSignal.g || 0) + (labSignal.y || 0) + (labSignal.r || 0);
+      /* ── signal controllers tick (multi-signal / green wave) ── */
+      var sigPhases = [];
+      for (var si = 0; si < labSignals.length; si++) {
+        var sg = labSignals[si];
+        sg.t += simDt;
+        var cyc = (sg.g || 0) + (sg.y || 0) + (sg.r || 0);
+        var ph = 'green';
         if (cyc > 0) {
-          var tt = labSignal.t % cyc;
-          sigPhase = tt < labSignal.g ? 'green' : tt < labSignal.g + labSignal.y ? 'yellow' : 'red';
+          var tt = (((sg.t + sg.offset) % cyc) + cyc) % cyc;
+          ph = tt < sg.g ? 'green' : tt < sg.g + sg.y ? 'yellow' : 'red';
         }
-        labSignal.phase = sigPhase;
+        sg.phase = ph;
+        sigPhases.push(ph);
       }
 
       /* spawn (template demand rate) */
-      if (vehicles.length < 50 && Math.random() < 0.15 * labDemandRate) {
+      if (vehicles.length < 50 && rng() < 0.15 * labDemandRate) {
         var nv = spawnVehicle();
         if (nv) vehicles.push(nv);
       }
 
       /* update each vehicle */
       var prevX = new Array(vehicles.length);
-      var sigX = labSignal ? labSignal.xFrac * W : null;
+      function nearestRedAhead(x) {
+        for (var q = 0; q < labSignals.length; q++) {
+          var sgn = labSignals[q];
+          if (sgn.phase === 'green') continue;
+          var sxq = sgn.xFrac * W;
+          if (sxq > x) return sxq;
+        }
+        return null;
+      }
       for (var i = 0; i < vehicles.length; i++) {
         var v = vehicles[i];
         prevX[i] = v.x;
@@ -289,7 +342,8 @@
         }
 
         /* signal stop-bar: brake comfortably when red/yellow ahead */
-        if (sigX !== null && sigPhase !== 'green') {
+        var sigX = nearestRedAhead(v.x);
+        if (sigX !== null) {
           var dStop = sigX - v.x;
           if (dStop > 2 && dStop < 150) {
             var aReq = (v.speed * v.speed) / (2 * Math.max(dStop - 3, 1));
@@ -299,17 +353,17 @@
         }
 
         /* erratic behavior */
-        if (v.isErratic && Math.random() < 0.008 * (1 - mpr)) {
-          var dir = Math.random() < 0.5 ? -1 : 1;
+        if (v.isErratic && rng() < 0.008 * (1 - mpr)) {
+          var dir = rng() < 0.5 ? -1 : 1;
           v.targetLane = clamp(v.lane + dir, 0, LANE_COUNT - 1);
         }
-        if (v.isErratic && Math.random() < 0.003 * (1 - mpr)) {
-          v.speed = v.idm.v0 * (0.3 + Math.random() * 0.4);
+        if (v.isErratic && rng() < 0.003 * (1 - mpr)) {
+          v.speed = v.idm.v0 * (0.3 + rng() * 0.4);
           v.erraticTimer = 60;
         }
         if (v.erraticTimer > 0) {
           v.erraticTimer--;
-          if (v.erraticTimer === 0) v.speed = v.idm.v0 + (Math.random() - 0.5) * 4;
+          if (v.erraticTimer === 0) v.speed = v.idm.v0 + (rng() - 0.5) * 4;
         }
 
         /* AV speed smoothing */
@@ -329,6 +383,7 @@
             var vClamp = Math.max(v.speed, 0.5);
             detD.count++;
             detD.n++;
+            detD.total++;
             detD.sumSpeed += vClamp;
             detD.sumInv += 1 / vClamp;   /* for true harmonic mean */
           }
@@ -356,6 +411,7 @@
       for (var d = 0; d < detectors.length; d++) {
         var det = detectors[d];
         det.tAcc += simDt;
+        det.time += simDt;
         if (det.tAcc >= 10) {
           det.hist.push({
             flow: Math.round(det.count * (3600 / det.tAcc)),
@@ -440,13 +496,14 @@
       ctx.lineWidth = 3;
       ctx.strokeRect(0, ROAD_TOP, W, LANE_COUNT * LANE_W);
 
-      /* stop-bar + signal head */
-      if (labSignal) {
-        var sx = labSignal.xFrac * W;
+      /* stop-bars + signal heads */
+      for (var sd = 0; sd < labSignals.length; sd++) {
+        var sig = labSignals[sd];
+        var sx = sig.xFrac * W;
         ctx.fillStyle = '#0f172a';
         ctx.fillRect(sx - 3, ROAD_TOP, 6, LANE_COUNT * LANE_W);
-        var col = labSignal.phase === 'green' ? '#22c55e'
-                : labSignal.phase === 'yellow' ? '#eab308' : '#ef4444';
+        var col = sig.phase === 'green' ? '#22c55e'
+                : sig.phase === 'yellow' ? '#eab308' : '#ef4444';
         ctx.fillStyle = col;
         for (var sl = 0; sl < LANE_COUNT; sl++) {
           ctx.beginPath();
@@ -550,14 +607,16 @@
       /* ── Simulation Lab API ── */
       applyIDM: function (ov) {
         if (!ov) return;
+        labIdmOverride = labIdmOverride || {};
         ['v0', 'T', 'a', 'b'].forEach(function (k) {
           var val = parseFloat(ov[k]);
           if (!isFinite(val) || val <= 0) return;
+          labIdmOverride[k] = val;
           for (var i = 0; i < vehicles.length; i++) vehicles[i].idm[k] = val;
         });
       },
       loadTemplate: function (name) {
-        labSignal = null; labSlowZone = null;
+        labSignals = []; labSlowZone = null;
         labDemandRate = 1; labV0Factor = 1;
         if (name === 'bottleneck') {
           labDemandRate = 1.7;
@@ -568,27 +627,69 @@
         } else if (name === 'uphill') {
           labV0Factor = 0.65; labDemandRate = 0.85;
         } else if (name === 'signal_arterial') {
-          labSignal = { xFrac: 0.62, g: 22, y: 3, r: 18, t: 0, phase: 'green' };
+          labSignals = [{ xFrac: 0.62, g: 22, y: 3, r: 18, offset: 0, t: 0, phase: 'green' }];
           labDemandRate = 1.2;
+        } else if (name === 'green_wave') {
+          labSignals = [
+            { xFrac: 0.30, g: 18, y: 3, r: 12, offset: 0, t: 0, phase: 'green' },
+            { xFrac: 0.55, g: 18, y: 3, r: 12, offset: -6, t: -6, phase: 'green' },
+            { xFrac: 0.80, g: 18, y: 3, r: 12, offset: -12, t: -12, phase: 'green' }
+          ];
+          labDemandRate = 1.25;
         }
         detectors = [
-          { xFrac: 0.33, count: 0, n: 0, sumSpeed: 0, sumInv: 0, tAcc: 0, hist: [] },
-          { xFrac: 0.66, count: 0, n: 0, sumSpeed: 0, sumInv: 0, tAcc: 0, hist: [] }
+          { xFrac: 0.33, count: 0, n: 0, sumSpeed: 0, sumInv: 0, tAcc: 0,
+            total: 0, time: 0, hist: [] },
+          { xFrac: 0.66, count: 0, n: 0, sumSpeed: 0, sumInv: 0, tAcc: 0,
+            total: 0, time: 0, hist: [] }
         ];
         fdSamples = []; tsFrames = [];
-        return { signal: labSignal, slowZone: labSlowZone,
+        return { signals: labSignals.length, slowZone: !!labSlowZone,
                  demandRate: labDemandRate, v0Factor: labV0Factor };
       },
       getDetectorStats: function () {
         return detectors.map(function (d, i) {
           var last = d.hist[d.hist.length - 1] || { flow: 0, hmean: 0 };
           return { id: i + 1, flow: last.flow, hmean: last.hmean,
-                   bins: d.hist.length };
+                   bins: d.hist.length,
+                   hist: d.hist.map(function (h) {
+                     return { flow: h.flow, hmean: h.hmean };
+                   }),
+                   totalRateVehH: d.time > 0 ? Math.round(d.total * 3600 / d.time) : 0 };
         });
       },
       getFDData: function () { return fdSamples.slice(); },
       getTSData: function () { return tsFrames.slice(); },
-      getSignalPhase: function () { return labSignal ? labSignal.phase : null; },
+      getSignalPhase: function () {
+        return labSignals.map(function (x) { return x.phase; }).join(',') || null;
+      },
+
+      setFleetMix: function (heavyPct) {
+        labHeavyPct = (heavyPct == null) ? null : Math.max(0, Math.min(60, heavyPct));
+      },
+      restart: function (seed) {
+        vehicles = [];
+        speedHistory = [];
+        stepCount = 0; frameInTick = 0;
+        labSeed = (typeof seed === 'number') ? seed | 0 : labSeed;
+        rng = mulberry32(labSeed);
+        detectors.forEach(function (d) { d.count = 0; d.n = 0; d.sumSpeed = 0; d.sumInv = 0; d.tAcc = 0; d.total = 0; d.time = 0; d.hist = []; });
+        fdSamples = []; tsFrames = [];
+        spawnedTypes = {};
+        drawRoad();
+      },
+      getSpawnMix: function () {
+        var human = 0, heavy = 0;
+        Object.keys(spawnedTypes).forEach(function (k) {
+          if (k.indexOf('av_') === 0) return;
+          human += spawnedTypes[k];
+          if (HEAVY_KEYS[k]) heavy += spawnedTypes[k];
+        });
+        return { human: human, heavy: heavy,
+                 heavyPct: human > 0 ? Math.round(100 * heavy / human) : 0 };
+      },
+      getSeed: function () { return labSeed; },
+      getLaneCount: function () { return LANE_COUNT; },
       reset: function () {
         RUNNING = false;
         paused = false;
@@ -645,6 +746,11 @@
     getFDData: function () { return simInstance ? simInstance.getFDData() : []; },
     getTSData: function () { return simInstance ? simInstance.getTSData() : []; },
     getSignalPhase: function () { return simInstance ? simInstance.getSignalPhase() : null; },
+    setFleetMix: function (p) { if (simInstance && simInstance.setFleetMix) simInstance.setFleetMix(p); },
+    restart: function (seed) { if (simInstance && simInstance.restart) simInstance.restart(seed); },
+    getSeed: function () { return simInstance ? simInstance.getSeed() : null; },
+    getLaneCount: function () { return simInstance ? simInstance.getLaneCount() : 4; },
+    getSpawnMix: function () { return simInstance && simInstance.getSpawnMix ? simInstance.getSpawnMix() : { human: 0, heavy: 0, heavyPct: 0 }; },
     reset: function () { if (simInstance) simInstance.reset(); },
     setSpeed: function (s) { if (simInstance) simInstance.setSpeed(s); },
     setMPR: function (m) { if (simInstance) simInstance.setMPR(m); },
