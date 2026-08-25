@@ -12,9 +12,14 @@ from app.core.config import settings
 
 def _build_engine(url: str):
     if url.startswith("sqlite"):
+        from sqlalchemy.pool import StaticPool
+
+        # StaticPool: one shared connection so every thread (uvicorn workers,
+        # TestClient portals) sees the same schema — critical for :memory:.
         return create_engine(
             url,
             connect_args={"check_same_thread": False},
+            poolclass=StaticPool,
             pool_pre_ping=True,
         )
     return create_engine(url, pool_pre_ping=True)

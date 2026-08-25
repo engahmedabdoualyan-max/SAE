@@ -17,6 +17,7 @@ from app.api.v1.auth import CurrentUser
 from app.api.v1.projects import _get_owned_project
 from app.core.database import get_db
 from app.models.network import Network
+from app.models.project import Project
 
 router = APIRouter()
 
@@ -396,7 +397,12 @@ async def upload_network(
 
 @router.get("/", response_model=list[NetworkSummaryOut])
 def list_networks(db: DbSession, current_user: CurrentUser, project_id: int | None = None) -> list[NetworkSummaryOut]:
-    stmt = select(Network).order_by(Network.id.desc())
+    stmt = (
+        select(Network)
+        .join(Project, Network.project_id == Project.id)
+        .where(Project.user_id == current_user["id"])
+        .order_by(Network.id.desc())
+    )
     if project_id is not None:
         stmt = stmt.where(Network.project_id == project_id)
     summaries: list[NetworkSummaryOut] = []
@@ -419,7 +425,11 @@ def list_networks(db: DbSession, current_user: CurrentUser, project_id: int | No
 
 @router.get("/{network_id}", response_model=NetworkOut)
 def get_network(network_id: int, db: DbSession, current_user: CurrentUser) -> Network:
-    network = db.get(Network, network_id)
+    network = db.scalars(
+        select(Network)
+        .join(Project, Network.project_id == Project.id)
+        .where(Network.id == network_id, Project.user_id == current_user["id"])
+    ).first()
     if network is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Network not found")
     return network
@@ -427,7 +437,11 @@ def get_network(network_id: int, db: DbSession, current_user: CurrentUser) -> Ne
 
 @router.delete("/{network_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_network(network_id: int, db: DbSession, current_user: CurrentUser):
-    network = db.get(Network, network_id)
+    network = db.scalars(
+        select(Network)
+        .join(Project, Network.project_id == Project.id)
+        .where(Network.id == network_id, Project.user_id == current_user["id"])
+    ).first()
     if network is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Network not found")
     db.delete(network)

@@ -30,6 +30,7 @@ from app.api.v1.auth import CurrentUser
 from app.core.config import settings
 from app.core.database import SessionLocal, get_db
 from app.models.network import Network
+from app.models.project import Project
 from app.models.scenario import Scenario
 from app.models.simulation import Simulation, SimulationStatus
 from app.services import calibration as calibration_service
@@ -302,8 +303,20 @@ def run_simulation_job(simulation_id: int) -> None:
 # --------------------------------------------------------------------------- #
 
 
-def _get_simulation(db: Session, simulation_id: int) -> Simulation:
-    simulation = db.get(Simulation, simulation_id)
+def _owned_sim_stmt(db: Session, current_user):
+    """Simulation rows reachable through an owned project chain."""
+    return (
+        select(Simulation)
+        .join(Scenario, Simulation.scenario_id == Scenario.id)
+        .join(Network, Scenario.network_id == Network.id)
+        .join(Project, Network.project_id == Project.id)
+        .where(Project.user_id == current_user["id"])
+    )
+
+
+def _get_simulation(db: Session, current_user, simulation_id: int) -> Simulation:
+    stmt = _owned_sim_stmt(db, current_user).where(Simulation.id == simulation_id)
+    simulation = db.scalars(stmt).first()
     if simulation is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Simulation not found")
     return simulation
@@ -326,9 +339,16 @@ def queue_simulation(
     current_user: CurrentUser,
 ) -> Simulation:
     """Queue a simulation run for a scenario (executed in the background)."""
-    scenario = db.get(Scenario, payload.scenario_id)
-    if scenario is None:
+    owned = db.scalars(
+        select(Scenario.id)
+        .join(Network, Scenario.network_id == Network.id)
+        .join(Project, Network.project_id == Project.id)
+        .where(Scenario.id == payload.scenario_id,
+               Project.user_id == current_user["id"])
+    ).first()
+    if owned is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Scenario not found")
+    scenario = db.get(Scenario, payload.scenario_id)
     if scenario.network_id is None:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Scenario has no network attached")
 
@@ -349,7 +369,7 @@ def queue_simulation(
 def list_simulations(
     db: DbSession, current_user: CurrentUser, scenario_id: int | None = None
 ) -> list[Simulation]:
-    query = select(Simulation).order_by(Simulation.id.desc()).limit(200)
+    query = _owned_sim_stmt(db, current_user).order_by(Simulation.id.desc()).limit(200)
     if scenario_id is not None:
         query = query.where(Simulation.scenario_id == scenario_id)
     return list(db.scalars(query).all())
@@ -357,12 +377,12 @@ def list_simulations(
 
 @router.get("/{simulation_id}", response_model=SimulationOut)
 def get_simulation(simulation_id: int, db: DbSession, current_user: CurrentUser) -> Simulation:
-    return _get_simulation(db, simulation_id)
+    return _get_simulation(db, current_user, simulation_id)
 
 
 @router.get("/{simulation_id}/trajectories", response_model=TrajectoryOut)
 def get_trajectories(simulation_id: int, db: DbSession, current_user: CurrentUser) -> TrajectoryOut:
-    simulation = _get_simulation(db, simulation_id)
+    simulation = _get_simulation(db, current_user, simulation_id)
     if simulation.status != SimulationStatus.COMPLETED or simulation.trajectory_data is None:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
@@ -431,7 +451,7 @@ def calibrate_simulation(
     simulation_id: int, payload: CalibrationRequest, db: DbSession, current_user: CurrentUser
 ) -> dict[str, Any]:
     """Calibrate the simulated model against observed field counts."""
-    simulation = _get_simulation(db, simulation_id)
+    simulation = _get_simulation(db, current_user, simulation_id)
     scenario = simulation.scenario
     network: Network | None = scenario.network if scenario is not None else None
     if network is None:
@@ -458,7 +478,7 @@ def calibrate_simulation(
 @router.get("/{simulation_id}/report")
 def download_report(simulation_id: int, db: DbSession, current_user: CurrentUser) -> Response:
     """Generate and download the PDF report for this simulation."""
-    simulation = _get_simulation(db, simulation_id)
+    simulation = _get_simulation(db, current_user, simulation_id)
     scenario = simulation.scenario
     network: Network | None = scenario.network if scenario is not None else None
 

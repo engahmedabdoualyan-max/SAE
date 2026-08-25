@@ -14,6 +14,8 @@ from sqlalchemy.orm import Session
 from app.api.v1.auth import CurrentUser
 from app.core.database import get_db
 from app.models.network import Network
+from app.models.network import Network
+from app.models.project import Project
 from app.models.scenario import Scenario
 
 router = APIRouter()
@@ -67,8 +69,19 @@ def _flatten(mapping: Mapping[str, Any], prefix: str = "") -> dict[str, Any]:
     return flat
 
 
-def _get_scenario(db: Session, scenario_id: int) -> Scenario:
-    scenario = db.get(Scenario, scenario_id)
+def _owned_scenario_stmt(db: Session, current_user):
+    """Scenario rows whose owning project belongs to current_user."""
+    return (
+        select(Scenario)
+        .join(Network, Scenario.network_id == Network.id)
+        .join(Project, Network.project_id == Project.id)
+        .where(Project.user_id == current_user["id"])
+    )
+
+
+def _get_scenario(db: Session, current_user, scenario_id: int) -> Scenario:
+    stmt = _owned_scenario_stmt(db, current_user).where(Scenario.id == scenario_id)
+    scenario = db.scalars(stmt).first()
     if scenario is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Scenario not found")
     return scenario
@@ -78,6 +91,15 @@ def _get_scenario(db: Session, scenario_id: int) -> Scenario:
 def create_scenario(payload: ScenarioCreate, db: DbSession, current_user: CurrentUser) -> Scenario:
     network = db.get(Network, payload.network_id)
     if network is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Network not found")
+
+    owned_net = db.scalars(
+        select(Network.id)
+        .join(Project, Network.project_id == Project.id)
+        .where(Network.id == payload.network_id,
+               Project.user_id == current_user["id"])
+    ).first()
+    if owned_net is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Network not found")
 
     scenario = Scenario(
@@ -94,7 +116,7 @@ def create_scenario(payload: ScenarioCreate, db: DbSession, current_user: Curren
 
 @router.get("/", response_model=list[ScenarioOut])
 def list_scenarios(db: DbSession, current_user: CurrentUser, network_id: int | None = None):
-    stmt = select(Scenario).order_by(Scenario.id.desc())
+    stmt = _owned_scenario_stmt(db, current_user).order_by(Scenario.id.desc())
     if network_id is not None:
         stmt = stmt.where(Scenario.network_id == network_id)
     return list(db.scalars(stmt).all())
@@ -102,14 +124,14 @@ def list_scenarios(db: DbSession, current_user: CurrentUser, network_id: int | N
 
 @router.get("/{scenario_id}", response_model=ScenarioOut)
 def get_scenario(scenario_id: int, db: DbSession, current_user: CurrentUser) -> Scenario:
-    return _get_scenario(db, scenario_id)
+    return _get_scenario(db, current_user, scenario_id)
 
 
 @router.put("/{scenario_id}", response_model=ScenarioOut)
 def update_scenario(
     scenario_id: int, payload: ScenarioUpdate, db: DbSession, current_user: CurrentUser
 ) -> Scenario:
-    scenario = _get_scenario(db, scenario_id)
+    scenario = _get_scenario(db, current_user, scenario_id)
     if payload.name is not None:
         scenario.name = payload.name.strip()
     if payload.params is not None:
@@ -123,7 +145,7 @@ def update_scenario(
 def fork_scenario(
     scenario_id: int, db: DbSession, current_user: CurrentUser, payload: ForkRequest | None = None
 ) -> Scenario:
-    source = _get_scenario(db, scenario_id)
+    source = _get_scenario(db, current_user, scenario_id)
     forked = Scenario(
         network_id=source.network_id,
         name=(payload.name if payload and payload.name else f"{source.name} (fork)").strip(),
@@ -141,8 +163,8 @@ def fork_scenario(
 def diff_scenarios(
     scenario_id: int, other_id: int, db: DbSession, current_user: CurrentUser
 ) -> DiffResult:
-    base = _flatten(_get_scenario(db, scenario_id).params or {})
-    other = _flatten(_get_scenario(db, other_id).params or {})
+    base = _flatten(_get_scenario(db, current_user, scenario_id).params or {})
+    other = _flatten(_get_scenario(db, current_user, other_id).params or {})
 
     added = {k: v for k, v in other.items() if k not in base}
     removed = {k: v for k, v in base.items() if k not in other}
