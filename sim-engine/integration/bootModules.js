@@ -10,6 +10,7 @@
  */
 import { initNavigation } from './navigationManager.js';
 import { createNetworkEditor } from '../editor/networkEditor.js';
+import { createGraphSimRunner } from './graphSimRunner.js';
 import { getEmissionFactors } from '../analysis/emissions.js';
 import { getNoiseLevel } from '../analysis/noise.js';
 import { v2xPenetrationImpact } from '../analysis/v2x.js';
@@ -125,6 +126,7 @@ function initRealNetworkEditor() {
     { id: 'sim', label: 'Simulation' },
     { id: 'ringroad', label: 'Ring Road' },
     { id: 'network-editor', label: 'Network Editor' },
+    { id: 'network-runner', label: 'Runner' },
     { id: 'signal-editor', label: 'Signals' },
     { id: 'calibration-section', label: 'Calibration' },
     { id: 'advanced-analysis', label: 'Analysis' },
@@ -136,6 +138,80 @@ function initRealNetworkEditor() {
 
   wireNavViewSwitching();
   initRealNetworkEditor();
+  initNetworkRunner();
+}
+
+/* ── Network Runner: IDM on the edited/imported graph ─────────────── */
+function initNetworkRunner() {
+  const runner = createGraphSimRunner('runner-canvas');
+  if (!runner) return;
+  let lastNetJSON = null;
+
+  const setStatus = (t) => {
+    const el = document.getElementById('nr-status');
+    if (el) el.textContent = t;
+  };
+  const refreshKpis = () => {
+    const st = runner.getStats();
+    if (!st) return;
+    const set = (id, v) => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = v;
+    };
+    set('nr-kpi-veh', st.active);
+    set('nr-kpi-speed', st.avgSpeedKmh);
+    set('nr-kpi-done', st.exited);
+    set('nr-kpi-los', `${st.los} · ${st.routesBuilt}`);
+    if (!runner.running && st.time > 0) setStatus(`paused @ t=${Math.round(st.time)}s`);
+  };
+
+  window.SAE_Runner = {
+    start() {
+      try {
+        const ed = window.__saeRealEditor;
+        const j = ed && ed.getNetwork ? ed.getNetwork().toJSON() : null;
+        if (!j || !j.nodes || j.nodes.length < 2) {
+          if (window.SAE_NetworkEditor) window.SAE_NetworkEditor._showToast(
+            'Draw or import a network first (OSM / SUMO / xodr)');
+          return false;
+        }
+        const sameNet = lastNetJSON &&
+          JSON.stringify(j).length === JSON.stringify(lastNetJSON).length;
+        const opts = {
+          vph: parseInt(document.getElementById('nr-vph')?.value || '900', 10),
+          duration: 600,
+          kRoutes: parseInt(document.getElementById('nr-k')?.value || '2', 10),
+          seed: 42,
+        };
+        if (!sameNet || !window.__saeRunnerLoaded) {
+          runner.load(j, opts);
+          lastNetJSON = j;
+          window.__saeRunnerLoaded = true;
+        }
+        runner.run();
+        setStatus('running…');
+        return true;
+      } catch (err) {
+        if (window.SAE_NetworkEditor) window.SAE_NetworkEditor._showToast(
+          'Runner error: ' + err.message);
+        return false;
+      }
+    },
+    pause() { runner.pause(); refreshKpis(); },
+    reset() {
+      window.__saeRunnerLoaded = false;
+      runner.reset(42);
+      setStatus('');
+      refreshKpis();
+    },
+    tick(n) { runner.tick(n); refreshKpis(); },
+    getStats: () => runner.getStats(),
+  };
+
+  setInterval(() => { if (runner && runner.sim) { try { refreshKpis(); } catch (e) { /* noop */ } } }, 400);
+
+  /* deep-link parity: #run=1 boots the runner after editor content exists */
+  if (location.hash === '#run=1') setTimeout(() => window.SAE_Runner.start(), 600);
 }
 
 if (document.readyState === 'loading') {

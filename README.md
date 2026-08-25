@@ -34,8 +34,10 @@ back over WebSocket.
 | **Micro-simulation engine** (`sim-engine/`, 46 modules) | IDM + MOBIL, network graph & Dijkstra routing, fixed/actuated signals, OD demand, Web-Worker loop, LOS/V/C/delay/queue KPIs |
 | **Multimodal** | Social-force pedestrians, bus dwell-time model, cyclists |
 | **Advanced analysis** | COPERT V emissions, FHWA TNM noise, TTC/PET safety surrogates, EV energy, V2X penetration impact — all computed from live sim state |
-| **Network editor** | Draw roads/junctions/signals on Google Maps (model-only fallback), import OpenDRIVE / SUMO / GeoJSON, export all four formats |
-| **Calibration** | CSV field-data upload, GEH/RMSE/R² grid-search over IDM params, one-click apply to engine |
+| **Network editor** | Draw roads/junctions/signals on Google Maps (model-only fallback), import OpenDRIVE / SUMO / GeoJSON / OSM, export all four formats |
+| **Network Runner** | One-click IDM micro-simulation on the edited/imported graph with k-route logit route choice, canvas rendering, live KPIs & LOS |
+| **Simulation Lab** | Scenario templates (bottleneck, lane closure, uphill, arterial, green wave), live IDM sliders, fleet-mix control, detectors, time–space & fundamental diagrams, share links |
+| **Calibration** | CSV field-data upload, GEH/RMSE/R² grid-search over IDM params scored by the real engine, one-click apply to engine |
 | **Cloud runs** | Editor network → FastAPI → netconvert → headless SUMO → trip KPIs via WebSocket |
 | **Scenarios** | Save/load/fork/diff with localStorage versioning |
 | **Exports** | SUMO package, PTV VISSIM `.inpx`, OpenDRIVE `.xodr`, GeoJSON, CSV, jsPDF reports, APA/IEEE/BibTeX/Harvard/Chicago citations |

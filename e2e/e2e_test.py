@@ -233,6 +233,14 @@ def phase2c_determinism_mix_calib(page, res: Result) -> None:
 def phase2d_osm_share_adaptive(page, res: Result) -> None:
     print("── Phase 2d: OSM import · share link · adaptive signals · snapshot")
 
+    page.evaluate("""async () => {
+        for (let i = 0; i < 40; i++) {
+            if (window.__saeRealEditor) return true;
+            await new Promise(r => setTimeout(r, 500));
+        }
+        return false;
+    }""")
+
     osm = page.evaluate("""async () => {
         const ed = window.__saeRealEditor;
         if (!ed) return 'no-editor';
@@ -244,7 +252,8 @@ def phase2d_osm_share_adaptive(page, res: Result) -> None:
     }""")
     res.check("OSM fixture imports through editor", isinstance(osm, dict) and osm.get("nodes", 0) >= 4 and osm.get("edges", 0) >= 3, str(osm)[:140])
     res.check("OSM way names preserved ('Ring Road')",
-              isinstance(osm, dict) and "Ring Road" in (osm.get("names") or []), str(osm.get("names"))[:80])
+              isinstance(osm, dict) and "Ring Road" in (osm.get("names") or []),
+              str(osm.get("names"))[:80] if isinstance(osm, dict) else str(osm)[:80])
 
     adaptive = page.evaluate("""() => {
         const run = (adaptive) => {
@@ -300,6 +309,42 @@ def phase2d_osm_share_adaptive(page, res: Result) -> None:
         res.check("canvas snapshot downloads PNG", fname.endswith(".png"), fname)
     except Exception as exc:  # noqa: BLE001
         res.check("canvas snapshot downloads PNG", False, repr(exc)[:120])
+
+
+def phase2e_network_runner(page, res: Result) -> None:
+    print("── Phase 2e: network runner (IDM on edited graph + route choice)")
+
+    started = page.evaluate("""async () => {
+        // ensure the editor holds the OSM fixture graph
+        const ed = window.__saeRealEditor;
+        if (!ed) return { error: 'no-editor' };
+        if (!document.querySelector('#cl-history .cl-view')) {
+            const txt = await fetch('/assets/fixtures/mini.osm').then(r => r.text());
+            await ed.import(txt, 'osm');
+        }
+        document.getElementById('nr-vph').value = '900';
+        document.getElementById('nr-k').value = '2';
+        const ok = window.SAE_Runner.start();
+        return { ok };
+    }""")
+    res.check("runner starts on imported OSM graph", bool(started.get("ok")), str(started))
+
+    stats = page.evaluate("""() => {
+        window.SAE_Runner.tick(400);   /* 200 sim-s */
+        return window.SAE_Runner.getStats();
+    }""")
+    st = stats or {}
+    res.check("vehicles running on graph", (st.get("active") or 0) > 3, str(stats))
+    res.check("route choice built (k≥1)", (st.get("routesBuilt") or 0) >= 1, str(stats))
+    res.check("trips completing on network", (st.get("exited") or 0) >= 1, str(stats))
+    res.check("LOS letter assigned", st.get("los") in list("ABCDEF"), str(stats))
+
+    pause = page.evaluate("""() => {
+        window.SAE_Runner.pause();
+        return { paused: !window.SAE_Runner.getStats().running,
+                 chip: document.getElementById('nr-kpi-veh')?.textContent };
+    }""")
+    res.check("pause stops the runner", pause.get("paused") is True and pause.get("chip") not in (None, ""), str(pause))
 
     # ── surfaced backend features: signup + run history browser
     acc = page.evaluate("() => document.getElementById('ne-import-file')?.accept || ''")
@@ -515,6 +560,7 @@ def main() -> int:
             phase2b_lab(page, res)
             phase2c_determinism_mix_calib(page, res)
             phase2d_osm_share_adaptive(page, res)
+            phase2e_network_runner(page, res)
             phase3_cloud_sumo(page, res)
         except Exception as exc:  # noqa: BLE001 — report and screenshot
             res.check("suite completed without crash", False, repr(exc)[:300])

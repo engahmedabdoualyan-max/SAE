@@ -472,3 +472,9 @@ Object.assign(TRANSLATIONS['fr'], {
     "cl_title": "Simulation cloud",
     "cl_desc": "Exécutez votre réseau sur le moteur SUMO côté serveur, avec progression WebSocket en direct."
 });
+
+/* Network Runner */
+Object.assign(TRANSLATIONS['fr'], {
+    "nr_title": "Lanceur de réseau",
+    "nr_desc": "Exécutez le moteur IDM sur votre réseau édité ou importé — avec choix d'itinéraire."
+});

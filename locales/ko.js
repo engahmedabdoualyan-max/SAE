@@ -448,3 +448,9 @@ Object.assign(TRANSLATIONS['ko'], {
     "cl_title": "클라우드 시뮬레이션",
     "cl_desc": "서버 측 SUMO 엔진에서 네트워크를 실행하고 WebSocket으로 실시간 진행률을 스트리밍합니다."
 });
+
+/* Network Runner */
+Object.assign(TRANSLATIONS['ko'], {
+    "nr_title": "네트워크 러너",
+    "nr_desc": "편집하거나 가져온 네트워크에서 IDM 엔진을 실행——대체 경로 선택 지원."
+});

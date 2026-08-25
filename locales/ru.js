@@ -472,3 +472,9 @@ Object.assign(TRANSLATIONS['ru'], {
     "cl_title": "Облачная симуляция",
     "cl_desc": "Запускайте сеть на серверном движке SUMO с живым прогрессом через WebSocket."
 });
+
+/* Network Runner */
+Object.assign(TRANSLATIONS['ru'], {
+    "nr_title": "Запуск сети",
+    "nr_desc": "Запустите IDM-движок на отредактированной или импортированной сети — с выбором маршрута."
+});

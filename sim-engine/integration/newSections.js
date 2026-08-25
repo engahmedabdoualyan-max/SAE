@@ -305,6 +305,37 @@
     '</section>';
   }
 
+  function createRunnerSection() {
+    return '' +
+    '<section id="network-runner" class="case-view py-16 bg-gradient-to-b from-slate-900 to-slate-800 text-white">' +
+    '  <div class="container mx-auto px-4">' +
+    '    <div class="text-center mb-8">' +
+    '      <h2 class="text-2xl md:text-3xl font-bold mb-3" data-key="nr_title">Network Runner</h2>' +
+    '      <p class="text-slate-300 max-w-3xl mx-auto text-sm" data-key="nr_desc">Run the IDM engine on your edited or imported network — with route choice between alternative paths.</p>' +
+    '    </div>' +
+    '    <div class="max-w-5xl mx-auto">' +
+    '      <div class="flex flex-wrap items-center gap-3 mb-4">' +
+    '        <button onclick="SAE_Runner && SAE_Runner.start()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 rounded-lg text-sm font-semibold"><i class="fas fa-play mr-1"></i>Run on my network</button>' +
+    '        <button onclick="SAE_Runner && SAE_Runner.pause()" class="px-4 py-2 bg-yellow-600 hover:bg-yellow-700 rounded-lg text-sm font-semibold"><i class="fas fa-pause mr-1"></i>Pause</button>' +
+    '        <button onclick="SAE_Runner && SAE_Runner.reset()" class="px-4 py-2 bg-slate-600 hover:bg-slate-500 rounded-lg text-sm font-semibold"><i class="fas fa-redo mr-1"></i>Reset</button>' +
+    '        <label class="flex items-center gap-2 text-xs text-slate-300">Demand' +
+    '          <input id="nr-vph" type="number" min="100" max="3600" step="100" value="900" class="w-20 px-2 py-1 bg-slate-800 border border-slate-600 rounded text-white">veh/h</label>' +
+    '        <label class="flex items-center gap-2 text-xs text-slate-300">Routes k' +
+    '          <select id="nr-k" class="px-2 py-1 bg-slate-800 border border-slate-600 rounded text-white"><option>1</option><option selected>2</option><option>3</option></select></label>' +
+    '        <span id="nr-status" class="text-xs text-slate-400 font-mono ml-auto"></span>' +
+    '      </div>' +
+    '      <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">' +
+    '        <div class="bg-slate-800 rounded-xl p-3 border border-slate-700 text-center"><div class="text-lg font-bold text-cyan-400" id="nr-kpi-veh">0</div><div class="text-[10px] text-slate-400">Active vehicles</div></div>' +
+    '        <div class="bg-slate-800 rounded-xl p-3 border border-slate-700 text-center"><div class="text-lg font-bold text-emerald-400" id="nr-kpi-speed">0</div><div class="text-[10px] text-slate-400">Avg speed km/h</div></div>' +
+    '        <div class="bg-slate-800 rounded-xl p-3 border border-slate-700 text-center"><div class="text-lg font-bold text-purple-400" id="nr-kpi-done">0</div><div class="text-[10px] text-slate-400">Trips completed</div></div>' +
+    '        <div class="bg-slate-800 rounded-xl p-3 border border-slate-700 text-center"><div class="text-lg font-bold text-orange-400" id="nr-kpi-los">-</div><div class="text-[10px] text-slate-400">LOS · routes <span id="nr-kpi-routes">0</span></div></div>' +
+    '      </div>' +
+    '      <canvas id="runner-canvas" width="920" height="520" role="img" aria-label="Network simulation view: vehicles moving on the edited road graph" class="w-full rounded-xl border border-slate-700"></canvas>' +
+    '    </div>' +
+    '  </div>' +
+    '</section>';
+  }
+
   window.SAE_Sections = {
     createNetworkEditorSection: createNetworkEditorSection,
     createSignalEditorSection: createSignalEditorSection,
@@ -327,14 +358,21 @@
       html += createReportsSection();
       footer.insertAdjacentHTML('beforebegin', html);
 
-      /* The Lab drives the live #sim canvas — it must sit in the MAIN view,
-         directly after the simulation section (not inside the case stack). */
       var lab = createLabSection();
       var simSec = document.getElementById('sim');
       if (simSec && simSec.parentElement) {
         simSec.insertAdjacentHTML('afterend', lab);
       } else {
         footer.insertAdjacentHTML('beforebegin', lab);
+      }
+
+      /* Network Runner belongs next to the editor that feeds it */
+      var runner = createRunnerSection();
+      var ne = document.getElementById('network-editor');
+      if (ne && ne.parentElement) {
+        ne.insertAdjacentHTML('afterend', runner);
+      } else {
+        footer.insertAdjacentHTML('beforebegin', runner);
       }
     }
   };

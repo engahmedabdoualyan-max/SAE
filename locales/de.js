@@ -472,3 +472,9 @@ Object.assign(TRANSLATIONS['de'], {
     "cl_title": "Cloud-Simulation",
     "cl_desc": "Führen Sie Ihr Netzwerk auf der serverseitigen SUMO-Engine aus — mit Live-Fortschritt über WebSocket."
 });
+
+/* Network Runner */
+Object.assign(TRANSLATIONS['de'], {
+    "nr_title": "Netzwerk-Runner",
+    "nr_desc": "IDM-Engine auf dem bearbeiteten oder importierten Netzwerk ausführen – mit Routenwahl."
+});

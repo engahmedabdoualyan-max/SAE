@@ -2,7 +2,7 @@
  * v3: precache grew to include bootModules/cloudPanel/comparison+export
  * panels; bump forces returning clients to refresh stale cached assets.
  */
-const CACHE = 'sae-autosim-v4';
+const CACHE = 'sae-autosim-v5';
 const PRECACHE = [
   '/',
   '/index.html',
@@ -14,6 +14,7 @@ const PRECACHE = [
   '/sim-engine/integration/bootModules.js',
   '/sim-engine/integration/comparisonPanel.js',
   '/sim-engine/integration/cloudPanel.js',
+  '/sim-engine/integration/graphSimRunner.js',
   '/sim-engine/integration/labPanel.js',
   '/sim-engine/integration/exportPanel.js',
   '/sim-engine/integration/fullIntegration.js',

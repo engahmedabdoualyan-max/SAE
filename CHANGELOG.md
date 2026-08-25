@@ -21,6 +21,15 @@ All notable changes to SAE AutoSim Hub.
   heavy-vehicle fleet-mix control, seeded deterministic restarts, loop
   detectors with true harmonic-mean speeds and flow sparklines, time–space
   diagram and fundamental q–k diagram.
+- **Network Runner**: one-click IDM micro-simulation directly on the edited
+  or imported network graph — k-penalized shortest-path route sets per OD
+  pair with multinomial-logit split over free-flow travel times (route
+  choice), canvas rendering of true edge geometry with vehicle trails,
+  signal-aware travel, live KPIs (active vehicles, network speed, completed
+  trips, LOS letter) and pause/reset controls.
+- **E2E suite grown to 53 checks**: new Phase 2e drives the runner on the
+  imported OSM fixture (start, vehicles running, route choice built, trips
+  completing, LOS assignment, pause) alongside the existing 47.
 - **Engine-driven calibration**: the wizard's grid search now runs the real
   simulation per candidate (12 seeded runs) and scores GEH against loop
   detector flows normalized per lane — replacing a mocked search.

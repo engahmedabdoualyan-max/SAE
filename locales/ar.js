@@ -473,3 +473,9 @@ Object.assign(TRANSLATIONS['ar'], {
     "exp_tools": "التصدير والأدوات",
     "fd_title": "البيانات الميدانية الحقيقية"
 });
+
+/* Network Runner */
+Object.assign(TRANSLATIONS['ar'], {
+    "nr_title": "مشغّل الشبكة",
+    "nr_desc": "شغّل محرك IDM على شبكتك المرسومة أو المستوردة — مع اختيار مسار بين البدائل."
+});

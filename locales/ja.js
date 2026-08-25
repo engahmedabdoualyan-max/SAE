@@ -448,3 +448,9 @@ Object.assign(TRANSLATIONS['ja'], {
     "cl_title": "クラウドシミュレーション",
     "cl_desc": "サーバー側SUMOエンジンでネットワークを実行。WebSocketで進捗をライブ配信します。"
 });
+
+/* Network Runner */
+Object.assign(TRANSLATIONS['ja'], {
+    "nr_title": "ネットワークランナー",
+    "nr_desc": "編集・インポートしたネットワーク上でIDMエンジンを実行——経路選択付き。"
+});

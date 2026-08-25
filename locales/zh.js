@@ -472,3 +472,9 @@ Object.assign(TRANSLATIONS['zh'], {
     "cl_title": "云端仿真",
     "cl_desc": "在服务端 SUMO 引擎上运行您的路网，通过WebSocket实时推送进度。"
 });
+
+/* Network Runner */
+Object.assign(TRANSLATIONS['zh'], {
+    "nr_title": "路网运行器",
+    "nr_desc": "在编辑或导入的路网上运行IDM引擎——支持备选路径选择。"
+});

@@ -448,3 +448,9 @@ Object.assign(TRANSLATIONS['hi'], {
     "cl_title": "क्लाउड सिमुलेशन",
     "cl_desc": "अपने नेटवर्क को सर्पर-SUMO इंजन पर चलाएँ — WebSocket पर लाइव प्रगति के साथ।"
 });
+
+/* Network Runner */
+Object.assign(TRANSLATIONS['hi'], {
+    "nr_title": "नेटवर्क रनर",
+    "nr_desc": "संपादित या आयातित नेटवर्क पर IDM इंजन चलाएँ — वैकल्पिक मार्गों के साथ।"
+});

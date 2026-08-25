@@ -994,6 +994,8 @@
     "lab_desc": "Scenario templates, live driver-parameter sliders, loop detectors, time-space diagram and the fundamental flow-density diagram.",
     "cl_title": "Cloud Simulation",
     "cl_desc": "Run your network on the server-side SUMO engine with live WebSocket progress and real trip KPIs.",
+    "nr_title": "Network Runner",
+    "nr_desc": "Run the IDM engine on your edited or imported network \u2014 with route choice between alternative paths.",
     "tab_main": "Reference",
     "tab_case": "Case Study",
     "nav_countries": "Countries",
