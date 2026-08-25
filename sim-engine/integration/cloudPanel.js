@@ -89,6 +89,48 @@
     return fallbackNetwork();
   }
 
+  /* Extract up to `maxRoutes` longest edge-chains so cloud runs get
+     substantive multi-edge trips instead of per-edge one-hop noise. */
+  function buildRoutes(netJson, maxRoutes) {
+    maxRoutes = maxRoutes || 2;
+    var adj = {};
+    netJson.edges.forEach(function (e) {
+      (adj[e.from] = adj[e.from] || []).push(e);
+    });
+    var used = {};
+    var routes = [];
+
+    function dfs(node, prevNode, path, depth) {
+      var best = path.slice();
+      if (depth >= 12) return best;
+      (adj[node] || []).forEach(function (e) {
+        if (used[e.id]) return;
+        if (e.to === prevNode) return;            /* no U-turn on the same pair */
+        if (path.indexOf(e.id) !== -1) return;    /* no edge reuse in-chain */
+        var next = path.concat([e.id]);
+        var cand = dfs(e.to, node, next, depth + 1);
+        if (cand.length > best.length) best = cand;
+      });
+      return best;
+    }
+
+    /* Start from nodes sorted by out-degree desc to favour arterial chains. */
+    var starts = netJson.nodes.slice().sort(function (a, b) {
+      return ((adj[b.id] || []).length) - ((adj[a.id] || []).length);
+    });
+    for (var i = 0; i < starts.length && routes.length < maxRoutes; i++) {
+      var r = dfs(starts[i].id, null, [], 0);
+      if (r.length >= 1 && (r.length > 1 || routes.length === 0)) {
+        routes.push(r);
+        r.forEach(function (id) { used[id] = true; });
+      }
+    }
+    if (routes.length === 0 && netJson.edges.length) {
+      routes.push([netJson.edges[0].id]);
+    }
+    return routes;
+  }
+
   window.SAE_Cloud = {
     login: function () {
       var email = ($('cl-email') || {}).value || 'demo@sae.local';
@@ -141,10 +183,22 @@
           .then(function (nw) { renderStep('network', 'done'); return nw.id; });
 
       }).then(function (networkId) {
-        /* scenario */
+        /* scenario — include explicit OD flows so trips span real chains */
         renderStep('scenario', 'active');
         var params = { simulation: { duration: duration } };
         if (window.__saeIdmOverrides) params.idm = window.__saeIdmOverrides;
+        try {
+          var netJson = currentNetworkJson();
+          var routes = buildRoutes(netJson, 2);
+          var vehsPerFlow = Math.max(20, Math.min(150, Math.round(duration / 2.5)));
+          params.demand = {
+            flows: routes.map(function (r, i) {
+              return { id: 'mainline_' + (i + 1), begin: 0,
+                       end: Math.round(duration * 0.85),
+                       number: vehsPerFlow, route: r };
+            })
+          };
+        } catch (e) { /* server synthesizes uniform flows as fallback */ }
         return api('POST', '/scenarios/', {
           json: { network_id: networkId, name: 'Cloud scenario', params: params },
         }, state.token).then(function (sc) { renderStep('scenario', 'done'); return sc.id; });

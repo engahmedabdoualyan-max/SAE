@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import shutil
 import statistics
 import subprocess
@@ -103,6 +104,49 @@ class SUMOBridge:
     # ------------------------------------------------------------------ #
 
     @staticmethod
+    def _to_local_meters(network: Mapping[str, Any]) -> list[dict[str, Any]]:
+        """Project node lon/lat degrees into a local meter frame.
+
+        netconvert interprets plain-XML coordinates as cartesian metres; raw
+        geographic degrees collapse the network to centimetres, producing
+        degenerate 5-metre edges. A local equirectangular projection around
+        the first node preserves relative geometry (accurate to <0.1% at
+        city scale) without adding a pyproj dependency.
+        """
+        nodes = [dict(n) for n in (network.get("nodes") or [])]
+        if not nodes:
+            return nodes
+        lat0 = float(nodes[0].get("y", nodes[0].get("lat", 0.0)) or 0.0)
+        lng0 = float(nodes[0].get("x", nodes[0].get("lng", 0.0)) or 0.0)
+        m_per_deg_lat = 110_540.0
+        m_per_deg_lng = max(1.0, 111_320.0 * math.cos(math.radians(lat0)))
+        for n in nodes:
+            lat = float(n.get("y", n.get("lat", 0.0)) or 0.0)
+            lng = float(n.get("x", n.get("lng", 0.0)) or 0.0)
+            n["x"] = (lng - lng0) * m_per_deg_lng
+            n["y"] = (lat - lat0) * m_per_deg_lat
+        for n in nodes:  # keep SUMO's positive-quadrant preference
+            n["x"] = round(n["x"] + 1000.0, 3)
+            n["y"] = round(n["y"] + 1000.0, 3)
+        return nodes
+
+    @staticmethod
+    def network_to_nodes_xml_from(projected: list[dict[str, Any]]) -> str:
+        root = ET.Element("nodes")
+        for node in projected:
+            ET.SubElement(
+                root,
+                "node",
+                attrib={
+                    "id": str(node["id"]),
+                    "x": f"{float(node.get('x', 0.0)):.3f}",
+                    "y": f"{float(node.get('y', 0.0)):.3f}",
+                    "type": "priority",
+                },
+            )
+        return _xml_tostring(root)
+
+    @staticmethod
     def network_to_nodes_xml(network: Mapping[str, Any]) -> str:
         root = ET.Element("nodes")
         for node in network.get("nodes") or []:
@@ -146,7 +190,10 @@ class SUMOBridge:
 
         nod_path = self.workdir / "nodes.nod.xml"
         edg_path = self.workdir / "edges.edg.xml"
-        nod_path.write_text(self.network_to_nodes_xml(network), encoding="utf-8")
+        nod_path.write_text(
+            self.network_to_nodes_xml_from(self._to_local_meters(network)),
+            encoding="utf-8",
+        )
         edg_path.write_text(self.network_to_edges_xml(network), encoding="utf-8")
 
         if self.netconvert_binary is None:
