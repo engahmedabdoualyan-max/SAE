@@ -1,0 +1,73 @@
+name: E2E Browser Tests
+
+# Full-stack regression: builds the compose stack, drives a real Chromium
+# through the three critical journeys (page integrity, in-browser IDM sim,
+# cloud SUMO pipeline with WebSocket progress).
+
+on:
+  push:
+    paths:
+      - 'index.html'
+      - 'assets/**'
+      - 'sim-engine/**'
+      - 'backend/**'
+      - 'sw.js'
+      - 'nginx.conf'
+      - 'docker-compose.yml'
+      - 'Dockerfile'
+      - 'e2e/**'
+      - '.github/workflows/e2e.yml'
+  pull_request:
+    paths:
+      - 'e2e/**'
+      - '.github/workflows/e2e.yml'
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Playwright + Chromium
+        run: |
+          pip install playwright
+          python -m playwright install --with-deps chromium
+
+      - name: Build and start the stack
+        run: docker compose up -d --build
+
+      - name: Wait for frontend + backend health
+        run: |
+          for i in $(seq 1 60); do
+            FRONT=$(curl -s -o /dev/null -w '%{http_code}' http://localhost/ || true)
+            HEALTH=$(curl -s -o /dev/null -w '%{http_code}' http://localhost/api/v1/openapi.json || true)
+            if [ "$FRONT" = "200" ] && [ "$HEALTH" = "200" ]; then
+              echo "stack ready after ${i}0s-ish"; exit 0
+            fi
+            sleep 5
+          done
+          echo "── container states:"; docker ps -a
+          echo "── backend log:"; docker compose logs backend | tail -50
+          exit 1
+
+      - name: Run E2E suite
+        env:
+          BASE_URL: http://localhost
+        run: python e2e/e2e_test.py
+
+      - name: Upload failure artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-artifacts
+          path: e2e/artifacts/
+          if-no-files-found: ignore
+
+      - name: Teardown
+        if: always()
+        run: docker compose down -v --remove-orphans
