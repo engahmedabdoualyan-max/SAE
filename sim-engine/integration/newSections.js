@@ -249,9 +249,17 @@
     '            <option value="signal_arterial">Signalized arterial</option>' +
     '            <option value="green_wave">Green wave (3 coordinated signals)</option>' +
     '          </select>' +
-    '          <div class="grid grid-cols-2 gap-2">' +
-    '            <button onclick="SAE_Lab && SAE_Lab.loadTemplate()" class="px-4 py-2 bg-cyan-600 hover:bg-cyan-700 rounded-lg text-sm font-semibold"><i class="fas fa-play mr-1"></i>Apply & Run</button>' +
-    '            <button onclick="SAE_Lab && SAE_Lab.restart()" title="Same seed → identical run" class="px-4 py-2 bg-slate-600 hover:bg-slate-500 rounded-lg text-sm font-semibold"><i class="fas fa-redo mr-1"></i>Restart ⟳</button>' +
+    '          <div class="grid grid-cols-3 gap-2">' +
+    '            <button onclick="SAE_Lab && SAE_Lab.loadTemplate()" class="px-3 py-2 bg-cyan-600 hover:bg-cyan-700 rounded-lg text-sm font-semibold"><i class="fas fa-play mr-1"></i>Run</button>' +
+    '            <button onclick="SAE_Lab && SAE_Lab.restart()" title="Same seed → identical run" class="px-3 py-2 bg-slate-600 hover:bg-slate-500 rounded-lg text-sm font-semibold"><i class="fas fa-redo mr-1"></i>Restart</button>' +
+    '            <button onclick="SAE_Lab && SAE_Lab.snapshot()" class="px-3 py-2 bg-indigo-600 hover:bg-indigo-700 rounded-lg text-sm font-semibold" aria-label="Download canvas snapshot as PNG"><i class="fas fa-camera mr-1"></i>PNG</button>' +
+    '          </div>' +
+    '          <div class="grid grid-cols-2 gap-2 mt-2">' +
+    '            <button onclick="SAE_Lab && SAE_Lab.copyShareLink()" class="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 rounded-lg text-xs font-semibold" aria-label="Copy shareable lab link"><i class="fas fa-link mr-1"></i>Share link</button>' +
+    '            <label class="px-3 py-1.5 bg-slate-700 rounded-lg text-xs font-semibold flex items-center justify-center gap-2 cursor-pointer select-none">' +
+    '              <input type="checkbox" id="lab-adaptive" onchange="SAE_Lab && SAE_Lab.setAdaptive(this.checked)" class="accent-emerald-500">' +
+    '              Adaptive signals' +
+    '            </label>' +
     '          </div>' +
     '          <div id="lab-detectors" class="grid grid-cols-2 gap-3 mt-4"></div>' +
     '          <div id="lab-sparks" class="grid grid-cols-2 gap-3 mt-3">' +
@@ -274,11 +282,11 @@
     '      </div>' +
     '      <div class="bg-slate-800 rounded-xl p-5 border border-slate-700">' +
     '        <h3 class="font-semibold text-sm mb-3"><i class="fas fa-chart-area text-purple-400 mr-2"></i>Time–Space Diagram <span class="text-[10px] text-slate-400">(position vs time, colored by speed)</span></h3>' +
-    '        <canvas id="lab-ts" width="880" height="240" class="w-full rounded-lg bg-slate-950"></canvas>' +
+    '        <canvas id="lab-ts" width="880" height="240" class="w-full rounded-lg bg-slate-950" role="img" aria-label="Time-space trajectory diagram: vehicle position over time colored by speed"></canvas>' +
     '      </div>' +
     '      <div class="bg-slate-800 rounded-xl p-5 border border-slate-700">' +
     '        <h3 class="font-semibold text-sm mb-3"><i class="fas fa-wave-square text-orange-400 mr-2"></i>Fundamental Diagram <span class="text-[10px] text-slate-400">q = k·v (flow vs density)</span></h3>' +
-    '        <canvas id="lab-fd" width="880" height="220" class="w-full rounded-lg bg-slate-950"></canvas>' +
+    '        <canvas id="lab-fd" width="880" height="220" class="w-full rounded-lg bg-slate-950" role="img" aria-label="Fundamental diagram: traffic flow versus density scatter"></canvas>' +
     '      </div>' +
     '    </div>' +
     '  </div>' +

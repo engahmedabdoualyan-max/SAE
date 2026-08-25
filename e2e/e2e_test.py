@@ -217,6 +217,78 @@ def phase2c_determinism_mix_calib(page, res: Result) -> None:
     res.check("detector sparkline painted", spark > 50, f"samples={spark}")
 
 
+def phase2d_osm_share_adaptive(page, res: Result) -> None:
+    print("── Phase 2d: OSM import · share link · adaptive signals · snapshot")
+
+    osm = page.evaluate("""async () => {
+        const ed = window.__saeRealEditor;
+        if (!ed) return 'no-editor';
+        const txt = await fetch('/assets/fixtures/mini.osm').then(r => r.text());
+        const net = await ed.import(txt, 'osm');
+        const j = net.toJSON ? net.toJSON() : net;
+        return { nodes: (j.nodes || []).length, edges: (j.edges || []).length,
+                 names: [...new Set((j.edges || []).map(e => e.name))].filter(Boolean) };
+    }""")
+    res.check("OSM fixture imports through editor", isinstance(osm, dict) and osm.get("nodes", 0) >= 4 and osm.get("edges", 0) >= 3, str(osm)[:140])
+    res.check("OSM way names preserved ('Ring Road')",
+              isinstance(osm, dict) and "Ring Road" in (osm.get("names") or []), str(osm.get("names"))[:80])
+
+    adaptive = page.evaluate("""() => {
+        const run = (adaptive) => {
+            window.SAE_Sim.setSignalAdaptive(adaptive);
+            window.SAE_Sim.restart(4242);
+            let red = 0;
+            for (let i = 0; i < 900; i++) {
+                if ((window.SAE_Sim.getSignalPhase() || '').includes('red')) red++;
+                window.SAE_Sim.tick(1);
+            }
+            const st = window.SAE_Sim.getDetectorStats() || [];
+            const rate = st.length
+                ? st.reduce((a, d) => a + (d.totalRateVehH || 0), 0) / st.length
+                : 0;
+            return { red, rate: Math.round(rate) };
+        };
+        const fixed = run(false);
+        const adap = run(true);
+        return { fixed, adap };
+    }""")
+    res.check("adaptive signals keep throughput (≥90%, non-inferior)",
+              adaptive["adap"]["rate"] >= adaptive["fixed"]["rate"] * 0.90,
+              str(adaptive))
+    res.check("adaptive mode actually alters signal timing",
+              adaptive["adap"]["red"] != adaptive["fixed"]["red"], str(adaptive))
+
+    share = page.evaluate("""() => {
+        document.getElementById('lab-sl-v0').value = 13.5;
+        document.getElementById('lab-val-v0').textContent = '13.5';
+        document.getElementById('lab-sl-heavy').value = '35';
+        document.getElementById('lab-val-heavy').textContent = '35';
+        document.getElementById('lab-adaptive').checked = true;
+        const h1 = window.SAE_Lab.buildShareHash();
+        // scramble state, then re-apply from hash
+        document.getElementById('lab-sl-v0').value = 30;
+        document.getElementById('lab-adaptive').checked = false;
+        window.SAE_Lab.applyShareHash(h1);
+        return {
+            v0: parseFloat(document.getElementById('lab-sl-v0').value),
+            hv: document.getElementById('lab-val-heavy').textContent,
+            ad: document.getElementById('lab-adaptive').checked,
+            engineV0: Math.max(...window.SAE_Sim.getVehicles().map(v => v.idm.v0)),
+        };
+    }""")
+    res.check("share-hash roundtrip restores lab state",
+              abs(share["v0"] - 13.5) < 0.01 and share["hv"] == "35"
+              and share["ad"] is True and share["engineV0"] <= 13.51, str(share))
+
+    try:
+        with page.expect_download(timeout=15000) as dl_info:
+            page.evaluate("() => window.SAE_Lab.snapshot()")
+        fname = dl_info.value.suggested_filename
+        res.check("canvas snapshot downloads PNG", fname.endswith(".png"), fname)
+    except Exception as exc:  # noqa: BLE001
+        res.check("canvas snapshot downloads PNG", False, repr(exc)[:120])
+
+
 def phase3_cloud_sumo(page, res: Result) -> None:
     print("── Phase 3: cloud SUMO pipeline")
     # Draw a deterministic network through the real editor API.
@@ -323,6 +395,7 @@ def main() -> int:
             phase2_local_sim(page, res)
             phase2b_lab(page, res)
             phase2c_determinism_mix_calib(page, res)
+            phase2d_osm_share_adaptive(page, res)
             phase3_cloud_sumo(page, res)
         except Exception as exc:  # noqa: BLE001 — report and screenshot
             res.check("suite completed without crash", False, repr(exc)[:300])

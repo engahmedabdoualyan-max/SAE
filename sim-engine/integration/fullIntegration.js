@@ -309,6 +309,19 @@
           var tt = (((sg.t + sg.offset) % cyc) + cyc) % cyc;
           ph = tt < sg.g ? 'green' : tt < sg.g + sg.y ? 'yellow' : 'red';
         }
+        /* adaptive extension: hold green while queued demand sits upstream */
+        if (sg.adaptive && cyc > 0 && ph === 'green') {
+          var barX = sg.xFrac * W;
+          var demandNear = vehicles.some(function (vv) {
+            var d = barX - vv.x;
+            return d > 2 && d < 80 && vv.speed < 2.5;
+          });
+          var effT = ((sg.t + sg.offset) % cyc + cyc) % cyc;
+          if (demandNear && effT >= (sg.minGreen || 6) && effT <= (sg.maxGreen || 40)) {
+            sg.t -= simDt;               /* freeze progress inside green */
+            ph = 'green';
+          }
+        }
         sg.phase = ph;
         sigPhases.push(ph);
       }
@@ -627,7 +640,7 @@
         } else if (name === 'uphill') {
           labV0Factor = 0.65; labDemandRate = 0.85;
         } else if (name === 'signal_arterial') {
-          labSignals = [{ xFrac: 0.62, g: 22, y: 3, r: 18, offset: 0, t: 0, phase: 'green' }];
+          labSignals = [{ xFrac: 0.62, g: 22, y: 3, r: 18, offset: 0, t: 0, phase: 'green', adaptive: false }];
           labDemandRate = 1.2;
         } else if (name === 'green_wave') {
           labSignals = [
@@ -664,6 +677,10 @@
         return labSignals.map(function (x) { return x.phase; }).join(',') || null;
       },
 
+      setSignalAdaptive: function (on) {
+        labSignals.forEach(function (sg) { sg.adaptive = !!on; });
+        return labSignals.map(function (sg) { return sg.adaptive; });
+      },
       setFleetMix: function (heavyPct) {
         labHeavyPct = (heavyPct == null) ? null : Math.max(0, Math.min(60, heavyPct));
       },
@@ -751,6 +768,7 @@
     getSeed: function () { return simInstance ? simInstance.getSeed() : null; },
     getLaneCount: function () { return simInstance ? simInstance.getLaneCount() : 4; },
     getSpawnMix: function () { return simInstance && simInstance.getSpawnMix ? simInstance.getSpawnMix() : { human: 0, heavy: 0, heavyPct: 0 }; },
+    setSignalAdaptive: function (on) { if (simInstance && simInstance.setSignalAdaptive) simInstance.setSignalAdaptive(on); },
     reset: function () { if (simInstance) simInstance.reset(); },
     setSpeed: function (s) { if (simInstance) simInstance.setSpeed(s); },
     setMPR: function (m) { if (simInstance) simInstance.setMPR(m); },

@@ -11,6 +11,10 @@
  */
 
 import { Network } from '../network/graph.js';
+import { parseOSM } from '../imports/osm.js';
+
+/** Re-export so editor/tests can import everything from one module. */
+export { parseOSM };
 
 // ---------------------------------------------------------------------------
 // helpers
@@ -652,6 +656,8 @@ export function importNetwork(content, format) {
     case 'sumo':
     case 'net.xml':
       return parseSUMONetwork(content);
+    case 'osm':
+      return parseOSM(content);
     default:
       throw new Error(`importNetwork: unknown format "${format}"`);
   }
@@ -671,5 +677,6 @@ export function sniffFormat(content) {
   }
   if (/<OpenDRIVE/i.test(head)) return 'opendrive';
   if (/<net[\s>]/i.test(head)) return 'sumo';
+  if (/<osm\b/i.test(head)) return 'osm';
   throw new Error('sniffFormat: unable to detect format');
 }

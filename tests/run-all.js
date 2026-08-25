@@ -17,6 +17,7 @@ const FILES = [
   'test-kpi.js',
   'test-calibration.js',
   'test-imports.js',
+  'test-osm.js',
   'test-scenario.js',
   'test-multimodal.js',
   'test-analysis.js',

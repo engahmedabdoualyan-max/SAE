@@ -177,8 +177,90 @@
     ctx.fillText('max ' + qMax + ' veh/h', W - 12, 16);
   }
 
+  /* ── share-link encoding (pure, testable) ── */
+  function buildShareHash() {
+    var st = { tpl: ($('lab-template') || {}).value || 'ring' };
+    SLIDERS.forEach(function (s) {
+      var inp = $('lab-sl-' + s.key);
+      if (inp) st[s.key] = parseFloat(inp.value);
+    });
+    var hv = $('lab-sl-heavy');
+    if (hv) st.hv = parseFloat(hv.value);
+    var ad = $('lab-adaptive');
+    if (ad) st.ad = !!ad.checked;
+    try { return 'lab=' + btoa(JSON.stringify(st)); } catch (e) { return ''; }
+  }
+
+  function applyShareHash(hash) {
+    if (!hash || hash.indexOf('lab=') !== 0) return null;
+    var st;
+    try { st = JSON.parse(atob(hash.slice(4))); } catch (e) { return null; }
+    if (!st || typeof st !== 'object') return null;
+    window.SAE_Lab.loadTemplate && (function () {
+      var sel = $('lab-template');
+      if (sel && st.tpl) sel.value = st.tpl;
+      window.SAE_Lab.loadTemplate();
+    })();
+    SLIDERS.forEach(function (s) {
+      if (!(s.key in st)) return;
+      var inp = $('lab-sl-' + s.key);
+      if (inp) { inp.value = st[s.key]; $('lab-val-' + s.key).textContent = st[s.key]; }
+    });
+    window.SAE_Lab.applySliders();
+    if ('hv' in st) {
+      var hv = $('lab-sl-heavy');
+      if (hv) { hv.value = st.hv; $('lab-val-heavy').textContent = st.hv; }
+      window.SAE_Sim.setFleetMix(st.hv);
+    }
+    if ('ad' in st) {
+      var ad = $('lab-adaptive');
+      if (ad) ad.checked = !!st.ad;
+      window.SAE_Sim.setSignalAdaptive(!!st.ad);
+    }
+    return st;
+  }
+
   /* ── public API ── */
   window.SAE_Lab = {
+    buildShareHash: buildShareHash,
+    applyShareHash: applyShareHash,
+
+    snapshot: function () {
+      var cv = document.getElementById('sim-canvas');
+      if (!cv || !cv.toBlob) return;
+      cv.toBlob(function (blob) {
+        if (!blob) return;
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.href = url;
+        a.download = 'SAE_sim_snapshot_' + Date.now() + '.png';
+        document.body.appendChild(a); a.click(); a.remove();
+        setTimeout(function () { URL.revokeObjectURL(url); }, 2000);
+      }, 'image/png');
+    },
+
+    copyShareLink: function () {
+      var h = buildShareHash();
+      if (!h) return;
+      var url = location.origin + location.pathname + '#' + h;
+      var done = function () {
+        var el = document.getElementById('toast');
+        var txt = document.getElementById('toast-text');
+        if (el && txt) {
+          txt.textContent = 'Share link copied';
+          el.classList.add('show');
+          setTimeout(function () { el.classList.remove('show'); }, 2400);
+        }
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(url).then(done).catch(done);
+      } else { done(); }
+    },
+
+    setAdaptive: function (on) {
+      if (window.SAE_Sim) window.SAE_Sim.setSignalAdaptive(!!on);
+    },
+
     loadTemplate: function () {
       if (!window.SAE_Sim) return;
       var sel = $('lab-template');

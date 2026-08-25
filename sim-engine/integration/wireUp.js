@@ -875,6 +875,18 @@
     wireKeyboard();
     SAE_Scenarios._render();
     SAE_SignalEditor._render();
+
+    /* deep-link: #lab=<base64 state> boots the Lab preconfigured */
+    if (location.hash && location.hash.indexOf('#lab=') === 0) {
+      var tryBoot = function (attempt) {
+        if (window.SAE_Lab && window.SAE_Sim) {
+          window.SAE_Lab.applyShareHash(location.hash.slice(1));
+        } else if (attempt < 20) {
+          setTimeout(function () { tryBoot(attempt + 1); }, 150);
+        }
+      };
+      tryBoot(0);
+    }
   }
 
   if (document.readyState === 'loading') {

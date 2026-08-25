@@ -17,7 +17,7 @@
  */
 
 import { Network, haversineM } from '../network/graph.js';
-import { exportGeoJSON, exportOpenDRIVE, exportSUMO, importGeoJSON, parseOpenDRIVE, parseSUMONetwork } from '../io/networkIO.js';
+import { exportGeoJSON, exportOpenDRIVE, exportSUMO, importGeoJSON, parseOpenDRIVE, parseSUMONetwork, parseOSM } from '../io/networkIO.js';
 
 const DEFAULT_ROAD_CONFIG = Object.freeze({
   name: '',
@@ -1170,7 +1170,8 @@ export class NetworkEditor {
       let net;
       if (fmt === 'geojson') net = importGeoJSON(content);
       else if (fmt === 'opendrive' || fmt === 'xodr') net = parseOpenDRIVE(content);
-      else if (fmt === 'sumo') net = parseSUMONetwork(content);
+      else if (fmt === 'sumo' || fmt === 'net.xml') net = parseSUMONetwork(content);
+      else if (fmt === 'osm') net = parseOSM(content);
       else net = Network.fromJSON(JSON.parse(content));
       this.loadNetwork(net);
       this._undoStack.length = 0;
