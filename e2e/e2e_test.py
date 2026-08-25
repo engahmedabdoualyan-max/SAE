@@ -108,6 +108,44 @@ def phase2_local_sim(page, res: Result) -> None:
     page.screenshot(path=str(ARTIFACTS / "phase2_sim.png"))
 
 
+def phase2b_lab(page, res: Result) -> None:
+    print("── Phase 2b: simulation lab")
+    loaded = page.evaluate("""() => {
+        const sel = document.getElementById('lab-template');
+        if (!sel) return 'no-section';
+        sel.value = 'signal_arterial';
+        const cfg = window.SAE_Lab.loadTemplate();
+        window.SAE_Sim.tick(400);
+        return { cfg: !!cfg, phase: window.SAE_Sim.getSignalPhase(),
+                 dets: window.SAE_Sim.getDetectorStats(),
+                 ts: window.SAE_Sim.getTSData().length,
+                 fd: window.SAE_Sim.getFDData().length };
+    }""")
+    res.check("template applied with active signal", bool(loaded.get("cfg")) and loaded.get("phase") in ("green", "yellow", "red"), str(loaded)[:120])
+    dets = loaded.get("dets", [])
+    res.check("loop detectors produced bins", len(dets) == 2 and all(d["bins"] > 0 for d in dets), str(dets)[:100])
+    res.check("harmonic-mean speeds plausible (≥5 km/h)", all(d["hmean"] >= 5 for d in dets), str([d["hmean"] for d in dets]))
+    res.check("time-space recorder streaming", loaded.get("ts", 0) > 3, f"frames={loaded.get('ts')}")
+    res.check("fundamental diagram sampling", loaded.get("fd", 0) > 10, f"pts={loaded.get('fd')}")
+
+    slider = page.evaluate("""() => {
+        document.getElementById('lab-sl-v0').value = 12;
+        document.getElementById('lab-val-v0').textContent = '12';
+        window.SAE_Lab.applySliders();
+        const vs = window.SAE_Sim.getVehicles();
+        return { appliedMaxV0: Math.max(...vs.map(v => v.idm.v0)) };
+    }""")
+    res.check("live IDM slider reaches engine", slider["appliedMaxV0"] <= 12.001, str(slider))
+    page.evaluate("() => window.SAE_Lab._tick()")
+    painted = page.evaluate("""() => {
+        const c = document.getElementById('lab-ts');
+        const d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data;
+        let n = 0; for (let i = 3; i < d.length; i += 396) if (d[i] > 0) n++;
+        return n;
+    }""")
+    res.check("time-space canvas painted", painted > 50, f"samples={painted}")
+
+
 def phase3_cloud_sumo(page, res: Result) -> None:
     print("── Phase 3: cloud SUMO pipeline")
     # Draw a deterministic network through the real editor API.
@@ -212,6 +250,7 @@ def main() -> int:
         try:
             phase1_page(page, res)
             phase2_local_sim(page, res)
+            phase2b_lab(page, res)
             phase3_cloud_sumo(page, res)
         except Exception as exc:  # noqa: BLE001 — report and screenshot
             res.check("suite completed without crash", False, repr(exc)[:300])

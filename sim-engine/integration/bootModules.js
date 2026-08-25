@@ -85,7 +85,35 @@ function initRealNetworkEditor() {
   });
 }
 
-function boot() {
+  /* Nav buttons must work across the main/case view split: auto-toggle the
+     view before scrolling when the target section lives in the other view. */
+  function wireNavViewSwitching() {
+    if (window.__saeNavViewWired) return;
+    window.__saeNavViewWired = true;
+    document.addEventListener('click', function (ev) {
+      var btn = ev.target.closest ? ev.target.closest('.sae-subnav-btn') : null;
+      if (!btn || btn.disabled) return;
+      var id = btn.dataset.target;
+      var el = id ? document.getElementById(id) : null;
+      if (!el) return;
+      var isCaseSection = el.classList.contains('case-view');
+      var inCaseMode = document.body.classList.contains('view-case');
+      if ((isCaseSection && !inCaseMode) || (!isCaseSection && inCaseMode)) {
+        ev.preventDefault();
+        ev.stopPropagation();
+        if (typeof window.setView === 'function') {
+          window.setView(isCaseSection ? 'case' : 'main');
+        } else {
+          document.body.classList.toggle('view-case', isCaseSection);
+        }
+        setTimeout(function () {
+          el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 80);
+      }
+    }, true); /* capture: run before the bar's own smooth-scroll handler */
+  }
+
+  function boot() {
   if (window.__saeModulesBooted) return;
   window.__saeModulesBooted = true;
 
@@ -100,11 +128,13 @@ function boot() {
     { id: 'signal-editor', label: 'Signals' },
     { id: 'calibration-section', label: 'Calibration' },
     { id: 'advanced-analysis', label: 'Analysis' },
+    { id: 'sim-lab', label: 'Lab' },
     { id: 'scenario-manager', label: 'Scenarios' },
     { id: 'cloud-run', label: 'Cloud Run' },
     { id: 'reports-section', label: 'Reports' }
   ]);
 
+  wireNavViewSwitching();
   initRealNetworkEditor();
 }
 

@@ -154,6 +154,17 @@
     var trailsOn = true;
     var TRAIL_LEN = 12, TRAIL_ALPHA = 0.25;
 
+    /* ── Simulation Lab state: signals, detectors, TS/FD recorders ── */
+    var PX_M = 0.5;                       /* canvas px → metres */
+    var labSignal = null;                 /* {xFrac, g, y, r, t} */
+    var labSlowZone = null;               /* {x0,x1 (frac), factor} */
+    var labDemandRate = 1;                /* spawn multiplier */
+    var labV0Factor = 1;                  /* free-speed multiplier */
+    var detectors = [];                   /* loop detectors */
+    var fdSamples = [];                   /* fundamental-diagram points */
+    var tsFrames = [];                    /* time-space snapshots */
+    var frameInTick = 0;
+
     var network = buildNetwork(corridors);
     var demand = buildDemand(fleet, network, mprValue);
 
@@ -243,19 +254,49 @@
       stepCount++;
       var simDt = dt * simSpeed;
       var t = stepCount * simDt;
+      frameInTick++;
 
-      /* spawn */
-      if (vehicles.length < 50 && Math.random() < 0.15) {
+      /* ── signal controller tick ── */
+      var sigPhase = 'green';
+      if (labSignal) {
+        labSignal.t += simDt;
+        var cyc = (labSignal.g || 0) + (labSignal.y || 0) + (labSignal.r || 0);
+        if (cyc > 0) {
+          var tt = labSignal.t % cyc;
+          sigPhase = tt < labSignal.g ? 'green' : tt < labSignal.g + labSignal.y ? 'yellow' : 'red';
+        }
+        labSignal.phase = sigPhase;
+      }
+
+      /* spawn (template demand rate) */
+      if (vehicles.length < 50 && Math.random() < 0.15 * labDemandRate) {
         var nv = spawnVehicle();
         if (nv) vehicles.push(nv);
       }
 
       /* update each vehicle */
-      var leaderInfo;
+      var prevX = new Array(vehicles.length);
+      var sigX = labSignal ? labSignal.xFrac * W : null;
       for (var i = 0; i < vehicles.length; i++) {
         var v = vehicles[i];
-        leaderInfo = findLeader(v, vehicles);
+        prevX[i] = v.x;
+        var leaderInfo = findLeader(v, vehicles);
         var acc = idmAccel(v, leaderInfo.gap, v.speed - leaderInfo.speed);
+
+        /* slow-zone (lane-closure / grade templates) */
+        if (labSlowZone && v.x > labSlowZone.x0 * W && v.x < labSlowZone.x1 * W) {
+          acc = Math.min(acc, (v.idm.v0 * labSlowZone.factor - v.speed) * 0.35);
+        }
+
+        /* signal stop-bar: brake comfortably when red/yellow ahead */
+        if (sigX !== null && sigPhase !== 'green') {
+          var dStop = sigX - v.x;
+          if (dStop > 2 && dStop < 150) {
+            var aReq = (v.speed * v.speed) / (2 * Math.max(dStop - 3, 1));
+            acc = Math.min(acc, -(aReq * 1.15));
+          }
+          if (dStop <= 3 && v.speed < 0.4) v.speed = 0;
+        }
 
         /* erratic behavior */
         if (v.isErratic && Math.random() < 0.008 * (1 - mpr)) {
@@ -277,8 +318,21 @@
         }
 
         /* integrate */
-        v.speed = clamp(v.speed + acc * simDt * 10, 0, v.idm.v0 * 1.2);
+        v.speed = clamp(v.speed + acc * simDt * 10, 0, v.idm.v0 * labV0Factor * 1.2);
         v.x += v.speed * 0.3 * simSpeed;
+
+        /* loop-detector crossings (indices still aligned here) */
+        for (var d = 0; d < detectors.length; d++) {
+          var detD = detectors[d];
+          var dx = detD.xFrac * W;
+          if (prevX[i] < dx && v.x >= dx && prevX[i] !== v.x) {
+            var vClamp = Math.max(v.speed, 0.5);
+            detD.count++;
+            detD.n++;
+            detD.sumSpeed += vClamp;
+            detD.sumInv += 1 / vClamp;   /* for true harmonic mean */
+          }
+        }
 
         /* trail history */
         if (trailsOn) {
@@ -297,6 +351,41 @@
 
       /* remove off-screen */
       vehicles = vehicles.filter(function (v) { return v.x < W + 60; });
+
+      /* ── detector bin rollover ── */
+      for (var d = 0; d < detectors.length; d++) {
+        var det = detectors[d];
+        det.tAcc += simDt;
+        if (det.tAcc >= 10) {
+          det.hist.push({
+            flow: Math.round(det.count * (3600 / det.tAcc)),
+            hmean: det.n > 0 ? Math.round((det.n / det.sumInv) * 3.6 * 10) / 10 : 0
+          });
+          if (det.hist.length > 24) det.hist.shift();
+          det.count = 0; det.n = 0; det.sumSpeed = 0; det.sumInv = 0; det.tAcc = 0;
+        }
+      }
+
+      /* ── fundamental-diagram sampling (every ~15 frames) ── */
+      if (frameInTick % 15 === 0 && vehicles.length > 0) {
+        var sumS = 0;
+        for (var f2 = 0; f2 < vehicles.length; f2++) sumS += vehicles[f2].speed;
+        var kmh = (sumS / vehicles.length) * 3.6;
+        var densityKm = vehicles.length / ((LANE_COUNT * W * PX_M) / 1000);
+        fdSamples.push({ k: Math.round(densityKm * 10) / 10, q: Math.round(densityKm * kmh) });
+        if (fdSamples.length > 360) fdSamples.shift();
+      }
+
+      /* ── time-space recorder (every ~12 frames) ── */
+      if (frameInTick % 12 === 0) {
+        var snap = [];
+        for (var s3 = 0; s3 < vehicles.length; s3++) {
+          snap.push([Math.round(vehicles[s3].x), vehicles[s3].lane,
+                     Math.round(vehicles[s3].speed * 10) / 10]);
+        }
+        tsFrames.push(snap);
+        if (tsFrames.length > 130) tsFrames.shift();
+      }
 
       /* KPIs */
       if (vehicles.length > 0) {
@@ -350,6 +439,21 @@
       ctx.strokeStyle = '#FCD34D';
       ctx.lineWidth = 3;
       ctx.strokeRect(0, ROAD_TOP, W, LANE_COUNT * LANE_W);
+
+      /* stop-bar + signal head */
+      if (labSignal) {
+        var sx = labSignal.xFrac * W;
+        ctx.fillStyle = '#0f172a';
+        ctx.fillRect(sx - 3, ROAD_TOP, 6, LANE_COUNT * LANE_W);
+        var col = labSignal.phase === 'green' ? '#22c55e'
+                : labSignal.phase === 'yellow' ? '#eab308' : '#ef4444';
+        ctx.fillStyle = col;
+        for (var sl = 0; sl < LANE_COUNT; sl++) {
+          ctx.beginPath();
+          ctx.arc(sx, ROAD_TOP + sl * LANE_W + LANE_W * 0.5, 5, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
     }
 
     function drawTrails() {
@@ -442,6 +546,49 @@
         drawRoad(); drawTrails(); drawVehicles(); drawSpeedChart();
       },
       setTrails: function (on) { trailsOn = !!on; },
+
+      /* ── Simulation Lab API ── */
+      applyIDM: function (ov) {
+        if (!ov) return;
+        ['v0', 'T', 'a', 'b'].forEach(function (k) {
+          var val = parseFloat(ov[k]);
+          if (!isFinite(val) || val <= 0) return;
+          for (var i = 0; i < vehicles.length; i++) vehicles[i].idm[k] = val;
+        });
+      },
+      loadTemplate: function (name) {
+        labSignal = null; labSlowZone = null;
+        labDemandRate = 1; labV0Factor = 1;
+        if (name === 'bottleneck') {
+          labDemandRate = 1.7;
+          labSlowZone = { x0: 0.55, x1: 0.8, factor: 0.45 };
+        } else if (name === 'lane_closure') {
+          labDemandRate = 1.5;
+          labSlowZone = { x0: 0.6, x1: 0.85, factor: 0.3 };
+        } else if (name === 'uphill') {
+          labV0Factor = 0.65; labDemandRate = 0.85;
+        } else if (name === 'signal_arterial') {
+          labSignal = { xFrac: 0.62, g: 22, y: 3, r: 18, t: 0, phase: 'green' };
+          labDemandRate = 1.2;
+        }
+        detectors = [
+          { xFrac: 0.33, count: 0, n: 0, sumSpeed: 0, sumInv: 0, tAcc: 0, hist: [] },
+          { xFrac: 0.66, count: 0, n: 0, sumSpeed: 0, sumInv: 0, tAcc: 0, hist: [] }
+        ];
+        fdSamples = []; tsFrames = [];
+        return { signal: labSignal, slowZone: labSlowZone,
+                 demandRate: labDemandRate, v0Factor: labV0Factor };
+      },
+      getDetectorStats: function () {
+        return detectors.map(function (d, i) {
+          var last = d.hist[d.hist.length - 1] || { flow: 0, hmean: 0 };
+          return { id: i + 1, flow: last.flow, hmean: last.hmean,
+                   bins: d.hist.length };
+        });
+      },
+      getFDData: function () { return fdSamples.slice(); },
+      getTSData: function () { return tsFrames.slice(); },
+      getSignalPhase: function () { return labSignal ? labSignal.phase : null; },
       reset: function () {
         RUNNING = false;
         paused = false;
@@ -492,6 +639,12 @@
     resume: function () { if (simInstance) simInstance.resume(); },
     tick: function (n) { if (simInstance && simInstance.tick) simInstance.tick(n); },
     setTrails: function (on) { if (simInstance && simInstance.setTrails) simInstance.setTrails(on); },
+    applyIDM: function (ov) { if (simInstance && simInstance.applyIDM) simInstance.applyIDM(ov); },
+    loadTemplate: function (n) { return simInstance && simInstance.loadTemplate ? simInstance.loadTemplate(n) : null; },
+    getDetectorStats: function () { return simInstance ? simInstance.getDetectorStats() : []; },
+    getFDData: function () { return simInstance ? simInstance.getFDData() : []; },
+    getTSData: function () { return simInstance ? simInstance.getTSData() : []; },
+    getSignalPhase: function () { return simInstance ? simInstance.getSignalPhase() : null; },
     reset: function () { if (simInstance) simInstance.reset(); },
     setSpeed: function (s) { if (simInstance) simInstance.setSpeed(s); },
     setMPR: function (m) { if (simInstance) simInstance.setMPR(m); },

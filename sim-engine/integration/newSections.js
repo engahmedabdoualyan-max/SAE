@@ -228,6 +228,48 @@
     '</section>';
   }
 
+  function createLabSection() {
+    return '' +
+    '<section id="sim-lab" class="py-16 bg-slate-900 text-white">' +
+    '  <div class="container mx-auto px-4">' +
+    '    <div class="text-center mb-10">' +
+    '      <h2 class="text-2xl md:text-3xl font-bold mb-3" data-key="lab_title">Simulation Lab</h2>' +
+    '      <p class="text-slate-300 max-w-3xl mx-auto text-sm" data-key="lab_desc">Scenario templates, live driver-parameter sliders, loop detectors, time-space diagram and the fundamental flow-density diagram.</p>' +
+    '    </div>' +
+    '    <div class="max-w-5xl mx-auto space-y-6">' +
+    '      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">' +
+    '        <div class="bg-slate-800 rounded-xl p-5 border border-slate-700">' +
+    '          <h3 class="font-semibold text-sm mb-3"><i class="fas fa-layer-group text-cyan-400 mr-2"></i>Scenario Templates</h3>' +
+    '          <select id="lab-template" class="w-full px-3 py-2 bg-slate-900 border border-slate-600 rounded-lg text-sm mb-3">' +
+    '            <option value="">— select template —</option>' +
+    '            <option value="ring">Ring Road baseline (free flow)</option>' +
+    '            <option value="bottleneck">On-ramp bottleneck</option>' +
+    '            <option value="lane_closure">Lane closure / work zone</option>' +
+    '            <option value="uphill">Uphill gradient (+3.5%)</option>' +
+    '            <option value="signal_arterial">Signalized arterial</option>' +
+    '          </select>' +
+    '          <button onclick="SAE_Lab && SAE_Lab.loadTemplate()" class="w-full px-4 py-2 bg-cyan-600 hover:bg-cyan-700 rounded-lg text-sm font-semibold"><i class="fas fa-play mr-2"></i>Apply & Run</button>' +
+    '          <div id="lab-detectors" class="grid grid-cols-2 gap-3 mt-4"></div>' +
+    '        </div>' +
+    '        <div class="bg-slate-800 rounded-xl p-5 border border-slate-700">' +
+    '          <h3 class="font-semibold text-sm mb-3"><i class="fas fa-sliders-h text-emerald-400 mr-2"></i>Live IDM Parameters</h3>' +
+    '          <div id="lab-sliders" class="space-y-3 text-xs"></div>' +
+    '          <button onclick="SAE_Lab && SAE_Lab.applySliders()" class="mt-3 w-full px-4 py-2 bg-emerald-600 hover:bg-emerald-700 rounded-lg text-sm font-semibold"><i class="fas fa-bolt mr-2"></i>Apply Live</button>' +
+    '        </div>' +
+    '      </div>' +
+    '      <div class="bg-slate-800 rounded-xl p-5 border border-slate-700">' +
+    '        <h3 class="font-semibold text-sm mb-3"><i class="fas fa-chart-area text-purple-400 mr-2"></i>Time–Space Diagram <span class="text-[10px] text-slate-400">(position vs time, colored by speed)</span></h3>' +
+    '        <canvas id="lab-ts" width="880" height="240" class="w-full rounded-lg bg-slate-950"></canvas>' +
+    '      </div>' +
+    '      <div class="bg-slate-800 rounded-xl p-5 border border-slate-700">' +
+    '        <h3 class="font-semibold text-sm mb-3"><i class="fas fa-wave-square text-orange-400 mr-2"></i>Fundamental Diagram <span class="text-[10px] text-slate-400">q = k·v (flow vs density)</span></h3>' +
+    '        <canvas id="lab-fd" width="880" height="220" class="w-full rounded-lg bg-slate-950"></canvas>' +
+    '      </div>' +
+    '    </div>' +
+    '  </div>' +
+    '</section>';
+  }
+
   window.SAE_Sections = {
     createNetworkEditorSection: createNetworkEditorSection,
     createSignalEditorSection: createSignalEditorSection,
@@ -236,6 +278,7 @@
     createScenarioManagerSection: createScenarioManagerSection,
     createReportsSection: createReportsSection,
     createCloudSection: createCloudSection,
+    createLabSection: createLabSection,
     injectAll: function () {
       var footer = document.querySelector('footer');
       if (!footer) return;
@@ -248,6 +291,16 @@
       html += createCloudSection();
       html += createReportsSection();
       footer.insertAdjacentHTML('beforebegin', html);
+
+      /* The Lab drives the live #sim canvas — it must sit in the MAIN view,
+         directly after the simulation section (not inside the case stack). */
+      var lab = createLabSection();
+      var simSec = document.getElementById('sim');
+      if (simSec && simSec.parentElement) {
+        simSec.insertAdjacentHTML('afterend', lab);
+      } else {
+        footer.insertAdjacentHTML('beforebegin', lab);
+      }
     }
   };
 

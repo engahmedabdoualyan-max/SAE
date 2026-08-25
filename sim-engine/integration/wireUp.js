@@ -98,6 +98,7 @@
   }
 
   function updateAdvKPIs(data) {
+    window.__saeUpdateAdvKPIs = updateAdvKPIs; /* expose for lab re-inits */
     var el;
     el = document.getElementById('adv-los');
     if (el) el.textContent = data.los || '-';
