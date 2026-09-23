@@ -1131,6 +1131,7 @@
     "dp_mgmt_request_staff": "Request staff",
     "dp_mgmt_staff_why": "Why do we need them",
     "dp_mgmt_no_staff": "No requests",
+    "dp_mgmt_pending": "pending",
     "dp_mgmt_hire": "Hire",
     "dp_mgmt_approved": "Approved",
     "dp_mgmt_declined": "Declined",

@@ -684,4 +684,6 @@ Object.assign(TRANSLATIONS["hi"], {
     "dp_mgmt_step_finance_note": "धन की व्यवस्था",
     "dp_mgmt_step_dist_note": "प्रत्येक प्रबंधक अपने विभाग / स्टेशन प्रबंधक सभी की निगरानी करता है",
     "dp_mgmt_step_monitor_note": "निगरानी और मूल्यांकन",
+
+    "dp_mgmt_pending": "लंबित",
 });

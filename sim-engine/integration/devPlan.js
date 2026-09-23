@@ -336,14 +336,19 @@ function summaryStripHtml() {
     : 0;
   const rec = recordedCount();
   const met = metCount();
+  const mg = plan.mgmt || {};
+  const mTasks = (mg.tasks || []).filter((t) => t.status === 'done').length + '/' + (mg.tasks || []).length;
+  const mProbs = (mg.problems || []).filter((p) => p.status !== 'solved').length;
   const blocks = [
     [plan.departments.length, tr('dp_depts')],
     [totalKpis, tr('dp_active')],
     [plan.horizon, tr('dp_horizon')],
     [avg + '%', tr('dp_avgProg')],
     [rec ? met + '/' + rec : '—', tr('dp_ontrack')],
+    [(mg.tasks || []).length ? mTasks : '—', tr('dp_mgmt_st_done')],
+    [mProbs, tr('dp_mgmt_prob_open')],
   ];
-  return '<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 mb-6">' + blocks.map(([v, l]) =>
+  return '<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-3 mb-6">' + blocks.map(([v, l]) =>
     '<div class="bg-slate-800 rounded-xl border border-slate-700/70 p-4 text-center">' +
     '  <div class="text-2xl font-extrabold text-white">' + v + '</div>' +
     '  <div class="text-[10px] uppercase tracking-wider text-slate-400 mt-1">' + l + '</div>' +
@@ -1175,6 +1180,27 @@ function roadReport() {
     risks.forEach((x) => {
       lines.push('[' + x.status + '] ' + tr(x.titleKey) + ' · ' + tr('dp_rm_risk_score') + ' ' + x.score + ' (' + x.likelihood + '×' + x.impact + ')');
     });
+  }
+  const m = plan.mgmt;
+  if (m) {
+    lines.push('--- ' + tr('dp_mgmt_title') + ' ---');
+    lines.push(tr('dp_mgmt_status') + ': ' + tr('dp_mgmt_st_' + m.status));
+    const tasks = m.tasks || [];
+    const doneT = tasks.filter((t) => t.status === 'done').length;
+    if (tasks.length) {
+      lines.push(tr('dp_mgmt_task') + ' · ' + tr('dp_mgmt_st_done') + ': ' + doneT + '/' + tasks.length
+        + ' · ' + tr('dp_mgmt_cost_total') + ': ' + fmtNum(mgmtTotalCost())
+        + (m.costApproved ? ' · ' + tr('dp_mgmt_fin_approved') + ': ' + fmtNum(m.costApproved) : ''));
+      tasks.forEach((t) => {
+        const pos = posByKey(t.position);
+        lines.push('- [' + t.status + '] ' + t.title + ' · ' + tr(pos.key)
+          + (Number(t.cost) ? ' · ' + tr('dp_mgmt_cost') + ' ' + fmtNum(Number(t.cost)) : '')
+          + (t.eval && t.eval.score ? ' · ' + tr('dp_mgmt_eval') + ' ' + t.eval.score + '/10' : ''));
+      });
+    }
+    const openProbs = (m.problems || []).filter((p) => p.status !== 'solved').length;
+    const pendingReq = (m.staffReqs || []).filter((s) => s.status === 'pending').length;
+    lines.push(tr('dp_mgmt_problem_title') + ': ' + openProbs + ' ' + tr('dp_mgmt_prob_open') + ' · ' + tr('dp_mgmt_hr_title') + ': ' + pendingReq + ' ' + tr('dp_mgmt_pending'));
   }
   return { title: tr('dp_rm_title'), text: lines.join('\n'), analytics: a };
 }

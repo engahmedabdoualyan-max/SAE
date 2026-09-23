@@ -709,4 +709,6 @@ Object.assign(TRANSLATIONS["ar"], {
     "dp_mgmt_step_finance_note": "يجّهز المالي المبلغ",
     "dp_mgmt_step_dist_note": "كل مسؤول يتابع قسمه / مدير المحطة يتابعهم كلهم",
     "dp_mgmt_step_monitor_note": "متابعة وتقييمات",
+
+    "dp_mgmt_pending": "معلّق",
 });

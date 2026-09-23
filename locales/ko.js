@@ -684,4 +684,6 @@ Object.assign(TRANSLATIONS["ko"], {
     "dp_mgmt_step_finance_note": "자금 확보",
     "dp_mgmt_step_dist_note": "각 관리자가 자기 부서를 따르고 / 스테이션 관리자가 모두를 따름",
     "dp_mgmt_step_monitor_note": "후속 조치 및 평가",
+
+    "dp_mgmt_pending": "대기 중",
 });

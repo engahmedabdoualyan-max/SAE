@@ -684,4 +684,6 @@ Object.assign(TRANSLATIONS["ja"], {
     "dp_mgmt_step_finance_note": "資金を確保",
     "dp_mgmt_step_dist_note": "各マネージャーが自分の部門をフォロー / ステーションマネージャーが全部をフォロー",
     "dp_mgmt_step_monitor_note": "フォローアップと評価",
+
+    "dp_mgmt_pending": "保留中",
 });

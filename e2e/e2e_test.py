@@ -845,6 +845,32 @@ def phase2f_dev_plan(page, res: Result) -> None:
     }""")
     res.check("exec plan: reset clears mgmt cycle, tasks, staff, problems", bool(execreset.get("ok")), str(execreset))
 
+    mgmtrep = page.evaluate("""() => {
+        const dp = window.SAE_DevPlan;
+        dp.addTask({ title: 'Reported task', position: 'pos_plant_mgr', cost: 40 });
+        dp.taskStatus(dp.getPlan().mgmt.tasks[0].id, 'done');
+        dp.evalTask(dp.getPlan().mgmt.tasks[0].id, 8, '');
+        dp.mgmtApprove();
+        dp.mgmtFinanceApprove(40);
+        const rep = dp.roadReport();
+        const txt = rep.text;
+        const hasExec = txt.includes('Reported task')
+            && /40/.test(txt) && /1\\/1/.test(txt)
+            && txt.split('\\n').length >= 8;
+        return { ok: hasExec, lines: txt.split('\\n').length, sample: txt.split('\\n').slice(6, 10).join(' | ') };
+    }""")
+    res.check("exec plan: management report includes execution section", bool(mgmtrep.get("ok")), str(mgmtrep))
+
+    strip2 = page.evaluate("""() => {
+        const dp = window.SAE_DevPlan;
+        dp.resetToTemplate();
+        dp.addTask({ title: 'A', position: 'pos_sales', cost: 0 });
+        dp.taskStatus(dp.getPlan().mgmt.tasks[0].id, 'done');
+        const strip = document.getElementById('dev-plan').textContent || '';
+        return { ok: /1\\/1/.test(strip) };
+    }""")
+    res.check("exec plan: summary strip tracks done tasks + open problems", bool(strip2.get("ok")), str(strip2))
+
 
 def phase3_cloud_sumo(page, res: Result) -> None:
     print("── Phase 3: cloud SUMO pipeline")

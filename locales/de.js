@@ -708,4 +708,6 @@ Object.assign(TRANSLATIONS["de"], {
     "dp_mgmt_step_finance_note": "Geld gesichert",
     "dp_mgmt_step_dist_note": "jeder Leiter folgt seiner Abteilung / Stationsleiter folgt allen",
     "dp_mgmt_step_monitor_note": "Follow-up & Bewertungen",
+
+    "dp_mgmt_pending": "ausstehend",
 });

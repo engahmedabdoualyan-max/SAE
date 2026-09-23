@@ -708,4 +708,6 @@ Object.assign(TRANSLATIONS["fr"], {
     "dp_mgmt_step_dist_note": "chaque responsable suit sa section / le chef de station suit tout le monde",
     "dp_mgmt_step_monitor_note": "suivi & évaluations",
     "dp_mgmt_step_finance_note": "argent sécurisé",
+
+    "dp_mgmt_pending": "en attente",
 });

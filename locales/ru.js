@@ -708,4 +708,6 @@ Object.assign(TRANSLATIONS["ru"], {
     "dp_mgmt_step_finance_note": "деньги обеспечены",
     "dp_mgmt_step_dist_note": "каждый руководитель следит за своим отделом / начальник станции за всеми",
     "dp_mgmt_step_monitor_note": "контроль и оценки",
+
+    "dp_mgmt_pending": "в ожидании",
 });

@@ -708,4 +708,6 @@ Object.assign(TRANSLATIONS["zh"], {
     "dp_mgmt_step_finance_note": "资金到位",
     "dp_mgmt_step_dist_note": "各经理跟进本部门 / 站点经理跟进所有",
     "dp_mgmt_step_monitor_note": "跟进与评估",
+
+    "dp_mgmt_pending": "待处理",
 });
