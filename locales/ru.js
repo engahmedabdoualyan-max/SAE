@@ -514,5 +514,8 @@ Object.assign(TRANSLATIONS["ru"], {
     "dp_active": "Активные KPI",
     "dp_horizon": "Горизонт",
     "dp_avgProg": "Ср. прогресс",
-    "dp_now": "Сейчас"
+    "dp_now": "Сейчас",
+    "dp_actual": "Факт",
+    "dp_actuals": "Ввести факт",
+    "dp_ontrack": "По цели",
 });

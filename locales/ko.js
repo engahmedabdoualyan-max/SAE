@@ -490,5 +490,8 @@ Object.assign(TRANSLATIONS["ko"], {
     "dp_active": "활성 KPI",
     "dp_horizon": "기간",
     "dp_avgProg": "평균 진행률",
-    "dp_now": "지금"
+    "dp_now": "지금",
+    "dp_actual": "실적",
+    "dp_actuals": "실적 기록",
+    "dp_ontrack": "목표 달성",
 });

@@ -490,5 +490,8 @@ Object.assign(TRANSLATIONS["hi"], {
     "dp_active": "सक्रिय KPI",
     "dp_horizon": "क्षितिज",
     "dp_avgProg": "औसत प्रगति",
-    "dp_now": "अभी"
+    "dp_now": "अभी",
+    "dp_actual": "वास्तविक",
+    "dp_actuals": "वास्तविक दर्ज करें",
+    "dp_ontrack": "लक्ष्य पर",
 });

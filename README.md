@@ -36,7 +36,7 @@ back over WebSocket.
 | **Advanced analysis** | COPERT V emissions, FHWA TNM noise, TTC/PET safety surrogates, EV energy, V2X penetration impact — all computed from live sim state |
 | **Network editor** | Draw roads/junctions/signals on Google Maps (model-only fallback), import OpenDRIVE / SUMO / GeoJSON / OSM, export all four formats |
 | **Network Runner** | One-click IDM micro-simulation on the edited/imported graph with k-route logit route choice, canvas rendering, live KPIs & LOS |
-| **Development Plan** | R&D factory targets (خطة التطوير): monthly per-department KPIs (sales, plants, quality, logistics) with Chart.js trajectories, task board, inline edit persisted locally, CSV export — 9-language support |
+| **Development Plan** | R&D factory targets (خطة التطوير): monthly per-department KPIs (sales, plants, quality, logistics) with Chart.js trajectories, task board, inline edit + actuals recording (on/off-target verdicts) persisted locally, CSV export — 9-language support |
 | **Simulation Lab** | Scenario templates (bottleneck, lane closure, uphill, arterial, green wave), live IDM sliders, fleet-mix control, detectors, time–space & fundamental diagrams, share links |
 | **Calibration** | CSV field-data upload, GEH/RMSE/R² grid-search over IDM params scored by the real engine, one-click apply to engine |
 | **Cloud runs** | Editor network → FastAPI → netconvert → headless SUMO → trip KPIs via WebSocket |

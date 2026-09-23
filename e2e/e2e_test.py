@@ -466,6 +466,41 @@ def phase2f_dev_plan(page, res: Result) -> None:
     }""")
     res.check("CSV export triggers download", bool(csv.get("downloaded")), str(csv))
 
+    actuals = page.evaluate("""() => {
+        window.SAE_DevPlan.toggleActuals();
+        const slot = document.getElementById('dp-edit-slot');
+        if (!slot || !slot.querySelector('input[data-plan="actual"]')) return { ok: false };
+        const row = slot.querySelector('div[data-di="0"][data-ki="0"]');
+        if (!row) return { ok: false };
+        const a1 = row.querySelector('input[data-plan="actual"][data-m="0"]');
+        const a2 = row.querySelector('input[data-plan="actual"][data-m="1"]');
+        a1.value = '5500';
+        a2.value = '5800';
+        window.SAE_DevPlan.commit();
+        const plan = window.SAE_DevPlan.getPlan();
+        const k = plan.departments.find(d => d.id === 'sales').kpis.find(k => k.id === 'concrete');
+        const stats = window.SAE_DevPlan.getStats();
+        return { ok: k.actuals[0] === 5500 && k.actuals[1] === 5800 && k.actuals[2] === null && stats.met === 1 && stats.recorded === 2, a0: k.actuals[0], a1: k.actuals[1], stats };
+    }""")
+    res.check("record actuals via inline inputs", bool(actuals.get("ok")), str(actuals))
+
+    board = page.evaluate("""() => {
+        const host = document.getElementById('dev-plan');
+        const tables = host.querySelectorAll('table tbody tr');
+        const mainTable = Array.from(tables).filter(t => t.querySelector('td.text-cyan-300')).length;
+        const onTrackChip = host.querySelector('.text-rose-300, .text-emerald-300');
+        return { mainTable, onTrack: !!onTrackChip };
+    }""")
+    res.check("task board renders actual markers", bool(board.get("onTrack") and board.get("mainTable") >= 1), str(board))
+
+    reset2 = page.evaluate("""() => {
+        window.SAE_DevPlan.resetToTemplate();
+        const k = window.SAE_DevPlan.getPlan()
+            .departments.find(d => d.id === 'sales').kpis.find(k => k.id === 'concrete');
+        return { ok: k.actuals[0] === null && k.targets[0] === 5500 };
+    }""")
+    res.check("reset clears actuals back to template", bool(reset2.get("ok")), str(reset2))
+
 
 def phase3_cloud_sumo(page, res: Result) -> None:
     print("── Phase 3: cloud SUMO pipeline")

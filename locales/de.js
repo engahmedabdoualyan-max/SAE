@@ -514,5 +514,8 @@ Object.assign(TRANSLATIONS["de"], {
     "dp_active": "Aktive KPIs",
     "dp_horizon": "Horizont",
     "dp_avgProg": "Ø Fortschritt",
-    "dp_now": "Jetzt"
+    "dp_now": "Jetzt",
+    "dp_actual": "Ist-Wert",
+    "dp_actuals": "Ist-Werte erfassen",
+    "dp_ontrack": "Im Plan",
 });

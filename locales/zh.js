@@ -514,5 +514,8 @@ Object.assign(TRANSLATIONS["zh"], {
     "dp_active": "活跃指标",
     "dp_horizon": "周期",
     "dp_avgProg": "平均进度",
-    "dp_now": "现在"
+    "dp_now": "现在",
+    "dp_actual": "实际",
+    "dp_actuals": "录入实际值",
+    "dp_ontrack": "达标",
 });

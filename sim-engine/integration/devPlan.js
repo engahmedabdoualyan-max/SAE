@@ -99,18 +99,62 @@ let plan = null;
 let chart = null;
 let chartDept = template.departments[0].id;
 
+/* أي اتجاه يُعدّ تقدّمًا: مؤشرات ترتفع (مبيعات) أو تنخفض (زمن الدوران). */
+function higherIsBetter(kpi) {
+  const last = kpi.targets[kpi.targets.length - 1];
+  return last >= kpi.current;
+}
+
+/* تحقّق شهر مسجّل من هدفه؟ true = محقق، false = متأخر، null = لم يُسجّل. */
+function achievedAt(kpi, m) {
+  const a = kpi.actuals ? kpi.actuals[m] : null;
+  if (a === null || a === undefined) return null;
+  const t = kpi.targets[m];
+  if (t === null || t === undefined) return null;
+  return higherIsBetter(kpi) ? a >= t : a <= t;
+}
+
+function recordedCount(p) {
+  return (p || plan).departments.reduce((acc, d) => acc + d.kpis.reduce(
+    (n, k) => n + (k.actuals || []).filter((v) => v !== null && v !== undefined).length, 0), 0);
+}
+
+function metCount(p) {
+  return (p || plan).departments.reduce((acc, d) => acc + d.kpis.reduce(
+    (n, k) => n + (k.actuals || []).filter((_, i) => achievedAt(k, i) === true).length, 0), 0);
+}
+
+/* تأكيد/توسيع أي خطة (محلّية أو قالب) لتطابق الأفق وتحمل `actuals`. */
+function normalize(p) {
+  if (!p || !Array.isArray(p.departments)) return p;
+  if (!p.horizon) p.horizon = 3;
+  p.departments.forEach((d) => {
+    if (!Array.isArray(d.kpis)) d.kpis = [];
+    d.kpis.forEach((k) => {
+      if (!Array.isArray(k.targets)) k.targets = [];
+      while (k.targets.length < p.horizon) {
+        k.targets.push(k.targets.length ? k.targets[k.targets.length - 1] : 0);
+      }
+      if (!Array.isArray(k.actuals)) k.actuals = [];
+      while (k.actuals.length < p.horizon) k.actuals.push(null);
+      if (k.actuals.length > p.horizon) k.actuals.length = p.horizon;
+    });
+  });
+  return p;
+}
+
 function load() {
   try {
     const raw = localStorage.getItem(LS_KEY);
     if (raw) {
       const parsed = JSON.parse(raw);
       if (parsed && Array.isArray(parsed.departments) && parsed.departments.length) {
-        plan = parsed;
+        plan = normalize(parsed);
         return;
       }
     }
   } catch (e) { /* corrupt → template */ }
-  plan = JSON.parse(JSON.stringify(template));
+  plan = normalize(JSON.parse(JSON.stringify(template)));
 }
 
 function save() {
@@ -118,7 +162,7 @@ function save() {
 }
 
 function resetToTemplate() {
-  plan = JSON.parse(JSON.stringify(template));
+  plan = normalize(JSON.parse(JSON.stringify(template)));
   chartDept = plan.departments[0].id;
   save();
   render();
@@ -180,6 +224,14 @@ function deltaBadge(kpi) {
 function kpiRowHtml(d, kpi) {
   const targetChips = kpi.targets.map((v, i) =>
     `<span class="px-1.5 py-0.5 rounded bg-slate-700 text-slate-200 text-[10px]" title="${tr('dp_month')} ${i + 1}">${v}</span>`).join('');
+  const actualChips = kpi.actuals.map((v, i) => {
+    const st = achievedAt(kpi, i);
+    const cls = v === null || v === undefined
+      ? 'bg-slate-800 text-slate-600'
+      : (st === true ? 'bg-emerald-600/25 text-emerald-300' : 'bg-rose-600/25 text-rose-300');
+    const glyph = v === null || v === undefined ? '·' : (st === true ? '✓' : '✗');
+    return `<span class="px-1.5 py-0.5 rounded ${cls} text-[10px]" title="${tr('dp_actual')} ${i + 1}">${glyph}${v === null || v === undefined ? '' : v}</span>`;
+  }).join('');
   return '' +
     '<div class="flex flex-wrap items-center justify-between gap-3 py-3 border-b border-slate-700/60 last:border-0">' +
     '  <div class="min-w-[140px]">' +
@@ -190,6 +242,8 @@ function kpiRowHtml(d, kpi) {
     '    <div class="text-right">' +
     '      <div class="text-[10px] text-slate-400">' + tr('dp_target') + '</div>' +
     '      <div class="flex gap-1 mt-1">' + targetChips + '</div>' +
+    '      <div class="text-[10px] text-slate-400 mt-1.5">' + tr('dp_actual') + '</div>' +
+    '      <div class="flex gap-1 mt-1">' + actualChips + '</div>' +
     '    </div>' +
     '    <div class="w-16 pr-2">' + deltaBadge(kpi) + '</div>' +
     '  </div>' +
@@ -222,13 +276,16 @@ function summaryStripHtml() {
   const avg = all.length
     ? Math.round(all.reduce((a, k) => a + progressOf(k), 0) / all.length)
     : 0;
+  const rec = recordedCount();
+  const met = metCount();
   const blocks = [
     [plan.departments.length, tr('dp_depts')],
     [totalKpis, tr('dp_active')],
     [plan.horizon, tr('dp_horizon')],
     [avg + '%', tr('dp_avgProg')],
+    [rec ? met + '/' + rec : '—', tr('dp_ontrack')],
   ];
-  return '<div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">' + blocks.map(([v, l]) =>
+  return '<div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 mb-6">' + blocks.map(([v, l]) =>
     '<div class="bg-slate-800 rounded-xl border border-slate-700/70 p-4 text-center">' +
     '  <div class="text-2xl font-extrabold text-white">' + v + '</div>' +
     '  <div class="text-[10px] uppercase tracking-wider text-slate-400 mt-1">' + l + '</div>' +
@@ -251,6 +308,12 @@ function taskBoardHtml() {
         const prev = m === 1 ? k.current : k.targets[m - 2];
         const delta = Math.round((tgt - prev) * 10) / 10;
         if (delta === 0) return;
+        const achieved = achievedAt(k, m - 1);
+        const act = k.actuals ? k.actuals[m - 1] : null;
+        const actualTd = act === null || act === undefined
+          ? '<span class="text-slate-600">—</span>'
+          : '<span class="' + (achieved === true ? 'text-emerald-300' : 'text-rose-300') + '">' + act + ' ' + k.unit +
+            ' <i class="fas fa-' + (achieved === true ? 'check' : 'xmark') + '"></i></span>';
         rows.push('' +
           '<tr class="border-b border-slate-700/50 last:border-0">' +
           '  <td class="py-2 px-2 text-[10px] text-cyan-300 font-mono">M' + m + '</td>' +
@@ -259,6 +322,7 @@ function taskBoardHtml() {
           '  <td class="py-2 px-2 text-xs text-right text-emerald-300 font-mono">' +
           (delta > 0 ? '+' : '') + delta + ' ' + k.unit + ' <span data-key="dp_per_month">' + tr('per_month') + '</span>' +
           '  <span class="text-[10px] text-slate-500 ml-1">' + prev + ' → ' + tgt + '</span></td>' +
+          '  <td class="py-2 px-2 text-xs text-right">' + actualTd + '</td>' +
           '</tr>');
       });
     });
@@ -273,6 +337,7 @@ function taskBoardHtml() {
     '    <th class="py-2 px-2">' + tr('dp_dept') + '</th>' +
     '    <th class="py-2 px-2">' + tr('dp_kpi') + '</th>' +
     '    <th class="py-2 px-2 text-right">' + tr('dp_tasks') + '</th>' +
+    '    <th class="py-2 px-2 text-right">' + tr('dp_actual') + '</th>' +
     '  </tr></thead><tbody>' + rows.join('') + '</tbody></table></div>';
 }
 
@@ -321,6 +386,7 @@ function render() {
     '      <div class="bg-slate-900 rounded-2xl border border-slate-700/70 p-4">' + taskBoardHtml() + '</div>' +
     '      <div class="flex flex-wrap gap-2 mt-4">' +
     '        <button onclick="SAE_DevPlan && SAE_DevPlan.toggleEdit()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 rounded-lg text-xs font-semibold"><i class="fas fa-pen mr-1"></i><span data-key="dp_edit">Edit plan</span></button>' +
+    '        <button onclick="SAE_DevPlan && SAE_DevPlan.toggleActuals()" class="px-4 py-2 bg-teal-600 hover:bg-teal-500 rounded-lg text-xs font-semibold"><i class="fas fa-clipboard-check mr-1"></i><span data-key="dp_actuals">Record actuals</span></button>' +
     '        <button onclick="SAE_DevPlan && SAE_DevPlan.exportCSV()" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-xs font-semibold"><i class="fas fa-file-csv mr-1"></i><span data-key="dp_export">Export CSV</span></button>' +
     '        <button onclick="SAE_DevPlan && SAE_DevPlan.resetToTemplate()" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-xs font-semibold"><i class="fas fa-rotate-left mr-1"></i><span data-key="dp_reset">Reset template</span></button>' +
     '      </div>' +
@@ -340,13 +406,29 @@ function renderChart() {
   if (!d) return;
   const labels = [tr('dp_now'), ...d.kpis[0].targets.map((_, i) => tr('dp_month') + ' ' + (i + 1))];
   const palettes = ['#34D399', '#22D3EE', '#A78BFA', '#FBBF24', '#F472B6'];
-  const datasets = d.kpis.map((k, i) => ({
-    label: translatorForKey(k.nameKey),
-    data: [k.current, ...k.targets],
-    borderColor: palettes[i % palettes.length],
-    backgroundColor: palettes[i % palettes.length] + '26',
-    fill: true, tension: 0.3, borderWidth: 2, pointRadius: 3, pointBackgroundColor: palettes[i % palettes.length],
-  }));
+  const datasets = [];
+  d.kpis.forEach((k, i) => {
+    const col = palettes[i % palettes.length];
+    datasets.push({
+      label: translatorForKey(k.nameKey),
+      data: [k.current, ...k.targets],
+      borderColor: col,
+      backgroundColor: col + '26',
+      fill: true, tension: 0.3, borderWidth: 2, pointRadius: 3, pointBackgroundColor: col,
+    });
+    if ((k.actuals || []).some((v) => v !== null && v !== undefined)) {
+      datasets.push({
+        label: translatorForKey(k.nameKey) + ' · ' + tr('dp_actual').toLowerCase(),
+        type: 'line',
+        showLine: false,
+        spanGaps: false,
+        data: [null, ...k.actuals],
+        borderColor: '#F8FAFC',
+        backgroundColor: '#FFFFFF',
+        pointRadius: 6, pointHoverRadius: 8, pointStyle: 'rect',
+      });
+    }
+  });
   const opts = {
     animation: false, responsive: true, maintainAspectRatio: false,
     plugins: {
@@ -371,18 +453,25 @@ function translatorForKey(key) {
 
 function editSlotHtml() {
   const rows = [];
+  if (!editing) editing = { mode: 'plan' };
+  const showActuals = editing.mode === 'actuals';
   plan.departments.forEach((d, di) => {
     rows.push('<h4 class="text-[11px] font-bold uppercase tracking-wider text-cyan-300 mt-3 mb-2" data-key="' + d.nameKey + '">' + d.nameKey + '</h4>');
     d.kpis.forEach((k, ki) => {
+      const actualIn = (k.actuals || []).map((v, mi) =>
+        '<label class="text-[9px] text-slate-500">' + tr('dp_actual') + ' ' + tr('dp_month') + ' ' + (mi + 1) +
+        '<input data-plan="actual" data-m="' + mi + '" type="number" step="0.5" value="' + (v === null || v === undefined ? '' : v) + '" placeholder="—" class="w-20 ml-1 px-2 py-1 bg-slate-800 border border-slate-600 rounded text-xs text-white">' +
+        '</label>').join('');
+      const targetIn = k.targets.map((v, mi) =>
+        '<label class="text-[9px] text-slate-500">' + tr('dp_month') + ' ' + (mi + 1) +
+        '<input data-plan="target" data-m="' + mi + '" type="number" step="0.5" value="' + v + '" class="w-20 ml-1 px-2 py-1 bg-slate-800 border border-slate-600 rounded text-xs text-white">' +
+        '</label>').join('');
       rows.push('<div data-row data-di="' + di + '" data-ki="' + ki + '" class="flex flex-wrap items-center gap-2 py-1.5 border-b border-slate-800 last:border-0">' +
         '<span class="w-36 text-xs text-slate-300 truncate" data-key="' + k.nameKey + '">' + k.nameKey + '</span>' +
-        '<label class="text-[9px] text-slate-500">' + tr('dp_current') +
-        '<input data-plan="current" type="number" value="' + k.current + '" class="w-20 ml-1 px-2 py-1 bg-slate-800 border border-slate-600 rounded text-xs text-white">' +
-        '</label>' +
-        k.targets.map((v, mi) =>
-          '<label class="text-[9px] text-slate-500">' + tr('dp_month') + ' ' + (mi + 1) +
-          '<input data-plan="target" data-m="' + mi + '" type="number" step="0.5" value="' + v + '" class="w-20 ml-1 px-2 py-1 bg-slate-800 border border-slate-600 rounded text-xs text-white">' +
-          '</label>').join('') +
+        (showActuals ? '' : '<label class="text-[9px] text-slate-500">' + tr('dp_current') +
+          '<input data-plan="current" type="number" value="' + k.current + '" class="w-20 ml-1 px-2 py-1 bg-slate-800 border border-slate-600 rounded text-xs text-white">' +
+          '</label>') +
+        (showActuals ? actualIn : targetIn) +
         '<button onclick="SAE_DevPlan && SAE_DevPlan.removeKpi(this)" class="px-2 py-1 rounded bg-rose-600/20 text-rose-300 text-[10px]" title="Remove"><i class="fas fa-xmark"></i></button>' +
         '</div>');
     });
@@ -406,9 +495,17 @@ function editSlotHtml() {
   return rows.join('');
 }
 
-let editing = false;
+let editing = null;
 function toggleEdit() {
-  editing = !editing;
+  editing = editing && editing.mode === 'plan' ? null : { mode: 'plan' };
+  const slot = document.getElementById('dp-edit-slot');
+  if (!slot) return;
+  slot.innerHTML = editing ? editSlotHtml() : '';
+  translateRecursive(slot);
+  renderChart();
+}
+function toggleActuals() {
+  editing = editing && editing.mode === 'actuals' ? null : { mode: 'actuals' };
   const slot = document.getElementById('dp-edit-slot');
   if (!slot) return;
   slot.innerHTML = editing ? editSlotHtml() : '';
@@ -422,7 +519,7 @@ function translateRecursive(root) {
     if (txt !== k) el.textContent = txt;
   });
 }
-function cancelEdit() { editing = false; const s = document.getElementById('dp-edit-slot'); if (s) s.innerHTML = ''; }
+function cancelEdit() { editing = null; const s = document.getElementById('dp-edit-slot'); if (s) s.innerHTML = ''; }
 
 function removeKpi(btn) {
   const row = btn.closest('div[data-row]');
@@ -436,13 +533,6 @@ function removeKpi(btn) {
 function commit() {
   const slot = document.getElementById('dp-edit-slot');
   if (!slot) return;
-  let di = 0, ki = 0;
-  slot.querySelectorAll('input[data-plan="dept"]').forEach((hidden) => {
-    const curIdx = parseInt(hidden.getAttribute('data-di'), 10);
-    const kpiIdx = parseInt(hidden.closest('div[data-row]').getAttribute('data-ki'), 10);
-    di = curIdx;
-    ki = kpiIdx;
-  });
   plan.departments.forEach((d, dix) => {
     d.kpis.forEach((k, kix) => {
       const row = slot.querySelector(`div[data-row][data-di="${dix}"][data-ki="${kix}"]`);
@@ -453,10 +543,16 @@ function commit() {
         const mi = parseInt(t.getAttribute('data-m'), 10);
         if (Number.isFinite(mi) && k.targets[mi] !== undefined) k.targets[mi] = parseFloat(t.value) || 0;
       });
+      row.querySelectorAll('input[data-plan="actual"]').forEach((a) => {
+        const mi = parseInt(a.getAttribute('data-m'), 10);
+        if (!Number.isFinite(mi) || k.actuals[mi] === undefined) return;
+        const v = a.value.trim();
+        k.actuals[mi] = v === '' ? null : (parseFloat(v) || 0);
+      });
     });
   });
   save();
-  editing = false;
+  editing = null;
   render();
 }
 
@@ -477,6 +573,7 @@ function addKpi() {
     unit,
     current: 0,
     targets: [0, 0, 0],
+    actuals: [null, null, null],
   });
   save();
   reflowEdit();
@@ -491,12 +588,17 @@ function selectChartDept(id) {
 
 function exportCSV() {
   const esc = (v) => '"' + String(v).replace(/"/g, '""') + '"';
-  const lines = ['department,key,unit,current,M1,M2,M3,delta_final'];
+  const header = ['department', 'key', 'unit', 'current', 'M1', 'M2', 'M3', 'A1', 'A2', 'A3', 'delta_final', 'ontrack'];
+  const lines = [header.join(',')];
   plan.departments.forEach((d) => {
     d.kpis.forEach((k) => {
       const last = k.targets[k.targets.length - 1];
       const delta = Math.round((last - k.current) * 10) / 10;
-      lines.push([d.nameKey, k.nameKey, k.unit, k.current, ...k.targets, delta].map(esc).join(','));
+      const rec = (k.actuals || []).filter((v) => v !== null && v !== undefined).length;
+      const met = (k.actuals || []).filter((_, i) => achievedAt(k, i) === true).length;
+      lines.push([d.nameKey, k.nameKey, k.unit, k.current, ...k.targets,
+        ...k.actuals.map((v) => v === null || v === undefined ? '' : v),
+        delta, rec ? met + '/' + rec : ''].map(esc).join(','));
     });
   });
   const blob = new Blob([lines.join('\n')], { type: 'text/csv;charset=utf-8' });
@@ -519,8 +621,9 @@ function initDevPlan() {
   langObserver = new MutationObserver(() => render());
   langObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['lang'] });
   window.SAE_DevPlan = {
-    selectChartDept, toggleEdit, commit, cancelEdit, removeKpi, addKpi,
+    selectChartDept, toggleEdit, toggleActuals, commit, cancelEdit, removeKpi, addKpi,
     exportCSV, resetToTemplate, getPlan: () => plan,
+    getStats: () => ({ recorded: recordedCount(), met: metCount() }),
   };
   return window.SAE_DevPlan;
 }

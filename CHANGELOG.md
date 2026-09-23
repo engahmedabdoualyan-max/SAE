@@ -27,10 +27,6 @@ All notable changes to SAE AutoSim Hub.
   choice), canvas rendering of true edge geometry with vehicle trails,
   signal-aware travel, live KPIs (active vehicles, network speed, completed
   trips, LOS letter) and pause/reset controls.
-- **E2E suite grown to 61 checks**: new Phase 2f drives the Development Plan
-  page (template seeded, entity targets 5000 → 5500, KPI cards, Chart.js
-  trajectory, edit/save/reset roundtrip, CSV export) alongside the existing
-  53.
 - **Development Plan (خطة التطوير) page** under the Research & Development
   section — the factory's brain: monthly targets per department (sales,
   plants, quality, logistics) with per-KPI current vs M1–M3 values, progress
@@ -40,6 +36,18 @@ All notable changes to SAE AutoSim Hub.
   template, and CSV export. Fully translated across all 9 languages with a
   reusable `dp_*` i18n key set and a `window.t` translation helper exposed to
   ES modules.
+- **Actuals tracking in the Development Plan**: record the real M1–M3 values
+  per KPI via a dedicated "Record actuals" edit mode; every month is marked
+  ✓ achieved / ✗ behind against its target (respecting direction — sales grow
+  upward, mixer turnaround shrinks), an "On target" summary block shows
+  `met/recorded`, the trajectory chart overlays white square actuals on the
+  coloured target lines, and the task board gains an actual column. CSV export
+  now carries `A1–A3` and an `ontrack` column. Old saved plans migrate
+  automatically.
+- **E2E suite grown to 64 checks**: Phase 2f covers the Development Plan end
+  to end — template seeding (5000 → 5500), KPI cards, Chart.js, edit/save/
+  reset roundtrip, CSV export, actuals recording with on/off-target verdicts
+  and reset-to-template — on top of the original 53.
 - **Engine-driven calibration**: the wizard's grid search now runs the real
   simulation per candidate (12 seeded runs) and scores GEH against loop
   detector flows normalized per lane — replacing a mocked search.

@@ -514,5 +514,8 @@ Object.assign(TRANSLATIONS["fr"], {
     "dp_active": "KPIs actifs",
     "dp_horizon": "Horizon",
     "dp_avgProg": "Progrès moy.",
-    "dp_now": "Maintenant"
+    "dp_now": "Maintenant",
+    "dp_actual": "Réel",
+    "dp_actuals": "Saisir le réel",
+    "dp_ontrack": "Sur cible",
 });

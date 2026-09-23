@@ -515,5 +515,8 @@ Object.assign(TRANSLATIONS["ar"], {
     "dp_active": "المؤشرات النشطة",
     "dp_horizon": "الأفق",
     "dp_avgProg": "متوسط الإنجاز",
-    "dp_now": "الآن"
+    "dp_now": "الآن",
+    "dp_actual": "الفعلي",
+    "dp_actuals": "تسجيل الفعلي",
+    "dp_ontrack": "على المسار",
 });

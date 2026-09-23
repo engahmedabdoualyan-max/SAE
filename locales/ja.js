@@ -490,5 +490,8 @@ Object.assign(TRANSLATIONS["ja"], {
     "dp_active": "有効なKPI",
     "dp_horizon": "期間",
     "dp_avgProg": "平均進捗",
-    "dp_now": "現在"
+    "dp_now": "現在",
+    "dp_actual": "実績",
+    "dp_actuals": "実績を入力",
+    "dp_ontrack": "達成",
 });
