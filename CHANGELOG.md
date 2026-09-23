@@ -106,10 +106,26 @@ All notable changes to SAE AutoSim Hub.
   to **mitigated**, while *keep the plan* records it as **accepted** — matching
   the PMP risk-response choices. Resolved risks stay in the log as history, and
   the whole register is included in the management report export.
-- **E2E suite grown to 91 checks**: Phase 2f now also verifies the advisor logs
-  an open schedule-slip risk after a behind-schedule review, risk scoring
-  persists across renders, re-baseline mitigates the risk, and choosing "keep
-  the plan" accepts it.
+- **Execution management layer in the Development Plan**: the plan now runs a
+  complete approval-and-delivery cycle like a PMO. *Management* approves the
+  plan; when execution has a cost, *finance* approves the funding (amount
+  captured as the necessary ledger), and zero-cost plans are distributed
+  straight away. After distribution, every manager follows their own section
+  while the plant manager can cover them all, with a notes/log timeline
+  throughout. Tasks are delegated **by job title (المسمى الوظيفي)** — plant
+  manager, station manager, quality, sales, logistics, HR, finance — each with
+  status (todo / in progress / done), rich follow-up notes, and a per-employee
+  evaluation score on task completion. An **HR panel** receives team-add
+  requests (e.g. "need more station managers") and approves or declines them.
+  A **problem scheduler** on the same page lets the team register problems to
+  solve — even ones unrelated to the plan — with severity, target month and an
+  open → in progress → solved tracker. A printable view prints current →
+  target → work steps → colored follow-up cells for the whole plan.
+- **E2E suite grown to 99 checks**: Phase 2f now also drives the full execution
+  cycle (cost >0: draft → mgmt OK → finance OK → distributed → monitoring),
+  the zero-cost direct-distribution shortcut, HR add-team approval, the
+  problem tracker, per-task follow-up/status/evaluation, and the printable
+  plan API.
 - **Engine-driven calibration**: the wizard's grid search now runs the real
   simulation per candidate (12 seeded runs) and scores GEH against loop
   detector flows normalized per lane — replacing a mocked search.

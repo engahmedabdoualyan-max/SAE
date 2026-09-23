@@ -759,6 +759,92 @@ def phase2f_dev_plan(page, res: Result) -> None:
     }""")
     res.check("roadmap: final reset restores clean plan", bool(roadreset2.get("ok")), str(roadreset2))
 
+    mgmt = page.evaluate("""() => {
+        const host = document.getElementById('dev-plan');
+        const dp = window.SAE_DevPlan;
+        if (!dp || !host) return { error: 'no-section' };
+        const st = dp.mgmtState();
+        const txt = host.textContent || '';
+        return {
+            status: st.status,
+            hasPrint: typeof dp.printPlan === 'function' && typeof dp.printPlan() === 'object',
+            mgmtKeysLeak: (txt.match(/dp_mgmt_[a-z_]+/g) || []).filter((k) => !txt.includes(k)).length,
+            rawTreeLabel: (host.querySelectorAll('[data-key]').length > 0),
+        };
+    }""")
+    res.check("exec plan: mgmt section + API mounted", mgmt.get("status") in ("draft", "monitoring"), str(mgmt))
+    res.check("exec plan: printable plan API returns output", bool(mgmt.get("hasPrint")), str(mgmt))
+
+    appro = page.evaluate("""() => {
+        const dp = window.SAE_DevPlan;
+        const r0 = dp.mgmtState().status;
+        const pl = dp.getPlan();
+        const had = pl.mgmt.tasks.length;
+        const t = dp.addTask({ title: 'E2E task', position: 'pos_quality', cost: 100 });
+        const st1 = dp.mgmtState().status;
+        const out = dp.mgmtApprove();
+        const st2 = dp.mgmtState().status;
+        const fin = dp.mgmtFinanceApprove(100);
+        const st3 = dp.mgmtState().status;
+        const dist = dp.mgmtApprove();
+        const st4 = dp.mgmtState().status;
+        const mon = dp.mgmtApprove();
+        const st5 = dp.mgmtState().status;
+        return { r0, t, st1, st2, st3, st4, st5, total: dp.mgmtState().costTotal, approved: dp.mgmtState().costApproved };
+    }""")
+    res.check("exec plan: cost>0 → draft→mgmt→finance→distributed→monitoring", bool(
+        appro.get("st1") == "draft" and appro.get("st2") == "mgmt_ok"
+        and appro.get("st3") == "finance_ok" and appro.get("st4") == "distributed" and appro.get("st5") == "monitoring"), str(appro))
+
+    nocost = page.evaluate("""() => {
+        window.SAE_DevPlan.resetToTemplate();
+        const dp = window.SAE_DevPlan;
+        dp.addTask({ title: 'Free task', position: 'pos_sales', cost: 0 });
+        dp.mgmtApprove();
+        return dp.mgmtState().status;
+    }""")
+    res.check("exec plan: zero-cost plan skips finance and distributes directly", nocost == "distributed", str(nocost))
+
+    staff = page.evaluate("""() => {
+        const dp = window.SAE_DevPlan;
+        const s = dp.addStaffReq({ position: 'pos_station_mgr', reason: 'E2E extra staff' });
+        const still = dp.getPlan().mgmt.staffReqs.some((x) => x.id === s.id && x.status === 'pending');
+        dp.resolveStaff(s.id, true);
+        const done = dp.getPlan().mgmt.staffReqs.some((x) => x.id === s.id && x.status === 'approved');
+        return { ok: still && done };
+    }""")
+    res.check("exec plan: HR receives and approves a team-add request", bool(staff.get("ok")), str(staff))
+
+    prob = page.evaluate("""() => {
+        const dp = window.SAE_DevPlan;
+        const p = dp.addProblem({ text: 'E2E problem', severity: 'high', targetMonth: 3 });
+        const got = dp.getPlan().mgmt.problems.find((x) => x.id === p.id);
+        dp.problemStatus(p.id, 'doing');
+        const doing = dp.getPlan().mgmt.problems.find((x) => x.id === p.id).status;
+        dp.problemStatus(p.id, 'solved');
+        const solved = dp.getPlan().mgmt.problems.find((x) => x.id === p.id).status;
+        return { ok: got && doing === 'doing' && solved === 'solved', sev: got ? got.severity : null };
+    }""")
+    res.check("exec plan: problem scheduler open → doing → solved", bool(prob.get("ok")), str(prob))
+
+    evalgrid = page.evaluate("""() => {
+        const dp = window.SAE_DevPlan;
+        const t = dp.addTask({ title: 'Evaluate me', position: 'pos_logistics', cost: 0 });
+        dp.taskFollow(t.id, 'started follow-up');
+        dp.taskStatus(t.id, 'done');
+        dp.evalTask(t.id, 9, '');
+        const tk = dp.getPlan().mgmt.tasks.find((x) => x.id === t.id);
+        return { ok: tk.followups.length === 1 && tk.status === 'done' && tk.eval.score === 9, eval: tk.eval.score };
+    }""")
+    res.check("exec plan: per-task follow-up note + status + employee eval", bool(evalgrid.get("ok")), str(evalgrid))
+
+    execreset = page.evaluate("""() => {
+        window.SAE_DevPlan.resetToTemplate();
+        const m = window.SAE_DevPlan.getPlan().mgmt;
+        return { ok: m.status === 'draft' && m.tasks.length === 0 && m.problems.length === 0 && m.staffReqs.length === 0 };
+    }""")
+    res.check("exec plan: reset clears mgmt cycle, tasks, staff, problems", bool(execreset.get("ok")), str(execreset))
+
 
 def phase3_cloud_sumo(page, res: Result) -> None:
     print("── Phase 3: cloud SUMO pipeline")

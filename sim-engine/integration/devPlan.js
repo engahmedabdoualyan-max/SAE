@@ -99,6 +99,33 @@ let plan = null;
 let chart = null;
 let chartDept = template.departments[0].id;
 
+/* ── المسميات الوظيفية: كل مهمة تُسند لمسمى ومسؤولية قسمه. ───────────── */
+const POSITIONS = [
+  { k: 'pos_plant_mgr',   key: 'dp_mgmt_pos_plant_mgr',   icon: 'fa-user-tie',   deptId: null },
+  { k: 'pos_station_mgr', key: 'dp_mgmt_pos_station_mgr', icon: 'fa-user-gear',  deptId: 'plants' },
+  { k: 'pos_quality',     key: 'dp_mgmt_pos_quality',     icon: 'fa-user-graduate', deptId: 'quality' },
+  { k: 'pos_sales',       key: 'dp_mgmt_pos_sales',       icon: 'fa-user-tag',   deptId: 'sales' },
+  { k: 'pos_logistics',   key: 'dp_mgmt_pos_logistics',   icon: 'fa-user-clock', deptId: 'logistics' },
+  { k: 'pos_hr',          key: 'dp_mgmt_pos_hr',          icon: 'fa-user-shield', deptId: null },
+  { k: 'pos_finance',     key: 'dp_mgmt_pos_finance',     icon: 'fa-user-crown', deptId: null },
+];
+
+function posByKey(k) { return POSITIONS.find((p) => p.k === k) || POSITIONS[0]; }
+
+/* نموذج إدارة التنفيذ: اعتماد، مهام، تكلفة، مشاكل، تقييمات. */
+function mgmtDefaults() {
+  return {
+    status: 'draft',            /* draft → mgmt_ok → finance_pending → finance_ok → distributed → monitoring */
+    logs: [],                   /* {at, role, note} */
+    costRequested: 0,
+    costApproved: 0,
+    financeNote: '',
+    tasks: [],
+    staffReqs: [],
+    problems: [],
+  };
+}
+
 /* أي اتجاه يُعدّ تقدّمًا: مؤشرات ترتفع (مبيعات) أو تنخفض (زمن الدوران). */
 function higherIsBetter(kpi) {
   const last = kpi.targets[kpi.targets.length - 1];
@@ -143,6 +170,33 @@ function normalize(p) {
   if (!p.roadmap || !Array.isArray(p.roadmap.phases) || !p.roadmap.phases.length) {
     p.roadmap = buildRoadmap(p);
   }
+  if (!p.mgmt || typeof p.mgmt !== 'object') p.mgmt = mgmtDefaults();
+  p.mgmt.status = p.mgmt.status || 'draft';
+  if (!Array.isArray(p.mgmt.logs)) p.mgmt.logs = [];
+  if (!Array.isArray(p.mgmt.tasks)) p.mgmt.tasks = [];
+  if (!Array.isArray(p.mgmt.staffReqs)) p.mgmt.staffReqs = [];
+  if (!Array.isArray(p.mgmt.problems)) p.mgmt.problems = [];
+  p.mgmt.tasks.forEach((t) => {
+    t.title = t.title || '';
+    t.position = t.position || 'pos_plant_mgr';
+    t.deptId = t.deptId || null;
+    t.status = t.status || 'todo';
+    t.cost = Number(t.cost) || 0;
+    t.followups = Array.isArray(t.followups) ? t.followups : [];
+    t.eval = t.eval || { score: null, note: '' };
+  });
+  p.mgmt.staffReqs.forEach((s) => {
+    s.position = s.position || 'pos_plant_mgr';
+    s.status = s.status || 'pending';
+    s.reason = s.reason || '';
+  });
+  p.mgmt.problems.forEach((q) => {
+    q.text = q.text || '';
+    q.severity = q.severity || 'med';
+    q.targetMonth = Number(q.targetMonth) || 1;
+    q.status = q.status || 'open';
+    q.note = q.note || '';
+  });
   return p;
 }
 
@@ -166,6 +220,7 @@ function save() {
 
 function resetToTemplate() {
   plan = normalize(JSON.parse(JSON.stringify(template)));
+  plan.mgmt = mgmtDefaults();
   chartDept = plan.departments[0].id;
   save();
   render();
@@ -366,6 +421,7 @@ function render() {
     '  </div>' +
     summaryStripHtml() +
     roadmapSectionHtml() +
+    mgmtSectionHtml() +
     '  <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 gap-6 mb-6">' +
     '    <div class="col-span-full flex flex-wrap items-center justify-between gap-2 mb-2">' +
     '      <h3 class="text-sm font-bold text-slate-300"><i class="fas fa-crosshairs mr-2 text-emerald-400"></i>' +
@@ -1553,6 +1609,380 @@ function exportReport() {
   return rep;
 }
 
+/* ── إدارة التنفيذ: دورة اعتماد الخطة + مهام بالمسمى الوظيفي + HR + تقييمات + تكلفة ومشاكل ── */
+
+const MGMT_STEPS = ['draft', 'mgmt_ok', 'finance_ok', 'distributed', 'monitoring'];
+
+function mgmtTotalCost() { return plan.mgmt.tasks.reduce((s, t) => s + (Number(t.cost) || 0), 0); }
+function mgmtStatusIdx() {
+  let i = MGMT_STEPS.indexOf(plan.mgmt.status);
+  if (i < 0) i = 0;
+  /* إذا بلا تكلفة، توزّع مباشرة بعد اعتماد الإدارة. */
+  if (plan.mgmt.status === 'mgmt_ok' && mgmtTotalCost() === 0) i = MGMT_STEPS.indexOf('distributed');
+  return i;
+}
+function mgmtLog(roleKey, note) {
+  plan.mgmt.logs = plan.mgmt.logs || [];
+  plan.mgmt.logs.unshift({ at: Date.now(), role: roleKey, note });
+}
+function mgmtApprove() {
+  if (plan.mgmt.status === 'draft') {
+    plan.mgmt.status = mgmtTotalCost() === 0 ? 'distributed' : 'mgmt_ok';
+    mgmtLog('dp_mgmt_role_mgmt', tr('dp_mgmt_approve_note'));
+  } else if (plan.mgmt.status === 'mgmt_ok' || plan.mgmt.status === 'finance_ok') {
+    plan.mgmt.status = 'distributed';
+    mgmtLog('dp_mgmt_role_mgmt', tr('dp_mgmt_dist_note'));
+  } else if (plan.mgmt.status === 'distributed') {
+    plan.mgmt.status = 'monitoring';
+    mgmtLog('dp_mgmt_role_mgmt', tr('dp_mgmt_monitor_note'));
+  }
+  save(); render(); renderChart();
+  return { status: plan.mgmt.status };
+}
+function mgmtFinanceApprove(amount) {
+  const v = Number(amount);
+  if (plan.mgmt.status === 'mgmt_ok') {
+    plan.mgmt.costApproved = Number.isFinite(v) && v >= 0 ? v : mgmtTotalCost();
+    plan.mgmt.status = 'finance_ok';
+    mgmtLog('dp_mgmt_role_finance', tr('dp_mgmt_fin_note') + ' ' + plan.mgmt.costApproved);
+  }
+  save(); render(); renderChart();
+  return { status: plan.mgmt.status, approved: plan.mgmt.costApproved };
+}
+function mgmtRejectFinance(note) {
+  plan.mgmt.financeNote = note || '';
+  mgmtLog('dp_mgmt_role_finance', note || tr('dp_mgmt_fin_reject'));
+  save(); render();
+  return { ok: true, note: plan.mgmt.financeNote };
+}
+
+/* مهمة بالمسمى الوظيفي: تسند لقسم/مسؤول، متابعة + تقييم. */
+function addTask(inputs) {
+  const t = {
+    id: Date.now() % 100000,
+    title: (inputs && inputs.title ? inputs.title : '').trim(),
+    position: (inputs && inputs.position) || 'pos_plant_mgr',
+    deptId: (inputs && inputs.deptId) || (posByKey((inputs && inputs.position) || 'pos_plant_mgr').deptId),
+    status: 'todo',
+    cost: Number(inputs && inputs.cost) || 0,
+    followups: [],
+    eval: { score: null, note: '', by: '' },
+  };
+  if (!t.title) return { error: 'title-required' };
+  plan.mgmt.tasks.push(t);
+  save(); render(); renderChart();
+  return { id: t.id };
+}
+function taskFollow(id, note) {
+  const t = plan.mgmt.tasks.find((x) => x.id === Number(id) || String(x.id) === String(id));
+  if (!t) return { error: 'no-task' };
+  t.followups.push({ at: Date.now(), note });
+  t.status = t.status === 'done' ? 'done' : 'doing';
+  save(); render();
+  return { ok: true, count: t.followups.length };
+}
+function taskStatus(id, status) {
+  const t = plan.mgmt.tasks.find((x) => String(x.id) === String(id));
+  if (!t) return { error: 'no-task' };
+  t.status = ['todo', 'doing', 'done'].includes(status) ? status : 'todo';
+  save(); render();
+  return { ok: true, status: t.status };
+}
+function evalTask(id, score, note) {
+  const t = plan.mgmt.tasks.find((x) => String(x.id) === String(id));
+  if (!t) return { error: 'no-task' };
+  const s = Number(score);
+  t.eval = { score: Number.isFinite(s) ? Math.max(1, Math.min(10, s)) : null, note: note || '', by: tr('dp_mgmt_role_mgmt') };
+  save(); render();
+  return { ok: true, score: t.eval.score };
+}
+function taskCost(id, cost) {
+  const t = plan.mgmt.tasks.find((x) => String(x.id) === String(id));
+  if (!t) return { error: 'no-task' };
+  t.cost = Number(cost) || 0;
+  save(); render();
+  return { ok: true, cost: t.cost, total: mgmtTotalCost() };
+}
+function delTask(id) {
+  plan.mgmt.tasks = plan.mgmt.tasks.filter((x) => String(x.id) !== String(id));
+  save(); render();
+  return { ok: true };
+}
+
+/* طلب إضافة أعضاء (يوجهه الإدارة للـ HR ومنه لفريق العمل). */
+function addStaffReq(inputs) {
+  const s = {
+    id: Date.now() % 100000,
+    position: (inputs && inputs.position) || 'pos_plant_mgr',
+    reason: (inputs && inputs.reason || '').trim(),
+    status: 'pending',
+  };
+  plan.mgmt.staffReqs.push(s);
+  save(); render();
+  return { id: s.id };
+}
+function resolveStaff(id, approved) {
+  const s = plan.mgmt.staffReqs.find((x) => String(x.id) === String(id));
+  if (!s) return { error: 'no-req' };
+  s.status = approved ? 'approved' : 'declined';
+  mgmtLog('dp_mgmt_role_hr', (approved ? tr('dp_mgmt_staff_filled') : tr('dp_mgmt_staff_declined')) + ' · ' + s.reason);
+  save(); render();
+  return { ok: true, status: s.status };
+}
+
+/* جدولة مشكلة: حتى لو كانت خارج الخطة نُسجّلها لنحلها. */
+function addProblem(inputs) {
+  const p = {
+    id: Date.now() % 100000,
+    text: (inputs && inputs.text || '').trim(),
+    severity: (inputs && inputs.severity) || 'med',
+    targetMonth: Number(inputs && inputs.targetMonth) || 1,
+    status: 'open',
+    note: '',
+  };
+  if (!p.text) return { error: 'text-required' };
+  plan.mgmt.problems.push(p);
+  save(); render();
+  return { id: p.id };
+}
+function problemStatus(id, status) {
+  const p = plan.mgmt.problems.find((x) => String(x.id) === String(id));
+  if (!p) return { error: 'no-problem' };
+  p.status = ['open', 'doing', 'solved'].includes(status) ? status : 'open';
+  save(); render();
+  return { ok: true, status: p.status };
+}
+function problemNote(id, note) {
+  const p = plan.mgmt.problems.find((x) => String(x.id) === String(id));
+  if (!p) return { error: 'no-problem' };
+  p.note = note || '';
+  save(); render();
+  return { ok: true };
+}
+
+/* خانات المتابعة بالألوان (للطباعة وللشاشة). */
+function mgmtStatusChip(status) {
+  const map = {
+    todo: ['bg-slate-600 text-white', tr('dp_mgmt_st_todo')],
+    doing: ['bg-amber-500 text-white', tr('dp_mgmt_st_doing')],
+    done: ['bg-emerald-500 text-white', tr('dp_mgmt_st_done')],
+    open: ['bg-rose-500 text-white', tr('dp_mgmt_prob_open')],
+    solved: ['bg-emerald-500 text-white', tr('dp_mgmt_prob_solved')],
+  };
+  const m = map[status] || map.todo;
+  return '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold ' + m[0] + '">' + m[1] + '</span>';
+}
+
+/* الجدول القابل للطباعة: الحالي + المستهدف + خطوات العمل + خانات المتابعة بالألوان. */
+function printablePlanHtml() {
+  const r = ensureRoadmap();
+  const m = plan.mgmt;
+  const total = mgmtTotalCost();
+  const steps = r.phases.map((p, i) => {
+    const st = p.status === 'done' ? 'done' : (p.status === 'active' ? 'doing' : 'open');
+    return { label: tr('dp_rm_phase') + ' ' + (i + 1) + ' (M' + p.startMonth + '–' + p.endMonth + ')', value: fmtNum(p.plannedEnd), status: st };
+  });
+  const rows = steps.map((s) => '<tr><td class="pr-cell">' + s.label + '</td><td class="pr-cell">' + s.value + '</td>' +
+    '<td class="pr-cell"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold ' + {
+      done: 'bg-emerald-500 text-white', doing: 'bg-amber-500 text-white', open: 'bg-slate-400 text-white'}[s.status] + '">' + {
+      done: tr('dp_mgmt_st_done'), doing: tr('dp_mgmt_st_doing'), open: tr('dp_mgmt_st_todo')}[s.status] + '</span></td></tr>').join('');
+  const tasks = m.tasks.map((t, i) => '<tr>' +
+    '<td class="pr-cell">' + (i + 1) + '</td>' +
+    '<td class="pr-cell">' + t.title + '</td>' +
+    '<td class="pr-cell">' + tr(posByKey(t.position).key) + '</td>' +
+    '<td class="pr-cell">' + mgmtStatusChip(t.status) + '</td>' +
+    '<td class="pr-cell">' + (Number(t.cost) || 0) + '</td>' +
+    '<td class="pr-cell">' + (t.eval && t.eval.score ? t.eval.score + '/10' : '—') + '</td>' +
+    '<td class="pr-cell">' + (t.followups && t.followups.length ? t.followups[t.followups.length - 1].note : '—') + '</td></tr>').join('');
+  const problems = m.problems.map((p, i) => '<tr><td class="pr-cell">' + (i + 1) + '</td><td class="pr-cell">' + p.text + '</td>' +
+    '<td class="pr-cell">' + p.targetMonth + '</td><td class="pr-cell">' + mgmtStatusChip(p.status) + '</td>' +
+    '<td class="pr-cell">' + (p.status === 'solved' ? '' : p.note) + '</td></tr>').join('');
+  return '' +
+    '<div id="printable-plan">' +
+    '  <div class="pp-head"><b>' + tr('dp_title') + '</b> · ' + tr('dp_mgmt_status') + ': <b>' + tr('dp_mgmt_st_' + m.status) + '</b></div>' +
+    '  <table class="pp">' +
+    '    <caption class="pp-caption">' + tr('dp_mgmt_tbl_summary') + '</caption>' +
+    '    <tr><th>' + tr('dp_mgmt_current') + '</th><th>' + tr('dp_mgmt_target') + '</th><th>' + tr('dp_rm_rate') + '</th><th>' + tr('dp_mgmt_horizon') + '</th></tr>' +
+    '    <tr><td class="pr-cell">' + fmtNum(r.current) + '</td><td class="pr-cell">' + fmtNum(r.target) + '</td><td class="pr-cell">' + fmtNum(r.target - r.current) + '</td><td class="pr-cell">' + r.horizon + ' ' + tr('dp_rm_months') + '</td></tr>' +
+    '  </table>' +
+    '  <table class="pp"><caption class="pp-caption">' + tr('dp_mgmt_tbl_steps') + ' — ' + tr('dp_mgmt_tbl_current_target') + '</caption>' +
+    '    <tr><th>' + tr('dp_rm_phase') + '</th><th>' + tr('dp_mgmt_planned') + '</th><th>' + tr('dp_mgmt_tbl_follow') + '</th></tr>' + rows + '</table>' +
+    '  <table class="pp"><caption class="pp-caption">' + tr('dp_mgmt_tbl_tasks') + ' + ' + tr('dp_mgmt_tbl_follow') + '</caption>' +
+    '    <tr><th>#</th><th>' + tr('dp_mgmt_task') + '</th><th>' + tr('dp_mgmt_position') + '</th><th>' + tr('dp_mgmt_status') + '</th><th>' + tr('dp_mgmt_cost') + '</th><th>' + tr('dp_mgmt_eval') + '</th><th>' + tr('dp_rm_notes') + '</th></tr>' + tasks + '</table>' +
+    (m.problems.length ? '  <table class="pp"><caption class="pp-caption">' + tr('dp_mgmt_tbl_problems') + '</caption>' +
+      '    <tr><th>#</th><th>' + tr('dp_mgmt_prob') + '</th><th>' + tr('dp_mgmt_month') + '</th><th>' + tr('dp_mgmt_status') + '</th><th>' + tr('dp_rm_notes') + '</th></tr>' + problems + '</table>' : '') +
+    '  <div class="pp-foot"><b>' + tr('dp_mgmt_cost_total') + ':</b> ' + fmtNum(total) +
+    (plan.mgmt.costApproved ? ' · <b>' + tr('dp_mgmt_fin_approved') + ':</b> ' + fmtNum(plan.mgmt.costApproved) : '') + '</div>' +
+    '</div>';
+}
+
+/* فتح الجدول في نافذة/طباعة. */
+function printPlan() {
+  const html = '<html><head><title>' + tr('dp_title') + '</title>' +
+    '<meta charset="utf-8"><style>' +
+    'body{font-family:sans-serif;padding:16px;color:#111}' +
+    '.pp{width:100%;border-collapse:collapse;margin:8px 0 16px;font-size:12px}' +
+    '.pp th,.pp .pr-cell{border:1px solid #444;padding:5px 8px;text-align:left}' +
+    '.pp th{background:#1e3a5f;color:#fff}' +
+    '.pp-caption{text-align:left;font-weight:bold;padding:6px 2px 2px;font-size:12px}' +
+    '.pp-head{font-size:15px;margin-bottom:8px}' +
+    '.pp-foot{margin-top:10px;font-size:13px}' +
+    '}</style></head><body>' + printablePlanHtml() + '</body></html>';
+  try {
+    const w = window.open('', '_blank');
+    if (w) { w.document.write(html); w.document.close(); w.focus(); setTimeout(() => { try { w.print(); } catch (e) {} }, 300); }
+  } catch (e) { /* popup blocked */ }
+  return { title: tr('dp_title'), html };
+}
+
+/* ── محتوى قسم الإدارة التنفيذية (الشاشة) ───────────────────────────── */
+function mgmtTaskRowHtml(t, i) {
+  return '<div class="rounded-xl border border-slate-700/70 bg-slate-800/40 p-3">' +
+    '  <div class="flex items-center justify-between gap-2 flex-wrap">' +
+    '    <div class="flex items-center gap-2 min-w-0"><span class="text-[9px] text-slate-500">' + (i + 1) + '</span>' +
+    '      <b class="text-[11px] text-white truncate">' + t.title + '</b>' + mgmtStatusChip(t.status) + '</div>' +
+    '    <div class="flex items-center gap-1.5">' +
+    '      <button onclick="SAE_DevPlan && SAE_DevPlan.taskStatus(' + t.id + ',\'todo\')" class="px-1.5 py-0.5 rounded bg-slate-700 text-[9px]">' + tr('dp_mgmt_st_todo') + '</button>' +
+    '      <button onclick="SAE_DevPlan && SAE_DevPlan.taskStatus(' + t.id + ',\'doing\')" class="px-1.5 py-0.5 rounded bg-amber-600 text-[9px]">' + tr('dp_mgmt_st_doing') + '</button>' +
+    '      <button onclick="SAE_DevPlan && SAE_DevPlan.taskStatus(' + t.id + ',\'done\')" class="px-1.5 py-0.5 rounded bg-emerald-600 text-[9px]">' + tr('dp_mgmt_st_done') + '</button>' +
+    '      <button onclick="SAE_DevPlan && SAE_DevPlan.delTask(' + t.id + ')" class="px-1.5 py-0.5 rounded bg-rose-700 text-[9px]"><i class="fas fa-trash"></i></button>' +
+    '    </div>' +
+    '  </div>' +
+    '  <div class="flex flex-wrap items-center gap-2 mt-1.5 text-[9px] text-slate-400">' +
+    '    <span class="inline-flex items-center gap-1"><i class="fas ' + posByKey(t.position).icon + ' text-slate-300"></i>' + tr(posByKey(t.position).key) + '</span>' +
+    '    <span class="inline-flex items-center gap-1"><i class="fas fa-building text-slate-500"></i>' + (t.deptId ? tr(deptById(t.deptId).nameKey) : tr('dp_mgmt_cross')) + '</span>' +
+    '    <span class="inline-flex items-center gap-1"><i class="fas fa-coins text-amber-400"></i>' + fmtNum(Number(t.cost) || 0) + '</span>' +
+    (t.eval && t.eval.score ? '<span class="px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-200 font-bold">' + tr('dp_mgmt_eval') + ' ' + t.eval.score + '/10</span>' : '') +
+    '  </div>' +
+    '  <div class="flex flex-wrap items-center gap-1.5 mt-2">' +
+    '    <input id="dp-task-follow-' + t.id + '" type="text" placeholder="' + tr('dp_mgmt_add_follow') + '…" class="flex-1 min-w-[140px] px-2 py-1 rounded bg-slate-900 border border-slate-700 text-[10px] text-white">' +
+    '    <button onclick="SAE_DevPlan && SAE_DevPlan.taskFollow(' + t.id + ', document.getElementById(\'dp-task-follow-' + t.id + '\').value)" class="px-2.5 py-1 rounded bg-cyan-600 hover:bg-cyan-500 text-[10px] font-bold"><i class="fas fa-pen mr-1"></i>' + tr('dp_mgmt_follow') + '</button>' +
+    '    <input id="dp-task-eval-' + t.id + '" type="number" min="1" max="10" placeholder="' + tr('dp_mgmt_eval') + '" class="w-20 px-2 py-1 rounded bg-slate-900 border border-slate-700 text-[10px] text-white">' +
+    '    <button onclick="SAE_DevPlan && SAE_DevPlan.evalTask(' + t.id + ', document.getElementById(\'dp-task-eval-' + t.id + '\').value, \'\')" class="px-2.5 py-1 rounded bg-indigo-600 hover:bg-indigo-500 text-[10px] font-bold"><i class="fas fa-star mr-1"></i>' + tr('dp_mgmt_eval_save') + '</button>' +
+    '  </div>' +
+    (t.followups.length ? '  <div class="mt-2 space-y-1">' + t.followups.map((f) =>
+      '<div class="text-[9px] text-slate-400 border-l-2 border-cyan-500 pl-2">' + f.note + '</div>').join('') + '</div>' : '') +
+    '</div>';
+}
+function mgmtStaffHtml() {
+  const reqs = plan.mgmt.staffReqs;
+  return '<div class="space-y-2">' +
+    (reqs.length ? reqs.map((s) => '<div class="flex items-center justify-between gap-2 rounded-lg bg-slate-800/60 border border-slate-700/60 px-3 py-2">' +
+      '<div class="min-w-0"><b class="text-[11px] text-white inline-flex items-center gap-1"><i class="fas ' + posByKey(s.position).icon + ' text-slate-300"></i>' + tr(posByKey(s.position).key) + '</b>' +
+      (s.reason ? '<div class="text-[9px] text-slate-400 truncate">' + s.reason + '</div>' : '') + '</div>' +
+      (s.status === 'pending'
+        ? '<div class="flex gap-1.5 shrink-0">' +
+          '<button onclick="SAE_DevPlan && SAE_DevPlan.resolveStaff(' + s.id + ',true)" class="px-2 py-1 rounded bg-emerald-600 hover:bg-emerald-500 text-[9px] font-bold"><i class="fas fa-check mr-1"></i>' + tr('dp_mgmt_hire') + '</button>' +
+          '<button onclick="SAE_DevPlan && SAE_DevPlan.resolveStaff(' + s.id + ',false)" class="px-2 py-1 rounded bg-slate-600 hover:bg-slate-500 text-[9px] font-bold"><i class="fas fa-x mr-1"></i></button></div>'
+        : '<span class="px-2 py-0.5 rounded-full text-[9px] font-bold ' + (s.status === 'approved' ? 'bg-emerald-500/20 text-emerald-300' : 'bg-rose-500/20 text-rose-300') + '">' + (s.status === 'approved' ? tr('dp_mgmt_approved') : tr('dp_mgmt_declined')) + '</span>') +
+      '</div>').join('')
+      : '<div class="text-[10px] text-slate-500">' + tr('dp_mgmt_no_staff') + '</div>') +
+    '</div>' +
+    '<div class="flex flex-wrap items-center gap-1.5 mt-2">' +
+    '<select id="dp-staff-pos" class="px-2 py-1 rounded bg-slate-900 border border-slate-700 text-[10px] text-white">' +
+    POSITIONS.map((p) => '<option value="' + p.k + '">' + tr(p.key) + '</option>').join('') +
+    '</select>' +
+    '<input id="dp-staff-reason" type="text" placeholder="' + tr('dp_mgmt_staff_why') + '…" class="flex-1 min-w-[120px] px-2 py-1 rounded bg-slate-900 border border-slate-700 text-[10px] text-white">' +
+    '<button onclick="SAE_DevPlan && SAE_DevPlan.addStaffReq({position: document.getElementById(\'dp-staff-pos\').value, reason: document.getElementById(\'dp-staff-reason\').value})" class="px-3 py-1 rounded bg-violet-600 hover:bg-violet-500 text-[10px] font-bold"><i class="fas fa-user-plus mr-1"></i>' + tr('dp_mgmt_request_staff') + '</button>' +
+    '</div>';
+}
+function mgmtProblemHtml() {
+  const ps = plan.mgmt.problems;
+  return '<div class="space-y-2">' +
+    (ps.length ? ps.map((p) => {
+      const sev = p.severity === 'high' ? 'bg-rose-500/20 text-rose-300 border-rose-500/40' : (p.severity === 'low' ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40' : 'bg-amber-500/20 text-amber-300 border-amber-500/40');
+      return '<div class="rounded-lg border ' + sev + ' border px-3 py-2">' +
+        '<div class="flex items-center justify-between gap-2 flex-wrap">' +
+        '<b class="text-[11px]">' + p.text + '</b>' + mgmtStatusChip(p.status) + '</div>' +
+        '<div class="flex items-center gap-2 mt-1.5 text-[9px] text-slate-400"><span class="inline-flex items-center gap-1"><i class="fas fa-calendar-day"></i>' + tr('dp_mgmt_month') + ' ' + p.targetMonth + '</span>' +
+        (p.status !== 'solved'
+          ? '<button onclick="SAE_DevPlan && SAE_DevPlan.problemStatus(' + p.id + ',\'doing\')" class="px-2 py-0.5 rounded bg-amber-600 text-[9px]">' + tr('dp_mgmt_st_doing') + '</button>' +
+            '<button onclick="SAE_DevPlan && SAE_DevPlan.problemStatus(' + p.id + ',\'solved\')" class="px-2 py-0.5 rounded bg-emerald-600 text-[9px]"><i class="fas fa-check mr-1"></i>' + tr('dp_mgmt_prob_solved') + '</button>'
+          : '') +
+        '<input data-pnote="' + p.id + '" type="text" placeholder="' + tr('dp_rm_notes') + '…" value="' + p.note + '" class="px-2 py-0.5 rounded bg-slate-900 border border-slate-700 text-[9px] text-white w-40">' +
+        '<button onclick="SAE_DevPlan && SAE_DevPlan.problemNote(' + p.id + ', document.querySelector(\'[data-pnote="' + p.id + '"]\').value)" class="px-2 py-0.5 rounded bg-slate-700 text-[9px]"><i class="fas fa-save mr-1"></i></button>' +
+        '</div></div>';
+    }).join('') : '<div class="text-[10px] text-slate-500">' + tr('dp_mgmt_no_probs') + '</div>') +
+    '</div>' +
+    '<div class="flex flex-wrap items-center gap-1.5 mt-2">' +
+    '<input id="dp-prob-text" type="text" placeholder="' + tr('dp_mgmt_prob_new') + '…" class="flex-1 min-w-[140px] px-2 py-1 rounded bg-slate-900 border border-slate-700 text-[10px] text-white">' +
+    '<select id="dp-prob-sev" class="px-2 py-1 rounded bg-slate-900 border border-slate-700 text-[10px] text-white">' +
+    '<option value="low">' + tr('dp_mgmt_sev_low') + '</option><option value="med">' + tr('dp_mgmt_sev_med') + '</option><option value="high">' + tr('dp_mgmt_sev_high') + '</option></select>' +
+    '<input id="dp-prob-mo" type="number" min="1" value="' + (ensureRoadmap().horizon) + '" class="w-16 px-2 py-1 rounded bg-slate-900 border border-slate-700 text-[10px] text-white">' +
+    '<button onclick="SAE_DevPlan && SAE_DevPlan.addProblem({text: document.getElementById(\'dp-prob-text\').value, severity: document.getElementById(\'dp-prob-sev\').value, targetMonth: document.getElementById(\'dp-prob-mo\').value})" class="px-3 py-1 rounded bg-sky-600 hover:bg-sky-500 text-[10px] font-bold"><i class="fas fa-bug mr-1"></i>' + tr('dp_mgmt_add_prob') + '</button>' +
+    '</div>';
+}
+function mgmtSectionHtml() {
+  const m = plan.mgmt;
+  const r = ensureRoadmap();
+  const total = mgmtTotalCost();
+  const stepDefs = [
+    { key: 'draft', labelKey: 'dp_mgmt_st_draft', icon: 'fa-pen-ruler', note: tr('dp_mgmt_step_draft_note') },
+    { key: 'mgmt_ok', labelKey: 'dp_mgmt_st_mgmt_ok', icon: 'fa-file-signature', note: tr('dp_mgmt_step_mgmt_note') },
+    { key: 'finance_ok', labelKey: 'dp_mgmt_st_finance_ok', icon: 'fa-coins', note: tr('dp_mgmt_step_finance_note') },
+    { key: 'distributed', labelKey: 'dp_mgmt_st_distributed', icon: 'fa-paper-plane', note: tr('dp_mgmt_step_dist_note') },
+    { key: 'monitoring', labelKey: 'dp_mgmt_st_monitoring', icon: 'fa-eye', note: tr('dp_mgmt_step_monitor_note') },
+  ];
+  const cur = mgmtStatusIdx();
+  const stepper = stepDefs.map((s, i) => {
+    const state = i < cur ? 'done' : (i === cur ? 'now' : 'wait');
+    const cls = state === 'done' ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/40' : (state === 'now' ? 'bg-amber-500/15 text-amber-200 border-amber-500/50' : 'bg-slate-800/60 text-slate-500 border-slate-700/60');
+    const icon = state === 'done' ? 'fa-check' : s.icon;
+    return '<div class="flex-1 text-center px-1">' +
+      '<div class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border text-[10px] font-bold ' + cls + '"><i class="fas ' + icon + '"></i><span data-key="' + s.labelKey + '">' + tr(s.labelKey) + '</span></div>' +
+      '<div class="mt-1 text-[8px] text-slate-500 leading-tight">' + s.note + '</div></div>';
+  }).join('');
+  const financeBlock = m.status === 'mgmt_ok'
+    ? '<div class="mt-3 rounded-xl border border-amber-500/40 bg-amber-500/10 p-3">' +
+    '<div class="text-[10px] font-bold text-amber-200 mb-2"><i class="fas fa-coins mr-1"></i><span data-key="dp_mgmt_fin_need">Funding needed</span> <b class="font-mono">' + fmtNum(total) + '</b></div>' +
+    '<div class="flex flex-wrap items-center gap-1.5">' +
+    '<input id="dp-fin-amount" type="number" value="' + total + '" class="w-28 px-2 py-1 rounded bg-slate-900 border border-slate-600 text-[10px] text-white">' +
+    '<button onclick="SAE_DevPlan && SAE_DevPlan.mgmtFinanceApprove(document.getElementById(\'dp-fin-amount\').value)" class="px-3 py-1 rounded bg-emerald-600 hover:bg-emerald-500 text-[10px] font-bold"><i class="fas fa-check mr-1"></i><span data-key="dp_mgmt_fin_approve">Approve funding</span></button>' +
+    '<button onclick="SAE_DevPlan && SAE_DevPlan.mgmtRejectFinance(\'\')" class="px-3 py-1 rounded bg-slate-600 hover:bg-slate-500 text-[10px] font-bold"><i class="fas fa-x mr-1"></i><span data-key="dp_mgmt_fin_reject">Reject</span></button>' +
+    '</div></div>'
+    : (m.status === 'finance_ok' ? '<div class="mt-3 rounded-xl border border-emerald-500/40 bg-emerald-500/10 px-3 py-2 text-[10px] text-emerald-200"><i class="fas fa-circle-check mr-1"></i><span data-key="dp_mgmt_fin_approved_note">Funding approved</span>: <b class="font-mono">' + fmtNum(m.costApproved) + '</b></div>' : '');
+  const actionBtn = m.status === 'draft'
+    ? '<button onclick="SAE_DevPlan && SAE_DevPlan.mgmtApprove()" class="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-xs font-bold"><i class="fas fa-check mr-1"></i><span data-key="dp_mgmt_act_mgmt">Approve plan / send it on</span></button>'
+    : (m.status === 'mgmt_ok' || m.status === 'finance_ok'
+      ? '<button onclick="SAE_DevPlan && SAE_DevPlan.mgmtApprove()" class="px-4 py-2 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-xs font-bold"><i class="fas fa-paper-plane mr-1"></i><span data-key="dp_mgmt_act_dist">Distribute to those in charge</span></button>'
+      : (m.status === 'distributed'
+        ? '<button onclick="SAE_DevPlan && SAE_DevPlan.mgmtApprove()" class="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-xs font-bold"><i class="fas fa-eye mr-1"></i><span data-key="dp_mgmt_act_mon">Start monitoring</span></button>'
+        : '<button onclick="SAE_DevPlan && SAE_DevPlan.mgmtApprove()" class="px-4 py-2 rounded-lg bg-slate-600 text-xs font-bold"><i class="fas fa-rotate-left mr-1"></i><span data-key="dp_mgmt_act_restart">Restart cycle</span></button>'));
+  /* أزرار إضافة المهام + النماذج الجاهزة */
+  const taskForm = '<div class="flex flex-wrap items-center gap-1.5 mt-2">' +
+    '<input id="dp-task-title" type="text" placeholder="' + tr('dp_mgmt_task_new') + '…" class="flex-1 min-w-[140px] px-2 py-1 rounded bg-slate-900 border border-slate-700 text-[10px] text-white">' +
+    '<select id="dp-task-pos" class="px-2 py-1 rounded bg-slate-900 border border-slate-700 text-[10px] text-white">' +
+    POSITIONS.map((p) => '<option value="' + p.k + '">' + tr(p.key) + '</option>').join('') +
+    '</select>' +
+    '<input id="dp-task-cost" type="number" placeholder="' + tr('dp_mgmt_cost') + '" class="w-24 px-2 py-1 rounded bg-slate-900 border border-slate-700 text-[10px] text-white">' +
+    '<button onclick="SAE_DevPlan && SAE_DevPlan.addTask({title: document.getElementById(\'dp-task-title\').value, position: document.getElementById(\'dp-task-pos\').value, cost: document.getElementById(\'dp-task-cost\').value})" class="px-3 py-1 rounded bg-cyan-600 hover:bg-cyan-500 text-[10px] font-bold"><i class="fas fa-plus mr-1"></i><span data-key="dp_mgmt_add_task">Add task</span></button>' +
+    '</div>';
+  return '' +
+'    <div class="mt-8 bg-slate-900 rounded-2xl border border-indigo-500/30 p-5">' +
+    '    <div class="flex items-center gap-3 mb-4 flex-wrap">' +
+    '      <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center text-white text-sm"><i class="fas fa-clipboard-user"></i></div>' +
+    '      <div class="flex-1 min-w-[220px]">' +
+    '        <div class="text-base font-bold text-white"><span data-key="dp_mgmt_title">Execution management</span> <span class="ml-1 text-[9px] px-2 py-0.5 rounded-full bg-violet-500/20 text-violet-200 font-bold" data-key="dp_mgmt_st_' + m.status + '">' + tr('dp_mgmt_st_' + m.status) + '</span></div>' +
+    '        <div class="text-[10px] text-slate-400"><span data-key="dp_mgmt_desc">Management approves the plan; finance secures the money; tasks are delegated by job title; HR fills the team.</span></div>' +
+    '      </div>' +
+    '      <button onclick="SAE_DevPlan && SAE_DevPlan.printPlan()" class="px-4 py-2 rounded-lg bg-slate-700 hover:bg-slate-600 text-xs font-bold"><i class="fas fa-print mr-1"></i><span data-key="dp_mgmt_print">Print the plan</span></button>' +
+    '      ' + actionBtn +
+    '    </div>' +
+    '    <div class="flex gap-2 mb-4">' + stepper + '</div>' +
+    financeBlock +
+    (m.logs.length ? '<div class="mt-3 space-y-1 max-h-32 overflow-y-auto">' + m.logs.map((g) =>
+      '<div class="flex items-center gap-2 text-[9px] text-slate-500"><i class="fas fa-circle text-[6px] text-indigo-400"></i><span data-key="' + g.role + '">' + tr(g.role) + '</span> · ' + g.note + '</div>').join('') + '</div>' : '') +
+    '    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4">' +
+    '      <div> <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-2"><i class="fas fa-list-check mr-1"></i><span data-key="dp_mgmt_tasks_title">Tasks by job title</span>' + (total > 0 ? ' · <span data-key="dp_mgmt_cost_total">total cost</span> <b class="font-mono text-amber-300">' + fmtNum(total) + '</b>' : '') + '</div>' +
+    '        <div class="space-y-2">' + (m.tasks.length ? m.tasks.map((t, i) => mgmtTaskRowHtml(t, i)).join('') : '<div class="text-[10px] text-slate-500">' + tr('dp_mgmt_no_tasks') + '</div>') + '</div>' + taskForm + '</div>' +
+    '      <div class="space-y-4">' +
+    '        <div><div class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-2"><i class="fas fa-user-plus mr-1"></i><span data-key="dp_mgmt_hr_title">HR — fill the team</span></div>' + mgmtStaffHtml() + '</div>' +
+    '        <div><div class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-2"><i class="fas fa-bug mr-1"></i><span data-key="dp_mgmt_problem_title">Problem scheduler</span> <span class="text-slate-500">(<span data-key="dp_mgmt_problem_outside">even outside the plan</span>)</span></div>' + mgmtProblemHtml() + '</div>' +
+    '      </div>' +
+    '    </div>' +
+    '  </div>';
+}
+
 /* ── إقلاع + إعادة رسم عند تغيير اللغة ───────────────────────────────── */
 
 let langObserver = null;
@@ -1582,6 +2012,12 @@ function initDevPlan() {
     acceptRisk, mitigateRisk,
     roadRiskHtml: () => roadRiskHtml(),
     getRoadmap: () => ensureRoadmap(),
+    mgmtApprove, mgmtFinanceApprove, mgmtRejectFinance,
+    mgmtState: () => ({ status: plan.mgmt.status, costTotal: mgmtTotalCost(), costApproved: plan.mgmt.costApproved }),
+    addTask, taskFollow, taskStatus, evalTask, taskCost, delTask,
+    addStaffReq, resolveStaff,
+    addProblem, problemStatus, problemNote,
+    printPlan: () => printPlan(),
   };
   return window.SAE_DevPlan;
 }
