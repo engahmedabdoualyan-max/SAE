@@ -589,5 +589,8 @@ Object.assign(TRANSLATIONS["fr"], {
     "dp_rm_or": "ou",
     "dp_rm_report": "Rapport de gestion",
     "dp_rm_evals": "Revues de phase",
-    "dp_rm_feed": "Tâche du jour pour chaque service"
+    "dp_rm_feed": "Tâche du jour pour chaque service",
+    "dp_rm_feas": "Faisabilité usine",
+    "dp_rm_feas_ok": "Les centrales peuvent livrer cette phase.",
+    "dp_rm_feas_warn": "Non réalisable à la capacité actuelle"
 });

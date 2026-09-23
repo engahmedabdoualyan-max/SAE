@@ -589,5 +589,8 @@ Object.assign(TRANSLATIONS["de"], {
     "dp_rm_or": "oder",
     "dp_rm_report": "Managementbericht",
     "dp_rm_evals": "Phasen-Reviews",
-    "dp_rm_feed": "Heutiger Auftrag für jede Abteilung"
+    "dp_rm_feed": "Heutiger Auftrag für jede Abteilung",
+    "dp_rm_feas": "Machbarkeit im Werk",
+    "dp_rm_feas_ok": "Werke können diese Phase liefern.",
+    "dp_rm_feas_warn": "Bei aktueller Kapazität nicht machbar"
 });

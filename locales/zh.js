@@ -589,5 +589,8 @@ Object.assign(TRANSLATIONS["zh"], {
     "dp_rm_or": "或",
     "dp_rm_report": "管理报告",
     "dp_rm_evals": "阶段评审",
-    "dp_rm_feed": "各部门今日任务"
+    "dp_rm_feed": "各部门今日任务",
+    "dp_rm_feas": "工厂产能可行性",
+    "dp_rm_feas_ok": "工厂可交付此阶段。",
+    "dp_rm_feas_warn": "当前产能不可行"
 });

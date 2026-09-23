@@ -74,10 +74,16 @@ All notable changes to SAE AutoSim Hub.
   printing daily output, rev. est., mixers and samples required right now. A
   **management report** export (text file) summarises plan, phases, SPI/variance
   and every phase review for sign-off.
-- **E2E suite grown to 80 checks**: Phase 2f now also verifies the active-phase
-  daily task feed, the behind-plan EAC trend forecast + corrective advice, the
-  management-report export (SPI + phases), and a final reset restoring the clean
-  plan.
+- **Feasibility check (فحص الجدوى)** in the advisor brain: for the *active
+  phase's* planned-end target it checks every plant station's required daily
+  output against current capacity — each station chip shows its demand and
+  utilisation, and a red cross warns when a station would exceed 100% with the
+  capacity lift (+%) that would be needed to make the phase real, alongside a
+  green confirmation when the plants can deliver. This closes the "plan →
+  distribute → evaluate → verify" loop with a ground-truth capacity gate.
+- **E2E suite grown to 81 checks**: Phase 2f now also verifies the per-station
+  feasibility report (target, station utilisations, warnings array) for the
+  active phase.
 - **Engine-driven calibration**: the wizard's grid search now runs the real
   simulation per candidate (12 seeded runs) and scores GEH against loop
   detector flows normalized per lane — replacing a mocked search.

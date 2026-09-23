@@ -932,7 +932,49 @@ function roadDeptFeed() {
     plannedEnd: active ? active.plannedEnd : r.target,
     daily: c.daily, util: c.util, mixers: c.mixers, tripsPerDay: c.tripsPerDay,
     samples: c.samples, revenue: c.revenue, cycleMin: c.cycleMin,
+    stations: c.stations,
   };
+}
+
+/* فحص الجدوى: هل تحقق أهداف المرحلة ممكن فعليًا على أرض المصنع؟ (قيد قدرة) */
+function roadFeasibility() {
+  const r = ensureRoadmap();
+  const active = r.phases.find((p) => p.status === 'active') || r.phases[r.phases.length - 1];
+  const target = active ? active.plannedEnd : r.target;
+  const c = opsModel(target);
+  const out = { target, daily: c.daily, util: c.util, stations: c.stations, warnings: [], ok: true };
+  c.stations.forEach((s) => {
+    if (s.util > 100) {
+      out.ok = false;
+      out.warnings.push({
+        nameKey: s.nameKey,
+        util: s.util,
+        liftPct: Math.round((s.util - 100) / Math.max(1, s.util) * 100),
+        req: s.req,
+      });
+    }
+  });
+  if (!out.ok) out.ok = false;
+  return out;
+}
+
+function roadFeasHtml() {
+  const f = roadFeasibility();
+  if (!f) return '';
+  const stationChips = f.stations.map((s) => {
+    const hot = s.util > 100;
+    return '<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md ' + (hot ? 'bg-rose-500/15 border border-rose-500/40 text-rose-200' : 'bg-slate-800 text-slate-300') + ' text-[10px]">' +
+      '<span data-key="' + s.nameKey + '">' + tr(s.nameKey) + '</span><b class="font-mono">' + s.req + '</b> · ' + (hot ? '<i class="fas fa-triangle-exclamation text-[9px]"></i>' : '') + s.util + '%</span>';
+  });
+  return '' +
+    '      <div class="mt-3 pt-3 border-t border-slate-700/60">' +
+    '        <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-2"><i class="fas fa-shield-halved mr-1"></i><span data-key="dp_rm_feas">Feasibility on plant floor</span></div>' +
+    '        <div class="flex flex-wrap gap-1.5 mb-2">' + stationChips.join('') + '</div>' +
+    (f.ok
+      ? '<div class="px-2.5 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-[10px] text-emerald-300"><i class="fas fa-circle-check mr-1"></i><span data-key="dp_rm_feas_ok">Plants can deliver this phase.</span></div>'
+      : '<div class="px-2.5 py-1.5 rounded-lg bg-rose-500/10 border border-rose-500/40 text-[10px] text-rose-200 leading-relaxed"><i class="fas fa-triangle-exclamation mr-1"></i><span data-key="dp_rm_feas_warn">Not feasible at current capacity</span>: ' +
+        f.warnings.map((w) => '<span data-key="' + w.nameKey + '">' + tr(w.nameKey) + '</span> <b class="font-mono">+' + w.liftPct + '%</b>').join(', ') + '</div>') +
+    '      </div>';
 }
 
 /* تقرير إداري نصي: ملخص الخطة والمراحل والتقييمات والتوصيات. */
@@ -1142,6 +1184,7 @@ function roadmapSectionHtml() {
     '        </div>' +
     '      </div>' +
     roadFeedHtml() +
+    roadFeasHtml() +
     (plan.roadmap.rebaselined ? '<div class="mt-3 px-3 py-2 rounded-lg bg-violet-500/10 border border-violet-500/30 text-[10px] text-violet-200"><i class="fas fa-wave-square mr-1"></i><span data-key="dp_rm_rebaselined">Plan re-baselined after the last review.</span></div>' : '') +
     '    </div>' +
     '  </div>';
@@ -1219,6 +1262,7 @@ function initDevPlan() {
     openRoadForm, applyRoadForm, cancelRoadForm,
     roadAnalytics: () => roadAnalytics(),
     roadDeptFeed: () => roadDeptFeed(),
+    roadFeasibility: () => roadFeasibility(),
     roadReport: () => roadReport(),
     exportReport,
     getRoadmap: () => ensureRoadmap(),

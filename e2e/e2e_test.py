@@ -647,6 +647,18 @@ def phase2f_dev_plan(page, res: Result) -> None:
     }""")
     res.check("roadmap: management report exports (SPI + phases)", bool(report.get("ok")), str(report))
 
+    feas = page.evaluate("""() => {
+        const f = window.SAE_DevPlan.roadFeasibility();
+        const chip = document.querySelector('[data-key="dp_rm_feas"]');
+        return {
+            ok: f && f.target > 0 && f.stations.length >= 2
+                && typeof f.ok === 'boolean' && f.warnings !== undefined
+                && f.stations.every(s => typeof s.util === 'number'),
+            feas: !!chip, util: f.util, stations: f.stations,
+        };
+    }""")
+    res.check("roadmap: feasibility check per station vs capacity", bool(feas.get("ok") and feas.get("feas")), str(feas))
+
     roadreset2 = page.evaluate("""() => {
         window.SAE_DevPlan.resetToTemplate();
         const r = window.SAE_DevPlan.getRoadmap();

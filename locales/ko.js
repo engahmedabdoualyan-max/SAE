@@ -565,5 +565,8 @@ Object.assign(TRANSLATIONS["ko"], {
     "dp_rm_or": "또는",
     "dp_rm_report": "경영 보고서",
     "dp_rm_evals": "단계 검토",
-    "dp_rm_feed": "각 부서의 오늘 과제"
+    "dp_rm_feed": "각 부서의 오늘 과제",
+    "dp_rm_feas": "공장 가용성 점검",
+    "dp_rm_feas_ok": "공장이 이 단계를 소화할 수 있습니다.",
+    "dp_rm_feas_warn": "현재 용량으로 불가"
 });

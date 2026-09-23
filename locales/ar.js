@@ -590,5 +590,8 @@ Object.assign(TRANSLATIONS["ar"], {
     "dp_rm_or": "أو",
     "dp_rm_report": "تقرير إداري",
     "dp_rm_evals": "مراجعات المراحل",
-    "dp_rm_feed": "مهمة اليوم لكل قسم"
+    "dp_rm_feed": "مهمة اليوم لكل قسم",
+    "dp_rm_feas": "فحص الجدوى على أرض المصنع",
+    "dp_rm_feas_ok": "المصانع قادرة على تلبية هذه المرحلة.",
+    "dp_rm_feas_warn": "غير ممكن بالسعة الحالية"
 });

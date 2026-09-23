@@ -565,5 +565,8 @@ Object.assign(TRANSLATIONS["ja"], {
     "dp_rm_or": "または",
     "dp_rm_report": "管理レポート",
     "dp_rm_evals": "フェーズレビュー",
-    "dp_rm_feed": "各部門の今日のタスク"
+    "dp_rm_feed": "各部門の今日のタスク",
+    "dp_rm_feas": "工場の実現可能性",
+    "dp_rm_feas_ok": "工場はこのフェーズを届けられます。",
+    "dp_rm_feas_warn": "現有能力では実現不可"
 });
