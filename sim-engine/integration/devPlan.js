@@ -140,6 +140,9 @@ function normalize(p) {
       if (k.actuals.length > p.horizon) k.actuals.length = p.horizon;
     });
   });
+  if (!p.roadmap || !Array.isArray(p.roadmap.phases) || !p.roadmap.phases.length) {
+    p.roadmap = buildRoadmap(p);
+  }
   return p;
 }
 
@@ -362,6 +365,7 @@ function render() {
     '    <p class="text-slate-300 max-w-3xl mx-auto text-sm" data-key="dp_desc">The factory\u2019s targets, distributed to every department as monthly tasks.</p>' +
     '  </div>' +
     summaryStripHtml() +
+    roadmapSectionHtml() +
     '  <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 gap-6 mb-6">' +
     '    <div class="col-span-full flex flex-wrap items-center justify-between gap-2 mb-2">' +
     '      <h3 class="text-sm font-bold text-slate-300"><i class="fas fa-crosshairs mr-2 text-emerald-400"></i>' +
@@ -785,6 +789,312 @@ function setOps(attr, val) {
   renderOps();
 }
 
+/* ── خطة PMP: الوضع الحالي ← هدف الوصول ← زمن الوصول ← مراحل ← تقييم ─ */
+
+const ROAD_DEFAULTS = { horizon: 6, phases: 3, phaseNames: [] };
+const ROAD_KEY = 'sae-devplan-road-v1';
+
+function findKpiGlobal(deptId, kpiId) {
+  const d = deptById(deptId);
+  return d ? (d.kpis.find((k) => k.id === kpiId) || null) : null;
+}
+
+/* بناء roadmap افتراضيًا من الخرسانة: حالي→هدف مع تقسيم المراحل. */
+function buildRoadmap(p) {
+  const d = (p.departments || []).find((dd) => dd.id === 'sales');
+  const concrete = d ? (d.kpis || []).find((k) => k.id === 'concrete') || null : null;
+  const cur = concrete ? concrete.current : 5000;
+  const tgt = concrete && Array.isArray(concrete.targets) && concrete.targets.length ? concrete.targets[concrete.targets.length - 1] : 6500;
+  const total = 6;
+  const n = 3;
+  const phases = [];
+  for (let i = 0; i < n; i++) {
+    const startMonth = Math.round((total / n) * i) + 1;
+    const endMonth = Math.round((total / n) * (i + 1));
+    const plannedEnd = Math.round((cur + ((tgt - cur) * endMonth) / total) * 10) / 10;
+    phases.push({ id: i + 1, name: '', startMonth, endMonth, plannedEnd, status: 'planned', actual: null, actualMonth: null, actualValue: null, notes: '' });
+  }
+  phases[0].status = 'active';
+  return {
+    goalName: 'خطة التطوير',
+    current: cur,
+    target: tgt,
+    horizon: total,
+    phaseCount: n,
+    rebaselined: false,
+    phases,
+    evaluations: [],
+  };
+}
+
+function ensureRoadmap() {
+  if (!plan.roadmap || !Array.isArray(plan.roadmap.phases) || !plan.roadmap.phases.length) {
+    plan.roadmap = buildRoadmap(plan);
+    save();
+  }
+  return plan.roadmap;
+}
+
+/* إعادة بناء خطة: مدخلات (حالي، هدف، شهور، مراحل) → مراحل موزّعة بالتساوي. */
+function updateRoadmap(inputs) {
+  const r = plan.roadmap;
+  const cur = Number.isFinite(inputs.current) ? inputs.current : r.current;
+  const tgt = Number.isFinite(inputs.target) ? inputs.target : r.target;
+  const total = Number.isFinite(inputs.horizon) ? Math.max(1, Math.round(inputs.horizon)) : r.horizon;
+  const n = Number.isFinite(inputs.phaseCount) ? Math.max(1, Math.min(12, Math.round(inputs.phaseCount))) : r.phaseCount;
+  const phases = [];
+  for (let i = 0; i < n; i++) {
+    const startMonth = Math.round((total / n) * i) + 1;
+    const endMonth = Math.round((total / n) * (i + 1));
+    const plannedEnd = Math.round((cur + ((tgt - cur) * endMonth) / total) * 10) / 10;
+    phases.push({ id: i + 1, name: (inputs.phaseNames && inputs.phaseNames[i]) || '', startMonth, endMonth, plannedEnd, status: 'planned', actual: null, actualMonth: null, actualValue: null, notes: '' });
+  }
+  phases[0].status = 'active';
+  r.current = cur; r.target = tgt; r.horizon = total; r.phaseCount = n;
+  r.phases = phases; r.rebaselined = false; r.evaluations = [];
+  syncRoadToConcrete();
+  save();
+  render();
+  renderChart();
+  return r;
+}
+
+/* دفع خطة المراحل إلى KPI الخرسانة ليقود الجدول/المهام/القدرة. */
+function syncRoadToConcrete() {
+  const r = plan.roadmap;
+  const d = (plan.departments || []).find((dd) => dd.id === 'sales');
+  const c = d ? (d.kpis || []).find((k) => k.id === 'concrete') || null : null;
+  if (!c || !r || !Array.isArray(r.phases)) return;
+  c.current = r.current;
+  for (let i = 0; i < plan.horizon && i < r.phases.length; i++) {
+    c.targets[i] = r.phases[i].plannedEnd;
+  }
+}
+
+/* عقل المستشار: تحليل المنهجية + توصيات (مثل PMP EVM). */
+function roadAnalytics() {
+  const r = ensureRoadmap();
+  const diff = r.target - r.current;
+  const perMonth = diff / Math.max(1, r.horizon);
+  const monthStep = (r.target - r.current) / Math.max(1, r.horizon);
+  const a = {
+    perMonth: Math.round(perMonth * 10) / 10,
+    growthPct: r.current ? Math.round((monthStep / r.current) * 1000) / 10 : 0,
+    spi: null, variance: null, verdict: 'idle', phaseIdx: 0, planPct: 0, donePct: 0,
+    remaining: 0, needed: 0, scheduleRisk: false,
+    messages: [],
+  };
+  const activeIdx = r.phases.findIndex((p) => p.status === 'active');
+  const done = r.phases.filter((p) => p.status === 'done' && p.actualValue !== null && p.actualValue !== undefined);
+  a.phaseIdx = activeIdx < 0 ? r.phases.length - 1 : activeIdx;
+  /* SPI = القيمة المنجزة الفعلية / القيمة المخطط لها حتى زمن التقييم. */
+  if (done.length) {
+    const last = done[done.length - 1];
+    a.spi = last.plannedEnd > 0 ? Math.round((last.actualValue / last.plannedEnd) * 100) / 100 : 1;
+    a.variance = last.plannedEnd > 0 ? Math.round(((last.actualValue - last.plannedEnd) / last.plannedEnd) * 1000) / 10 : 0;
+    a.verdict = a.spi >= 1.0 ? 'on' : 'late';
+    a.donePct = Math.round((last.actualValue / Math.max(1, r.target)) * 100);
+    a.planPct = last.plannedEnd ? Math.round((last.plannedEnd / Math.max(1, r.target)) * 100) : 0;
+    a.remaining = r.target - last.actualValue;
+    const monthsLeft = last.endMonth ? Math.max(1, r.horizon - last.endMonth) : r.horizon;
+    a.needed = Math.round((a.remaining / monthsLeft) * 10) / 10;
+    if (a.spi < 0.95) a.scheduleRisk = true;
+  } else {
+    a.planPct = 0; a.donePct = 0;
+    a.remaining = r.target - r.current;
+    a.needed = a.perMonth;
+  }
+  return a;
+}
+
+/* تقييم مرحلة: الفعلي مقابل المخطط → تحديث الحالة + المتابعة التالية. */
+function evaluatePhase(phaseId) {
+  const r = ensureRoadmap();
+  const ph = r.phases.find((p) => p.id === phaseId);
+  if (!ph) return null;
+  const slot = document.getElementById('dp-eval-' + ph.id);
+  if (!slot) return null;
+  const valIn = slot.querySelector('input[data-actual]');
+  const monIn = slot.querySelector('input[data-actualmonth]');
+  const notIn = slot.querySelector('input[data-notes]');
+  const v = valIn ? parseFloat(valIn.value) : NaN;
+  if (!Number.isFinite(v)) return { error: 'actual-required' };
+  ph.actualValue = v;
+  ph.actualMonth = monIn && Number.isFinite(parseFloat(monIn.value)) ? Math.max(1, parseInt(monIn.value, 10)) : ph.endMonth;
+  ph.notes = (notIn && notIn.value ? notIn.value : '').trim();
+  ph.status = 'done';
+  const ev = {
+    phase: ph.id, planned: ph.plannedEnd, actual: v, endMonth: ph.actualMonth,
+    variance: ph.plannedEnd ? Math.round(((v - ph.plannedEnd) / ph.plannedEnd) * 1000) / 10 : 0,
+    spi: ph.plannedEnd ? Math.round((v / ph.plannedEnd) * 100) / 100 : 1,
+    date: Date.now(), notes: ph.notes,
+  };
+  r.evaluations.push(ev);
+  const next = r.phases.find((p) => p.status === 'planned');
+  if (next) next.status = 'active';
+  save();
+  return { ok: true, ev, nextPhase: next ? next.id : null };
+}
+
+/* إعادة التخطيط: تقييم ما تحقق → تعديل أهداف المراحل المتبقية للسياق الجديد. */
+function rebaseline() {
+  ensureRoadmap();
+  const done = plan.roadmap.phases.filter((p) => p.status === 'done');
+  if (!done.length) return null;
+  const last = done[done.length - 1];
+  const remaining = plan.roadmap.phases.filter((p) => p.status !== 'done');
+  if (!remaining.length) return null;
+  const monthsLeft = plan.roadmap.horizon - last.endMonth;
+  if (monthsLeft <= 0) return null;
+  const step = (plan.roadmap.target - last.actualValue) / monthsLeft;
+  let m = last.endMonth;
+  remaining.forEach((p) => {
+    m += 1;
+    p.plannedEnd = Math.round((last.actualValue + step * (m - last.endMonth)) * 10) / 10;
+    p.startMonth = Math.min(p.startMonth, m);
+    p.endMonth = m;
+  });
+  plan.roadmap.rebaselined = true;
+  save();
+  render();
+  renderChart();
+  return { lastActual: last.actualValue, step: Math.round(step * 10) / 10, remaining };
+}
+
+function fmtNum(v) {
+  if (v === null || v === undefined || !Number.isFinite(v)) return '—';
+  return Math.round(v * 10) / 10;
+}
+
+function roadEvalHtml(ph) {
+  return `<div id="dp-eval-${ph.id}" class="mt-2 bg-slate-800/60 rounded-xl border border-slate-700/70 p-3">
+    <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-2"><i class="fas fa-clipboard-check mr-1 text-amber-400"></i><span data-key="dp_rm_eval">Phase evaluation</span></div>
+    <div class="flex flex-wrap items-end gap-2">
+      <label class="flex flex-col gap-1 text-[9px] text-slate-500">${tr('dp_rm_actual')}
+        <input data-actual type="number" step="0.5" placeholder="${fmtNum(ph.plannedEnd)}" class="w-28 px-2 py-1 bg-slate-800 border border-slate-600 rounded text-xs text-white"></label>
+      <label class="flex flex-col gap-1 text-[9px] text-slate-500">${tr('dp_rm_real_month')}
+        <input data-actualmonth type="number" min="1" placeholder="${ph.endMonth}" class="w-16 px-2 py-1 bg-slate-800 border border-slate-600 rounded text-xs text-white"></label>
+      <label class="flex flex-col gap-1 text-[9px] text-slate-500 flex-1 min-w-[120px]">${tr('dp_rm_notes')}
+        <input data-notes type="text" placeholder="…" class="w-full px-2 py-1 bg-slate-800 border border-slate-600 rounded text-xs text-white"></label>
+      <button onclick="SAE_DevPlan.evaluatePhase(${ph.id})" class="px-4 py-2 bg-amber-600 hover:bg-amber-500 rounded-lg text-xs font-bold"><i class="fas fa-check mr-1"></i>${tr('dp_rm_save')}</button>
+    </div>
+  </div>`;
+}
+
+function phaseCardHtml(ph, idx, anal) {
+  const active = ph.status === 'active';
+  const done = ph.status === 'done';
+  const statusIcon = done ? 'fa-circle-check text-emerald-400' : (active ? 'fa-circle-play text-amber-400' : 'fa-circle text-slate-600');
+  const chip = `inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-[10px] font-bold ${done ? 'bg-emerald-600/20 text-emerald-300' : (active ? 'bg-amber-600/20 text-amber-300' : 'bg-slate-700/60 text-slate-400')}`;
+  const actualLine = ph.actualValue !== null && ph.actualValue !== undefined
+    ? `<div class="text-[10px] mt-1"><span class="text-slate-400">${tr('dp_rm_actual')}:</span> <b class="text-white">${fmtNum(ph.actualValue)}</b> <span class="${(ph.evaluations && ph.evaluations.length ? '' : '')} ${ph.plannedEnd && ph.actualValue >= ph.plannedEnd ? 'text-emerald-300' : 'text-rose-300'}">${ph.plannedEnd && ph.actualValue >= ph.plannedEnd ? '✓' : '✗'}</span></div>`
+    : ((active && !done) ? roadEvalHtml(ph) : '<div class="text-[10px] mt-1 text-slate-600">' + (done ? '— ' + tr('dp_rm_done_past') : tr('dp_rm_pending')) + '</div>');
+  return '' +
+    '<div class="bg-slate-900 rounded-2xl border ' + (active ? 'border-amber-500/60 shadow-lg shadow-amber-900/10' : 'border-slate-700/60') + ' p-4">' +
+    '  <div class="flex items-center justify-between gap-2 mb-2">' +
+    '    <div class="flex items-center gap-2"><i class="fas ' + (active ? 'fa-flag' : 'fa-flag-checkered') + ' text-slate-500 text-xs"></i>' +
+    '      <span class="text-sm font-bold text-white">' + tr('dp_rm_phase') + ' ' + ph.id + '</span>' +
+    '      <span class="text-[10px] text-slate-400">M' + ph.startMonth + '–' + ph.endMonth + '</span></div>' +
+    '    <span class="' + chip + '"><i class="fas ' + statusIcon + '"></i> ' + (done ? tr('dp_rm_done') : (active ? tr('dp_rm_active') : tr('dp_rm_planned'))) + '</span>' +
+    '  </div>' +
+    '  <div class="text-[11px] text-slate-300"><span class="text-slate-400">' + tr('dp_rm_planned_end') + ':</span> <b class="text-cyan-300 font-mono">' + fmtNum(ph.plannedEnd) + '</b></div>' +
+    actualLine +
+    '  <div class="h-1 w-full rounded-full bg-slate-700 overflow-hidden mt-2">' +
+    '    <div class="h-full rounded-full ' + (ph.plannedEnd && ph.actualValue >= ph.plannedEnd ? 'bg-emerald-500' : (active ? 'bg-amber-500' : 'bg-slate-600')) + '" style="width:' + Math.min(100, ph.plannedEnd ? Math.round((ph.actualValue || 0) / ph.plannedEnd * 100) : 0) + '%"></div>' +
+    '  </div>' +
+    '</div>';
+}
+
+/* تقرير العقل: تحليلات ومراحل وتوصيات — الجزء الأول من الصفحة الشاملة. */
+function roadmapSectionHtml() {
+  const r = ensureRoadmap();
+  const anal = roadAnalytics();
+  const cards = r.phases.map((ph, i) => phaseCardHtml(ph, i, anal)).join('');
+  const feasible = !anal.scheduleRisk;
+  const verdictHtml = anal.verdict === 'idle'
+    ? '<span class="text-slate-400">' + tr('dp_rm_idle') + '</span>'
+    : (feasible ? '<span class="text-emerald-300"><i class="fas fa-circle-check mr-1"></i>' + tr('dp_rm_on_track') + '</span>'
+       : '<span class="text-rose-300"><i class="fas fa-triangle-exclamation mr-1"></i>' + tr('dp_rm_late') + '</span>');
+  const spiHtml = anal.spi !== null
+    ? '<div class="flex items-center gap-2"><span class="w-24 text-[10px] text-slate-400">' + tr('dp_rm_spi') + '</span><b class="font-mono text-white">' + anal.spi + '</b></div>' +
+      '<div class="flex items-center gap-2"><span class="w-24 text-[10px] text-slate-400">' + tr('dp_rm_variance') + '</span><b class="font-mono ' + (anal.variance >= 0 ? 'text-emerald-300' : 'text-rose-300') + '">' + (anal.variance >= 0 ? '+' : '') + anal.variance + '%</b></div>' +
+      '<div class="flex items-center gap-2"><span class="w-24 text-[10px] text-slate-400">' + tr('dp_rm_progress') + '</span><b class="font-mono text-white">' + anal.donePct + '% / ' + tr('dp_rm_planned') + ' ' + anal.planPct + '%</b></div>'
+    : '<div class="text-[10px] text-slate-500">' + tr('dp_rm_no_eval') + '</div>';
+  const remainingHtml = '<div class="flex items-center gap-2"><span class="w-24 text-[10px] text-slate-400">' + tr('dp_rm_remaining') + '</span><b class="font-mono text-white">' + fmtNum(anal.remaining) + '</b></div>' +
+    '<div class="flex items-center gap-2"><span class="w-24 text-[10px] text-slate-400">' + tr('dp_rm_needed') + '</span><b class="font-mono text-white">' + fmtNum(anal.needed) + '</b></div>';
+  return '' +
+    '  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">' +
+    '    <div class="lg:col-span-2 bg-slate-900 rounded-2xl border border-slate-700/70 p-5">' +
+    '      <div class="flex items-center gap-3 mb-4">' +
+    '        <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center text-white text-sm"><i class="fas fa-route"></i></div>' +
+    '        <div><div class="text-base font-bold text-white"><span data-key="dp_rm_title">Development roadmap</span></div>' +
+    '          <div class="text-[10px] text-slate-400"><span data-key="dp_rm_goal">From today to the goal</span>: <b class="text-white">' + fmtNum(r.current) + '</b> → <b class="text-emerald-300">' + fmtNum(r.target) + '</b> · <b class="text-cyan-300">' + r.horizon + '</b> <span data-key="dp_rm_months">months</span></div></div>' +
+    '      </div>' +
+    '      <div class="grid grid-cols-2 md:grid-cols-3 gap-3">' + cards + '</div>' +
+    '      <div class="flex flex-wrap gap-2 mt-4">' +
+    '        <button onclick="SAE_DevPlan && SAE_DevPlan.openRoadForm()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 rounded-lg text-xs font-semibold"><i class="fas fa-sliders mr-1"></i><span data-key="dp_rm_config">Define current → target → time</span></button>' +
+    '        <button onclick="SAE_DevPlan && SAE_DevPlan.rebaseline()" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-xs font-semibold"><i class="fas fa-wave-square mr-1"></i><span data-key="dp_rm_rebase">Re-baseline after review</span></button>' +
+    '      </div>' +
+    '      <div id="dp-road-edit" class="mt-4"></div>' +
+    '    </div>' +
+    '    <div class="bg-slate-900 rounded-2xl border border-slate-700/70 p-5">' +
+    '      <div class="flex items-center gap-3 mb-4">' +
+    '        <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center text-white text-sm"><i class="fas fa-brain"></i></div>' +
+    '        <div><div class="text-base font-bold text-white"><span data-key="dp_rm_brain">The advisor</span></div>' +
+    '          <div class="text-[10px] text-slate-400" data-key="dp_rm_brain_desc">Thinks like the sharpest planner — EVM, variance & corrective action.</div></div>' +
+    '      </div>' +
+    '      <div class="space-y-2 text-xs">' +
+    '        <div class="flex items-center gap-2"><span class="w-24 text-[10px] text-slate-400">' + tr('dp_rm_rate') + '</span><b class="font-mono text-cyan-300">' + fmtNum(anal.perMonth) + '</b></div>' +
+    '        <div class="flex items-center gap-2"><span class="w-24 text-[10px] text-slate-400">' + tr('dp_rm_growth') + '</span><b class="font-mono text-white">' + anal.growthPct + '%</b></div>' +
+    spiHtml + remainingHtml +
+    '        <div class="flex items-center gap-2"><span class="w-24 text-[10px] text-slate-400">' + tr('dp_rm_verdict') + '</span>' + verdictHtml + '</div>' +
+    '      </div>' +
+    '      <div class="mt-3 pt-3 border-t border-slate-700/60 space-y-2">' +
+    '        <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400"><i class="fas fa-list-check mr-1"></i><span data-key="dp_rm_tasks">Who carries the goal</span></div>' +
+    '        <div class="flex flex-wrap gap-1.5">' +
+    plan.departments.map((d) => '<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-slate-800 text-[10px] text-slate-300"><i class="fas ' + d.icon + ' text-slate-400"></i><span data-key="' + d.nameKey + '">' + tr(d.nameKey) + '</span></span>').join('') +
+    '        </div>' +
+    '      </div>' +
+    (plan.roadmap.rebaselined ? '<div class="mt-3 px-3 py-2 rounded-lg bg-violet-500/10 border border-violet-500/30 text-[10px] text-violet-200"><i class="fas fa-wave-square mr-1"></i><span data-key="dp_rm_rebaselined">Plan re-baselined after the last review.</span></div>' : '') +
+    '    </div>' +
+    '  </div>';
+}
+
+function roadFormHtml() {
+  const r = ensureRoadmap();
+  return '<div class="bg-slate-800/60 rounded-xl border border-slate-700/70 p-4">' +
+    '  <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-2"><i class="fas fa-sliders mr-1"></i><span data-key="dp_rm_config_title">Plan parameters</span></div>' +
+    '  <div class="grid grid-cols-2 md:grid-cols-4 gap-2">' +
+    '    <label class="flex flex-col gap-1 text-[9px] text-slate-500">' + tr('dp_rm_current') + '<input id="dp-rf-current" type="number" value="' + r.current + '" class="px-2 py-1.5 bg-slate-900 border border-slate-600 rounded text-xs text-white"></label>' +
+    '    <label class="flex flex-col gap-1 text-[9px] text-slate-500">' + tr('dp_rm_target') + '<input id="dp-rf-target" type="number" value="' + r.target + '" class="px-2 py-1.5 bg-slate-900 border border-slate-600 rounded text-xs text-white"></label>' +
+    '    <label class="flex flex-col gap-1 text-[9px] text-slate-500">' + tr('dp_rm_months') + '<input id="dp-rf-horizon" type="number" min="1" max="24" value="' + r.horizon + '" class="px-2 py-1.5 bg-slate-900 border border-slate-600 rounded text-xs text-white"></label>' +
+    '    <label class="flex flex-col gap-1 text-[9px] text-slate-500">' + tr('dp_rm_phase_count') + '<input id="dp-rf-phases" type="number" min="1" max="12" value="' + r.phaseCount + '" class="px-2 py-1.5 bg-slate-900 border border-slate-600 rounded text-xs text-white"></label>' +
+    '  </div>' +
+    '  <div class="flex gap-2 mt-3">' +
+    '    <button onclick="SAE_DevPlan && SAE_DevPlan.applyRoadForm()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 rounded-lg text-xs font-bold"><i class="fas fa-check mr-1"></i><span data-key="dp_rm_apply">Apply plan</span></button>' +
+    '    <button onclick="SAE_DevPlan && SAE_DevPlan.cancelRoadForm()" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-xs font-bold"><span data-key="dp_cancel">Cancel</span></button>' +
+    '  </div>' +
+    '</div>';
+}
+
+function openRoadForm() {
+  const slot = document.getElementById('dp-road-edit');
+  if (!slot) return;
+  slot.innerHTML = roadFormHtml();
+  translateRecursive(slot);
+}
+function applyRoadForm() {
+  const g = (id) => { const el = document.getElementById(id); return el ? parseFloat(el.value) : NaN; };
+  updateRoadmap({
+    current: g('dp-rf-current'), target: g('dp-rf-target'),
+    horizon: g('dp-rf-horizon'), phaseCount: g('dp-rf-phases'),
+  });
+}
+function cancelRoadForm() {
+  const slot = document.getElementById('dp-road-edit');
+  if (slot) slot.innerHTML = '';
+}
+
 /* ── إقلاع + إعادة رسم عند تغيير اللغة ───────────────────────────────── */
 
 let langObserver = null;
@@ -802,6 +1112,10 @@ function initDevPlan() {
     exportCSV, resetToTemplate, getPlan: () => plan,
     getStats: () => ({ recorded: recordedCount(), met: metCount() }),
     setOpsMonth, setOps, computeOps: () => computeOps(),
+    updateRoadmap, evaluatePhase, rebaseline,
+    openRoadForm, applyRoadForm, cancelRoadForm,
+    roadAnalytics: () => roadAnalytics(),
+    getRoadmap: () => ensureRoadmap(),
   };
   return window.SAE_DevPlan;
 }

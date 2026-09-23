@@ -52,10 +52,24 @@ All notable changes to SAE AutoSim Hub.
   Assumptions (working days, mixer load, shift hours, load/unload, buffer %,
   price/m³, sampling interval) are editable and persisted to `localStorage`;
   the planner re-computes live for any M1–M3 month.
-- **E2E suite grown to 68 checks**: Phase 2f now covers the capacity planner
-  (mounted, 5500 → daily output + trips + mixers, per-station utilisation,
-  and an assumption change recomputing tasks) on top of the dev-plan and
-  actuals coverage.
+- **PMP roadmap (قائد الخطة)** in the Development Plan, following Earned Value
+  Management: input the current state (الوضع الحالي), the goal to reach
+  (هدف الوصول), the time-to-reach (زمن الوصول) and a phase count — the page
+  distributes the journey into equal phases with interpolated planned-end
+  values and syncs them into the concrete KPI so the chart, task board and
+  capacity planner all follow. A **smart advisor brain** panel reports the
+  required monthly rate, monthly growth %, SPI (schedule performance index),
+  variance % and an on-track / behind verdict. After each phase a live
+  **evaluation form** records the achieved actual + real month + notes; the
+  phase closes, the next one activates, and a **re-baseline** action re-
+  projects the remaining phases from the achieved value to the goal — the
+  classic PMP "plan, evaluate, correct" loop. (المراحل تتوزع المهام وتُقيَّم
+  وتُعدَّل الخطة بعد كل مرحلة)
+- **E2E suite grown to 76 checks**: Phase 2f now also covers the PMP roadmap —
+  seeded phases from current→target, advisor brain panel, re-plan distributing
+  phases *and* syncing the concrete KPI, evaluation guard (actual required),
+  evaluating a phase closing it and opening the next, SPI/verdict computation,
+  re-baseline after review, and reset restoring the default phase plan.
 - **Engine-driven calibration**: the wizard's grid search now runs the real
   simulation per candidate (12 seeded runs) and scores GEH against loop
   detector flows normalized per lane — replacing a mocked search.

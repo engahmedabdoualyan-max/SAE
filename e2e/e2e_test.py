@@ -522,6 +522,85 @@ def phase2f_dev_plan(page, res: Result) -> None:
     }""")
     res.check("changing an assumption recomputes tasks", bool(opchange.get("ok")), str(opchange))
 
+    road = page.evaluate("""() => {
+        const dp = window.SAE_DevPlan;
+        const r = dp.getRoadmap();
+        const brainTxt = document.querySelector('[data-key="dp_rm_brain"]')?.textContent || '';
+        const advisor = document.querySelector('.fa-brain') ? true : false;
+        return {
+            ok: r && r.phases.length === 3 && r.current === 5000 && r.target === 6500
+                && r.phases[0].status === 'active' && r.phases[0].plannedEnd === 5500,
+            phases: r.phases.length, current: r.current, target: r.target,
+            planned: r.phases.map(p => p.plannedEnd), brain: !!brainTxt, advisor,
+        };
+    }""")
+    res.check("roadmap: current→target with phases seeded", bool(road.get("ok")), str(road))
+    res.check("roadmap: advisor brain panel rendered", bool(road.get("brain") and road.get("advisor")), str(road))
+
+    replan = page.evaluate("""() => {
+        window.SAE_DevPlan.updateRoadmap({ current: 4800, target: 7000, horizon: 6, phaseCount: 4 });
+        const r = window.SAE_DevPlan.getRoadmap();
+        const c = window.SAE_DevPlan.getPlan()
+            .departments.find(d => d.id === 'sales').kpis.find(k => k.id === 'concrete');
+        return {
+            ok: r.phases.length === 4 && r.current === 4800 && r.target === 7000
+                && c.current === 4800 && c.targets[0] === r.phases[0].plannedEnd,
+            phases: r.phases.length, cCur: c.current, cM1: c.targets[0],
+            step: r.phases.map(p => p.plannedEnd),
+        };
+    }""")
+    res.check("roadmap: re-plan distributes phases and syncs concrete KPI", bool(replan.get("ok")), str(replan))
+
+    evalg = page.evaluate("""() => {
+        const slot = document.getElementById('dp-eval-1');
+        if (!slot) return { error: 'no-eval-form', hostile: true };
+        const a = slot.querySelector('input[data-actual]');
+        a.value = '';
+        const guarded = window.SAE_DevPlan.evaluatePhase(1);
+        return { guarded: !!guarded && guarded.error === 'actual-required' };
+    }""")
+    res.check("roadmap: evaluation requires an actual value", bool(evalg.get("guarded")), str(evalg))
+
+    evald = page.evaluate("""() => {
+        const g = (sel) => {
+            const el = document.querySelector('#dp-eval-1 ' + sel);
+            return el;
+        };
+        const a = g('input[data-actual]'); const m = g('input[data-actualmonth]');
+        if (!a) return { error: 'no-input' };
+        a.value = '5600';
+        if (m) m.value = '2';
+        const out = window.SAE_DevPlan.evaluatePhase(1);
+        const r = window.SAE_DevPlan.getRoadmap();
+        const ph1 = r.phases[0], ph2 = r.phases[1];
+        return {
+            ok: !!out && out.ok && ph1.status === 'done' && ph2.status === 'active'
+                && r.evaluations.length === 1 && r.evaluations[0].spi > 1,
+            spi: r.evaluations[0] && r.evaluations[0].spi, evLen: r.evaluations.length,
+        };
+    }""")
+    res.check("roadmap: evaluating a phase closes it and opens the next", bool(evald.get("ok")), str(evald))
+    res.check("roadmap: SPI/verdict computed from actual vs plan", float(evald.get("spi") or 0) > 1, str(evald))
+
+    rebase = page.evaluate("""() => {
+        const before = window.SAE_DevPlan.getRoadmap().phases.filter(p => p.status !== 'done').length;
+        const out = window.SAE_DevPlan.rebaseline();
+        const r = window.SAE_DevPlan.getRoadmap();
+        return { ok: !!out && r.rebaselined === true && r.phases.length === 4, before, after: r.phases.length };
+    }""")
+    res.check("roadmap: re-baseline adjusts remaining phases after review", bool(rebase.get("ok")), str(rebase))
+
+    roadreset = page.evaluate("""() => {
+        window.SAE_DevPlan.resetToTemplate();
+        const r = window.SAE_DevPlan.getRoadmap();
+        return {
+            ok: r && r.phases.length === 3 && r.current === 5000 && r.target === 6500
+                && r.phases[0].status === 'active' && r.rebaselined === false,
+            phases: r.phases.length,
+        };
+    }""")
+    res.check("roadmap: reset restores default phase plan", bool(roadreset.get("ok")), str(roadreset))
+
 
 def phase3_cloud_sumo(page, res: Result) -> None:
     print("── Phase 3: cloud SUMO pipeline")
