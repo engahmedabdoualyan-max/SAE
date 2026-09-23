@@ -592,5 +592,18 @@ Object.assign(TRANSLATIONS["de"], {
     "dp_rm_feed": "Heutiger Auftrag für jede Abteilung",
     "dp_rm_feas": "Machbarkeit im Werk",
     "dp_rm_feas_ok": "Werke können diese Phase liefern.",
-    "dp_rm_feas_warn": "Bei aktueller Kapazität nicht machbar"
+    "dp_rm_feas_warn": "Bei aktueller Kapazität nicht machbar",
+    "dp_rm_timeline": "Zeitplan",
+    "dp_rm_scen": "Entscheidungsszenarien",
+    "dp_rm_scen_keep": "Plan beibehalten",
+    "dp_rm_scen_keep_desc": "Bleibt das Tempo, rutscht das Ziel über die Frist",
+    "dp_rm_scen_pace": "Tempo neu basieren",
+    "dp_rm_scen_pace_desc": "rechtzeitig fertig, Monatstempo auf",
+    "dp_rm_scen_pace_ok": "Sie liegen im Plan — Tempo halten",
+    "dp_rm_scen_extend": "Horizont verlängern",
+    "dp_rm_scen_extend_desc": "Tempo halten und Zeitplan um",
+    "dp_rm_reco": "empfohlen",
+    "dp_rm_choose": "Wählen",
+    "dp_rm_keep": "Verzug akzeptieren",
+    "dp_rm_on_time": "pünktlich"
 });

@@ -659,6 +659,43 @@ def phase2f_dev_plan(page, res: Result) -> None:
     }""")
     res.check("roadmap: feasibility check per station vs capacity", bool(feas.get("ok") and feas.get("feas")), str(feas))
 
+    timeline = page.evaluate("""() => {
+        const host = document.querySelector('[data-key="dp_rm_timeline"]');
+        const segs = document.querySelectorAll('[data-key="dp_rm_timeline"] ~ div ~ div .rounded, [data-key="dp_rm_timeline"]').length;
+        window.SAE_DevPlan.updateRoadmap({ current: 5000, target: 6500, horizon: 6, phaseCount: 3 });
+        return { ok: !!host, timeline: !!host };
+    }""")
+    res.check("roadmap: visual phase timeline on a month axis", bool(timeline.get("ok")), str(timeline))
+
+    scen = page.evaluate("""() => {
+        const a = document.querySelector('#dp-eval-1 input[data-actual]');
+        if (!a) return { error: 'no-eval' };
+        a.value = '5200';
+        const out = window.SAE_DevPlan.evaluatePhase(1);
+        const host = document.querySelector('[data-key="dp_rm_scen"]');
+        const options = document.querySelectorAll('[data-key="dp_rm_scen_keep"], [data-key="dp_rm_scen_pace"], [data-key="dp_rm_scen_extend"]').length;
+        return { ok: !!host && options >= 3, options };
+    }""")
+    res.check("roadmap: decision scenarios appear after a review", bool(scen.get("ok")), str(scen))
+
+    scenapply = page.evaluate("""() => {
+        const before = window.SAE_DevPlan.getRoadmap().horizon;
+        const out = window.SAE_DevPlan.applyScenario('extend');
+        const after = window.SAE_DevPlan.getRoadmap().horizon;
+        return { ok: !!out && out.applied === true && after > before, before, after };
+    }""")
+    res.check("roadmap: applying 'extend horizon' lengthens the plan", bool(scenapply.get("ok")), str(scenapply))
+
+    scenpace = page.evaluate("""() => {
+        const a = document.querySelector('#dp-eval-1 input[data-actual]');
+        if (!a) return { ok: false, why: 'no-eval' };
+        a.value = '5700';
+        const ev = window.SAE_DevPlan.evaluatePhase(1);
+        const out = window.SAE_DevPlan.applyScenario('pace');
+        return { ok: !!ev && !!out && out.applied === true, why: '' };
+    }""")
+    res.check("roadmap: applying 're-baseline pace' adjusts remaining phases", bool(scenpace.get("ok")), str(scenpace))
+
     roadreset2 = page.evaluate("""() => {
         window.SAE_DevPlan.resetToTemplate();
         const r = window.SAE_DevPlan.getRoadmap();

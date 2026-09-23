@@ -568,5 +568,18 @@ Object.assign(TRANSLATIONS["hi"], {
     "dp_rm_feed": "प्रत्येक विभाग का आज का कार्य",
     "dp_rm_feas": "प्लांट क्षमता जाँच",
     "dp_rm_feas_ok": "प्लांट इस चरण को पूरा कर सकते हैं।",
-    "dp_rm_feas_warn": "मौजूदा क्षमता पर संभव नहीं"
+    "dp_rm_feas_warn": "मौजूदा क्षमता पर संभव नहीं",
+    "dp_rm_timeline": "टाइमलाइन",
+    "dp_rm_scen": "निर्णय परिदृश्य",
+    "dp_rm_scen_keep": "योजना जैसी है वैसे रखें",
+    "dp_rm_scen_keep_desc": "मौजूदा गति पर लक्ष्य समय से पीछे हो जाएगा",
+    "dp_rm_scen_pace": "गति पुनः-आधारित करें",
+    "dp_rm_scen_pace_desc": "मासिक गति बढ़ाकर समय पर पूरा करें",
+    "dp_rm_scen_pace_ok": "आप सही रास्ते पर हैं — यही गति रखें",
+    "dp_rm_scen_extend": "क्षितिज बढ़ाएँ",
+    "dp_rm_scen_extend_desc": "गति रखते हुए समय को आगे बढ़ाएँ",
+    "dp_rm_reco": "अनुशंसित",
+    "dp_rm_choose": "यही चुनें",
+    "dp_rm_keep": "विलंब स्वीकारें",
+    "dp_rm_on_time": "समय पर"
 });

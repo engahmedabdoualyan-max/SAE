@@ -81,9 +81,18 @@ All notable changes to SAE AutoSim Hub.
   capacity lift (+%) that would be needed to make the phase real, alongside a
   green confirmation when the plants can deliver. This closes the "plan →
   distribute → evaluate → verify" loop with a ground-truth capacity gate.
-- **E2E suite grown to 81 checks**: Phase 2f now also verifies the per-station
-  feasibility report (target, station utilisations, warnings array) for the
-  active phase.
+- **Visual phase timeline & decision scenarios** in the roadmap: a horizontal
+  month-axis strip colour-codes every phase (done/active/planned) with hover
+  tooltips. Once any phase is evaluated, the advisor offers three PMP-style
+  decision scenarios — *keep the plan as is* (shows the projected slip), 
+  *re-baseline the pace* (recommended; recalculates remaining phases onto the
+  goal), and *extend the horizon* (spreads the remaining gap over more months
+  from the last achieved actual). Each scenario carries its projected finish
+  and a one-click "choose this" action.
+- **E2E suite grown to 85 checks**: Phase 2f now also verifies the visual phase
+  timeline, decision scenarios appearing after a review, applying "extend
+  horizon" lengthening the plan, and applying "re-baseline pace" adjusting the
+  remaining phases.
 - **Engine-driven calibration**: the wizard's grid search now runs the real
   simulation per candidate (12 seeded runs) and scores GEH against loop
   detector flows normalized per lane — replacing a mocked search.

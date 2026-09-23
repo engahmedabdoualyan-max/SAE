@@ -1033,6 +1033,112 @@ function roadEacHtml(a) {
     '      </div>';
 }
 
+/* شريط زمني بصري: عرض المراحل على محور الشهور. */
+function roadTimelineHtml() {
+  const r = ensureRoadmap();
+  if (!r || !Array.isArray(r.phases) || !r.phases.length) return '';
+  const total = Math.max(1, r.horizon || 1);
+  let segs = '';
+  r.phases.forEach((p) => {
+    const w = Math.max(6, Math.round(((p.endMonth - p.startMonth + 1) / total) * 100));
+    const color = p.status === 'done' ? 'bg-emerald-500' : (p.status === 'active' ? 'bg-amber-500' : 'bg-slate-600');
+    segs += `<div title="${tr('dp_rm_phase')} ${p.id}: M${p.startMonth}–${p.endMonth}" class="${color} rounded transition flex items-center justify-center text-white text-[8px] font-bold" style="width:${w}%"></div>`;
+  });
+  return '' +
+    '      <div class="mb-3">' +
+    '        <div class="text-[10px] text-slate-400 mb-1"><i class="fas fa-timeline mr-1"></i>' + tr('dp_rm_planned') + ' · <span data-key="dp_rm_timeline">Timeline</span></div>' +
+    '        <div class="flex w-full h-4 gap-0.5 overflow-hidden rounded-md">' + segs + '</div>' +
+    '        <div class="flex justify-between text-[8px] text-slate-500 mt-1"><span>M1</span><span>M' + total + '</span></div>' +
+    '      </div>';
+}
+
+/* سيناريوهات القرار: إبقاء الخطة / إعادة تخطيط الوتيرة / تمديد الأفق. */
+function roadScenarioHtml(a) {
+  const r = ensureRoadmap();
+  if (!a || a.spi === null) return '';
+  const sc = roadScenarioData();
+  return '' +
+    '      <div class="mt-3 pt-3 border-t border-slate-700/60">' +
+    '        <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-2"><i class="fas fa-gavel mr-1"></i><span data-key="dp_rm_scen">Decision scenarios</span></div>' +
+    '        <div class="space-y-2">' +
+    sc.map((s) =>
+      '<div class="rounded-xl border ' + (s.kind === 'pace' && a.scheduleRisk ? 'border-amber-500/50 bg-amber-500/10' : 'border-slate-700/60 bg-slate-800/50') + ' p-2.5">' +
+      '  <div class="flex items-center justify-between gap-2">' +
+      '    <div class="text-[11px] font-bold text-slate-200"><i class="fas ' + s.icon + ' mr-1 text-slate-400"></i><span data-key="' + s.key + '">' + s.label + '</span>' + (s.kind === 'pace' && a.scheduleRisk ? '<span class="ml-1 text-[8px] px-1 py-0.5 rounded bg-amber-500/20 text-amber-200 font-bold">' + tr('dp_rm_reco') + '</span>' : '') + '</div>' +
+    '    <b class="font-mono text-cyan-300 text-[10px]">' + s.duration + '</b>' +
+    '  </div>' +
+    '  <div class="text-[9px] text-slate-400 mt-1">' + s.desc + '</div>' +
+    (s.kind !== 'keep'
+      ? '<button onclick="SAE_DevPlan && SAE_DevPlan.applyScenario(\'' + s.kind + '\')" class="mt-2 px-3 py-1 rounded-lg text-[10px] font-bold ' + (s.kind === 'pace' ? 'bg-amber-600 hover:bg-amber-500' : (s.kind === 'extend' ? 'bg-cyan-600 hover:bg-cyan-500' : 'bg-slate-600 hover:bg-slate-500')) + ' text-white"><i class="fas fa-check mr-1"></i><span data-key="dp_rm_choose">Apply this</span></button>'
+      : '<button onclick="SAE_DevPlan && SAE_DevPlan.keepPlan()" class="mt-2 px-3 py-1 rounded-lg text-[10px] font-bold bg-slate-600 hover:bg-slate-500 text-white"><i class="fas fa-ghost mr-1"></i><span data-key="dp_rm_keep">Accept the slip</span></button>') +
+    '</div>'
+    ).join('') +
+    '        </div>' +
+    '      </div>';
+}
+
+/* بيانات السيناريوهات: كم ستدوم كل خيار وماذا سيعني للمدير. */
+function roadScenarioData() {
+  const a = roadAnalytics();
+  const r = ensureRoadmap();
+  const out = [];
+  out.push({
+    kind: 'keep', icon: 'fa-hand-back-fist', key: 'dp_rm_scen_keep', label: 'Keep the plan as is',
+    duration: 'M' + (a.eacMonths !== null ? a.eacMonths : r.horizon),
+    desc: (a.monthsLate > 0 ? '+' + a.monthsLate + ' ' + tr('dp_rm_months') : tr('dp_rm_on_time')) + ' — ' + tr('dp_rm_scen_keep_desc'),
+  });
+  const paceDuration = a.scheduleRisk ? r.horizon : null;
+  out.push({
+    kind: 'pace', icon: 'fa-gauge-high', key: 'dp_rm_scen_pace', label: 'Re-baseline the pace',
+    duration: paceDuration !== null ? 'M' + paceDuration : 'M' + r.horizon,
+    desc: paceDuration !== null
+      ? tr('dp_rm_scen_pace_desc') + ' ' + fmtNum(a.advice ? a.advice.fasterRate : a.perMonth) + '/mo'
+      : tr('dp_rm_scen_pace_ok'),
+  });
+  const extendTo = a.advice ? a.advice.extendTo : (r.horizon + 1);
+  out.push({
+    kind: 'extend', icon: 'fa-hourglass-end', key: 'dp_rm_scen_extend', label: 'Extend the horizon',
+    duration: 'M' + extendTo,
+    desc: tr('dp_rm_scen_extend_desc') + ' ' + (extendTo - r.horizon) + ' ' + tr('dp_rm_months'),
+  });
+  return out;
+}
+
+/* تطبيق سيناريو: 'keep' → بلا تغيير؛ 'pace' → إعادة تخطيط؛ 'extend' → أفق أطول. */
+function applyScenario(kind) {
+  if (kind === 'keep') return { applied: false, kind };
+  if (kind === 'pace') return { applied: true, kind, ...(rebaseline() || {}) };
+  if (kind === 'extend') {
+    const a = roadAnalytics();
+    const r = ensureRoadmap();
+    const target = r.target;
+    const extendTo = Math.max(r.horizon + 1, a.advice ? a.advice.extendTo : r.horizon + 1);
+    /* الغداء من "أين نحن" بعد التقييمات: آخر فعلي مُسجّل = المستوى الحالي. */
+    const doneP = (r.phases || []).filter((p) => p.status === 'done' && p.actualValue !== null && p.actualValue !== undefined);
+    const anchor = doneP.length ? doneP[doneP.length - 1].actualValue : r.current;
+    const phases = [];
+    for (let i = 0; i < r.phases.length; i++) {
+      const startMonth = Math.round((extendTo / r.phases.length) * i) + 1;
+      const endMonth = Math.round((extendTo / r.phases.length) * (i + 1));
+      const plannedEnd = Math.round((anchor + ((target - anchor) * endMonth) / extendTo) * 10) / 10;
+      phases.push({ id: i + 1, name: '', startMonth, endMonth, plannedEnd, status: 'planned', actual: null, actualMonth: null, actualValue: null, notes: '' });
+    }
+    phases[0].status = 'active';
+    r.current = anchor;
+    r.horizon = extendTo;
+    r.phases = phases;
+    r.rebaselined = true;
+    syncRoadToConcrete();
+    save();
+    render();
+    renderChart();
+    return { applied: true, kind, extendTo, anchor };
+  }
+  return { applied: false, kind };
+}
+
+function keepPlan() { return { applied: false, kept: true }; }
+
 /* تقييم مرحلة: الفعلي مقابل المخطط → تحديث الحالة + المتابعة التالية. */
 function evaluatePhase(phaseId) {
   const r = ensureRoadmap();
@@ -1059,6 +1165,7 @@ function evaluatePhase(phaseId) {
   const next = r.phases.find((p) => p.status === 'planned');
   if (next) next.status = 'active';
   save();
+  render();
   return { ok: true, ev, nextPhase: next ? next.id : null };
 }
 
@@ -1156,6 +1263,7 @@ function roadmapSectionHtml() {
     '        <div><div class="text-base font-bold text-white"><span data-key="dp_rm_title">Development roadmap</span></div>' +
     '          <div class="text-[10px] text-slate-400"><span data-key="dp_rm_goal">From today to the goal</span>: <b class="text-white">' + fmtNum(r.current) + '</b> → <b class="text-emerald-300">' + fmtNum(r.target) + '</b> · <b class="text-cyan-300">' + r.horizon + '</b> <span data-key="dp_rm_months">months</span></div></div>' +
     '      </div>' +
+    roadTimelineHtml() +
     '      <div class="grid grid-cols-2 md:grid-cols-3 gap-3">' + cards + '</div>' +
     '      <div class="flex flex-wrap gap-2 mt-4">' +
     '        <button onclick="SAE_DevPlan && SAE_DevPlan.openRoadForm()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 rounded-lg text-xs font-semibold"><i class="fas fa-sliders mr-1"></i><span data-key="dp_rm_config">Define current → target → time</span></button>' +
@@ -1177,6 +1285,7 @@ function roadmapSectionHtml() {
     '        <div class="flex items-center gap-2"><span class="w-24 text-[10px] text-slate-400">' + tr('dp_rm_verdict') + '</span>' + verdictHtml + '</div>' +
     '      </div>' +
     roadEacHtml(anal) +
+    roadScenarioHtml(anal) +
     '      <div class="mt-3 pt-3 border-t border-slate-700/60 space-y-2">' +
     '        <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400"><i class="fas fa-list-check mr-1"></i><span data-key="dp_rm_tasks">Who carries the goal</span></div>' +
     '        <div class="flex flex-wrap gap-1.5">' +
@@ -1263,6 +1372,7 @@ function initDevPlan() {
     roadAnalytics: () => roadAnalytics(),
     roadDeptFeed: () => roadDeptFeed(),
     roadFeasibility: () => roadFeasibility(),
+    applyScenario, keepPlan,
     roadReport: () => roadReport(),
     exportReport,
     getRoadmap: () => ensureRoadmap(),

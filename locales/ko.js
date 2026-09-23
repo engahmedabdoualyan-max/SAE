@@ -568,5 +568,18 @@ Object.assign(TRANSLATIONS["ko"], {
     "dp_rm_feed": "각 부서의 오늘 과제",
     "dp_rm_feas": "공장 가용성 점검",
     "dp_rm_feas_ok": "공장이 이 단계를 소화할 수 있습니다.",
-    "dp_rm_feas_warn": "현재 용량으로 불가"
+    "dp_rm_feas_warn": "현재 용량으로 불가",
+    "dp_rm_timeline": "타임라인",
+    "dp_rm_scen": "결정 시나리오",
+    "dp_rm_scen_keep": "계획을 그대로 유지",
+    "dp_rm_scen_keep_desc": "현재 속도로는 목표가 시한을 넘깁니다",
+    "dp_rm_scen_pace": "속도 재기준",
+    "dp_rm_scen_pace_desc": "월간 속도를 올려 제시간에 완료",
+    "dp_rm_scen_pace_ok": "계획대로입니다 — 이 속도 유지",
+    "dp_rm_scen_extend": "기간 연장",
+    "dp_rm_scen_extend_desc": "속도를 유지하며 일정 연장",
+    "dp_rm_reco": "권장",
+    "dp_rm_choose": "이것을 선택",
+    "dp_rm_keep": "지연 수용",
+    "dp_rm_on_time": "정시"
 });

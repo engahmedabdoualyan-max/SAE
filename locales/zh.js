@@ -592,5 +592,18 @@ Object.assign(TRANSLATIONS["zh"], {
     "dp_rm_feed": "各部门今日任务",
     "dp_rm_feas": "工厂产能可行性",
     "dp_rm_feas_ok": "工厂可交付此阶段。",
-    "dp_rm_feas_warn": "当前产能不可行"
+    "dp_rm_feas_warn": "当前产能不可行",
+    "dp_rm_timeline": "时间线",
+    "dp_rm_scen": "决策方案",
+    "dp_rm_scen_keep": "保持计划不变",
+    "dp_rm_scen_keep_desc": "按当前节奏目标将错过期限",
+    "dp_rm_scen_pace": "重新基准节奏",
+    "dp_rm_scen_pace_desc": "提升月度节奏以按时完成",
+    "dp_rm_scen_pace_ok": "你正在按计划——保持此节奏",
+    "dp_rm_scen_extend": "延长时间范围",
+    "dp_rm_scen_extend_desc": "保持节奏并延长进度",
+    "dp_rm_reco": "推荐",
+    "dp_rm_choose": "选择此项",
+    "dp_rm_keep": "接受拖延",
+    "dp_rm_on_time": "按时"
 });

@@ -592,5 +592,18 @@ Object.assign(TRANSLATIONS["fr"], {
     "dp_rm_feed": "Tâche du jour pour chaque service",
     "dp_rm_feas": "Faisabilité usine",
     "dp_rm_feas_ok": "Les centrales peuvent livrer cette phase.",
-    "dp_rm_feas_warn": "Non réalisable à la capacité actuelle"
+    "dp_rm_feas_warn": "Non réalisable à la capacité actuelle",
+    "dp_rm_timeline": "Chronologie",
+    "dp_rm_scen": "Scénarios de décision",
+    "dp_rm_scen_keep": "Garder le plan tel quel",
+    "dp_rm_scen_keep_desc": "au rythme actuel l'objectif dépasse son échéance",
+    "dp_rm_scen_pace": "Ré-baseler le rythme",
+    "dp_rm_scen_pace_desc": "finir dans les temps en passant à",
+    "dp_rm_scen_pace_ok": "vous êtes dans les temps — maintenez ce rythme",
+    "dp_rm_scen_extend": "Étendre l'horizon",
+    "dp_rm_scen_extend_desc": "tenir le rythme et prolonger le calendrier de",
+    "dp_rm_reco": "recommandé",
+    "dp_rm_choose": "Choisir",
+    "dp_rm_keep": "Accepter le retard",
+    "dp_rm_on_time": "dans les temps"
 });

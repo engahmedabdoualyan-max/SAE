@@ -593,5 +593,18 @@ Object.assign(TRANSLATIONS["ar"], {
     "dp_rm_feed": "مهمة اليوم لكل قسم",
     "dp_rm_feas": "فحص الجدوى على أرض المصنع",
     "dp_rm_feas_ok": "المصانع قادرة على تلبية هذه المرحلة.",
-    "dp_rm_feas_warn": "غير ممكن بالسعة الحالية"
+    "dp_rm_feas_warn": "غير ممكن بالسعة الحالية",
+    "dp_rm_timeline": "الخط الزمني",
+    "dp_rm_scen": "سيناريوهات القرار",
+    "dp_rm_scen_keep": "الإبقاء على الخطة كما هي",
+    "dp_rm_scen_keep_desc": "إن أبقيت الوتيرة الحالية سيتأخر الهدف عن موعده",
+    "dp_rm_scen_pace": "إعادة تخطيط الوتيرة",
+    "dp_rm_scen_pace_desc": "أنهِ الهدف برفع الوتيرة الشهرية إلى",
+    "dp_rm_scen_pace_ok": "أنت على المسار — حافظ على هذه الوتيرة",
+    "dp_rm_scen_extend": "تمديد الأفق",
+    "dp_rm_scen_extend_desc": "تمسّك بالوتيرة ومُدّ الجدول بمقدار",
+    "dp_rm_reco": "موصى به",
+    "dp_rm_choose": "اختر هذا",
+    "dp_rm_keep": "اقبل التأخر",
+    "dp_rm_on_time": "في الموعد"
 });

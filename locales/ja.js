@@ -568,5 +568,18 @@ Object.assign(TRANSLATIONS["ja"], {
     "dp_rm_feed": "各部門の今日のタスク",
     "dp_rm_feas": "工場の実現可能性",
     "dp_rm_feas_ok": "工場はこのフェーズを届けられます。",
-    "dp_rm_feas_warn": "現有能力では実現不可"
+    "dp_rm_feas_warn": "現有能力では実現不可",
+    "dp_rm_timeline": "タイムライン",
+    "dp_rm_scen": "意思決定シナリオ",
+    "dp_rm_scen_keep": "計画をこのまま維持",
+    "dp_rm_scen_keep_desc": "現ペースでは目標が期限を超えます",
+    "dp_rm_scen_pace": "ペースを再基準化",
+    "dp_rm_scen_pace_desc": "月次ペースを上げて期限内に達成",
+    "dp_rm_scen_pace_ok": "順調です — このペースを維持",
+    "dp_rm_scen_extend": "期間を延長",
+    "dp_rm_scen_extend_desc": "ペース維持のままスケジュールを延長",
+    "dp_rm_reco": "推奨",
+    "dp_rm_choose": "これを選ぶ",
+    "dp_rm_keep": "遅れを受け入れる",
+    "dp_rm_on_time": "予定通り"
 });
