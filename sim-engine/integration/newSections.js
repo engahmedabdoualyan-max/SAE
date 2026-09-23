@@ -336,6 +336,14 @@
     '</section>';
   }
 
+  function createDevPlanSection() {
+    return '' +
+    '<section id="dev-plan" class="case-view py-16 bg-slate-800 text-white">' +
+    '  <div class="container mx-auto">' +
+    '  </div>' +
+    '</section>';
+  }
+
   window.SAE_Sections = {
     createNetworkEditorSection: createNetworkEditorSection,
     createSignalEditorSection: createSignalEditorSection,
@@ -345,6 +353,7 @@
     createReportsSection: createReportsSection,
     createCloudSection: createCloudSection,
     createLabSection: createLabSection,
+    createDevPlanSection: createDevPlanSection,
     injectAll: function () {
       var footer = document.querySelector('footer');
       if (!footer) return;
@@ -356,6 +365,7 @@
       html += createScenarioManagerSection();
       html += createCloudSection();
       html += createReportsSection();
+      html += createDevPlanSection();
       footer.insertAdjacentHTML('beforebegin', html);
 
       var lab = createLabSection();

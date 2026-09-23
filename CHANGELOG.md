@@ -27,9 +27,19 @@ All notable changes to SAE AutoSim Hub.
   choice), canvas rendering of true edge geometry with vehicle trails,
   signal-aware travel, live KPIs (active vehicles, network speed, completed
   trips, LOS letter) and pause/reset controls.
-- **E2E suite grown to 53 checks**: new Phase 2e drives the runner on the
-  imported OSM fixture (start, vehicles running, route choice built, trips
-  completing, LOS assignment, pause) alongside the existing 47.
+- **E2E suite grown to 61 checks**: new Phase 2f drives the Development Plan
+  page (template seeded, entity targets 5000 → 5500, KPI cards, Chart.js
+  trajectory, edit/save/reset roundtrip, CSV export) alongside the existing
+  53.
+- **Development Plan (خطة التطوير) page** under the Research & Development
+  section — the factory's brain: monthly targets per department (sales,
+  plants, quality, logistics) with per-KPI current vs M1–M3 values, progress
+  bars, Chart.js target-trajectory line chart per department, a task board
+  translating each KPI into per-department monthly deltas, inline edit mode
+  (add/remove KPI, adjust targets) persisted to `localStorage`, reset-to-
+  template, and CSV export. Fully translated across all 9 languages with a
+  reusable `dp_*` i18n key set and a `window.t` translation helper exposed to
+  ES modules.
 - **Engine-driven calibration**: the wizard's grid search now runs the real
   simulation per candidate (12 seeded runs) and scores GEH against loop
   detector flows normalized per lane — replacing a mocked search.

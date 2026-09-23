@@ -478,3 +478,41 @@ Object.assign(TRANSLATIONS['de'], {
     "nr_title": "Netzwerk-Runner",
     "nr_desc": "IDM-Engine auf dem bearbeiteten oder importierten Netzwerk ausführen – mit Routenwahl."
 });
+
+/* Development Plan (R&D) */
+Object.assign(TRANSLATIONS["de"], {
+    "dp_title": "Entwicklungsplan",
+    "dp_desc": "Die Ziele der Fabrik – verteilt auf jede Abteilung als Monatsaufgaben, Monat für Monat.",
+    "dp_dept_sales": "Vertrieb",
+    "dp_dept_plants": "Mischwerke",
+    "dp_dept_quality": "Qualitätslabor",
+    "dp_dept_logistics": "Logistik",
+    "dp_kpi_concrete": "Fertigbeton-Verkäufe",
+    "dp_kpi_bricks": "Ziegelstein-Verkäufe",
+    "dp_kpi_station1": "Leistung Werk 1",
+    "dp_kpi_station2": "Leistung Werk 2",
+    "dp_kpi_compliance": "Proben-Konformität",
+    "dp_kpi_turnaround": "Mischer-Umlaufzeit",
+    "dp_per_month": "pro Monat",
+    "dp_trajectory": "Monatsverlauf",
+    "dp_depts_title": "Abteilungen & Ziele",
+    "dp_tasks_title": "Aufgabentafel",
+    "dp_edit": "Plan bearbeiten",
+    "dp_export": "CSV exportieren",
+    "dp_reset": "Vorlage zurücksetzen",
+    "dp_save": "Plan speichern",
+    "dp_cancel": "Abbrechen",
+    "dp_add_kpi": "KPI hinzufügen",
+    "dp_current": "Aktuell",
+    "dp_target": "Ziel",
+    "dp_progress": "Fortschritt",
+    "dp_month": "Monat",
+    "dp_dept": "Abteilung",
+    "dp_kpi": "KPI",
+    "dp_tasks": "Monatsaufgabe",
+    "dp_depts": "Abteilungen",
+    "dp_active": "Aktive KPIs",
+    "dp_horizon": "Horizont",
+    "dp_avgProg": "Ø Fortschritt",
+    "dp_now": "Jetzt"
+});

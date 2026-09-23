@@ -454,3 +454,41 @@ Object.assign(TRANSLATIONS['hi'], {
     "nr_title": "नेटवर्क रनर",
     "nr_desc": "संपादित या आयातित नेटवर्क पर IDM इंजन चलाएँ — वैकल्पिक मार्गों के साथ।"
 });
+
+/* Development Plan (R&D) */
+Object.assign(TRANSLATIONS["hi"], {
+    "dp_title": "विकास योजना",
+    "dp_desc": "कारखाने के लक्ष्य — मासिक कार्यों के रूप में हर विभाग में वितरित।",
+    "dp_dept_sales": "बिक्री",
+    "dp_dept_plants": "मिश्रण संयंत्र",
+    "dp_dept_quality": "गुणवत्ता प्रयोगशाला",
+    "dp_dept_logistics": "लॉजिस्टिक्स",
+    "dp_kpi_concrete": "रेडीमिक्स कंक्रीट बिक्री",
+    "dp_kpi_bricks": "ईंट बिक्री",
+    "dp_kpi_station1": "संयंत्र 1 उत्पादन",
+    "dp_kpi_station2": "संयंत्र 2 उत्पादन",
+    "dp_kpi_compliance": "नमूना अनुपालन",
+    "dp_kpi_turnaround": "मिक्सर चक्र समय",
+    "dp_per_month": "प्रति माह",
+    "dp_trajectory": "मासिक प्रक्षेपवक्र",
+    "dp_depts_title": "विभाग और लक्ष्य",
+    "dp_tasks_title": "कार्य बोर्ड",
+    "dp_edit": "योजना संपादित करें",
+    "dp_export": "CSV निर्यात",
+    "dp_reset": "टेम्पलेट रीसेट",
+    "dp_save": "योजना सहेजें",
+    "dp_cancel": "रद्द करें",
+    "dp_add_kpi": "KPI जोड़ें",
+    "dp_current": "वर्तमान",
+    "dp_target": "लक्ष्य",
+    "dp_progress": "प्रगति",
+    "dp_month": "माह",
+    "dp_dept": "विभाग",
+    "dp_kpi": "KPI",
+    "dp_tasks": "मासिक कार्य",
+    "dp_depts": "विभाग",
+    "dp_active": "सक्रिय KPI",
+    "dp_horizon": "क्षितिज",
+    "dp_avgProg": "औसत प्रगति",
+    "dp_now": "अभी"
+});

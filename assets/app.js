@@ -996,6 +996,40 @@
     "cl_desc": "Run your network on the server-side SUMO engine with live WebSocket progress and real trip KPIs.",
     "nr_title": "Network Runner",
     "nr_desc": "Run the IDM engine on your edited or imported network \u2014 with route choice between alternative paths.",
+    "dp_title": "Development Plan",
+    "dp_desc": "The factory\u2019s targets \u2014 distributed to every department as monthly tasks, projected month by month.",
+    "dp_dept_sales": "Sales",
+    "dp_dept_plants": "Batch Plants",
+    "dp_dept_quality": "Quality Lab",
+    "dp_dept_logistics": "Logistics",
+    "dp_kpi_concrete": "Readymix concrete sales",
+    "dp_kpi_bricks": "Bricks / blocks sales",
+    "dp_kpi_station1": "Plant 1 output",
+    "dp_kpi_station2": "Plant 2 output",
+    "dp_kpi_compliance": "Sample compliance",
+    "dp_kpi_turnaround": "Mixer turnaround",
+    "dp_per_month": "per month",
+    "dp_trajectory": "Monthly trajectory",
+    "dp_depts_title": "Departments & targets",
+    "dp_tasks_title": "Task board \u2014 who does what",
+    "dp_edit": "Edit plan",
+    "dp_export": "Export CSV",
+    "dp_reset": "Reset template",
+    "dp_save": "Save plan",
+    "dp_cancel": "Cancel",
+    "dp_add_kpi": "Add KPI",
+    "dp_current": "Current",
+    "dp_target": "Target",
+    "dp_progress": "Progress",
+    "dp_month": "Month",
+    "dp_dept": "Department",
+    "dp_kpi": "KPI",
+    "dp_tasks": "Monthly task",
+    "dp_depts": "Departments",
+    "dp_active": "Active KPIs",
+    "dp_horizon": "Horizon",
+    "dp_avgProg": "Avg progress",
+    "dp_now": "Now",
     "tab_main": "Reference",
     "tab_case": "Case Study",
     "nav_countries": "Countries",
@@ -2669,6 +2703,14 @@ function updateURL() {
     };
   }
 });
+
+/* Expose the translation helper for ES-module sections (e.g. devPlan.js). */
+try {
+  if (typeof t === 'function') window.t = t;
+  Object.defineProperty(window, 'currentLangSafe', {
+    get: function () { return currentLang; }
+  });
+} catch (e) {}
 
 // Initialize SSAM metrics when page loads
 document.addEventListener('DOMContentLoaded', function() {

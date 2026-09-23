@@ -478,3 +478,41 @@ Object.assign(TRANSLATIONS['fr'], {
     "nr_title": "Lanceur de réseau",
     "nr_desc": "Exécutez le moteur IDM sur votre réseau édité ou importé — avec choix d'itinéraire."
 });
+
+/* Development Plan (R&D) */
+Object.assign(TRANSLATIONS["fr"], {
+    "dp_title": "Plan de développement",
+    "dp_desc": "Les objectifs de l'usine – répartis à chaque département comme tâches mensuelles.",
+    "dp_dept_sales": "Ventes",
+    "dp_dept_plants": "Centrales à béton",
+    "dp_dept_quality": "Laboratoire qualité",
+    "dp_dept_logistics": "Logistique",
+    "dp_kpi_concrete": "Ventes béton prêt",
+    "dp_kpi_bricks": "Ventes briques",
+    "dp_kpi_station1": "Production usine 1",
+    "dp_kpi_station2": "Production usine 2",
+    "dp_kpi_compliance": "Conformité échantillons",
+    "dp_kpi_turnaround": "Temps de cycle malaxeur",
+    "dp_per_month": "par mois",
+    "dp_trajectory": "Trajectoire mensuelle",
+    "dp_depts_title": "Départements & objectifs",
+    "dp_tasks_title": "Tableau des tâches",
+    "dp_edit": "Modifier le plan",
+    "dp_export": "Exporter CSV",
+    "dp_reset": "Réinitialiser",
+    "dp_save": "Enregistrer",
+    "dp_cancel": "Annuler",
+    "dp_add_kpi": "Ajouter un KPI",
+    "dp_current": "Actuel",
+    "dp_target": "Objectif",
+    "dp_progress": "Progrès",
+    "dp_month": "Mois",
+    "dp_dept": "Département",
+    "dp_kpi": "KPI",
+    "dp_tasks": "Tâche mensuelle",
+    "dp_depts": "Départements",
+    "dp_active": "KPIs actifs",
+    "dp_horizon": "Horizon",
+    "dp_avgProg": "Progrès moy.",
+    "dp_now": "Maintenant"
+});

@@ -11,6 +11,7 @@
 import { initNavigation } from './navigationManager.js';
 import { createNetworkEditor } from '../editor/networkEditor.js';
 import { createGraphSimRunner } from './graphSimRunner.js';
+import { initDevPlan } from './devPlan.js';
 import { getEmissionFactors } from '../analysis/emissions.js';
 import { getNoiseLevel } from '../analysis/noise.js';
 import { v2xPenetrationImpact } from '../analysis/v2x.js';
@@ -133,12 +134,14 @@ function initRealNetworkEditor() {
     { id: 'sim-lab', label: 'Lab' },
     { id: 'scenario-manager', label: 'Scenarios' },
     { id: 'cloud-run', label: 'Cloud Run' },
-    { id: 'reports-section', label: 'Reports' }
+    { id: 'reports-section', label: 'Reports' },
+    { id: 'dev-plan', label: 'Dev Plan' }
   ]);
 
   wireNavViewSwitching();
   initRealNetworkEditor();
   initNetworkRunner();
+  initDevPlan();
 }
 
 /* ── Network Runner: IDM on the edited/imported graph ─────────────── */

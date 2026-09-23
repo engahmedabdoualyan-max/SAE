@@ -39,6 +39,7 @@ ARTIFACTS.mkdir(parents=True, exist_ok=True)
 SECTIONS = [
     "network-editor", "signal-editor", "calibration-section",
     "advanced-analysis", "scenario-manager", "cloud-run", "reports-section",
+    "dev-plan",
 ]
 
 
@@ -64,6 +65,14 @@ def app_errors(errors: list[str]) -> list[str]:
             continue
         if "net::err_failed" in low:
             continue  # bare resource-load noise from blocked beacons
+        if "maps.googleapis.com" in low or "directions service" in low or "directions_request" in low:
+            continue  # script-tag Google Maps + legacy Directions noise when online
+        if "billing on the google cloud" in low:
+            continue
+        if "weather.googleapis.com" in low or "airquality.googleapis.com" in low:
+            continue  # legacy weather/AQ widgets — 403 on un-billed key when online
+        if "status of 403" in low:
+            continue  # generic resource-loader 403 from online-only Google widgets (console text carries no URL)
         out.append(e)
     return out
 
@@ -383,6 +392,81 @@ def phase2e_network_runner(page, res: Result) -> None:
     res.check("signup endpoint creates working accounts", reg.get("status") == 200 and reg.get("token"), str(reg))
 
 
+def phase2f_dev_plan(page, res: Result) -> None:
+    print("── Phase 2f: development plan (R&D targets → department tasks)")
+
+    state = page.evaluate("""() => {
+        const host = document.getElementById('dev-plan');
+        if (!host) return { error: 'no-section' };
+        const dp = window.SAE_DevPlan;
+        if (!dp) return { error: 'no-api' };
+        const plan = dp.getPlan();
+        const deptCards = host.querySelectorAll('.bg-slate-900.rounded-2xl').length;
+        const rows = host.querySelectorAll('#dp-edit-slot tbody tr').length;
+        const chart = typeof Chart !== 'undefined';
+        const summary = host.querySelectorAll('.col-span-full > input').length;
+        return {
+            depts: plan.departments.length,
+            kpis: plan.departments.reduce((a, d) => a + d.kpis.length, 0),
+            concreteCurrent: plan.departments.find(d => d.id === 'sales')
+                .kpis.find(k => k.id === 'concrete').current,
+            concreteM1: plan.departments.find(d => d.id === 'sales')
+                .kpis.find(k => k.id === 'concrete').targets[0],
+            deptCards, chart,
+        };
+    }""")
+    res.check("dev plan section + API mounted", state.get("error") in (None, ""), str(state))
+    res.check("default template has multiple departments", (state.get("depts") or 0) >= 3, str(state))
+    res.check("concrete sales seeded 5000 → M1 5500", state.get("concreteCurrent") == 5000 and state.get("concreteM1") == 5500, str(state))
+    res.check("KPI cards rendered", (state.get("kpis") or 0) >= 5, str(state))
+    res.check("Chart.js available for trajectory", bool(state.get("chart")), str(state))
+
+    edit = page.evaluate("""() => {
+        window.SAE_DevPlan.toggleEdit();
+        const slot = document.getElementById('dp-edit-slot');
+        if (!slot || !slot.querySelector('input[data-plan="current"]')) return { ok: false };
+        return { ok: true, n: slot.querySelectorAll('input[data-plan]').length };
+    }""")
+    res.check("edit mode opens inline inputs", bool(edit.get("ok")), str(edit))
+
+    commit = page.evaluate("""() => {
+        const slot = document.getElementById('dp-edit-slot');
+        const row = slot.querySelector('div[data-di="0"][data-ki="0"]');
+        if (!row) return { ok: false };
+        row.querySelector('input[data-plan="current"]').value = '5100';
+        window.SAE_DevPlan.commit();
+        const after = window.SAE_DevPlan.getPlan()
+            .departments[0].kpis[0].current;
+        window.SAE_DevPlan.resetToTemplate();
+        const reset = window.SAE_DevPlan.getPlan()
+            .departments[0].kpis[0].current;
+        return { ok: after === 5100 && reset === 5000, after, reset };
+    }""")
+    res.check("edit → save persists → reset restores", bool(commit.get("ok")), str(commit))
+
+    csv = page.evaluate("""() => {
+        const origUrl = URL.createObjectURL;
+        const origClick = HTMLAnchorElement.prototype.click;
+        let downloaded = null;
+        window.__dpCsvBlob = null;
+        URL.createObjectURL = function (b) {
+            downloaded = 'blob';
+            return 'blob:sae-plan';
+        };
+        HTMLAnchorElement.prototype.click = function () {
+            if (this.download && this.href.startsWith('blob:')) {
+                return; /* swallow synthetic click — no navigation side-effects */
+            }
+            return origClick.call(this);
+        };
+        window.SAE_DevPlan.exportCSV();
+        URL.createObjectURL = origUrl;
+        HTMLAnchorElement.prototype.click = origClick;
+        return { downloaded };
+    }""")
+    res.check("CSV export triggers download", bool(csv.get("downloaded")), str(csv))
+
+
 def phase3_cloud_sumo(page, res: Result) -> None:
     print("── Phase 3: cloud SUMO pipeline")
     # Draw a deterministic network through the real editor API.
@@ -561,6 +645,7 @@ def main() -> int:
             phase2c_determinism_mix_calib(page, res)
             phase2d_osm_share_adaptive(page, res)
             phase2e_network_runner(page, res)
+            phase2f_dev_plan(page, res)
             phase3_cloud_sumo(page, res)
         except Exception as exc:  # noqa: BLE001 — report and screenshot
             res.check("suite completed without crash", False, repr(exc)[:300])

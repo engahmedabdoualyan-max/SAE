@@ -479,3 +479,41 @@ Object.assign(TRANSLATIONS['ar'], {
     "nr_title": "مشغّل الشبكة",
     "nr_desc": "شغّل محرك IDM على شبكتك المرسومة أو المستوردة — مع اختيار مسار بين البدائل."
 });
+
+/* Development Plan (R&D) */
+Object.assign(TRANSLATIONS["ar"], {
+    "dp_title": "خطة التطوير",
+    "dp_desc": "أهداف المصنع — موزَّعة على كل قسم كمهام شهرية، وتوقعات شهر بشهر.",
+    "dp_dept_sales": "المبيعات",
+    "dp_dept_plants": "محطات الخلط",
+    "dp_dept_quality": "مختبر الجودة",
+    "dp_dept_logistics": "اللوجستيات",
+    "dp_kpi_concrete": "مبيعات الخرسانة الجاهزة",
+    "dp_kpi_bricks": "مبيعات البلك والطوب",
+    "dp_kpi_station1": "إنتاجية المحطة 1",
+    "dp_kpi_station2": "إنتاجية المحطة 2",
+    "dp_kpi_compliance": "مطابقة العينات",
+    "dp_kpi_turnaround": "زمن دورة الخلاطة",
+    "dp_per_month": "بالشهر",
+    "dp_trajectory": "المسار الشهري",
+    "dp_depts_title": "الأقسام والأهداف",
+    "dp_tasks_title": "لوحة المهام — مين يعمل إيه",
+    "dp_edit": "تعديل الخطة",
+    "dp_export": "تصدير CSV",
+    "dp_reset": "استعادة القالب",
+    "dp_save": "حفظ الخطة",
+    "dp_cancel": "إلغاء",
+    "dp_add_kpi": "إضافة مؤشر",
+    "dp_current": "الحالي",
+    "dp_target": "الهدف",
+    "dp_progress": "نسبة الإنجاز",
+    "dp_month": "الشهر",
+    "dp_dept": "القسم",
+    "dp_kpi": "المؤشر",
+    "dp_tasks": "مهمة شهرية",
+    "dp_depts": "الأقسام",
+    "dp_active": "المؤشرات النشطة",
+    "dp_horizon": "الأفق",
+    "dp_avgProg": "متوسط الإنجاز",
+    "dp_now": "الآن"
+});

@@ -478,3 +478,41 @@ Object.assign(TRANSLATIONS['zh'], {
     "nr_title": "路网运行器",
     "nr_desc": "在编辑或导入的路网上运行IDM引擎——支持备选路径选择。"
 });
+
+/* Development Plan (R&D) */
+Object.assign(TRANSLATIONS["zh"], {
+    "dp_title": "发展计划",
+    "dp_desc": "工厂目标——分配到每个部门作为月度任务。",
+    "dp_dept_sales": "销售",
+    "dp_dept_plants": "搅拌站",
+    "dp_dept_quality": "质量实验室",
+    "dp_dept_logistics": "物流",
+    "dp_kpi_concrete": "商品混凝土销售",
+    "dp_kpi_bricks": "砖块销售",
+    "dp_kpi_station1": "搅拌站1产量",
+    "dp_kpi_station2": "搅拌站2产量",
+    "dp_kpi_compliance": "样品合规率",
+    "dp_kpi_turnaround": "搅拌车周转时间",
+    "dp_per_month": "每月",
+    "dp_trajectory": "月度轨迹",
+    "dp_depts_title": "部门与目标",
+    "dp_tasks_title": "任务板",
+    "dp_edit": "编辑计划",
+    "dp_export": "导出CSV",
+    "dp_reset": "重置模板",
+    "dp_save": "保存计划",
+    "dp_cancel": "取消",
+    "dp_add_kpi": "添加指标",
+    "dp_current": "当前",
+    "dp_target": "目标",
+    "dp_progress": "进度",
+    "dp_month": "月份",
+    "dp_dept": "部门",
+    "dp_kpi": "指标",
+    "dp_tasks": "月度任务",
+    "dp_depts": "部门",
+    "dp_active": "活跃指标",
+    "dp_horizon": "周期",
+    "dp_avgProg": "平均进度",
+    "dp_now": "现在"
+});

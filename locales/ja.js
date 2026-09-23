@@ -454,3 +454,41 @@ Object.assign(TRANSLATIONS['ja'], {
     "nr_title": "ネットワークランナー",
     "nr_desc": "編集・インポートしたネットワーク上でIDMエンジンを実行——経路選択付き。"
 });
+
+/* Development Plan (R&D) */
+Object.assign(TRANSLATIONS["ja"], {
+    "dp_title": "開発計画",
+    "dp_desc": "工場の目標を各部門に月次タスクとして配分。",
+    "dp_dept_sales": "営業",
+    "dp_dept_plants": "ミキシングプラント",
+    "dp_dept_quality": "品質検査室",
+    "dp_dept_logistics": "物流",
+    "dp_kpi_concrete": "生コンクリート販売",
+    "dp_kpi_bricks": "レンガ販売",
+    "dp_kpi_station1": "プラント1生産量",
+    "dp_kpi_station2": "プラント2生産量",
+    "dp_kpi_compliance": "サンプル適合率",
+    "dp_kpi_turnaround": "ミキサー回転時間",
+    "dp_per_month": "/月",
+    "dp_trajectory": "月次軌道",
+    "dp_depts_title": "部門と目標",
+    "dp_tasks_title": "タスクボード",
+    "dp_edit": "計画を編集",
+    "dp_export": "CSVエクスポート",
+    "dp_reset": "テンプレートをリセット",
+    "dp_save": "計画を保存",
+    "dp_cancel": "キャンセル",
+    "dp_add_kpi": "KPIを追加",
+    "dp_current": "現在",
+    "dp_target": "目標",
+    "dp_progress": "進捗",
+    "dp_month": "月",
+    "dp_dept": "部門",
+    "dp_kpi": "KPI",
+    "dp_tasks": "月次タスク",
+    "dp_depts": "部門",
+    "dp_active": "有効なKPI",
+    "dp_horizon": "期間",
+    "dp_avgProg": "平均進捗",
+    "dp_now": "現在"
+});

@@ -478,3 +478,41 @@ Object.assign(TRANSLATIONS['ru'], {
     "nr_title": "Запуск сети",
     "nr_desc": "Запустите IDM-движок на отредактированной или импортированной сети — с выбором маршрута."
 });
+
+/* Development Plan (R&D) */
+Object.assign(TRANSLATIONS["ru"], {
+    "dp_title": "План развития",
+    "dp_desc": "Цели завода, распределённые по отделам как ежемесячные задачи.",
+    "dp_dept_sales": "Продажи",
+    "dp_dept_plants": "Бетонные заводы",
+    "dp_dept_quality": "Лаборатория качества",
+    "dp_dept_logistics": "Логистика",
+    "dp_kpi_concrete": "Продажи готового бетона",
+    "dp_kpi_bricks": "Продажи кирпича",
+    "dp_kpi_station1": "Выработка завода 1",
+    "dp_kpi_station2": "Выработка завода 2",
+    "dp_kpi_compliance": "Соответствие проб",
+    "dp_kpi_turnaround": "Цикл миксера",
+    "dp_per_month": "в месяц",
+    "dp_trajectory": "Ежемесячная траектория",
+    "dp_depts_title": "Отделы и цели",
+    "dp_tasks_title": "Доска задач",
+    "dp_edit": "Изменить план",
+    "dp_export": "Экспорт CSV",
+    "dp_reset": "Сброс шаблона",
+    "dp_save": "Сохранить",
+    "dp_cancel": "Отмена",
+    "dp_add_kpi": "Добавить KPI",
+    "dp_current": "Текущее",
+    "dp_target": "Цель",
+    "dp_progress": "Прогресс",
+    "dp_month": "Месяц",
+    "dp_dept": "Отдел",
+    "dp_kpi": "KPI",
+    "dp_tasks": "Ежемесячная задача",
+    "dp_depts": "Отделы",
+    "dp_active": "Активные KPI",
+    "dp_horizon": "Горизонт",
+    "dp_avgProg": "Ср. прогресс",
+    "dp_now": "Сейчас"
+});

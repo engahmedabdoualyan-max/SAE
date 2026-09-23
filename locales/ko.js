@@ -454,3 +454,41 @@ Object.assign(TRANSLATIONS['ko'], {
     "nr_title": "네트워크 러너",
     "nr_desc": "편집하거나 가져온 네트워크에서 IDM 엔진을 실행——대체 경로 선택 지원."
 });
+
+/* Development Plan (R&D) */
+Object.assign(TRANSLATIONS["ko"], {
+    "dp_title": "개발 계획",
+    "dp_desc": "공장 목표를 각 부서에 월간 작업으로 배분합니다.",
+    "dp_dept_sales": "영업",
+    "dp_dept_plants": "배치 플랜트",
+    "dp_dept_quality": "품질 연구소",
+    "dp_dept_logistics": "물류",
+    "dp_kpi_concrete": "레디믹스 콘크리트 판매",
+    "dp_kpi_bricks": "벽돌 판매",
+    "dp_kpi_station1": "플랜트1 생산량",
+    "dp_kpi_station2": "플랜트2 생산량",
+    "dp_kpi_compliance": "샘플 적합률",
+    "dp_kpi_turnaround": "믹서 회전 시간",
+    "dp_per_month": "월간",
+    "dp_trajectory": "월간 궤적",
+    "dp_depts_title": "부서 및 목표",
+    "dp_tasks_title": "작업 보드",
+    "dp_edit": "계획 편집",
+    "dp_export": "CSV 내보내기",
+    "dp_reset": "템플릿 초기화",
+    "dp_save": "계획 저장",
+    "dp_cancel": "취소",
+    "dp_add_kpi": "KPI 추가",
+    "dp_current": "현재",
+    "dp_target": "목표",
+    "dp_progress": "진행률",
+    "dp_month": "월",
+    "dp_dept": "부서",
+    "dp_kpi": "KPI",
+    "dp_tasks": "월간 작업",
+    "dp_depts": "부서",
+    "dp_active": "활성 KPI",
+    "dp_horizon": "기간",
+    "dp_avgProg": "평균 진행률",
+    "dp_now": "지금"
+});
