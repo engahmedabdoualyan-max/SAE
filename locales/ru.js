@@ -579,5 +579,15 @@ Object.assign(TRANSLATIONS["ru"], {
     "dp_rm_current": "Текущее состояние",
     "dp_rm_target": "Цель",
     "dp_rm_phase_count": "Этапы",
-    "dp_cancel": "Отмена"
+    "dp_cancel": "Отмена",
+    "dp_rm_eac": "Прогноз тенденции",
+    "dp_rm_eac_months": "Прогноз времени",
+    "dp_rm_miss": "Задержка этапа",
+    "dp_rm_advice": "Советник",
+    "dp_rm_advice_faster": "увеличить темп до",
+    "dp_rm_advice_extend": "или продлить до",
+    "dp_rm_or": "или",
+    "dp_rm_report": "Управленческий отчёт",
+    "dp_rm_evals": "Разборы этапов",
+    "dp_rm_feed": "Задача дня для каждого отдела"
 });

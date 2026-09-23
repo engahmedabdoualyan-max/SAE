@@ -65,11 +65,19 @@ All notable changes to SAE AutoSim Hub.
   projects the remaining phases from the achieved value to the goal — the
   classic PMP "plan, evaluate, correct" loop. (المراحل تتوزع المهام وتُقيَّم
   وتُعدَّل الخطة بعد كل مرحلة)
-- **E2E suite grown to 76 checks**: Phase 2f now also covers the PMP roadmap —
-  seeded phases from current→target, advisor brain panel, re-plan distributing
-  phases *and* syncing the concrete KPI, evaluation guard (actual required),
-  evaluating a phase closing it and opening the next, SPI/verdict computation,
-  re-baseline after review, and reset restoring the default phase plan.
+- **Advisor console with trend forecast & corrective action** in the roadmap:
+  when a phase closes behind plan (SPI < 1) the brain computes an EVM-style
+  **EAC** (estimated completion = horizon/SPI), the forecast milestone miss in
+  months, and a concrete corrective recommendation — raise the monthly pace to
+  `X` or extend the horizon to `Y` months. A **"today's job for every
+  department"** feed reuses the capacity model for the *active phase's* target,
+  printing daily output, rev. est., mixers and samples required right now. A
+  **management report** export (text file) summarises plan, phases, SPI/variance
+  and every phase review for sign-off.
+- **E2E suite grown to 80 checks**: Phase 2f now also verifies the active-phase
+  daily task feed, the behind-plan EAC trend forecast + corrective advice, the
+  management-report export (SPI + phases), and a final reset restoring the clean
+  plan.
 - **Engine-driven calibration**: the wizard's grid search now runs the real
   simulation per candidate (12 seeded runs) and scores GEH against loop
   detector flows normalized per lane — replacing a mocked search.

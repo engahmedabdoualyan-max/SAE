@@ -555,5 +555,15 @@ Object.assign(TRANSLATIONS["hi"], {
     "dp_rm_current": "वर्तमान स्थिति",
     "dp_rm_target": "लक्ष्य",
     "dp_rm_phase_count": "चरण",
-    "dp_cancel": "रद्द करें"
+    "dp_cancel": "रद्द करें",
+    "dp_rm_eac": "रुझान पूर्वानुमान",
+    "dp_rm_eac_months": "अनुमानित समय",
+    "dp_rm_miss": "माइलस्टोन विलंब",
+    "dp_rm_advice": "सलाहकार",
+    "dp_rm_advice_faster": "गति बढ़ाएँ",
+    "dp_rm_advice_extend": "या बढ़ाएँ",
+    "dp_rm_or": "या",
+    "dp_rm_report": "प्रबंधन रिपोर्ट",
+    "dp_rm_evals": "चरण समीक्षा",
+    "dp_rm_feed": "प्रत्येक विभाग का आज का कार्य"
 });

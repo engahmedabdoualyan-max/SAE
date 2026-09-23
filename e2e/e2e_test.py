@@ -601,6 +601,59 @@ def phase2f_dev_plan(page, res: Result) -> None:
     }""")
     res.check("roadmap: reset restores default phase plan", bool(roadreset.get("ok")), str(roadreset))
 
+    feed = page.evaluate("""() => {
+        const f = window.SAE_DevPlan.roadDeptFeed();
+        const host = document.querySelector('[data-key="dp_rm_feed"]');
+        return {
+            ok: f && f.plannedEnd > 0 && f.daily > 0 && f.mixers > 0 && f.revenue > 0,
+            feed: !!host, plannedEnd: f.plannedEnd, daily: f.daily, mixers: f.mixers,
+        };
+    }""")
+    res.check("roadmap: daily task feed for the active phase", bool(feed.get("ok") and feed.get("feed")), str(feed))
+
+    trend = page.evaluate("""() => {
+        window.SAE_DevPlan.updateRoadmap({ current: 5000, target: 6500, horizon: 6, phaseCount: 3 });
+        const a = document.querySelector('#dp-eval-1 input[data-actual]');
+        if (!a) return { error: 'no-eval' };
+        a.value = '5200'; /* behind the phase-1 target (≈5500) */
+        const out = window.SAE_DevPlan.evaluatePhase(1);
+        const ana = window.SAE_DevPlan.roadAnalytics();
+        return {
+            ok: !!out && out.ok && ana.spi !== null && ana.spi < 1
+                && ana.eacMonths !== null && ana.eacMonths > 6
+                && ana.advice && ana.advice.fasterRate > ana.perMonth,
+            spi: ana.spi, eac: ana.eacMonths, late: ana.monthsLate,
+            advice: ana.advice && ana.advice.fasterRate,
+        };
+    }""")
+    res.check("roadmap: EAC trend forecast & corrective advice when behind", bool(trend.get("ok")), str(trend))
+
+    report = page.evaluate("""() => {
+        const origUrl = URL.createObjectURL;
+        const origClick = HTMLAnchorElement.prototype.click;
+        let downloaded = null;
+        URL.createObjectURL = function (b) { downloaded = 'blob'; return 'blob:sae-report'; };
+        HTMLAnchorElement.prototype.click = function () {
+            if (this.download && this.href.startsWith('blob:')) return;
+            return origClick.call(this);
+        };
+        const rep = window.SAE_DevPlan.exportReport();
+        URL.createObjectURL = origUrl;
+        HTMLAnchorElement.prototype.click = origClick;
+        return {
+            ok: downloaded === 'blob' && rep && rep.text.includes('SPI') && rep.text.split('\\n').length >= 5,
+            lines: rep.text.split('\\n').length,
+        };
+    }""")
+    res.check("roadmap: management report exports (SPI + phases)", bool(report.get("ok")), str(report))
+
+    roadreset2 = page.evaluate("""() => {
+        window.SAE_DevPlan.resetToTemplate();
+        const r = window.SAE_DevPlan.getRoadmap();
+        return { ok: r.phases[0].status === 'active' && r.rebaselined === false, phases: r.phases.length };
+    }""")
+    res.check("roadmap: final reset restores clean plan", bool(roadreset2.get("ok")), str(roadreset2))
+
 
 def phase3_cloud_sumo(page, res: Result) -> None:
     print("── Phase 3: cloud SUMO pipeline")

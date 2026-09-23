@@ -555,5 +555,15 @@ Object.assign(TRANSLATIONS["ko"], {
     "dp_rm_current": "현재 상태",
     "dp_rm_target": "목표",
     "dp_rm_phase_count": "단계 수",
-    "dp_cancel": "취소"
+    "dp_cancel": "취소",
+    "dp_rm_eac": "추세 예측",
+    "dp_rm_eac_months": "예상 시간",
+    "dp_rm_miss": "마일스톤 지연",
+    "dp_rm_advice": "자문관",
+    "dp_rm_advice_faster": "속도를 높여",
+    "dp_rm_advice_extend": "또는 연장",
+    "dp_rm_or": "또는",
+    "dp_rm_report": "경영 보고서",
+    "dp_rm_evals": "단계 검토",
+    "dp_rm_feed": "각 부서의 오늘 과제"
 });

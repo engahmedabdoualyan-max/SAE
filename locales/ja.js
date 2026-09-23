@@ -555,5 +555,15 @@ Object.assign(TRANSLATIONS["ja"], {
     "dp_rm_current": "現在の状態",
     "dp_rm_target": "目標",
     "dp_rm_phase_count": "フェーズ数",
-    "dp_cancel": "キャンセル"
+    "dp_cancel": "キャンセル",
+    "dp_rm_eac": "トレンド予測",
+    "dp_rm_eac_months": "予測時間",
+    "dp_rm_miss": "マイルストーン遅延",
+    "dp_rm_advice": "アドバイザー",
+    "dp_rm_advice_faster": "ペースを引き上げ",
+    "dp_rm_advice_extend": "または延長",
+    "dp_rm_or": "または",
+    "dp_rm_report": "管理レポート",
+    "dp_rm_evals": "フェーズレビュー",
+    "dp_rm_feed": "各部門の今日のタスク"
 });

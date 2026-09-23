@@ -579,5 +579,15 @@ Object.assign(TRANSLATIONS["fr"], {
     "dp_rm_current": "État actuel",
     "dp_rm_target": "Objectif",
     "dp_rm_phase_count": "Phases",
-    "dp_cancel": "Annuler"
+    "dp_cancel": "Annuler",
+    "dp_rm_eac": "Prévision de tendance",
+    "dp_rm_eac_months": "Durée prévue",
+    "dp_rm_miss": "Retard de jalon",
+    "dp_rm_advice": "Conseiller",
+    "dp_rm_advice_faster": "augmenter le rythme à",
+    "dp_rm_advice_extend": "ou prolonger à",
+    "dp_rm_or": "ou",
+    "dp_rm_report": "Rapport de gestion",
+    "dp_rm_evals": "Revues de phase",
+    "dp_rm_feed": "Tâche du jour pour chaque service"
 });

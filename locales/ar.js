@@ -580,5 +580,15 @@ Object.assign(TRANSLATIONS["ar"], {
     "dp_rm_current": "الوضع الحالي",
     "dp_rm_target": "هدف الوصول",
     "dp_rm_phase_count": "عدد المراحل",
-    "dp_cancel": "إلغاء"
+    "dp_cancel": "إلغاء",
+    "dp_rm_eac": "توقُّع الاتجاه",
+    "dp_rm_eac_months": "الزمن المتوقع",
+    "dp_rm_miss": "تأخر المرحلة",
+    "dp_rm_advice": "المستشار",
+    "dp_rm_advice_faster": "ارفع الوتيرة إلى",
+    "dp_rm_advice_extend": "او مِدّ حتى",
+    "dp_rm_or": "أو",
+    "dp_rm_report": "تقرير إداري",
+    "dp_rm_evals": "مراجعات المراحل",
+    "dp_rm_feed": "مهمة اليوم لكل قسم"
 });

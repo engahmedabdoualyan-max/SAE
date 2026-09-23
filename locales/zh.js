@@ -579,5 +579,15 @@ Object.assign(TRANSLATIONS["zh"], {
     "dp_rm_current": "当前状态",
     "dp_rm_target": "目标",
     "dp_rm_phase_count": "阶段数",
-    "dp_cancel": "取消"
+    "dp_cancel": "取消",
+    "dp_rm_eac": "趋势预测",
+    "dp_rm_eac_months": "预计时间",
+    "dp_rm_miss": "里程碑延误",
+    "dp_rm_advice": "顾问",
+    "dp_rm_advice_faster": "将节奏提升至",
+    "dp_rm_advice_extend": "或延长至",
+    "dp_rm_or": "或",
+    "dp_rm_report": "管理报告",
+    "dp_rm_evals": "阶段评审",
+    "dp_rm_feed": "各部门今日任务"
 });

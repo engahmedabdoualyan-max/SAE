@@ -659,14 +659,12 @@ function findKpi(deptId, kpiId) {
   return d ? (d.kpis.find((k) => k.id === kpiId) || null) : null;
 }
 
-/* القيم المحسوبة من التارجت + الافتراضات (بدون أي منطق عرض). */
-function computeOps() {
-  const concrete = findKpi('sales', 'concrete');
+/* القيم المحسوبة من تارجت معيّن + الافتراضات (بدون أي منطق عرض). */
+function opsModel(target) {
   const turnaround = findKpi('logistics', 'turnaround');
   const stations = (deptById('plants') || {}).kpis || [];
   const out = { salesTarget: 0, daily: 0, tripsPerDay: 0, cycleMin: 0, tripsPerMixer: 0, mixers: 0, samples: 0, revenue: 0, stations: [], util: 0 };
-  if (!concrete || !turnaround) return out;
-  const target = concrete.targets[opsMonth] || concrete.current || 0;
+  if (!turnaround) return out;
   const buf = 1 + (ops.reservePct || 0) / 100;
   const daily = target / Math.max(1, ops.workingDays) * buf;
   const tripsPerDay = daily / Math.max(0.1, ops.mixerLoad);
@@ -693,6 +691,12 @@ function computeOps() {
     return { nameKey: k.nameKey, unit: k.unit || 'm³', req: Math.round(req), util: Math.max(0, Math.min(400, u)) };
   });
   return out;
+}
+
+function computeOps() {
+  const concrete = findKpi('sales', 'concrete');
+  if (!concrete) return opsModel(0);
+  return opsModel(concrete.targets[opsMonth] || concrete.current || 0);
 }
 
 function opsInput(labelKey, attr, step) {
@@ -882,6 +886,7 @@ function roadAnalytics() {
     growthPct: r.current ? Math.round((monthStep / r.current) * 1000) / 10 : 0,
     spi: null, variance: null, verdict: 'idle', phaseIdx: 0, planPct: 0, donePct: 0,
     remaining: 0, needed: 0, scheduleRisk: false,
+    eacMonths: null, monthsLate: 0, advice: null,
     messages: [],
   };
   const activeIdx = r.phases.findIndex((p) => p.status === 'active');
@@ -898,13 +903,92 @@ function roadAnalytics() {
     a.remaining = r.target - last.actualValue;
     const monthsLeft = last.endMonth ? Math.max(1, r.horizon - last.endMonth) : r.horizon;
     a.needed = Math.round((a.remaining / monthsLeft) * 10) / 10;
-    if (a.spi < 0.95) a.scheduleRisk = true;
+    /* EAC (زمنيًا): كم شهرًا سيستغرق الهدف لو استمر الإيقاع الحالي؟ */
+    a.eacMonths = Math.round((r.horizon / a.spi) * 10) / 10;
+    a.monthsLate = Math.round((a.eacMonths - r.horizon) * 10) / 10;
+    if (a.spi < 1.0) a.scheduleRisk = true;
+    if (a.scheduleRisk) {
+      a.advice = {
+        lateMonths: a.monthsLate,
+        fasterRate: a.needed,
+        extendTo: Math.ceil(a.remaining / Math.max(1, a.perMonth) + (last.endMonth || 0)),
+      };
+    }
   } else {
     a.planPct = 0; a.donePct = 0;
     a.remaining = r.target - r.current;
     a.needed = a.perMonth;
   }
   return a;
+}
+
+/* طلب اليوم لكل قسم خلال المرحلة النشطة (يوزّع المهام من خطة المرحلة). */
+function roadDeptFeed() {
+  const r = ensureRoadmap();
+  const active = r.phases.find((p) => p.status === 'active') || r.phases[r.phases.length - 1];
+  const c = opsModel(active ? active.plannedEnd : r.target);
+  return {
+    phase: active ? active.id : null,
+    plannedEnd: active ? active.plannedEnd : r.target,
+    daily: c.daily, util: c.util, mixers: c.mixers, tripsPerDay: c.tripsPerDay,
+    samples: c.samples, revenue: c.revenue, cycleMin: c.cycleMin,
+  };
+}
+
+/* تقرير إداري نصي: ملخص الخطة والمراحل والتقييمات والتوصيات. */
+function roadReport() {
+  const r = ensureRoadmap();
+  const a = roadAnalytics();
+  const lines = [];
+  lines.push(tr('dp_rm_title') + ' — ' + r.goalName);
+  lines.push(tr('dp_rm_current') + ': ' + fmtNum(r.current) + ' → ' + tr('dp_rm_target') + ': ' + fmtNum(r.target) + ' (' + r.horizon + ' ' + tr('dp_rm_months') + ')');
+  lines.push(tr('dp_rm_rate') + ': ' + fmtNum(a.perMonth) + ' · ' + tr('dp_rm_growth') + ': ' + a.growthPct + '%');
+  r.phases.forEach((p) => {
+    lines.push(tr('dp_rm_phase') + ' ' + p.id + ' M' + p.startMonth + '–' + p.endMonth + ' → ' + fmtNum(p.plannedEnd)
+      + (p.actualValue !== null && p.actualValue !== undefined ? ' | ' + tr('dp_rm_actual') + ': ' + fmtNum(p.actualValue) + ' (' + p.status + ')' : ''));
+  });
+  if (a.spi !== null) {
+    lines.push('SPI: ' + a.spi + ' · ' + tr('dp_rm_variance') + ': ' + (a.variance >= 0 ? '+' : '') + a.variance + '% · ' + tr('dp_rm_verdict') + ': ' + (a.scheduleRisk ? tr('dp_rm_late') : tr('dp_rm_on_track')));
+    if (a.advice) {
+      lines.push(tr('dp_rm_advice') + ': ' + tr('dp_rm_advice_faster') + ' ' + fmtNum(a.advice.fasterRate) + '/mo · ' + tr('dp_rm_advice_extend') + ' ' + a.advice.extendTo + ' ' + tr('dp_rm_months'));
+    }
+  }
+  if (r.evaluations.length) {
+    lines.push('--- ' + tr('dp_rm_evals') + ' ---');
+    r.evaluations.forEach((e) => {
+      lines.push('P' + e.phase + ': ' + fmtNum(e.planned) + ' → ' + fmtNum(e.actual) + ' (SPI ' + e.spi + ', ' + (e.variance >= 0 ? '+' : '') + e.variance + '%)' + (e.notes ? ' · ' + e.notes : ''));
+    });
+  }
+  return { title: tr('dp_rm_title'), text: lines.join('\n'), analytics: a };
+}
+
+function roadFeedHtml() {
+  const f = roadDeptFeed();
+  if (!f) return '';
+  const icon = (name) => { const d = deptById(name); return d ? (d.icon || 'fa-building') : 'fa-building'; };
+  return '' +
+    '      <div class="mt-3 pt-3 border-t border-slate-700/60">' +
+    '        <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-2"><i class="fas fa-bullseye mr-1"></i><span data-key="dp_rm_feed">Today\u2019s job for every department</span></div>' +
+    '        <div class="grid grid-cols-2 gap-1.5 text-[10px]">' +
+            `<div class="flex items-center gap-1.5 px-2 py-1 rounded-md bg-slate-800/70"><i class="fas fa-coins text-slate-400 w-3"></i><span data-key="dp_ops_rev">Revenue est.</span><b class="ml-auto font-mono text-white">${Math.round(f.revenue / 1000)}k</b></div>` +
+            `<div class="flex items-center gap-1.5 px-2 py-1 rounded-md bg-slate-800/70"><i class="fas fa-industry text-slate-400 w-3"></i><span data-key="dp_ops_dayreq">req daily</span><b class="ml-auto font-mono text-white">${f.daily}</b></div>` +
+            `<div class="flex items-center gap-1.5 px-2 py-1 rounded-md bg-slate-800/70"><i class="fas fa-truck fa-flip-horizontal text-slate-400 w-3"></i><span data-key="dp_ops_mixers">mixers</span><b class="ml-auto font-mono text-white">${f.mixers}</b></div>` +
+            `<div class="flex items-center gap-1.5 px-2 py-1 rounded-md bg-slate-800/70"><i class="fas fa-vials text-slate-400 w-3"></i><span data-key="dp_ops_samples">samples</span><b class="ml-auto font-mono text-white">${f.samples}</b></div>` +
+    '        </div>' +
+    '      </div>';
+}
+
+function roadEacHtml(a) {
+  if (a.spi === null) return '';
+  return '' +
+    '      <div class="mt-3 pt-3 border-t border-slate-700/60 space-y-2">' +
+    '        <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400"><i class="fas fa-chart-line mr-1"></i><span data-key="dp_rm_eac">Trend forecast</span></div>' +
+    '        <div class="flex items-center gap-2"><span class="w-24 text-[10px] text-slate-400">' + tr('dp_rm_eac_months') + '</span><b class="font-mono text-cyan-300">' + a.eacMonths + ' <span class="text-slate-400">' + tr('dp_rm_months') + '</span></b></div>' +
+    '        <div class="flex items-center gap-2"><span class="w-24 text-[10px] text-slate-400">' + tr('dp_rm_miss') + '</span><b class="font-mono ' + (a.monthsLate > 0 ? 'text-rose-300' : 'text-emerald-300') + '">' + (a.monthsLate > 0 ? '+' : '') + a.monthsLate + ' ' + tr('dp_rm_months') + '</b></div>' +
+    (a.advice
+      ? '<div class="px-2.5 py-2 rounded-lg bg-amber-500/10 border border-amber-500/30 text-[10px] text-amber-200 leading-relaxed"><i class="fas fa-lightbulb mr-1"></i><span data-key="dp_rm_advice">Advisor</span>: <span data-key="dp_rm_advice_faster">raise pace to</span> <b class="font-mono">' + fmtNum(a.advice.fasterRate) + '</b>/mo <span data-key="dp_rm_or">or</span> <span data-key="dp_rm_advice_extend">extend to</span> <b class="font-mono">' + a.advice.extendTo + '</b> ' + tr('dp_rm_months') + '</div>'
+      : '') +
+    '      </div>';
 }
 
 /* تقييم مرحلة: الفعلي مقابل المخطط → تحديث الحالة + المتابعة التالية. */
@@ -1034,6 +1118,7 @@ function roadmapSectionHtml() {
     '      <div class="flex flex-wrap gap-2 mt-4">' +
     '        <button onclick="SAE_DevPlan && SAE_DevPlan.openRoadForm()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 rounded-lg text-xs font-semibold"><i class="fas fa-sliders mr-1"></i><span data-key="dp_rm_config">Define current → target → time</span></button>' +
     '        <button onclick="SAE_DevPlan && SAE_DevPlan.rebaseline()" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-xs font-semibold"><i class="fas fa-wave-square mr-1"></i><span data-key="dp_rm_rebase">Re-baseline after review</span></button>' +
+    '        <button onclick="SAE_DevPlan && SAE_DevPlan.exportReport()" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-xs font-semibold"><i class="fas fa-file-excel mr-1"></i><span data-key="dp_rm_report">Management report</span></button>' +
     '      </div>' +
     '      <div id="dp-road-edit" class="mt-4"></div>' +
     '    </div>' +
@@ -1049,12 +1134,14 @@ function roadmapSectionHtml() {
     spiHtml + remainingHtml +
     '        <div class="flex items-center gap-2"><span class="w-24 text-[10px] text-slate-400">' + tr('dp_rm_verdict') + '</span>' + verdictHtml + '</div>' +
     '      </div>' +
+    roadEacHtml(anal) +
     '      <div class="mt-3 pt-3 border-t border-slate-700/60 space-y-2">' +
     '        <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400"><i class="fas fa-list-check mr-1"></i><span data-key="dp_rm_tasks">Who carries the goal</span></div>' +
     '        <div class="flex flex-wrap gap-1.5">' +
     plan.departments.map((d) => '<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-slate-800 text-[10px] text-slate-300"><i class="fas ' + d.icon + ' text-slate-400"></i><span data-key="' + d.nameKey + '">' + tr(d.nameKey) + '</span></span>').join('') +
     '        </div>' +
     '      </div>' +
+    roadFeedHtml() +
     (plan.roadmap.rebaselined ? '<div class="mt-3 px-3 py-2 rounded-lg bg-violet-500/10 border border-violet-500/30 text-[10px] text-violet-200"><i class="fas fa-wave-square mr-1"></i><span data-key="dp_rm_rebaselined">Plan re-baselined after the last review.</span></div>' : '') +
     '    </div>' +
     '  </div>';
@@ -1095,6 +1182,22 @@ function cancelRoadForm() {
   if (slot) slot.innerHTML = '';
 }
 
+function exportReport() {
+  const rep = roadReport();
+  try {
+    const blob = new Blob([rep.text], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'sae-development-plan-report.txt';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 1500);
+  } catch (e) { /* storage blocked */ }
+  return rep;
+}
+
 /* ── إقلاع + إعادة رسم عند تغيير اللغة ───────────────────────────────── */
 
 let langObserver = null;
@@ -1115,6 +1218,9 @@ function initDevPlan() {
     updateRoadmap, evaluatePhase, rebaseline,
     openRoadForm, applyRoadForm, cancelRoadForm,
     roadAnalytics: () => roadAnalytics(),
+    roadDeptFeed: () => roadDeptFeed(),
+    roadReport: () => roadReport(),
+    exportReport,
     getRoadmap: () => ensureRoadmap(),
   };
   return window.SAE_DevPlan;

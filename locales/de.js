@@ -579,5 +579,15 @@ Object.assign(TRANSLATIONS["de"], {
     "dp_rm_current": "Ist-Zustand",
     "dp_rm_target": "Ziel",
     "dp_rm_phase_count": "Phasen",
-    "dp_cancel": "Abbrechen"
+    "dp_cancel": "Abbrechen",
+    "dp_rm_eac": "Trend-Prognose",
+    "dp_rm_eac_months": "Prognosezeit",
+    "dp_rm_miss": "Meilenstein-Verzug",
+    "dp_rm_advice": "Berater",
+    "dp_rm_advice_faster": "Tempo erhöhen auf",
+    "dp_rm_advice_extend": "oder verlängern auf",
+    "dp_rm_or": "oder",
+    "dp_rm_report": "Managementbericht",
+    "dp_rm_evals": "Phasen-Reviews",
+    "dp_rm_feed": "Heutiger Auftrag für jede Abteilung"
 });
