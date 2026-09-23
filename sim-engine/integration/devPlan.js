@@ -392,8 +392,19 @@ function render() {
     '      </div>' +
     '      <div id="dp-edit-slot" class="mt-4"></div>' +
     '    </div>' +
+    '  </div>' +
+    '  <div class="mt-6 bg-slate-900 rounded-2xl border border-slate-700/70 p-5">' +
+    '    <div class="flex items-center gap-3 mb-4">' +
+    '      <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-slate-600 to-slate-800 flex items-center justify-center text-white text-sm"><i class="fas fa-calculator"></i></div>' +
+    '      <div>' +
+    '        <div class="text-base font-bold text-white" data-key="dp_ops_title">Capacity planner</div>' +
+    '        <div class="text-[10px] text-slate-400" data-key="dp_ops_desc">Turn the monthly concrete target into an everyday task for every department.</div>' +
+    '      </div>' +
+    '    </div>' +
+    '    <div id="dp-ops"></div>' +
     '  </div>';
   translateDynamic();
+  renderOps();
   renderChart();
 }
 
@@ -609,11 +620,177 @@ function exportCSV() {
   setTimeout(() => URL.revokeObjectURL(a.href), 3000);
 }
 
+/* ── حاسبة القدرة التشغيلية: من التارجت الشهري للمهمة اليومية ───────── */
+
+const OPS_KEY = 'sae-devplan-ops-v1';
+const opsDefaults = {
+  workingDays: 26,
+  mixerLoad: 7,
+  shiftHours: 12,
+  loadUnload: 20,
+  reservePct: 8,
+  pricePerM3: 900,
+  sampleEvery: 60,
+};
+let ops = null;
+let opsMonth = 0;
+
+function loadOps() {
+  try {
+    const raw = localStorage.getItem(OPS_KEY);
+    if (raw) {
+      const p = JSON.parse(raw);
+      if (p && typeof p === 'object') { ops = Object.assign({}, opsDefaults, p); return; }
+    }
+  } catch (e) { /* corrupt */ }
+  ops = Object.assign({}, opsDefaults);
+  saveOps();
+}
+function saveOps() {
+  try { localStorage.setItem(OPS_KEY, JSON.stringify(ops)); } catch (e) { /* storage blocked */ }
+}
+
+function findKpi(deptId, kpiId) {
+  const d = deptById(deptId);
+  return d ? (d.kpis.find((k) => k.id === kpiId) || null) : null;
+}
+
+/* القيم المحسوبة من التارجت + الافتراضات (بدون أي منطق عرض). */
+function computeOps() {
+  const concrete = findKpi('sales', 'concrete');
+  const turnaround = findKpi('logistics', 'turnaround');
+  const stations = (deptById('plants') || {}).kpis || [];
+  const out = { salesTarget: 0, daily: 0, tripsPerDay: 0, cycleMin: 0, tripsPerMixer: 0, mixers: 0, samples: 0, revenue: 0, stations: [], util: 0 };
+  if (!concrete || !turnaround) return out;
+  const target = concrete.targets[opsMonth] || concrete.current || 0;
+  const buf = 1 + (ops.reservePct || 0) / 100;
+  const daily = target / Math.max(1, ops.workingDays) * buf;
+  const tripsPerDay = daily / Math.max(0.1, ops.mixerLoad);
+  const cycleMin = (turnaround.targets[opsMonth] || turnaround.current || 0) + (ops.loadUnload || 0);
+  const tripsPerMixer = Math.max(1, Math.round((ops.shiftHours * 60) / Math.max(1, cycleMin)));
+  const mixers = Math.max(1, Math.ceil(tripsPerDay / tripsPerMixer));
+  const samples = Math.ceil(target / Math.max(1, ops.sampleEvery));
+  const curSum = stations.reduce((a, k) => a + (k.current || 0), 0);
+  const totalDaily = curSum / Math.max(1, ops.workingDays);
+  out.salesTarget = Math.round(target);
+  out.daily = Math.round(daily);
+  out.tripsPerDay = Math.round(tripsPerDay * 10) / 10;
+  out.cycleMin = Math.round(cycleMin);
+  out.tripsPerMixer = tripsPerMixer;
+  out.mixers = mixers;
+  out.samples = samples;
+  out.revenue = Math.round(target * (ops.pricePerM3 || 0));
+  out.util = totalDaily ? Math.round((daily / totalDaily) * 100) : 0;
+  out.stations = stations.map((k) => {
+    const curDaily = (k.current || 0) / Math.max(1, ops.workingDays);
+    const share = curSum ? (k.current || 0) / curSum : 0;
+    const req = daily * share;
+    const u = curDaily ? Math.round((req / curDaily) * 100) : 0;
+    return { nameKey: k.nameKey, unit: k.unit || 'm³', req: Math.round(req), util: Math.max(0, Math.min(400, u)) };
+  });
+  return out;
+}
+
+function opsInput(labelKey, attr, step) {
+  return `<label class="flex flex-col gap-1 text-[9px] text-slate-500">
+    <span data-key="${labelKey}">${labelKey}</span>
+    <input data-op="${attr}" type="number" step="${step || '1'}" value="${ops[attr]}" onchange="SAE_DevPlan && SAE_DevPlan.setOps('${attr}', this.value)"
+      class="w-full px-2 py-1.5 bg-slate-800 border border-slate-600 rounded text-xs text-white font-mono"></label>`;
+}
+
+function renderOps() {
+  const host = document.getElementById('dp-ops');
+  if (!host || !ops) return;
+  const c = computeOps();
+  const monthBtns = () => {
+    let html = '';
+    for (let m = 0; m < plan.horizon; m++) {
+      html += `<button onclick="SAE_DevPlan && SAE_DevPlan.setOpsMonth(${m})" class="px-3 py-1.5 rounded-lg text-xs font-bold transition ${m === opsMonth ? 'bg-cyan-600 text-white' : 'bg-slate-800 text-slate-300 hover:bg-slate-700'}">${tr('dp_month')} ${m + 1}</button>`;
+    }
+    return html;
+  };
+  const stationRows = c.stations.length ? c.stations.map((s) => `
+      <div class="flex items-center gap-2 py-1 border-b border-slate-800 last:border-0">
+        <span class="text-[10px] text-slate-300 flex-1 truncate" data-key="${s.nameKey}">${s.nameKey}</span>
+        <span class="text-[10px] text-slate-400 font-mono">${s.req} ${s.unit}</span>
+        <div class="w-16 h-1.5 rounded-full bg-slate-700 overflow-hidden">
+          <div class="h-full ${s.util > 100 ? 'bg-rose-500' : 'bg-emerald-500'} rounded-full" style="width:${Math.min(100, s.util)}%"></div>
+        </div>
+        <span class="text-[10px] w-8 text-right font-mono ${s.util > 100 ? 'text-rose-300' : 'text-emerald-300'}">${s.util}%</span>
+      </div>`).join('') : '<div class="text-slate-500 text-[10px] py-2">—</div>';
+  host.innerHTML =
+    '<div class="flex flex-col lg:flex-row gap-6">' +
+    /* الافتراضات */
+    '  <div class="lg:w-72 shrink-0">' +
+    '    <div class="text-[11px] font-bold text-slate-400 mb-3"><i class="fas fa-sliders mr-1"></i><span data-key="dp_ops_assume">Assumptions</span></div>' +
+    '    <div class="grid grid-cols-2 gap-2">' +
+    opsInput('dp_a_days', 'workingDays') + opsInput('dp_a_load', 'mixerLoad', '0.5') +
+    opsInput('dp_a_shift', 'shiftHours', '0.5') + opsInput('dp_a_unload', 'loadUnload') +
+    opsInput('dp_a_reserve', 'reservePct') + opsInput('dp_a_price', 'pricePerM3', '50') +
+    opsInput('dp_a_sample', 'sampleEvery') +
+    '    </div>' +
+    '  </div>' +
+    /* النتائج */
+    '  <div class="flex-1">' +
+    '    <div class="flex flex-wrap items-center justify-between gap-2 mb-3">' +
+    '      <div class="flex gap-2">' + monthBtns() + '</div>' +
+    '      <div class="flex items-center gap-2 text-[10px] text-slate-400"><i class="fas fa-bullseye text-cyan-400"></i>' +
+    `        <span>${tr('dp_ops_target')}</span>: <b class="text-cyan-300 font-mono">${c.salesTarget} m³/${tr('dp_month').toLowerCase()} ${opsMonth + 1}</b></div>` +
+    '    </div>' +
+    '    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">' +
+    /* المبيعات */
+    '      <div class="bg-slate-800 rounded-xl border border-slate-700/70 p-4">' +
+    '        <div class="text-[10px] uppercase tracking-wider text-slate-400 mb-2"><i class="fas fa-sack-dollar text-emerald-400 mr-1"></i><span data-key="dp_dept_sales">Sales</span></div>' +
+    `        <div class="text-2xl font-extrabold text-white font-mono">${c.salesTarget.toLocaleString()}</div>` +
+    '        <div class="text-[9px] text-slate-400 mt-1" data-key="dp_per_month">per month</div>' +
+    `        <div class="mt-2 pt-2 border-t border-slate-700/60 text-[10px] text-slate-400">${tr('dp_ops_rev')}: <b class="text-emerald-300 font-mono">${c.revenue.toLocaleString()}</b></div>` +
+    '      </div>' +
+    /* المحطات */
+    '      <div class="bg-slate-800 rounded-xl border border-slate-700/70 p-4">' +
+    '        <div class="text-[10px] uppercase tracking-wider text-slate-400 mb-2"><i class="fas fa-industry text-cyan-400 mr-1"></i><span data-key="dp_dept_plants">Batch Plants</span></div>' +
+    `        <div class="text-2xl font-extrabold text-white font-mono">${c.daily.toLocaleString()} <span class="text-sm text-slate-400">m³</span></div>` +
+    '        <div class="text-[9px] text-slate-400 mt-1" data-key="dp_ops_dayreq">required daily (w/ buffer)</div>' +
+    `        <div class="mt-1 text-[10px] text-slate-400">${tr('dp_ops_util')}: <b class="${c.util > 100 ? 'text-rose-300' : 'text-emerald-300'} font-mono">${c.util}%</b></div>` +
+    '        <div class="mt-2">' + stationRows + '</div>' +
+    '      </div>' +
+    /* اللوجستيات */
+    '      <div class="bg-slate-800 rounded-xl border border-slate-700/70 p-4">' +
+    '        <div class="text-[10px] uppercase tracking-wider text-slate-400 mb-2"><i class="fas fa-truck-fast text-amber-400 mr-1"></i><span data-key="dp_dept_logistics">Logistics</span></div>' +
+    `        <div class="text-2xl font-extrabold text-white font-mono">${c.mixers} <span class="text-sm text-slate-400">${tr('dp_ops_mixers')}</span></div>` +
+    '        <div class="text-[9px] text-slate-400 mt-1 flex flex-col gap-0.5">' +
+    `          <span>${tr('dp_ops_trips')}: <b class="text-amber-300 font-mono">${c.tripsPerDay}</b></span>` +
+    `          <span>${tr('dp_ops_cycle')}: <b class="text-slate-200 font-mono">${c.cycleMin} ${tr('dp_unit_min')}</b> → ${c.tripsPerMixer}/${tr('dp_ops_shift')}</span>` +
+    '        </div>' +
+    '      </div>' +
+    /* الجودة */
+    '      <div class="bg-slate-800 rounded-xl border border-slate-700/70 p-4">' +
+    '        <div class="text-[10px] uppercase tracking-wider text-slate-400 mb-2"><i class="fas fa-flask text-violet-400 mr-1"></i><span data-key="dp_dept_quality">Quality Lab</span></div>' +
+    `        <div class="text-2xl font-extrabold text-white font-mono">${c.samples} <span class="text-sm text-slate-400">${tr('dp_ops_samples')}</span></div>` +
+    `        <div class="text-[9px] text-slate-400 mt-1">${tr('dp_ops_every')} ${ops.sampleEvery} m³</div>` +
+    '      </div>' +
+    '    </div>' +
+    '  </div>' +
+    '</div>';
+  translateDynamic();
+}
+
+function setOpsMonth(m) {
+  opsMonth = Math.max(0, Math.min(plan.horizon - 1, m));
+  renderOps();
+}
+function setOps(attr, val) {
+  const num = parseFloat(val);
+  ops[attr] = Number.isFinite(num) ? num : ops[attr];
+  saveOps();
+  renderOps();
+}
+
 /* ── إقلاع + إعادة رسم عند تغيير اللغة ───────────────────────────────── */
 
 let langObserver = null;
 function initDevPlan() {
   load();
+  loadOps();
   const host = document.getElementById('dev-plan');
   if (!host) return null;
   render();
@@ -624,6 +801,7 @@ function initDevPlan() {
     selectChartDept, toggleEdit, toggleActuals, commit, cancelEdit, removeKpi, addKpi,
     exportCSV, resetToTemplate, getPlan: () => plan,
     getStats: () => ({ recorded: recordedCount(), met: metCount() }),
+    setOpsMonth, setOps, computeOps: () => computeOps(),
   };
   return window.SAE_DevPlan;
 }

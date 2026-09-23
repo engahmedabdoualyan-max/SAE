@@ -44,10 +44,18 @@ All notable changes to SAE AutoSim Hub.
   coloured target lines, and the task board gains an actual column. CSV export
   now carries `A1–A3` and an `ontrack` column. Old saved plans migrate
   automatically.
-- **E2E suite grown to 64 checks**: Phase 2f covers the Development Plan end
-  to end — template seeding (5000 → 5500), KPI cards, Chart.js, edit/save/
-  reset roundtrip, CSV export, actuals recording with on/off-target verdicts
-  and reset-to-template — on top of the original 53.
+- **Capacity planner (حاسبة القدرة)** inside the Development Plan: turns the
+  monthly concrete target into an everyday operational task for every
+  department — plants (required daily output with buffer, per-station
+  utilisation bars), logistics (mixer trips/day, cycle time from turnaround,
+  mixers needed per shift), quality (samples/month), and sales (revenue est.).
+  Assumptions (working days, mixer load, shift hours, load/unload, buffer %,
+  price/m³, sampling interval) are editable and persisted to `localStorage`;
+  the planner re-computes live for any M1–M3 month.
+- **E2E suite grown to 68 checks**: Phase 2f now covers the capacity planner
+  (mounted, 5500 → daily output + trips + mixers, per-station utilisation,
+  and an assumption change recomputing tasks) on top of the dev-plan and
+  actuals coverage.
 - **Engine-driven calibration**: the wizard's grid search now runs the real
   simulation per candidate (12 seeded runs) and scores GEH against loop
   detector flows normalized per lane — replacing a mocked search.

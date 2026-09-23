@@ -501,6 +501,27 @@ def phase2f_dev_plan(page, res: Result) -> None:
     }""")
     res.check("reset clears actuals back to template", bool(reset2.get("ok")), str(reset2))
 
+    ops = page.evaluate("""() => {
+        const host = document.getElementById('dp-ops');
+        if (!host || !host.querySelector('input[data-op]')) return { error: 'no-ops' };
+        const c = window.SAE_DevPlan.computeOps();
+        const probes = document.getElementById('dev-plan').querySelectorAll('#dp-ops .bg-slate-800.rounded-xl').length;
+        return { c, probes };
+    }""")
+    res.check("capacity planner mounted", bool(ops.get("c") and ops.get("probes") >= 4), str(ops))
+    res.check("target 5500 → daily output & trips computed", bool(ops["c"] and ops["c"]["salesTarget"] == 5500 and ops["c"]["tripsPerDay"] > 0 and ops["c"]["mixers"] > 0), str((ops.get("c") or {})))
+    res.check("per-station utilisation rows", bool(ops["c"] and len((ops["c"].get("stations") or [])) >= 2), str((ops.get("c") or {})))
+
+    opchange = page.evaluate("""() => {
+        const before = window.SAE_DevPlan.computeOps().mixers;
+        window.SAE_DevPlan.setOps('workingDays', 13);
+        const after = window.SAE_DevPlan.computeOps();
+        const host = document.getElementById('dp-ops');
+        window.SAE_DevPlan.setOps('workingDays', 26);
+        return { ok: after.mixers > before && after.tripsPerDay > before, before, after: after.mixers };
+    }""")
+    res.check("changing an assumption recomputes tasks", bool(opchange.get("ok")), str(opchange))
+
 
 def phase3_cloud_sumo(page, res: Result) -> None:
     print("── Phase 3: cloud SUMO pipeline")
