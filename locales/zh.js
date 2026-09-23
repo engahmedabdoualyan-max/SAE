@@ -605,5 +605,11 @@ Object.assign(TRANSLATIONS["zh"], {
     "dp_rm_reco": "推荐",
     "dp_rm_choose": "选择此项",
     "dp_rm_keep": "接受拖延",
-    "dp_rm_on_time": "按时"
+    "dp_rm_on_time": "按时",
+    "dp_rm_rev_log": "阶段评审日志",
+    "dp_rm_result": "是否符合计划",
+    "dp_rm_met": "达标",
+    "dp_rm_missed": "未达标",
+    "dp_rm_planned_cum": "计划（累计）",
+    "dp_rm_actual_cum": "实际（累计）",
 });

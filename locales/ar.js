@@ -606,5 +606,11 @@ Object.assign(TRANSLATIONS["ar"], {
     "dp_rm_reco": "موصى به",
     "dp_rm_choose": "اختر هذا",
     "dp_rm_keep": "اقبل التأخر",
-    "dp_rm_on_time": "في الموعد"
+    "dp_rm_on_time": "في الموعد",
+    "dp_rm_rev_log": "سجل مراجعات المراحل",
+    "dp_rm_result": "المعيار",
+    "dp_rm_met": "تحقق",
+    "dp_rm_missed": "لم يتحقق",
+    "dp_rm_planned_cum": "المخطط (تراكمي)",
+    "dp_rm_actual_cum": "الفعلي (تراكمي)",
 });

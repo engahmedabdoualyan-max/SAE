@@ -581,5 +581,11 @@ Object.assign(TRANSLATIONS["ko"], {
     "dp_rm_reco": "권장",
     "dp_rm_choose": "이것을 선택",
     "dp_rm_keep": "지연 수용",
-    "dp_rm_on_time": "정시"
+    "dp_rm_on_time": "정시",
+    "dp_rm_rev_log": "단계 리뷰 로그",
+    "dp_rm_result": "계획 대비",
+    "dp_rm_met": "달성",
+    "dp_rm_missed": "미달",
+    "dp_rm_planned_cum": "계획(누적)",
+    "dp_rm_actual_cum": "실적(누적)",
 });

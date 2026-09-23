@@ -696,6 +696,28 @@ def phase2f_dev_plan(page, res: Result) -> None:
     }""")
     res.check("roadmap: applying 're-baseline pace' adjusts remaining phases", bool(scenpace.get("ok")), str(scenpace))
 
+    revlog = page.evaluate("""() => {
+        const r0 = window.SAE_DevPlan.getRoadmap();
+        const evs = r0.evaluations || [];
+        const ev1 = document.querySelector('#dp-eval-1 input[data-actual]');
+        if (ev1) { ev1.value = '5500'; window.SAE_DevPlan.evaluatePhase(1); }
+        window.SAE_DevPlan.rebaseline();
+        const ev2 = document.querySelector('#dp-eval-2 input[data-actual]');
+        if (ev2) { ev2.value = '6000'; window.SAE_DevPlan.evaluatePhase(2); }
+        const rows = Array.from(document.querySelectorAll('table')).filter((t) => t.querySelector('tbody')).map((t) => t.querySelectorAll('tbody tr').length).filter((n) => n >= 2).length;
+        const canvas = !!document.querySelector('#dp-road-review');
+        const r = window.SAE_DevPlan.getRoadmap();
+        return { ok: rows >= 2 && canvas, rows, evals: (r.evaluations || []).length };
+    }""")
+    res.check("roadmap: phase review log lists every evaluation", bool(revlog.get("ok")), str(revlog))
+
+    revreset = page.evaluate("""() => {
+        window.SAE_DevPlan.resetToTemplate();
+        const r = window.SAE_DevPlan.getRoadmap();
+        return { ok: (r.evaluations || []).length === 0 };
+    }""")
+    res.check("roadmap: review log clears on reset", bool(revreset.get("ok")), str(revreset))
+
     roadreset2 = page.evaluate("""() => {
         window.SAE_DevPlan.resetToTemplate();
         const r = window.SAE_DevPlan.getRoadmap();

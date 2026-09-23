@@ -605,5 +605,11 @@ Object.assign(TRANSLATIONS["fr"], {
     "dp_rm_reco": "recommandé",
     "dp_rm_choose": "Choisir",
     "dp_rm_keep": "Accepter le retard",
-    "dp_rm_on_time": "dans les temps"
+    "dp_rm_on_time": "dans les temps",
+    "dp_rm_rev_log": "Journal des revues de phase",
+    "dp_rm_result": "vs plan",
+    "dp_rm_met": "atteint",
+    "dp_rm_missed": "manqué",
+    "dp_rm_planned_cum": "Prévu (cum.)",
+    "dp_rm_actual_cum": "Réel (cum.)",
 });

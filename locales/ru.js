@@ -605,5 +605,11 @@ Object.assign(TRANSLATIONS["ru"], {
     "dp_rm_reco": "рекомендуется",
     "dp_rm_choose": "Выбрать",
     "dp_rm_keep": "Принять задержку",
-    "dp_rm_on_time": "в срок"
+    "dp_rm_on_time": "в срок",
+    "dp_rm_rev_log": "Журнал ревизий этапов",
+    "dp_rm_result": "к плану",
+    "dp_rm_met": "выполнено",
+    "dp_rm_missed": "не выполнено",
+    "dp_rm_planned_cum": "План (накоп.)",
+    "dp_rm_actual_cum": "Факт (накоп.)",
 });

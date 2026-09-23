@@ -581,5 +581,11 @@ Object.assign(TRANSLATIONS["ja"], {
     "dp_rm_reco": "推奨",
     "dp_rm_choose": "これを選ぶ",
     "dp_rm_keep": "遅れを受け入れる",
-    "dp_rm_on_time": "予定通り"
+    "dp_rm_on_time": "予定通り",
+    "dp_rm_rev_log": "フェーズレビュー記録",
+    "dp_rm_result": "対計画",
+    "dp_rm_met": "達成",
+    "dp_rm_missed": "未達",
+    "dp_rm_planned_cum": "計画（累計）",
+    "dp_rm_actual_cum": "実績（累計）",
 });

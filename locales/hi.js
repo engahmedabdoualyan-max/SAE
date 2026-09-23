@@ -581,5 +581,11 @@ Object.assign(TRANSLATIONS["hi"], {
     "dp_rm_reco": "अनुशंसित",
     "dp_rm_choose": "यही चुनें",
     "dp_rm_keep": "विलंब स्वीकारें",
-    "dp_rm_on_time": "समय पर"
+    "dp_rm_on_time": "समय पर",
+    "dp_rm_rev_log": "चरण समीक्षा लॉग",
+    "dp_rm_result": "बनाम योजना",
+    "dp_rm_met": "पूरा हुआ",
+    "dp_rm_missed": "चूक",
+    "dp_rm_planned_cum": "योजना (संचयी)",
+    "dp_rm_actual_cum": "वास्तविक (संचयी)",
 });

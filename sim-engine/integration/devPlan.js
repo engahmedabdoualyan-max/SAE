@@ -410,6 +410,7 @@ function render() {
   translateDynamic();
   renderOps();
   renderChart();
+  renderRoadReviewChart();
 }
 
 /* ── المخطط الزمني ──────────────────────────────────────────────────── */
@@ -1238,6 +1239,80 @@ function phaseCardHtml(ph, idx, anal) {
     '</div>';
 }
 
+/* سجل مراجعات المراحل: تقييم فعلي مقابل مخطط لكل مرحلة مكتملة + منحنى الفعلي التراكمي. */
+function roadReviewHtml(a) {
+  const r = ensureRoadmap();
+  const evs = r.evaluations || [];
+  if (!evs.length) return '';
+  const rows = evs.map((e) => {
+    const ok = e.actual >= e.planned;
+    return '<tr class="border-t border-slate-800">' +
+      '<td class="py-1.5 px-2 text-[10px] font-bold text-white">' + tr('dp_rm_phase') + ' ' + e.phase + '</td>' +
+      '<td class="py-1.5 px-2 text-[10px] font-mono text-slate-400">' + fmtNum(e.planned) + '</td>' +
+      '<td class="py-1.5 px-2 text-[10px] font-mono text-white">' + fmtNum(e.actual) + '</td>' +
+      '<td class="py-1.5 px-2 text-[10px] font-mono ' + (e.spi >= 1 ? 'text-emerald-300' : 'text-rose-300') + '">' + e.spi + '</td>' +
+      '<td class="py-1.5 px-2 text-[10px] font-mono ' + (e.variance >= 0 ? 'text-emerald-300' : 'text-rose-300') + '">' + (e.variance >= 0 ? '+' : '') + e.variance + '%</td>' +
+      '<td class="py-1.5 px-2 text-[10px] ' + (ok ? 'text-emerald-300' : 'text-rose-300') + '">' + (ok ? tr('dp_rm_met') : tr('dp_rm_missed')) + '</td>' +
+      '<td class="py-1.5 px-2 text-[10px] text-slate-400">' + (e.notes ? e.notes : '—') + '</td>' +
+    '</tr>';
+  }).join('');
+  const chart = evs.length >= 2
+    ? '<div class="mt-3"><canvas id="dp-road-review" height="90"></canvas></div>'
+    : '';
+  return '' +
+    '      <div class="mt-4">' +
+    '        <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-2"><i class="fas fa-clipboard-list mr-1"></i><span data-key="dp_rm_rev_log">Phase review log</span></div>' +
+    '        <div class="overflow-x-auto rounded-xl border border-slate-700/70">' +
+    '          <table class="w-full text-left min-w-[480px]">' +
+    '            <thead><tr class="bg-slate-800/80 text-[9px] uppercase tracking-wider text-slate-500">' +
+    '              <th class="px-2 py-2">' + tr('dp_rm_phase') + '</th>' +
+    '              <th class="px-2 py-2">' + tr('dp_rm_planned') + '</th>' +
+    '              <th class="px-2 py-2">' + tr('dp_rm_actual') + '</th>' +
+    '              <th class="px-2 py-2">' + tr('dp_rm_spi') + '</th>' +
+    '              <th class="px-2 py-2">' + tr('dp_rm_variance') + '</th>' +
+    '              <th class="px-2 py-2">' + tr('dp_rm_result') + '</th>' +
+    '              <th class="px-2 py-2">' + tr('dp_rm_notes') + '</th>' +
+    '            </tr></thead>' +
+    '            <tbody>' + rows + '</tbody>' +
+    '          </table>' +
+    '        </div>' + chart +
+    '      </div>';
+}
+
+/* منحنى الفعلي التراكمي مقارنة بالمخطط عبر كل المراحل المكتملة (مخطط EVM). */
+function renderRoadReviewChart() {
+  const cv = document.getElementById('dp-road-review');
+  if (!cv || typeof Chart === 'undefined') return;
+  const r = ensureRoadmap();
+  const evs = r.evaluations || [];
+  if (evs.length < 2) return;
+  const labels = evs.map((e) => tr('dp_rm_phase') + ' ' + e.phase);
+  let planAcc = 0, actAcc = 0;
+  const planData = evs.map((e) => { planAcc += e.planned; return Math.round(planAcc * 10) / 10; });
+  const actData = evs.map((e) => { actAcc += e.actual; return Math.round(actAcc * 10) / 10; });
+  if (typeof cv.roadChart !== 'undefined') { cv.roadChart.destroy(); }
+  cv.roadChart = new Chart(cv.getContext('2d'), {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [{
+        label: tr('dp_rm_planned_cum'), data: planData,
+        borderColor: '#22D3EE', backgroundColor: '#22D3EE26',
+        fill: false, tension: 0.25, pointRadius: 3, borderWidth: 2,
+      }, {
+        label: tr('dp_rm_actual_cum'), data: actData,
+        borderColor: '#FBBF24', backgroundColor: '#FBBF2426',
+        fill: false, tension: 0.25, pointRadius: 3, borderWidth: 2,
+      }],
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { labels: { color: '#94A3B8', boxWidth: 10, font: { size: 9 } } } },
+      scales: { x: { ticks: { color: '#64748B', font: { size: 9 } } }, y: { ticks: { color: '#64748B', font: { size: 9 } } } },
+    },
+  });
+}
+
 /* تقرير العقل: تحليلات ومراحل وتوصيات — الجزء الأول من الصفحة الشاملة. */
 function roadmapSectionHtml() {
   const r = ensureRoadmap();
@@ -1265,6 +1340,7 @@ function roadmapSectionHtml() {
     '      </div>' +
     roadTimelineHtml() +
     '      <div class="grid grid-cols-2 md:grid-cols-3 gap-3">' + cards + '</div>' +
+    roadReviewHtml(anal) +
     '      <div class="flex flex-wrap gap-2 mt-4">' +
     '        <button onclick="SAE_DevPlan && SAE_DevPlan.openRoadForm()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 rounded-lg text-xs font-semibold"><i class="fas fa-sliders mr-1"></i><span data-key="dp_rm_config">Define current → target → time</span></button>' +
     '        <button onclick="SAE_DevPlan && SAE_DevPlan.rebaseline()" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-xs font-semibold"><i class="fas fa-wave-square mr-1"></i><span data-key="dp_rm_rebase">Re-baseline after review</span></button>' +

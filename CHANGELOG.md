@@ -89,10 +89,15 @@ All notable changes to SAE AutoSim Hub.
   goal), and *extend the horizon* (spreads the remaining gap over more months
   from the last achieved actual). Each scenario carries its projected finish
   and a one-click "choose this" action.
-- **E2E suite grown to 85 checks**: Phase 2f now also verifies the visual phase
-  timeline, decision scenarios appearing after a review, applying "extend
-  horizon" lengthening the plan, and applying "re-baseline pace" adjusting the
-  remaining phases.
+- **Phase review log (سجل مراجعات المراحل)** in the roadmap: every completed
+  phase is appended to a review table — phase, planned end, actual, SPI,
+  variance, met/vs-plan verdict and notes — so the whole "evaluate actual vs
+  planned" story stays visible as an audit trail. Once ≥2 phases are reviewed,
+  it adds an EVM line chart plotting the planned vs the actual cumulative
+  trajectory across the phases, making the gap between promises and delivery
+  obvious at a glance. The log clears together with a reset.
+- **E2E suite grown to 87 checks**: Phase 2f now also verifies the review log
+  lists every evaluation and that it clears on reset.
 - **Engine-driven calibration**: the wizard's grid search now runs the real
   simulation per candidate (12 seeded runs) and scores GEH against loop
   detector flows normalized per lane — replacing a mocked search.
