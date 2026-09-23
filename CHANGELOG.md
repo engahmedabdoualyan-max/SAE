@@ -96,8 +96,20 @@ All notable changes to SAE AutoSim Hub.
   it adds an EVM line chart plotting the planned vs the actual cumulative
   trajectory across the phases, making the gap between promises and delivery
   obvious at a glance. The log clears together with a reset.
-- **E2E suite grown to 87 checks**: Phase 2f now also verifies the review log
-  lists every evaluation and that it clears on reset.
+- **Risk register (سجل المخاطر)**, PMP-style, auto-maintained by the advisor
+  brain: every review feeds the register. The brain detects a *schedule-slip
+  risk* when the SPI falls (scored likelihood×impact, red hot on severity) and
+  a *capacity risk* whenever a plant station would exceed 100% demand, caching
+  its severity over time as "waves". Each open risk card shows its score and a
+  concrete corrective path (raise the monthly pace to X, or extend the horizon
+  to M N). Applying *re-baseline pace* / *extend horizon* transitions the risk
+  to **mitigated**, while *keep the plan* records it as **accepted** — matching
+  the PMP risk-response choices. Resolved risks stay in the log as history, and
+  the whole register is included in the management report export.
+- **E2E suite grown to 91 checks**: Phase 2f now also verifies the advisor logs
+  an open schedule-slip risk after a behind-schedule review, risk scoring
+  persists across renders, re-baseline mitigates the risk, and choosing "keep
+  the plan" accepts it.
 - **Engine-driven calibration**: the wizard's grid search now runs the real
   simulation per candidate (12 seeded runs) and scores GEH against loop
   detector flows normalized per lane — replacing a mocked search.

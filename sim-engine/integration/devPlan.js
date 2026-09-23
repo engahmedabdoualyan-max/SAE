@@ -829,6 +829,7 @@ function buildRoadmap(p) {
     rebaselined: false,
     phases,
     evaluations: [],
+    risks: [],
   };
 }
 
@@ -856,7 +857,7 @@ function updateRoadmap(inputs) {
   }
   phases[0].status = 'active';
   r.current = cur; r.target = tgt; r.horizon = total; r.phaseCount = n;
-  r.phases = phases; r.rebaselined = false; r.evaluations = [];
+  r.phases = phases; r.rebaselined = false; r.evaluations = []; r.risks = [];
   syncRoadToConcrete();
   save();
   render();
@@ -978,6 +979,116 @@ function roadFeasHtml() {
     '      </div>';
 }
 
+/* ── سجل المخاطر: العقل يسجّل ويقيس المخاطر ويقترح المعالجة (أسلوب PMP). ── */
+const RISK_LIK = { H: 5, M: 3, L: 1 };
+
+/* فحص مستمر: تحويل الحالة الحالية (جدول زمني/قدرة) إلى سجل مخاطر مفتوح/مُعالج. */
+function scanRisks() {
+  const r = ensureRoadmap();
+  if (!Array.isArray(r.risks)) r.risks = [];
+  const a = roadAnalytics();
+  const f = roadFeasibility();
+  const now = Date.now();
+  const cooked = [];
+
+  /* مخاطرة الجدول الزمني: التخلف عن سباق الفترات → التأخر. */
+  if (a.scheduleRisk && a.spi !== null) {
+    const lik = a.monthsLate >= 2 ? 'H' : (a.monthsLate >= 1 ? 'M' : 'L');
+    cooked.push({
+      id: 'schedule', type: 'schedule', titleKey: 'dp_rm_risk_schedule',
+      likelihood: lik, impact: 'H', score: RISK_LIK[lik] * 5,
+      detail: { monthsLate: a.monthsLate, fasterRate: a.advice ? a.advice.fasterRate : a.needed, extendTo: a.advice ? a.advice.extendTo : r.horizon },
+    });
+  }
+  /* مخاطرة القدرة: المستودعات لن تفي بمتطلبات المرحلة النشطة. */
+  if (f && !f.ok) {
+    const maxUtil = f.warnings.reduce((m, w) => Math.max(m, w.util), 0);
+    const lik = maxUtil >= 120 ? 'H' : 'M';
+    cooked.push({
+      id: 'capacity', type: 'capacity', titleKey: 'dp_rm_risk_capacity',
+      likelihood: lik, impact: 'H', score: RISK_LIK[lik] * 5,
+      detail: { liftPct: Math.max.apply(null, f.warnings.map((w) => w.liftPct)), stations: f.warnings.length },
+    });
+  }
+
+  /* مزامنة مع السجل الدائم: فتح الموجود، معالجة المختفي. */
+  cooked.forEach((c) => {
+    const open = r.risks.find((x) => x.id === c.id && x.status === 'open');
+    if (open) {
+      open.likelihood = c.likelihood; open.impact = c.impact; open.score = c.score; open.detail = c.detail;
+      open.titleKey = c.titleKey;
+    } else {
+      /* إعادة فتح فقط إذا تفاقمت الخطورة عن آخر مخاطرة معالجة (موجة جديدة). */
+      const prior = r.risks.filter((x) => x.id === c.id);
+      const resolvedMax = Math.max.apply(null, [0].concat(
+        prior.filter((x) => x.status !== 'open').map((x) => x.score || 0)));
+      if (c.score <= resolvedMax) return;
+      const wave = (prior.length ? Math.max.apply(null, prior.map((x) => x.wave || 1)) : 0) + 1;
+      r.risks.push(Object.assign({ status: 'open', openedAt: now, closedAt: null, wave }, c));
+    }
+  });
+  r.risks.forEach((x) => {
+    if (x.status !== 'open') return;
+    if (!cooked.find((c) => c.id === x.id)) { x.status = 'mitigated'; x.closedAt = now; }
+  });
+  return r.risks;
+}
+
+/* قبول التأخر صراحة (سيناريو "إبقاء الخطة") → تحويل المخاطرة إلى "مقبولة". */
+function acceptRisk(id) {
+  const r = ensureRoadmap();
+  if (!Array.isArray(r.risks)) r.risks = [];
+  scanRisks();
+  const x = r.risks.find((z) => z.id === id && z.status === 'open')
+    || r.risks.find((z) => z.id === id);
+  if (x) { x.status = 'accepted'; x.closedAt = Date.now(); }
+  return x || null;
+}
+
+/* تحويل مخاطرة مفتوحة إلى مُعالَجة بعد تطبيق خطة معالجة. */
+function mitigateRisk(id) {
+  const r = ensureRoadmap();
+  if (!Array.isArray(r.risks)) r.risks = [];
+  const x = r.risks.find((z) => z.id === id && z.status === 'open');
+  if (x) { x.status = 'mitigated'; x.closedAt = Date.now(); }
+  return x || null;
+}
+
+function roadRiskHtml() {
+  const r = ensureRoadmap();
+  const risks = scanRisks();
+  const open = risks.filter((x) => x.status === 'open');
+  const hist = risks.filter((x) => x.status !== 'open').slice(-3);
+  const chip = (r2) => {
+    const col = r2.score >= 20 ? 'bg-rose-500/15 border-rose-500/40 text-rose-200' : (r2.score >= 10 ? 'bg-amber-500/10 border-amber-500/30 text-amber-200' : 'bg-emerald-500/10 border-emerald-500/30 text-emerald-200');
+    return '<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md border ' + col + ' text-[10px] font-mono"><i class="fas fa-shield-halved text-[9px]"></i> ' + r2.score + '</span>';
+  };
+  const mit = (r2) => r2.id === 'capacity'
+    ? tr('dp_rm_risk_capacity_mit') + ' <b class="font-mono">+' + r2.detail.liftPct + '%</b>'
+    : tr('dp_rm_risk_schedule_mit') + ' <b class="font-mono">' + fmtNum(r2.detail.fasterRate) + '</b>/mo <span class="text-slate-500">' + tr('dp_rm_or') + '</span> ' + tr('dp_rm_risk_extend') + ' <b class="font-mono">M' + r2.detail.extendTo + '</b>';
+  return '' +
+    '      <div class="mt-3 pt-3 border-t border-slate-700/60">' +
+    '        <div class="flex items-center justify-between gap-2 mb-2">' +
+    '          <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400"><i class="fas fa-shield-virus mr-1"></i><span data-key="dp_rm_risk">Risk register</span></div>' +
+    (open.length ? '<span class="text-[9px] px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-200 font-bold">' + open.length + '</span>' : '') +
+    '        </div>' +
+    (open.length
+      ? open.map((r2) => '' +
+          '<div class="rounded-xl border ' + (r2.score >= 20 ? 'border-rose-500/40 bg-rose-500/10' : 'border-amber-500/30 bg-amber-500/10') + ' p-2.5 mb-1.5">' +
+          '  <div class="flex items-center justify-between gap-2">' +
+          '    <div class="text-[11px] font-bold text-slate-200"><i class="fas ' + (r2.id === 'capacity' ? 'fa-industry' : 'fa-stopwatch') + ' mr-1 text-slate-400"></i><span data-key="' + r2.titleKey + '">' + tr(r2.titleKey) + '</span></div>' + chip(r2) +
+          '  </div>' +
+          '  <div class="text-[9px] text-amber-100/70 mt-1 leading-relaxed">' + mit(r2) + '</div>' +
+          '</div>').join('')
+      : '<div class="px-2.5 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-[10px] text-emerald-300"><i class="fas fa-circle-check mr-1"></i><span data-key="dp_rm_risk_clear">No open risks</span></div>') +
+    (hist.length
+      ? '<div class="mt-2 space-y-1">' + hist.reverse().map((x) =>
+          '<div class="flex items-center justify-between gap-2 text-[9px] text-slate-500"><span><i class="fas ' + (x.status === 'accepted' ? 'fa-hand' : 'fa-bandage') + ' mr-1"></i><span data-key="' + x.titleKey + '">' + tr(x.titleKey) + '</span></span>' +
+          '<span class="px-1.5 py-0.5 rounded bg-slate-800 text-slate-400">' + (x.status === 'accepted' ? tr('dp_rm_risk_accepted') : tr('dp_rm_risk_mitigated')) + '</span></div>').join('') + '</div>'
+      : '') +
+    '      </div>';
+}
+
 /* تقرير إداري نصي: ملخص الخطة والمراحل والتقييمات والتوصيات. */
 function roadReport() {
   const r = ensureRoadmap();
@@ -1000,6 +1111,13 @@ function roadReport() {
     lines.push('--- ' + tr('dp_rm_evals') + ' ---');
     r.evaluations.forEach((e) => {
       lines.push('P' + e.phase + ': ' + fmtNum(e.planned) + ' → ' + fmtNum(e.actual) + ' (SPI ' + e.spi + ', ' + (e.variance >= 0 ? '+' : '') + e.variance + '%)' + (e.notes ? ' · ' + e.notes : ''));
+    });
+  }
+  const risks = scanRisks();
+  if (risks.length) {
+    lines.push('--- ' + tr('dp_rm_risk') + ' ---');
+    risks.forEach((x) => {
+      lines.push('[' + x.status + '] ' + tr(x.titleKey) + ' · ' + tr('dp_rm_risk_score') + ' ' + x.score + ' (' + x.likelihood + '×' + x.impact + ')');
     });
   }
   return { title: tr('dp_rm_title'), text: lines.join('\n'), analytics: a };
@@ -1108,7 +1226,11 @@ function roadScenarioData() {
 /* تطبيق سيناريو: 'keep' → بلا تغيير؛ 'pace' → إعادة تخطيط؛ 'extend' → أفق أطول. */
 function applyScenario(kind) {
   if (kind === 'keep') return { applied: false, kind };
-  if (kind === 'pace') return { applied: true, kind, ...(rebaseline() || {}) };
+  if (kind === 'pace') {
+    const out = rebaseline();
+    if (out) mitigateRisk('schedule');
+    return { applied: true, kind, ...(out || {}) };
+  }
   if (kind === 'extend') {
     const a = roadAnalytics();
     const r = ensureRoadmap();
@@ -1129,6 +1251,7 @@ function applyScenario(kind) {
     r.horizon = extendTo;
     r.phases = phases;
     r.rebaselined = true;
+    mitigateRisk('schedule');
     syncRoadToConcrete();
     save();
     render();
@@ -1138,7 +1261,10 @@ function applyScenario(kind) {
   return { applied: false, kind };
 }
 
-function keepPlan() { return { applied: false, kept: true }; }
+function keepPlan() {
+  const accepted = acceptRisk('schedule');
+  return { applied: false, kept: true, accepted: !!accepted };
+}
 
 /* تقييم مرحلة: الفعلي مقابل المخطط → تحديث الحالة + المتابعة التالية. */
 function evaluatePhase(phaseId) {
@@ -1370,6 +1496,7 @@ function roadmapSectionHtml() {
     '      </div>' +
     roadFeedHtml() +
     roadFeasHtml() +
+    roadRiskHtml() +
     (plan.roadmap.rebaselined ? '<div class="mt-3 px-3 py-2 rounded-lg bg-violet-500/10 border border-violet-500/30 text-[10px] text-violet-200"><i class="fas fa-wave-square mr-1"></i><span data-key="dp_rm_rebaselined">Plan re-baselined after the last review.</span></div>' : '') +
     '    </div>' +
     '  </div>';
@@ -1451,6 +1578,9 @@ function initDevPlan() {
     applyScenario, keepPlan,
     roadReport: () => roadReport(),
     exportReport,
+    scanRisks: () => scanRisks(),
+    acceptRisk, mitigateRisk,
+    roadRiskHtml: () => roadRiskHtml(),
     getRoadmap: () => ensureRoadmap(),
   };
   return window.SAE_DevPlan;

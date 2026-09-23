@@ -678,6 +678,21 @@ def phase2f_dev_plan(page, res: Result) -> None:
     }""")
     res.check("roadmap: decision scenarios appear after a review", bool(scen.get("ok")), str(scen))
 
+    risklog = page.evaluate("""() => {
+        const risks = window.SAE_DevPlan.scanRisks();
+        const open = risks.filter((x) => x.status === 'open');
+        const sched = open.find((x) => x.id === 'schedule');
+        const host = !!document.querySelector('[data-key="dp_rm_risk"]');
+        return { ok: !!sched && sched.score > 0 && host, open: open.map((x) => x.id + ':' + x.score), risks: risks.length };
+    }""")
+    res.check("roadmap: advisor logs an open schedule-slip risk after a behind review", bool(risklog.get("ok")), str(risklog))
+
+    risksummary = page.evaluate("""() => {
+        const open = window.SAE_DevPlan.scanRisks().filter((x) => x.status === 'open');
+        return { ok: open.length >= 1 && open[0].status === 'open', first: open[0] };
+    }""")
+    res.check("roadmap: risk scoring persists across renders", bool(risksummary.get("ok")), str(risksummary))
+
     scenapply = page.evaluate("""() => {
         const before = window.SAE_DevPlan.getRoadmap().horizon;
         const out = window.SAE_DevPlan.applyScenario('extend');
@@ -695,6 +710,25 @@ def phase2f_dev_plan(page, res: Result) -> None:
         return { ok: !!ev && !!out && out.applied === true, why: '' };
     }""")
     res.check("roadmap: applying 're-baseline pace' adjusts remaining phases", bool(scenpace.get("ok")), str(scenpace))
+
+    riskmit = page.evaluate("""() => {
+        const risks = window.SAE_DevPlan.scanRisks();
+        const sched = risks.find((x) => x.id === 'schedule');
+        return { ok: !!sched && sched.status === 'mitigated', status: sched ? sched.status : null };
+    }""")
+    res.check("roadmap: re-baseline pace mitigates the schedule-slip risk", bool(riskmit.get("ok")), str(riskmit))
+
+    riskacc = page.evaluate("""() => {
+        const a = document.querySelector('#dp-eval-2 input[data-actual]') || document.querySelector('#dp-eval-1 input[data-actual]');
+        if (!a) return { ok: false, why: 'no-eval' };
+        a.value = '4800';
+        const ev = window.SAE_DevPlan.evaluatePhase(Number(a.closest('[id^="dp-eval-"]').id.split('-')[2]));
+        const out = window.SAE_DevPlan.keepPlan();
+        const risks = window.SAE_DevPlan.scanRisks();
+        const sched = risks.filter((x) => x.id === 'schedule').pop();
+        return { ok: !!ev && !!out && !!sched && sched.status === 'accepted', status: sched ? sched.status : null };
+    }""")
+    res.check("roadmap: keeping the plan accepts the slip risk", bool(riskacc.get("ok")), str(riskacc))
 
     revlog = page.evaluate("""() => {
         const r0 = window.SAE_DevPlan.getRoadmap();
