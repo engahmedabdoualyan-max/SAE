@@ -123,7 +123,177 @@ function mgmtDefaults() {
     tasks: [],
     staffReqs: [],
     problems: [],
+    baselines: [],              /* snapshots للـ roadmap للمقارنة */
   };
+}
+
+/* ── Critical Path Method (CPM): حساب المسار الحرج ──────────────────── */
+
+/* Forward pass: حساب Early Start (ES) و Early Finish (EF) */
+function calculateEarlyTimes(tasks) {
+  const es = {}; /* Early Start */
+  const ef = {}; /* Early Finish */
+  const sorted = [];
+
+  /* Topological sort */
+  const visited = new Set();
+  function visit(id) {
+    if (visited.has(id)) return;
+    visited.add(id);
+    const t = tasks.find((x) => x.id === id);
+    if (t && t.predecessors) {
+      t.predecessors.forEach((pid) => visit(pid));
+    }
+    sorted.push(id);
+  }
+  tasks.forEach((t) => visit(t.id));
+
+  sorted.forEach((id) => {
+    const t = tasks.find((x) => x.id === id);
+    if (!t) return;
+    const maxPredEF = t.predecessors.reduce((max, pid) => Math.max(max, ef[pid] || 0), 0);
+    es[id] = maxPredEF;
+    ef[id] = es[id] + (t.duration || 1);
+  });
+
+  return { es, ef };
+}
+
+/* Backward pass: حساب Late Start (LS) و Late Finish (LF) */
+function calculateLateTimes(tasks) {
+  const ls = {}; /* Late Start */
+  const lf = {}; /* Late Finish */
+
+  /* Find max EF (project duration) */
+  const { ef } = calculateEarlyTimes(tasks);
+  const projectDuration = Math.max(...Object.values(ef), 0);
+
+  /* Initialize LF for all tasks */
+  tasks.forEach((t) => { lf[t.id] = projectDuration; });
+
+  /* Reverse topological sort */
+  const reversed = tasks.map((t) => t.id).reverse();
+
+  reversed.forEach((id) => {
+    const t = tasks.find((x) => x.id === id);
+    if (!t) return;
+
+    /* Find successors (tasks that depend on this one) */
+    const successors = tasks.filter((s) => s.predecessors && s.predecessors.includes(id));
+    if (successors.length > 0) {
+      const minSuccLS = Math.min(...successors.map((s) => ls[s.id] || projectDuration));
+      lf[id] = minSuccLS;
+    } else {
+      lf[id] = projectDuration;
+    }
+    ls[id] = lf[id] - (t.duration || 1);
+  });
+
+  return { ls, lf };
+}
+
+/* حساب Float وتحديد المسار الحرج */
+function calculateCPM() {
+  const tasks = plan.mgmt.tasks || [];
+  if (tasks.length === 0) return { criticalPath: [], totalFloat: 0 };
+
+  const { es, ef } = calculateEarlyTimes(tasks);
+  const { ls, lf } = calculateLateTimes(tasks);
+
+  let totalFloat = 0;
+  const criticalPath = [];
+
+  tasks.forEach((t) => {
+    const float = (ls[t.id] || 0) - (es[t.id] || 0);
+    t.float = float;
+    t.isCritical = float === 0;
+    totalFloat += float;
+
+    if (t.isCritical) {
+      criticalPath.push(t);
+    }
+  });
+
+  save();
+  return { criticalPath, totalFloat, projectDuration: Math.max(...Object.values(ef), 0) };
+}
+
+/* إضافة predecessor لمهمة */
+function addPredecessor(taskId, predId) {
+  const t = plan.mgmt.tasks.find((x) => String(x.id) === String(taskId));
+  if (!t) return { error: 'no-task' };
+  if (!t.predecessors) t.predecessors = [];
+  if (!t.predecessors.includes(Number(predId)) && !t.predecessors.includes(String(predId))) {
+    t.predecessors.push(predId);
+  }
+  save();
+  calculateCPM();
+  render();
+  return { ok: true, predecessors: t.predecessors };
+}
+
+/* حذف predecessor */
+function removePredecessor(taskId, predId) {
+  const t = plan.mgmt.tasks.find((x) => String(x.id) === String(taskId));
+  if (!t) return { error: 'no-task' };
+  t.predecessors = (t.predecessors || []).filter((p) => String(p) !== String(predId));
+  save();
+  calculateCPM();
+  render();
+  return { ok: true, predecessors: t.predecessors };
+}
+
+/* تغيير مدة المهمة */
+function setTaskDuration(taskId, duration) {
+  const t = plan.mgmt.tasks.find((x) => String(x.id) === String(taskId));
+  if (!t) return { error: 'no-task' };
+  t.duration = Number(duration) || 1;
+  save();
+  calculateCPM();
+  render();
+  return { ok: true, duration: t.duration };
+}
+
+/* ── Baselines: حفظ snapshot للمقارنة ─────────────────────────────── */
+
+function saveBaseline() {
+  const r = ensureRoadmap();
+  const baseline = {
+    id: Date.now() % 100000,
+    savedAt: new Date().toISOString(),
+    current: r.current,
+    target: r.target,
+    horizon: r.horizon,
+    phases: JSON.parse(JSON.stringify(r.phases)),
+    tasks: JSON.parse(JSON.stringify(plan.mgmt.tasks || [])),
+  };
+  plan.mgmt.baselines = plan.mgmt.baselines || [];
+  plan.mgmt.baselines.push(baseline);
+  save();
+  render();
+  return { ok: true, baselineId: baseline.id };
+}
+
+function deleteBaseline(id) {
+  plan.mgmt.baselines = (plan.mgmt.baselines || []).filter((b) => String(b.id) !== String(id));
+  save();
+  render();
+  return { ok: true };
+}
+
+function restoreBaseline(id) {
+  const b = (plan.mgmt.baselines || []).find((x) => String(x.id) === String(id));
+  if (!b) return { error: 'no-baseline' };
+  const r = ensureRoadmap();
+  r.current = b.current;
+  r.target = b.target;
+  r.horizon = b.horizon;
+  r.phases = JSON.parse(JSON.stringify(b.phases));
+  plan.mgmt.tasks = JSON.parse(JSON.stringify(b.tasks));
+  save();
+  render();
+  renderChart();
+  return { ok: true };
 }
 
 /* أي اتجاه يُعدّ تقدّمًا: مؤشرات ترتفع (مبيعات) أو تنخفض (زمن الدوران). */
@@ -176,6 +346,7 @@ function normalize(p) {
   if (!Array.isArray(p.mgmt.tasks)) p.mgmt.tasks = [];
   if (!Array.isArray(p.mgmt.staffReqs)) p.mgmt.staffReqs = [];
   if (!Array.isArray(p.mgmt.problems)) p.mgmt.problems = [];
+  if (!p.mgmt.baselines) p.mgmt.baselines = [];
   p.mgmt.tasks.forEach((t) => {
     t.title = t.title || '';
     t.position = t.position || 'pos_plant_mgr';
@@ -184,6 +355,10 @@ function normalize(p) {
     t.cost = Number(t.cost) || 0;
     t.followups = Array.isArray(t.followups) ? t.followups : [];
     t.eval = t.eval || { score: null, note: '' };
+    t.predecessors = Array.isArray(t.predecessors) ? t.predecessors : [];
+    t.duration = Number(t.duration) || 1;
+    t.float = t.float || 0;
+    t.isCritical = t.isCritical || false;
   });
   p.mgmt.staffReqs.forEach((s) => {
     s.position = s.position || 'pos_plant_mgr';
@@ -1799,6 +1974,107 @@ function mgmtStatusChip(status) {
   return '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold ' + m[0] + '">' + m[1] + '</span>';
 }
 
+/* ── WBS Tree: عرض هرمي للمهام ─────────────────────────────────────── */
+
+function renderWBSTree(tasks) {
+  if (!tasks || tasks.length === 0) return '';
+
+  /* Find root tasks (no predecessors) */
+  const roots = tasks.filter((t) => !t.predecessors || t.predecessors.length === 0);
+  const children = {};
+  tasks.forEach((t) => {
+    (t.predecessors || []).forEach((pid) => {
+      if (!children[pid]) children[pid] = [];
+      children[pid].push(t);
+    });
+  });
+
+  function renderNode(task, depth) {
+    const indent = depth * 16;
+    const criticalCls = task.isCritical ? 'border-l-2 border-rose-500 bg-rose-500/10' : 'border-l-2 border-slate-700';
+    const statusIcon = task.status === 'done' ? '✓' : (task.status === 'doing' ? '◐' : '○');
+    const statusCls = task.status === 'done' ? 'text-emerald-400' : (task.status === 'doing' ? 'text-amber-400' : 'text-slate-500');
+
+    let html = '<div class="flex items-center gap-2 py-1 px-2 ' + criticalCls + '" style="margin-left:' + indent + 'px">' +
+      '<span class="' + statusCls + ' text-[10px]">' + statusIcon + '</span>' +
+      '<span class="text-[10px] text-white font-semibold">' + task.title + '</span>' +
+      '<span class="text-[9px] text-slate-400">' + (task.duration || 1) + ' ' + tr('dp_cpm_days') + '</span>' +
+      (task.isCritical ? '<span class="px-1 py-0.5 rounded bg-rose-500/20 text-rose-300 text-[8px]"><i class="fas fa-fire"></i></span>' : '') +
+      '</div>';
+
+    const kids = children[task.id] || [];
+    kids.forEach((kid) => {
+      html += renderNode(kid, depth + 1);
+    });
+
+    return html;
+  }
+
+  return roots.map((r) => renderNode(r, 0)).join('');
+}
+
+/* ── Gantt Chart: مخطط جانت بسيط ───────────────────────────────────── */
+
+function renderGanttChart(tasks) {
+  if (!tasks || tasks.length === 0) return '<div class="text-[10px] text-slate-500">' + tr('dp_mgmt_no_tasks') + '</div>';
+
+  const cpm = calculateCPM();
+  const projectDuration = cpm.projectDuration || 10;
+  const { es, ef } = calculateEarlyTimes(tasks);
+  const rowHeight = 28;
+  const dayWidth = 30;
+  const labelWidth = 200;
+  const totalWidth = labelWidth + (projectDuration * dayWidth);
+
+  let html = '<div style="min-width:' + totalWidth + 'px">';
+
+  /* Header: days */
+  html += '<div style="display:flex; margin-bottom:4px;">';
+  html += '<div style="width:' + labelWidth + 'px; flex-shrink:0;"></div>';
+  for (let d = 0; d < projectDuration; d++) {
+    html += '<div style="width:' + dayWidth + 'px; text-align:center; font-size:9px; color:#64748b; border-left:1px solid #334155;">' + (d + 1) + '</div>';
+  }
+  html += '</div>';
+
+  /* Rows */
+  tasks.forEach((task, i) => {
+    const start = es[task.id] || 0;
+    const end = ef[task.id] || (start + (task.duration || 1));
+    const barLeft = labelWidth + (start * dayWidth);
+    const barWidth = ((end - start) * dayWidth) - 4;
+    const barColor = task.isCritical ? '#ef4444' : '#06b6d4';
+
+    html += '<div style="display:flex; align-items:center; height:' + rowHeight + 'px; border-bottom:1px solid #1e293b;">';
+    html += '<div style="width:' + labelWidth + 'px; flex-shrink:0; padding:0 8px; font-size:10px; color:#cbd5e1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="' + task.title + '">' + (i + 1) + '. ' + task.title + '</div>';
+    html += '<div style="flex:1; position:relative; height:100%;">';
+
+    /* Grid lines */
+    for (let d = 0; d < projectDuration; d++) {
+      html += '<div style="position:absolute; left:' + (d * dayWidth) + 'px; top:0; bottom:0; width:1px; background:#1e293b;"></div>';
+    }
+
+    /* Bar */
+    html += '<div style="position:absolute; left:' + barLeft + 'px; top:6px; width:' + barWidth + 'px; height:' + (rowHeight - 12) + 'px; background:' + barColor + '; border-radius:4px; opacity:0.8; box-shadow:0 2px 4px rgba(0,0,0,0.2);"></div>';
+
+    html += '</div></div>';
+  });
+
+  /* Dependency arrows (simple visual indicator) */
+  tasks.forEach((task) => {
+    (task.predecessors || []).forEach((pid) => {
+      const predTask = tasks.find((t) => t.id === pid);
+      if (predTask) {
+        const predEnd = ef[predTask.id] || 0;
+        const taskStart = es[task.id] || 0;
+        /* Arrow would go from predEnd to taskStart - simplified visual */
+      }
+    });
+  });
+
+  html += '</div>';
+  return html;
+}
+
 /* الجدول القابل للطباعة: الحالي + المستهدف + خطوات العمل + خانات المتابعة بالألوان. */
 function printablePlanHtml() {
   const r = ensureRoadmap();
@@ -1863,10 +2139,18 @@ function printPlan() {
 
 /* ── محتوى قسم الإدارة التنفيذية (الشاشة) ───────────────────────────── */
 function mgmtTaskRowHtml(t, i) {
-  return '<div class="rounded-xl border border-slate-700/70 bg-slate-800/40 p-3">' +
+  const criticalCls = t.isCritical ? 'border-rose-500/60 bg-rose-500/5' : '';
+  const predOptions = (plan.mgmt.tasks || []).filter((x) => x.id !== t.id).map((x) => '<option value="' + x.id + '">' + x.title + '</option>').join('');
+  const predChips = (t.predecessors || []).map((pid) => {
+    const pred = plan.mgmt.tasks.find((x) => x.id === pid);
+    return pred ? '<span class="px-1.5 py-0.5 rounded bg-slate-700 text-[8px] text-slate-300">' + pred.title + ' <button onclick="SAE_DevPlan && SAE_DevPlan.removePredecessor(' + t.id + ',' + pid + ')" class="ml-1 text-rose-400 hover:text-rose-300">×</button></span>' : '';
+  }).join('');
+
+  return '<div class="rounded-xl border border-slate-700/70 bg-slate-800/40 p-3 ' + criticalCls + '">' +
     '  <div class="flex items-center justify-between gap-2 flex-wrap">' +
     '    <div class="flex items-center gap-2 min-w-0"><span class="text-[9px] text-slate-500">' + (i + 1) + '</span>' +
-    '      <b class="text-[11px] text-white truncate">' + t.title + '</b>' + mgmtStatusChip(t.status) + '</div>' +
+    '      <b class="text-[11px] text-white truncate">' + t.title + '</b>' + mgmtStatusChip(t.status) +
+    (t.isCritical ? '<span class="px-1.5 py-0.5 rounded-full bg-rose-500/20 text-rose-300 text-[8px] font-bold"><i class="fas fa-fire mr-1"></i>' + tr('dp_cpm_critical') + '</span>' : '') + '</div>' +
     '    <div class="flex items-center gap-1.5">' +
     '      <button onclick="SAE_DevPlan && SAE_DevPlan.taskStatus(' + t.id + ',\'todo\')" class="px-1.5 py-0.5 rounded bg-slate-700 text-[9px]">' + tr('dp_mgmt_st_todo') + '</button>' +
     '      <button onclick="SAE_DevPlan && SAE_DevPlan.taskStatus(' + t.id + ',\'doing\')" class="px-1.5 py-0.5 rounded bg-amber-600 text-[9px]">' + tr('dp_mgmt_st_doing') + '</button>' +
@@ -1878,8 +2162,17 @@ function mgmtTaskRowHtml(t, i) {
     '    <span class="inline-flex items-center gap-1"><i class="fas ' + posByKey(t.position).icon + ' text-slate-300"></i>' + tr(posByKey(t.position).key) + '</span>' +
     '    <span class="inline-flex items-center gap-1"><i class="fas fa-building text-slate-500"></i>' + (t.deptId ? tr(deptById(t.deptId).nameKey) : tr('dp_mgmt_cross')) + '</span>' +
     '    <span class="inline-flex items-center gap-1"><i class="fas fa-coins text-amber-400"></i>' + fmtNum(Number(t.cost) || 0) + '</span>' +
+    '    <span class="inline-flex items-center gap-1"><i class="fas fa-clock text-cyan-400"></i>' + (t.duration || 1) + ' ' + tr('dp_cpm_days') + '</span>' +
+    '    <span class="inline-flex items-center gap-1"><i class="fas fa-sliders text-violet-400"></i>' + tr('dp_cpm_float') + ': ' + (t.float || 0) + '</span>' +
     (t.eval && t.eval.score ? '<span class="px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-200 font-bold">' + tr('dp_mgmt_eval') + ' ' + t.eval.score + '/10</span>' : '') +
     '  </div>' +
+    '  <div class="flex flex-wrap items-center gap-1.5 mt-2">' +
+    '    <input id="dp-task-dur-' + t.id + '" type="number" min="1" value="' + (t.duration || 1) + '" placeholder="' + tr('dp_cpm_duration') + '" class="w-16 px-2 py-1 rounded bg-slate-900 border border-slate-700 text-[10px] text-white">' +
+    '    <button onclick="SAE_DevPlan && SAE_DevPlan.setTaskDuration(' + t.id + ', document.getElementById(\'dp-task-dur-' + t.id + '\').value)" class="px-2 py-1 rounded bg-cyan-600 hover:bg-cyan-500 text-[10px] font-bold"><i class="fas fa-clock mr-1"></i>' + tr('dp_cpm_set_dur') + '</button>' +
+    '    <select id="dp-task-pred-' + t.id + '" class="px-2 py-1 rounded bg-slate-900 border border-slate-700 text-[10px] text-white">' + predOptions + '</select>' +
+    '    <button onclick="SAE_DevPlan && SAE_DevPlan.addPredecessor(' + t.id + ', document.getElementById(\'dp-task-pred-' + t.id + '\').value)" class="px-2 py-1 rounded bg-violet-600 hover:bg-violet-500 text-[10px] font-bold"><i class="fas fa-link mr-1"></i>' + tr('dp_cpm_add_pred') + '</button>' +
+    '  </div>' +
+    (predChips ? '<div class="flex flex-wrap items-center gap-1 mt-1">' + predChips + '</div>' : '') +
     '  <div class="flex flex-wrap items-center gap-1.5 mt-2">' +
     '    <input id="dp-task-follow-' + t.id + '" type="text" placeholder="' + tr('dp_mgmt_add_follow') + '…" class="flex-1 min-w-[140px] px-2 py-1 rounded bg-slate-900 border border-slate-700 text-[10px] text-white">' +
     '    <button onclick="SAE_DevPlan && SAE_DevPlan.taskFollow(' + t.id + ', document.getElementById(\'dp-task-follow-' + t.id + '\').value)" class="px-2.5 py-1 rounded bg-cyan-600 hover:bg-cyan-500 text-[10px] font-bold"><i class="fas fa-pen mr-1"></i>' + tr('dp_mgmt_follow') + '</button>' +
@@ -1942,6 +2235,7 @@ function mgmtSectionHtml() {
   const m = plan.mgmt;
   const r = ensureRoadmap();
   const total = mgmtTotalCost();
+  const cpm = calculateCPM();
   const stepDefs = [
     { key: 'draft', labelKey: 'dp_mgmt_st_draft', icon: 'fa-pen-ruler', note: tr('dp_mgmt_step_draft_note') },
     { key: 'mgmt_ok', labelKey: 'dp_mgmt_st_mgmt_ok', icon: 'fa-file-signature', note: tr('dp_mgmt_step_mgmt_note') },
@@ -1983,8 +2277,44 @@ function mgmtSectionHtml() {
     '<input id="dp-task-cost" type="number" placeholder="' + tr('dp_mgmt_cost') + '" class="w-24 px-2 py-1 rounded bg-slate-900 border border-slate-700 text-[10px] text-white">' +
     '<button onclick="SAE_DevPlan && SAE_DevPlan.addTask({title: document.getElementById(\'dp-task-title\').value, position: document.getElementById(\'dp-task-pos\').value, cost: document.getElementById(\'dp-task-cost\').value})" class="px-3 py-1 rounded bg-cyan-600 hover:bg-cyan-500 text-[10px] font-bold"><i class="fas fa-plus mr-1"></i><span data-key="dp_mgmt_add_task">Add task</span></button>' +
     '</div>';
+
+  /* WBS + Gantt + Baselines sections */
+  const wbsGanttSection = '' +
+    '<div class="mt-4 grid grid-cols-1 gap-4">' +
+    '  <div class="rounded-xl border border-slate-700/70 bg-slate-800/40 p-4">' +
+    '    <div class="flex items-center justify-between mb-3">' +
+    '      <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400"><i class="fas fa-sitemap mr-1"></i><span data-key="dp_wbs_title">Work Breakdown Structure (WBS)</span></div>' +
+    '      <div class="flex items-center gap-2 text-[10px] text-slate-400">' +
+    '        <span><i class="fas fa-fire text-rose-400"></i> <b class="text-rose-300">' + cpm.criticalPath.length + '</b> ' + tr('dp_cpm_critical_tasks') + '</span>' +
+    '        <span><i class="fas fa-calendar text-cyan-400"></i> ' + tr('dp_cpm_project_dur') + ': <b class="text-cyan-300">' + cpm.projectDuration + '</b> ' + tr('dp_cpm_days') + '</span>' +
+    '      </div>' +
+    '    </div>' +
+    '    <div class="space-y-1">' + (m.tasks.length ? renderWBSTree(m.tasks) : '<div class="text-[10px] text-slate-500">' + tr('dp_mgmt_no_tasks') + '</div>') + '</div>' +
+    '  </div>' +
+    '  <div class="rounded-xl border border-slate-700/70 bg-slate-800/40 p-4">' +
+    '    <div class="flex items-center justify-between mb-3">' +
+    '      <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400"><i class="fas fa-chart-gantt mr-1"></i><span data-key="dp_gantt_title">Gantt Chart</span></div>' +
+    '    </div>' +
+    '    <div id="dp-gantt-container" style="overflow-x: auto;">' + renderGanttChart(m.tasks) + '</div>' +
+    '  </div>' +
+    '  <div class="rounded-xl border border-slate-700/70 bg-slate-800/40 p-4">' +
+    '    <div class="flex items-center justify-between mb-3">' +
+    '      <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400"><i class="fas fa-history mr-1"></i><span data-key="dp_baseline_title">Baselines</span></div>' +
+    '      <button onclick="SAE_DevPlan && SAE_DevPlan.saveBaseline()" class="px-3 py-1 rounded bg-violet-600 hover:bg-violet-500 text-[10px] font-bold"><i class="fas fa-save mr-1"></i>' + tr('dp_baseline_save') + '</button>' +
+    '    </div>' +
+    '    <div class="space-y-1">' + ((m.baselines || []).length ? (m.baselines || []).map((b) =>
+      '<div class="flex items-center justify-between gap-2 rounded-lg bg-slate-900/50 border border-slate-700/60 px-3 py-2">' +
+      '<div class="min-w-0"><b class="text-[10px] text-white">' + new Date(b.savedAt).toLocaleString() + '</b>' +
+      '<div class="text-[9px] text-slate-400">' + tr('dp_baseline_phases') + ': ' + (b.phases ? b.phases.length : 0) + ' · ' + tr('dp_baseline_tasks') + ': ' + (b.tasks ? b.tasks.length : 0) + '</div></div>' +
+      '<div class="flex gap-1.5 shrink-0">' +
+      '<button onclick="SAE_DevPlan && SAE_DevPlan.restoreBaseline(' + b.id + ')" class="px-2 py-1 rounded bg-cyan-600 hover:bg-cyan-500 text-[9px] font-bold"><i class="fas fa-undo mr-1"></i>' + tr('dp_baseline_restore') + '</button>' +
+      '<button onclick="SAE_DevPlan && SAE_DevPlan.deleteBaseline(' + b.id + ')" class="px-2 py-1 rounded bg-rose-700 hover:bg-rose-600 text-[9px] font-bold"><i class="fas fa-trash"></i></button>' +
+      '</div></div>').join('') : '<div class="text-[10px] text-slate-500">' + tr('dp_baseline_none') + '</div>') + '</div>' +
+    '  </div>' +
+    '</div>';
+
   return '' +
-'    <div class="mt-8 bg-slate-900 rounded-2xl border border-indigo-500/30 p-5">' +
+    '<div class="mt-8 bg-slate-900 rounded-2xl border border-indigo-500/30 p-5">' +
     '    <div class="flex items-center gap-3 mb-4 flex-wrap">' +
     '      <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center text-white text-sm"><i class="fas fa-clipboard-user"></i></div>' +
     '      <div class="flex-1 min-w-[220px]">' +
@@ -2006,6 +2336,7 @@ function mgmtSectionHtml() {
     '        <div><div class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-2"><i class="fas fa-bug mr-1"></i><span data-key="dp_mgmt_problem_title">Problem scheduler</span> <span class="text-slate-500">(<span data-key="dp_mgmt_problem_outside">even outside the plan</span>)</span></div>' + mgmtProblemHtml() + '</div>' +
     '      </div>' +
     '    </div>' +
+    wbsGanttSection +
     '  </div>';
 }
 
