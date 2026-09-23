@@ -686,4 +686,21 @@ Object.assign(TRANSLATIONS["hi"], {
     "dp_mgmt_step_monitor_note": "निगरानी और मूल्यांकन",
 
     "dp_mgmt_pending": "लंबित",
+
+    "dp_cpm_critical": "गंभीर",
+    "dp_cpm_days": "दिन",
+    "dp_cpm_float": "फ्लोट",
+    "dp_cpm_duration": "अवधि",
+    "dp_cpm_set_dur": "अवधि सेट करें",
+    "dp_cpm_add_pred": "पूर्ववर्ती जोड़ें",
+    "dp_cpm_critical_tasks": "गंभीर कार्य",
+    "dp_cpm_project_dur": "परियोजना अवधि",
+    "dp_wbs_title": "कार्य विवरण संरचना",
+    "dp_gantt_title": "गैंट चार्ट",
+    "dp_baseline_title": "बेसलाइन",
+    "dp_baseline_save": "बेसलाइन सहेजें",
+    "dp_baseline_phases": "चरण",
+    "dp_baseline_tasks": "कार्य",
+    "dp_baseline_restore": "पुनर्स्थापित करें",
+    "dp_baseline_none": "कोई बेसलाइन सहेजी नहीं गई",
 });

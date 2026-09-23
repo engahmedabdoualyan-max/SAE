@@ -686,4 +686,21 @@ Object.assign(TRANSLATIONS["ja"], {
     "dp_mgmt_step_monitor_note": "フォローアップと評価",
 
     "dp_mgmt_pending": "保留中",
+
+    "dp_cpm_critical": "クリティカル",
+    "dp_cpm_days": "日",
+    "dp_cpm_float": "フロート",
+    "dp_cpm_duration": "期間",
+    "dp_cpm_set_dur": "期間を設定",
+    "dp_cpm_add_pred": "先行タスクを追加",
+    "dp_cpm_critical_tasks": "クリティカルタスク",
+    "dp_cpm_project_dur": "プロジェクト期間",
+    "dp_wbs_title": "作業分解構造",
+    "dp_gantt_title": "ガントチャート",
+    "dp_baseline_title": "ベースライン",
+    "dp_baseline_save": "ベースラインを保存",
+    "dp_baseline_phases": "フェーズ",
+    "dp_baseline_tasks": "タスク",
+    "dp_baseline_restore": "復元",
+    "dp_baseline_none": "保存されたベースラインはありません",
 });

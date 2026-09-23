@@ -871,6 +871,87 @@ def phase2f_dev_plan(page, res: Result) -> None:
     }""")
     res.check("exec plan: summary strip tracks done tasks + open problems", bool(strip2.get("ok")), str(strip2))
 
+    cpm = page.evaluate("""() => {
+        const dp = window.SAE_DevPlan;
+        dp.resetToTemplate();
+        const t1 = dp.addTask({ title: 'T1', position: 'pos_plant_mgr', cost: 0 });
+        const t2 = dp.addTask({ title: 'T2', position: 'pos_plant_mgr', cost: 0 });
+        const t3 = dp.addTask({ title: 'T3', position: 'pos_plant_mgr', cost: 0 });
+        dp.setTaskDuration(t1.id, 3);
+        dp.setTaskDuration(t2.id, 5);
+        dp.setTaskDuration(t3.id, 2);
+        dp.addPredecessor(t2.id, t1.id);
+        dp.addPredecessor(t3.id, t2.id);
+        const cpm = dp.calculateCPM();
+        const plan = dp.getPlan();
+        const tasks = plan.mgmt.tasks;
+        return {
+            ok: cpm && cpm.criticalPath && cpm.criticalPath.length === 3,
+            criticalPath: cpm.criticalPath ? cpm.criticalPath.map(t => t.title) : [],
+            projectDuration: cpm ? cpm.projectDuration : 0,
+            floats: tasks.map(t => ({ title: t.title, float: t.float, isCritical: t.isCritical })),
+        };
+    }""")
+    res.check("CPM: critical path calculation with dependencies", bool(cpm.get("ok")), str(cpm))
+
+    preds = page.evaluate("""() => {
+        const dp = window.SAE_DevPlan;
+        const plan = dp.getPlan();
+        const t1 = plan.mgmt.tasks[0];
+        const t2 = plan.mgmt.tasks[1];
+        dp.removePredecessor(t2.id, t1.id);
+        const cpm = dp.calculateCPM();
+        return {
+            ok: cpm.criticalPath.length >= 1,
+            t1Predecessors: t1.predecessors,
+            t2Predecessors: t2.predecessors,
+        };
+    }""")
+    res.check("CPM: predecessor removal updates critical path", bool(preds.get("ok")), str(preds))
+
+    wbs = page.evaluate("""() => {
+        const dp = window.SAE_DevPlan;
+        const host = document.getElementById('dev-plan');
+        const txt = host.textContent || '';
+        const hasWBS = txt.includes('Work Breakdown Structure') || txt.includes('WBS') || txt.includes('هيكل تجزئة العمل');
+        const hasGantt = txt.includes('Gantt Chart') || txt.includes('مخطط جانت');
+        return { ok: hasWBS && hasGantt };
+    }""")
+    res.check("CPM: WBS tree and Gantt chart rendered", bool(wbs.get("ok")), str(wbs))
+
+    baseline = page.evaluate("""() => {
+        const dp = window.SAE_DevPlan;
+        dp.resetToTemplate();
+        dp.addTask({ title: 'Baseline task', position: 'pos_plant_mgr', cost: 50 });
+        const b = dp.saveBaseline();
+        const plan = dp.getPlan();
+        const hasBaseline = plan.mgmt.baselines && plan.mgmt.baselines.length === 1;
+        const bl = plan.mgmt.baselines[0];
+        dp.addTask({ title: 'New task after baseline', position: 'pos_plant_mgr', cost: 0 });
+        dp.deleteBaseline(bl.id);
+        const plan2 = dp.getPlan();
+        const deleted = plan2.mgmt.baselines.length === 0;
+        return { ok: hasBaseline && bl && bl.tasks && bl.tasks.length === 1 && deleted };
+    }""")
+    res.check("baselines: save, verify content, and delete", bool(baseline.get("ok")), str(baseline))
+
+    restore = page.evaluate("""() => {
+        const dp = window.SAE_DevPlan;
+        dp.resetToTemplate();
+        dp.addTask({ title: 'Restore test', position: 'pos_plant_mgr', cost: 100 });
+        const b = dp.saveBaseline();
+        const plan1 = dp.getPlan();
+        const bl = plan1.mgmt.baselines[0];
+        dp.addTask({ title: 'Extra task', position: 'pos_plant_mgr', cost: 0 });
+        const plan2 = dp.getPlan();
+        const before = plan2.mgmt.tasks.length;
+        dp.restoreBaseline(bl.id);
+        const plan3 = dp.getPlan();
+        const after = plan3.mgmt.tasks.length;
+        return { ok: before === 2 && after === 1 };
+    }""")
+    res.check("baselines: restore reverts tasks to saved state", bool(restore.get("ok")), str(restore))
+
 
 def phase3_cloud_sumo(page, res: Result) -> None:
     print("── Phase 3: cloud SUMO pipeline")

@@ -710,4 +710,21 @@ Object.assign(TRANSLATIONS["de"], {
     "dp_mgmt_step_monitor_note": "Follow-up & Bewertungen",
 
     "dp_mgmt_pending": "ausstehend",
+
+    "dp_cpm_critical": "Kritisch",
+    "dp_cpm_days": "Tage",
+    "dp_cpm_float": "Puffer",
+    "dp_cpm_duration": "Dauer",
+    "dp_cpm_set_dur": "Dauer festlegen",
+    "dp_cpm_add_pred": "Vorgänger hinzufügen",
+    "dp_cpm_critical_tasks": "kritische Aufgaben",
+    "dp_cpm_project_dur": "Projektdauer",
+    "dp_wbs_title": "Projektstrukturplan",
+    "dp_gantt_title": "Gantt-Diagramm",
+    "dp_baseline_title": "Baselines",
+    "dp_baseline_save": "Baseline speichern",
+    "dp_baseline_phases": "Phasen",
+    "dp_baseline_tasks": "Aufgaben",
+    "dp_baseline_restore": "Wiederherstellen",
+    "dp_baseline_none": "Keine Baselines gespeichert",
 });

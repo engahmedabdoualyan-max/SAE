@@ -710,4 +710,21 @@ Object.assign(TRANSLATIONS["fr"], {
     "dp_mgmt_step_finance_note": "argent sécurisé",
 
     "dp_mgmt_pending": "en attente",
+
+    "dp_cpm_critical": "Critique",
+    "dp_cpm_days": "jours",
+    "dp_cpm_float": "Marge",
+    "dp_cpm_duration": "Durée",
+    "dp_cpm_set_dur": "Définir durée",
+    "dp_cpm_add_pred": "Ajouter prédécesseur",
+    "dp_cpm_critical_tasks": "tâches critiques",
+    "dp_cpm_project_dur": "Durée du projet",
+    "dp_wbs_title": "Structure de répartition du travail",
+    "dp_gantt_title": "Diagramme de Gantt",
+    "dp_baseline_title": "Références",
+    "dp_baseline_save": "Enregistrer référence",
+    "dp_baseline_phases": "phases",
+    "dp_baseline_tasks": "tâches",
+    "dp_baseline_restore": "Restaurer",
+    "dp_baseline_none": "Aucune référence enregistrée",
 });

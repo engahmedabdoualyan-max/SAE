@@ -711,4 +711,21 @@ Object.assign(TRANSLATIONS["ar"], {
     "dp_mgmt_step_monitor_note": "متابعة وتقييمات",
 
     "dp_mgmt_pending": "معلّق",
+
+    "dp_cpm_critical": "حرج",
+    "dp_cpm_days": "أيام",
+    "dp_cpm_float": "المرونة",
+    "dp_cpm_duration": "المدة",
+    "dp_cpm_set_dur": "تعيين المدة",
+    "dp_cpm_add_pred": "إضافة سابقة",
+    "dp_cpm_critical_tasks": "مهام حرجة",
+    "dp_cpm_project_dur": "مدة المشروع",
+    "dp_wbs_title": "هيكل تجزئة العمل",
+    "dp_gantt_title": "مخطط جانت",
+    "dp_baseline_title": "خطوط الأساس",
+    "dp_baseline_save": "حفظ خط الأساس",
+    "dp_baseline_phases": "مراحل",
+    "dp_baseline_tasks": "مهام",
+    "dp_baseline_restore": "استعادة",
+    "dp_baseline_none": "لا توجد خطوط أساس محفوظة",
 });

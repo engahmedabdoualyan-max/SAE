@@ -2375,6 +2375,9 @@ function initDevPlan() {
     addStaffReq, resolveStaff,
     addProblem, problemStatus, problemNote,
     printPlan: () => printPlan(),
+    calculateCPM: () => calculateCPM(),
+    addPredecessor, removePredecessor, setTaskDuration,
+    saveBaseline, deleteBaseline, restoreBaseline,
   };
   return window.SAE_DevPlan;
 }

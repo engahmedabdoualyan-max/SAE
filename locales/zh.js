@@ -710,4 +710,21 @@ Object.assign(TRANSLATIONS["zh"], {
     "dp_mgmt_step_monitor_note": "跟进与评估",
 
     "dp_mgmt_pending": "待处理",
+
+    "dp_cpm_critical": "关键",
+    "dp_cpm_days": "天",
+    "dp_cpm_float": "浮动",
+    "dp_cpm_duration": "持续时间",
+    "dp_cpm_set_dur": "设置持续时间",
+    "dp_cpm_add_pred": "添加前置任务",
+    "dp_cpm_critical_tasks": "关键任务",
+    "dp_cpm_project_dur": "项目持续时间",
+    "dp_wbs_title": "工作分解结构",
+    "dp_gantt_title": "甘特图",
+    "dp_baseline_title": "基准",
+    "dp_baseline_save": "保存基准",
+    "dp_baseline_phases": "阶段",
+    "dp_baseline_tasks": "任务",
+    "dp_baseline_restore": "恢复",
+    "dp_baseline_none": "尚未保存基准",
 });

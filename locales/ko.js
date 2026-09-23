@@ -686,4 +686,21 @@ Object.assign(TRANSLATIONS["ko"], {
     "dp_mgmt_step_monitor_note": "후속 조치 및 평가",
 
     "dp_mgmt_pending": "대기 중",
+
+    "dp_cpm_critical": "핵심",
+    "dp_cpm_days": "일",
+    "dp_cpm_float": "여유",
+    "dp_cpm_duration": "기간",
+    "dp_cpm_set_dur": "기간 설정",
+    "dp_cpm_add_pred": "선행 작업 추가",
+    "dp_cpm_critical_tasks": "핵심 작업",
+    "dp_cpm_project_dur": "프로젝트 기간",
+    "dp_wbs_title": "작업 분할 구조",
+    "dp_gantt_title": "간트 차트",
+    "dp_baseline_title": "기준선",
+    "dp_baseline_save": "기준선 저장",
+    "dp_baseline_phases": "단계",
+    "dp_baseline_tasks": "작업",
+    "dp_baseline_restore": "복원",
+    "dp_baseline_none": "저장된 기준선 없음",
 });

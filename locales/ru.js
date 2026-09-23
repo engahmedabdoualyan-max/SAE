@@ -710,4 +710,21 @@ Object.assign(TRANSLATIONS["ru"], {
     "dp_mgmt_step_monitor_note": "контроль и оценки",
 
     "dp_mgmt_pending": "в ожидании",
+
+    "dp_cpm_critical": "Критический",
+    "dp_cpm_days": "дней",
+    "dp_cpm_float": "Резерв",
+    "dp_cpm_duration": "Длительность",
+    "dp_cpm_set_dur": "Установить длительность",
+    "dp_cpm_add_pred": "Добавить предшественника",
+    "dp_cpm_critical_tasks": "критических задач",
+    "dp_cpm_project_dur": "Длительность проекта",
+    "dp_wbs_title": "Структура декомпозиции работ",
+    "dp_gantt_title": "Диаграмма Ганта",
+    "dp_baseline_title": "Базовые планы",
+    "dp_baseline_save": "Сохранить базовый план",
+    "dp_baseline_phases": "фаз",
+    "dp_baseline_tasks": "задач",
+    "dp_baseline_restore": "Восстановить",
+    "dp_baseline_none": "Нет сохраненных базовых планов",
 });
